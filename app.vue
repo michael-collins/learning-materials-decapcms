@@ -1,5 +1,6 @@
 <template>
   <div>
+    <NuxtScript src="https://identity.netlify.com/v1/netlify-identity-widget.js" />
     <header class="header">
       <nav class="nav">
         <NuxtLink to="/" class="logo">Learning Materials</NuxtLink>
@@ -15,10 +16,25 @@
       <NuxtPage />
     </main>
     <footer class="footer">
-      <p>&copy; 2024 Learning Materials. Powered by Nuxt 3 and DecapCMS.</p>
+      <p>&copy; 2024 Learning Materials. Powered by Nuxt 4 and DecapCMS.</p>
     </footer>
   </div>
 </template>
+
+<script setup>
+// Handle Netlify Identity redirect after authentication
+if (import.meta.client) {
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", (user) => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/admin/";
+        });
+      }
+    });
+  }
+}
+</script>
 
 <style>
 * {
