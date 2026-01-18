@@ -12,7 +12,7 @@
       </nav>
     </header>
     <main class="main">
-      <slot />
+      <NuxtPage />
     </main>
     <footer class="footer">
       <p>&copy; 2024 Learning Materials. Powered by Nuxt 4 and DecapCMS.</p>
