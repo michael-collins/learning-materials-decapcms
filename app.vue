@@ -15,7 +15,7 @@
       <NuxtPage />
     </main>
     <footer class="footer">
-      <p>&copy; 2024 Learning Materials. Powered by Nuxt 4 and DecapCMS.</p>
+      <p>&copy; 2024 Learning Materials. Powered by Nuxt 3 and DecapCMS.</p>
     </footer>
   </div>
 </template>
