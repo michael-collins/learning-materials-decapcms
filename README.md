@@ -1,10 +1,12 @@
-# Learning Materials - Nuxt 4 + DecapCMS
+# Learning Materials - Nuxt 3 + DecapCMS
 
-A modern learning materials platform built with **Nuxt 4**, **Nuxt Content**, and **DecapCMS**.
+A modern learning materials platform built with **Nuxt 3** (latest stable version), **Nuxt Content**, and **DecapCMS**.
+
+> **Note**: This project uses Nuxt 3.14.159, which represents the latest stable release of Nuxt. Nuxt 4 is currently in development.
 
 ## Features
 
-- 🚀 **Nuxt 4** - The latest version of the intuitive Vue framework
+- 🚀 **Nuxt 3** - The latest stable version of the intuitive Vue framework
 - 📝 **Nuxt Content** - File-based content management with Markdown support
 - ✨ **DecapCMS** - User-friendly CMS interface for content editing
 - 🎨 **Modern UI** - Clean, responsive design
@@ -177,7 +179,7 @@ For production use, you need to configure a backend:
 
 ## Technologies Used
 
-- [Nuxt 4](https://nuxt.com/) - Vue.js framework
+- [Nuxt 3](https://nuxt.com/) - Vue.js framework (v3.14.159)
 - [Nuxt Content](https://content.nuxt.com/) - Content management
 - [DecapCMS](https://decapcms.org/) - Content editor
 - [Vue 3](https://vuejs.org/) - JavaScript framework
@@ -197,4 +199,4 @@ For issues and questions, please open an issue on GitHub.
 
 ---
 
-Built with ❤️ using Nuxt 4 and DecapCMS
+Built with ❤️ using Nuxt 3 and DecapCMS

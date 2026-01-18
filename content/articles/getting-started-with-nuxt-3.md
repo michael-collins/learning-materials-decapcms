@@ -1,13 +1,13 @@
 ---
-title: "Getting Started with Nuxt 4"
-description: "Learn the basics of Nuxt 4, the intuitive Vue framework for building modern web applications."
+title: "Getting Started with Nuxt 3"
+description: "Learn the basics of Nuxt 3, the intuitive Vue framework for building modern web applications."
 author: "Learning Materials Team"
 date: 2024-01-15
 ---
 
-# Getting Started with Nuxt 4
+# Getting Started with Nuxt 3
 
-Nuxt 4 is the latest version of the popular Vue.js framework that makes web development simple and powerful. This article will guide you through the fundamentals.
+Nuxt 3 is the latest version of the popular Vue.js framework that makes web development simple and powerful. This article will guide you through the fundamentals.
 
 ## What is Nuxt?
 
@@ -22,7 +22,7 @@ Nuxt is a free and open-source framework with an intuitive and extendable way to
 
 ## Installation
 
-Getting started with Nuxt 4 is simple:
+Getting started with Nuxt 3 is simple:
 
 ```bash
 npx nuxi@latest init my-app
@@ -48,7 +48,7 @@ Create a file at `pages/index.vue`:
 ```vue
 <template>
   <div>
-    <h1>Welcome to Nuxt 4!</h1>
+    <h1>Welcome to Nuxt 3!</h1>
   </div>
 </template>
 ```
@@ -61,4 +61,4 @@ That's it! Your page is now accessible at the root URL.
 - Learn about Nuxt Content for content management
 - Try building your first component
 
-Happy coding with Nuxt 4!
+Happy coding with Nuxt 3!

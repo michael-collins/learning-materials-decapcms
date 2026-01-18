@@ -2,7 +2,7 @@
   <div class="home">
     <div class="hero">
       <h1>Welcome to Learning Materials</h1>
-      <p>A modern content platform powered by Nuxt 4, Nuxt Content, and DecapCMS</p>
+      <p>A modern content platform powered by Nuxt 3, Nuxt Content, and DecapCMS</p>
     </div>
 
     <div class="features">
@@ -28,7 +28,7 @@
     <div class="tech-stack">
       <h2>Built With</h2>
       <ul>
-        <li><strong>Nuxt 4</strong> - The Intuitive Vue Framework</li>
+        <li><strong>Nuxt 3</strong> - The Intuitive Vue Framework</li>
         <li><strong>Nuxt Content</strong> - File-based CMS for Nuxt</li>
         <li><strong>DecapCMS</strong> - Open-source content management</li>
       </ul>
