@@ -3,7 +3,7 @@
     <h1>Articles</h1>
     <p class="subtitle">Browse our collection of educational articles</p>
     
-    <div v-if="articles && articles.length" class="articles-grid">
+    <div v-if="articles?.length" class="articles-grid">
       <article v-for="article in articles" :key="article._path" class="article-card">
         <NuxtLink :to="article._path" class="article-link">
           <h2>{{ article.title }}</h2>
