@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noEmit": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [
+      "@nuxt/devtools"
+    ]
+  },
+  "extends": "./.nuxt/tsconfig.json"
+}
