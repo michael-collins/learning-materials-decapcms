@@ -3,7 +3,7 @@
     <h1>Tutorials</h1>
     <p class="subtitle">Step-by-step guides to help you learn</p>
     
-    <div v-if="tutorials && tutorials.length" class="tutorials-grid">
+    <div v-if="tutorials?.length" class="tutorials-grid">
       <article v-for="tutorial in tutorials" :key="tutorial._path" class="tutorial-card">
         <NuxtLink :to="tutorial._path" class="tutorial-link">
           <h2>{{ tutorial.title }}</h2>
