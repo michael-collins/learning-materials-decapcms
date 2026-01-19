@@ -5,6 +5,7 @@ description: Learn the basics of Nuxt 3, the intuitive Vue framework for
 author: Learning Materials Team
 date: 2024-01-15
 license: CC BY 4.0
+allowEmbed: true
 attachments:
   - file: /uploads/full-professor-career-path_2026-01-15_16-00-32.png
     title: Diagram
