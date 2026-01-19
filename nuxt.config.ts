@@ -46,8 +46,9 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
+      crawlLinks: true,
       routes: ['/'],
-      ignore: ['/articles', '/tutorials', '/admin']
+      ignore: ['/admin']
     }
   }
 })
