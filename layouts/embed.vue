@@ -50,17 +50,25 @@ const debouncedResize = () => {
 }
 
 const waitForImages = async () => {
-  const images = Array.from(document.images)
-  
-  await Promise.all(
-    images.map(img => {
-      if (img.complete) return Promise.resolve()
-      return new Promise((resolve) => {
-        img.addEventListener('load', () => resolve(true))
-        img.addEventListener('error', () => resolve(true))
-      })
-    })
-  )
+  // Wait multiple times to catch images added during hydration
+  for (let i = 0; i < 3; i++) {
+    await new Promise(resolve => setTimeout(resolve, 200))
+    const images = Array.from(document.images)
+    
+    if (images.length > 0) {
+      await Promise.all(
+        images.map(img => {
+          if (img.complete) return Promise.resolve()
+          return new Promise((resolve) => {
+            img.addEventListener('load', () => resolve(true))
+            img.addEventListener('error', () => resolve(true))
+            // Timeout after 5 seconds per image
+            setTimeout(() => resolve(true), 5000)
+          })
+        })
+      )
+    }
+  }
 }
 
 onMounted(async () => {
