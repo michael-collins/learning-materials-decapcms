@@ -1,9 +1,11 @@
 <script setup>
+const route = useRoute()
+const isEmbed = computed(() => route.query.embed === 'true')
+
 definePageMeta({
   layout: 'docs'
 })
 
-const route = useRoute()
 const articlePath = `/articles/${route.params.slug.join('/')}`
 
 const { data: article } = await useAsyncData(`article-${articlePath}`, () =>
@@ -15,18 +17,26 @@ const breadcrumbs = computed(() => [
   { label: 'Articles', path: '/articles' },
   { label: article.value?.title || 'Loading...' }
 ])
+
+// Switch to embed layout if embed parameter is present
+if (isEmbed.value) {
+  definePageMeta({
+    layout: 'embed'
+  })
+}
 </script>
 
 <template>
   <div v-if="article">
     <CollectionItem
-      :breadcrumbs="breadcrumbs"
+      :breadcrumbs="isEmbed ? [] : breadcrumbs"
       :title="article.title"
       :description="article.description"
       :date="article.date"
       :author="article.author"
       :difficulty="article.difficulty"
       :license="article.license"
+      :allowEmbed="isEmbed ? false : article.allowEmbed"
       :attachments="article.attachments"
     >
       <ContentRenderer :value="article" />

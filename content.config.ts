@@ -11,6 +11,7 @@ export default defineContentConfig({
         author: z.string().optional(),
         date: z.string().optional(),
         license: z.string().optional(),
+        allowEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string(),
           title: z.string(),
@@ -27,6 +28,7 @@ export default defineContentConfig({
         author: z.string().optional(),
         date: z.string().optional(),
         license: z.string().optional(),
+        allowEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string(),
           title: z.string(),
