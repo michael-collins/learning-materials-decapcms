@@ -1,30 +1,39 @@
 <template>
   <div class="content-page">
-    <ContentDoc v-slot="{ doc }">
-      <article class="tutorial">
-        <header class="tutorial-header">
-          <h1>{{ doc.title }}</h1>
-          <div class="meta">
-            <span v-if="doc.date" class="date">{{ formatDate(doc.date) }}</span>
-            <span v-if="doc.author" class="author">By {{ doc.author }}</span>
-            <span v-if="doc.difficulty" class="difficulty">{{ doc.difficulty }}</span>
-          </div>
-          <p v-if="doc.description" class="description">{{ doc.description }}</p>
-        </header>
-        
-        <div class="tutorial-content">
-          <ContentRenderer :value="doc" />
+    <article v-if="tutorial" class="tutorial">
+      <header class="tutorial-header">
+        <h1>{{ tutorial.title }}</h1>
+        <div class="meta">
+          <span v-if="tutorial.date" class="date">{{ formatDate(tutorial.date) }}</span>
+          <span v-if="tutorial.author" class="author">By {{ tutorial.author }}</span>
+          <span v-if="tutorial.difficulty" class="difficulty">{{ tutorial.difficulty }}</span>
         </div>
-        
-        <footer class="tutorial-footer">
-          <NuxtLink to="/tutorials" class="back-link">← Back to tutorials</NuxtLink>
-        </footer>
-      </article>
-    </ContentDoc>
+        <p v-if="tutorial.description" class="description">{{ tutorial.description }}</p>
+      </header>
+      
+      <div class="tutorial-content">
+        <ContentRenderer :value="tutorial" />
+      </div>
+      
+      <footer class="tutorial-footer">
+        <NuxtLink to="/tutorials" class="back-link">← Back to tutorials</NuxtLink>
+      </footer>
+    </article>
+    <div v-else class="not-found">
+      <h1>Tutorial not found</h1>
+      <NuxtLink to="/tutorials">← Back to tutorials</NuxtLink>
+    </div>
   </div>
 </template>
 
 <script setup>
+const route = useRoute()
+const tutorialPath = `/tutorials/${route.params.slug.join('/')}`
+
+const { data: tutorial } = await useAsyncData(`tutorial-${tutorialPath}`, () =>
+  queryCollection('tutorials').path(tutorialPath).first()
+)
+
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -167,5 +176,21 @@ const formatDate = (date) => {
 
 .back-link:hover {
   color: #5568d3;
+}
+
+.not-found {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.not-found h1 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.not-found a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
 }
 </style>
