@@ -4,6 +4,10 @@ description: Learn the basics of Nuxt 3, the intuitive Vue framework for
   building modern web applications.
 author: Learning Materials Team
 date: 2024-01-15
+attachments:
+  - file: /uploads/full-professor-career-path_2026-01-15_16-00-32.png
+    title: Diagram
+    description: This is the description of the diagram. Thanks.
 ---
 ![Airline Chair](/images/uploads/244141_743985d156708c43_b-1-.jpg "Airline Chair")
 
