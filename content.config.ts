@@ -10,6 +10,11 @@ export default defineContentConfig({
         description: z.string(),
         author: z.string().optional(),
         date: z.string().optional(),
+        attachments: z.array(z.object({
+          file: z.string(),
+          title: z.string(),
+          description: z.string().optional(),
+        })).optional(),
       })
     }),
     tutorials: defineCollection({
@@ -20,6 +25,11 @@ export default defineContentConfig({
         description: z.string(),
         author: z.string().optional(),
         date: z.string().optional(),
+        attachments: z.array(z.object({
+          file: z.string(),
+          title: z.string(),
+          description: z.string().optional(),
+        })).optional(),
       })
     })
   }
