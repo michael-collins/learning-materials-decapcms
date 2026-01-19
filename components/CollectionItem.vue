@@ -109,7 +109,7 @@ const copyEmbedCode = async () => {
           :src="image"
           :alt="imageAlt || title"
           class="w-full aspect-[2/1] object-cover rounded-lg mb-6"
-          loading="lazy"
+          loading="eager"
         />
         
         <h1 class="text-4xl font-bold tracking-tight mb-4">{{ title }}</h1>

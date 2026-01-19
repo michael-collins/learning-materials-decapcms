@@ -2,6 +2,11 @@
 import { buildSupportingMaterialSchema } from '~/lib/oer-schema-builder'
 
 const route = useRoute()
+const isEmbed = computed(() => route.query.embed === 'true')
+
+definePageMeta({
+  layout: false
+})
 
 // Get the lecture path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
@@ -25,12 +30,12 @@ const oerSchema = computed(() => {
 </script>
 
 <template>
-  <NuxtLayout name="docs">
+  <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
     <div v-if="lecture">
       <CollectionItem
-        :breadcrumbs="breadcrumbs"
+        :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="lecture.title"
         :author="lecture.author"
       >
