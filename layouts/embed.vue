@@ -3,11 +3,13 @@ import { onMounted, onUnmounted, nextTick } from 'vue'
 
 let resizeObserver: ResizeObserver | null = null
 let resizeTimeout: ReturnType<typeof setTimeout> | null = null
+let lastSentHeight = 0
+let observerActive = true
 
 const getContentHeight = () => {
-  // The body/html are being constrained, so measure the actual content inside
+  // CRITICAL: Only measure body content, NOT html.scrollHeight
+  // html.scrollHeight includes the iframe height set by Canvas, creating a feedback loop
   const body = document.body
-  const html = document.documentElement
   
   // Find the actual content - look for the deepest/largest content containers
   let actualContentHeight = 0
@@ -31,28 +33,14 @@ const getContentHeight = () => {
     maxContentDivHeight = Math.max(maxContentDivHeight, bottom, el.scrollHeight)
   })
   
+  // ONLY use body measurements and actual content, NOT html which reflects iframe size
   const height = Math.max(
     body.scrollHeight,
     body.offsetHeight,
-    html.scrollHeight,
-    html.offsetHeight,
     actualContentHeight,
     maxContentDivHeight,
     mainContent?.scrollHeight || 0
   )
-  
-  // Debug: Log what we're measuring
-  console.log('[LTI Embed] Height measurements:', {
-    'body.scrollHeight': body.scrollHeight,
-    'body.offsetHeight': body.offsetHeight,
-    'html.scrollHeight': html.scrollHeight,
-    'html.offsetHeight': html.offsetHeight,
-    'actualContentHeight (deepest element)': actualContentHeight,
-    'maxContentDivHeight': maxContentDivHeight,
-    'mainContent.scrollHeight': mainContent?.scrollHeight || 0,
-    'calculated': height,
-    'allElements.length': allElements.length
-  })
   
   return height
 }
@@ -61,25 +49,39 @@ const sendCanvasResize = () => {
   if (typeof window === 'undefined') return
   
   try {
-    // Scroll to top
-    parent.postMessage(JSON.stringify({ subject: "lti.scrollToTop" }), "*")
-    
     // Get accurate content height
     const height = getContentHeight()
+    const heightWithPadding = height + 20
+    
+    // Only send if height actually changed (prevent infinite loop)
+    if (Math.abs(heightWithPadding - lastSentHeight) < 5) {
+      console.log('[LTI Embed] Height unchanged, skipping resize')
+      return
+    }
+    
+    lastSentHeight = heightWithPadding
+    
+    // Scroll to top
+    parent.postMessage(JSON.stringify({ subject: "lti.scrollToTop" }), "*")
     
     // Send height update with some padding to avoid cut-off
     parent.postMessage(JSON.stringify({ 
       subject: "lti.frameResize", 
-      height: height + 20 
+      height: heightWithPadding
     }), "*")
     
-    console.log('[LTI Embed] Sent resize message:', height + 20)
+    console.log('[LTI Embed] Sent resize message:', heightWithPadding)
   } catch (err) {
     console.error('Failed to send Canvas LMS resize message:', err)
   }
 }
 
 const debouncedResize = () => {
+  if (!observerActive) {
+    console.log('[LTI Embed] Observer inactive, skipping resize')
+    return
+  }
+  
   console.log('[LTI Embed] debouncedResize called')
   if (resizeTimeout) {
     clearTimeout(resizeTimeout)
@@ -158,9 +160,17 @@ onMounted(async () => {
   setTimeout(() => {
     console.log('[LTI Embed] Final resize at 5000ms')
     sendCanvasResize()
+    
+    // Stop observing after final resize to prevent infinite loops
+    console.log('[LTI Embed] Disabling ResizeObserver after final resize')
+    observerActive = false
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
   }, 5000)
   
-  // Watch for content changes and resize accordingly
+  // Watch for content changes and resize accordingly (only for first 5 seconds)
   resizeObserver = new ResizeObserver(debouncedResize)
 
   if (document.body) {
