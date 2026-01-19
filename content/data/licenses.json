@@ -45,5 +45,53 @@
     "id": "rechAszLyCamhxDYY",
     "slug": "cc-by-40",
     "name": "CC BY 4.0"
+  },
+  {
+    "id": "aiul-na",
+    "slug": "aiul-na",
+    "name": "AIUL-NA",
+    "fullName": "Not Allowed",
+    "description": "No AI tools allowed. All work must be entirely student-generated.",
+    "url": "https://dmd-program.github.io/aiul/licenses/na/1.0.0/"
+  },
+  {
+    "id": "aiul-wa",
+    "slug": "aiul-wa",
+    "name": "AIUL-WA",
+    "fullName": "With Approval",
+    "description": "Limited AI assistance is permitted only with instructor pre-approval.",
+    "url": "https://dmd-program.github.io/aiul/licenses/wa/1.0.0/"
+  },
+  {
+    "id": "aiul-cd",
+    "slug": "aiul-cd",
+    "name": "AIUL-CD",
+    "fullName": "Conceptual Development",
+    "description": "AI tools may be used for research and ideation, but the final work must be entirely student-generated.",
+    "url": "https://dmd-program.github.io/aiul/licenses/cd/1.0.0/"
+  },
+  {
+    "id": "aiul-tc",
+    "slug": "aiul-tc",
+    "name": "AIUL-TC",
+    "fullName": "Transformative Collaboration",
+    "description": "AI may be used as a collaborative tool, but outputs must be significantly transformed.",
+    "url": "https://dmd-program.github.io/aiul/licenses/tc/1.0.0/"
+  },
+  {
+    "id": "aiul-dp",
+    "slug": "aiul-dp",
+    "name": "AIUL-DP",
+    "fullName": "Directed Production",
+    "description": "AI-assisted creation is permitted with clear direction and modification from the student.",
+    "url": "https://dmd-program.github.io/aiul/licenses/dp/1.0.0/"
+  },
+  {
+    "id": "aiul-iu",
+    "slug": "aiul-iu",
+    "name": "AIUL-IU",
+    "fullName": "Integrated Usage",
+    "description": "AI usage is a required component of the assignment, with focus on sophisticated AI integration.",
+    "url": "https://dmd-program.github.io/aiul/licenses/iu/1.0.0/"
   }
 ]

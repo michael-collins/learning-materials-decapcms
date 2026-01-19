@@ -140,6 +140,26 @@ export function getLicenseUrl(license: string): string {
 }
 
 /**
+ * Get AIUL (AI Usage License) URL from license tag
+ */
+export function getAIULUrl(license: string): string {
+  // Handle full license tags like "AIUL-NA-WR" by extracting base tag
+  const baseMatch = license.match(/^(AIUL-[A-Z]{2})/);
+  const baseTag = baseMatch ? baseMatch[1] : license;
+  
+  const map: Record<string, string> = {
+    'AIUL-NA': 'https://dmd-program.github.io/aiul/licenses/na/1.0.0/',
+    'AIUL-WA': 'https://dmd-program.github.io/aiul/licenses/wa/1.0.0/',
+    'AIUL-CD': 'https://dmd-program.github.io/aiul/licenses/cd/1.0.0/',
+    'AIUL-TC': 'https://dmd-program.github.io/aiul/licenses/tc/1.0.0/',
+    'AIUL-DP': 'https://dmd-program.github.io/aiul/licenses/dp/1.0.0/',
+    'AIUL-IU': 'https://dmd-program.github.io/aiul/licenses/iu/1.0.0/',
+  };
+  
+  return map[baseTag] || `https://dmd-program.github.io/aiul/licenses.html`;
+}
+
+/**
  * Parse duration from text (e.g., "30 seconds", "8 weeks")
  */
 export function parseDuration(text: any): string | null {

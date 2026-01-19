@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrUCq3o-AvWZ3A6mQTd8O9uJ
 image: /uploads/exercises/recDaZ0H0qFz4iYlR_image_animation.png
 imageAlt: animation.png
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

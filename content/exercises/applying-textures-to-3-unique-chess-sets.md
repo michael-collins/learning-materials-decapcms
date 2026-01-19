@@ -23,6 +23,9 @@ attachments:
     citation: 'Pawel Czerwinski - https://unsplash.com/'
     sourceUrl: 'https://unsplash.com/photos/blue-and-white-water-splash-oykbZuvajO0'
     type: image/jpeg
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 ---
 
 In this exercise, you will apply Image textures to a Chess board and pieces

@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrVL5OApws44r45Oz65NJyEi
 image: /uploads/exercises/rechgHKhLdlHzKX81_image_banner-creatures-compressed.jpg
 imageAlt: banner-creatures-compressed.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

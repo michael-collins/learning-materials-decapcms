@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrUGw6OioaTkVBSCP12C9mjq
 image: /uploads/exercises/recF0xzVxfkZoJ63J_image_airline-chair-texturing-header.jpg
 imageAlt: airline-chair-texturing-header.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

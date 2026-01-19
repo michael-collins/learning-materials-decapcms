@@ -27,6 +27,7 @@ interface Props {
   author?: string
   difficulty?: string
   license?: string
+  aiLicense?: string | string[]
   allowEmbed?: boolean
   attachments?: Attachment[]
   image?: string
@@ -256,6 +257,7 @@ const copyEmbedCode = async () => {
         </div>
       </div>
 
+      <!-- Creative Commons License -->
       <div v-if="license" class="mt-12 pt-8 border-t flex items-start gap-3">
         <svg class="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
@@ -268,6 +270,9 @@ const copyEmbedCode = async () => {
           <span v-else class="font-medium text-foreground">{{ license }}</span>
         </p>
       </div>
+
+      <!-- AI Usage License (AIUL) -->
+      <AIULComponent v-if="aiLicense" :license="aiLicense" />
     </article>
   </div>
 </template>
