@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrUtPySfHyf4j_w6PGi6AES9
 image: /uploads/exercises/recLtYP0nJUL7RK8O_image_modeling-objects-header.jpg
 imageAlt: modeling-objects-header.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

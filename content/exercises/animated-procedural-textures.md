@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh
 image: /uploads/exercises/recHfTCKlxhMVb30g_image_waterfall.png
 imageAlt: waterfall.png
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

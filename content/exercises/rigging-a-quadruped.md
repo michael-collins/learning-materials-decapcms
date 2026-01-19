@@ -9,6 +9,9 @@ image: >-
   /uploads/exercises/recF6aLZmbNHI355u_image_ex-6-intermediate-banner-compressed.jpg
 imageAlt: ex-6-intermediate-banner-compressed.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

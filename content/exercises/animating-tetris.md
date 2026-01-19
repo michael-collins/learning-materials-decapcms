@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrUEv-pnXBisI7G3yU_puFGv
 image: /uploads/exercises/recxOxvwqqUAVs2TK_image_banner-tetris-compressed.jpg
 imageAlt: banner-tetris-compressed.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

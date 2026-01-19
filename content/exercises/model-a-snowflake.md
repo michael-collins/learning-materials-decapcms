@@ -14,6 +14,9 @@ author: Kenneth Ian Brill
 authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 ---
 
 In this exercise, you will learn how to model 3 snowflakes

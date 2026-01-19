@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrVabQ0miYe-Oy-PZe6Jab7Q
 image: /uploads/exercises/recbAgArvnM20cFKL_image_rendering-banner.jpg
 imageAlt: rendering-banner.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

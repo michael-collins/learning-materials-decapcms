@@ -8,6 +8,10 @@ youtubePlaylistID: PL-V2nChTadrWRqmkePyLUhIndLHarj7H-
 image: /uploads/projects/recyIT96rUW4iYLNm_image_cycles-banner-compressed2.jpg
 imageAlt: cycles-banner-compressed2.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-CD
+  - AIUL-NA-3D
 rubric: project
 tags:
   - Blender

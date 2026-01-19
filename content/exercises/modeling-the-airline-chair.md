@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrXnIBdsAhYlYODx8f45Jk9f
 image: /uploads/exercises/recksNEMV7vl5SFG4_image_airline-chair-header-compressed.jpg
 imageAlt: airline-chair-header-compressed.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

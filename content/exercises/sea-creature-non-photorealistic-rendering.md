@@ -9,6 +9,9 @@ image: >-
   /uploads/exercises/recEGCzExXCKxYoco_image_sculpting-retopo-rendering-header-v1.jpg
 imageAlt: sculpting-retopo-rendering-header-v1.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

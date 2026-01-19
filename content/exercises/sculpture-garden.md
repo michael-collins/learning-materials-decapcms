@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrXmwBV0kO-ErBLFnyWukKsD
 image: /uploads/exercises/recHQtwVG79n7xiNK_image_sculpture-garden.jpg
 imageAlt: sculpture-garden.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender
