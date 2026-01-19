@@ -18,6 +18,16 @@ const navigationGroups = [
       { title: 'Articles', path: '/articles' },
       { title: 'Tutorials', path: '/tutorials' },
     ]
+  },
+  {
+    label: 'Learning',
+    items: [
+      { title: 'Exercises', path: '/exercises' },
+      { title: 'Projects', path: '/projects' },
+      { title: 'Specializations', path: '/specializations' },
+      { title: 'Pathways', path: '/pathways' },
+      { title: 'Lectures', path: '/lectures' },
+    ]
   }
 ]
 

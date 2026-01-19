@@ -1,0 +1,49 @@
+[
+  {
+    "id": "recMNmSFctAhZGwYK",
+    "slug": "cc-by-40",
+    "name": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "recq60S0IfEQOIOyP",
+    "slug": "cc0-10",
+    "name": "CC0 1.0",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "id": "rec7CvF25wPXn7p2y",
+    "slug": "cc-by-sa-40",
+    "name": "CC BY-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "id": "recRFy8NYOGzUWPLu",
+    "slug": "cc-by-nd-40",
+    "name": "CC BY-ND 4.0",
+    "url": "https://creativecommons.org/licenses/by-nd/4.0/"
+  },
+  {
+    "id": "rectccIWOPIDqUS8P",
+    "slug": "cc-by-nc-40",
+    "name": "CC BY-NC 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/"
+  },
+  {
+    "id": "recgPYHmhQzRe57bF",
+    "slug": "cc-by-nc-sa-40",
+    "name": "CC BY-NC-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+  },
+  {
+    "id": "recvVNm8BAktJaNco",
+    "slug": "cc-by-nc-nd-40",
+    "name": "CC BY-NC-ND 4.0",
+    "url": "https://creativecommons.org/licenses/by-nc-nd/4.0/"
+  },
+  {
+    "id": "rechAszLyCamhxDYY",
+    "slug": "cc-by-40",
+    "name": "CC BY 4.0"
+  }
+]
