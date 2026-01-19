@@ -4,6 +4,7 @@ description: Learn the basics of Nuxt 3, the intuitive Vue framework for
   building modern web applications.
 author: Learning Materials Team
 date: 2024-01-15
+license: CC BY 4.0
 attachments:
   - file: /uploads/full-professor-career-path_2026-01-15_16-00-32.png
     title: Diagram
