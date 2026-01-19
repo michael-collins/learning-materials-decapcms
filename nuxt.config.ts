@@ -49,6 +49,10 @@ export default defineNuxtConfig({
       crawlLinks: true,
       routes: ['/'],
       ignore: ['/admin']
+    },
+    output: {
+      dir: '.output',
+      publicDir: '.output/public'
     }
   }
 })
