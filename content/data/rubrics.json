@@ -1,0 +1,117 @@
+[
+  {
+    "id": "recviCCqLwU1SAn2Z",
+    "slug": "exercise",
+    "name": "Exercise",
+    "description": "An exercise assessment type is formative and tends to focus on evaluating mastery of a narrow set of competencies and capabilities, defined in the learning objectives.",
+    "criteria": [
+      {
+        "id": "recDvB7XFqiTA9AX6",
+        "name": "Steps completed",
+        "description": "This criteria assess whether you completed all parts of a given set of instructions."
+      },
+      {
+        "id": "recCfnMbyUIiHI3PT",
+        "name": "Attention to detail",
+        "description": "This criteria measures ability to use proper naming conventions and formats, meet submission deadlines, check to see that others are able to access submitted materials, and fulfills other specified requirements."
+      },
+      {
+        "id": "recgzIu9wDNGWpJhv",
+        "name": "On time",
+        "description": "This criterion checks to see if the assigned task was submitted on time. This indirectly assesses time management."
+      }
+    ]
+  },
+  {
+    "id": "recf5JXy6nxQxtm2o",
+    "slug": "exercise-low-poly",
+    "name": "Exercise Low Poly",
+    "description": "Demonstration: Low Poly Animal\nThis week I want you to make a low poly animal. Ideally, you will have more than one reference image.\n\nBelow is a demonstration of how I would approach resolving a low poly model with only a profile image. \n\nFor your assignment I encourage you to work from multiple reference images instead. However, some of the techniques I use to calculate volume and resolve topological flow may be of help.\n\nThere is an additional video in the playlist that demonstrates the use of particles as a means of generating feathers on my Ostrich.",
+    "criteria": [
+      {
+        "id": "recDvB7XFqiTA9AX6",
+        "name": "Steps completed",
+        "description": "This criteria assess whether you completed all parts of a given set of instructions."
+      },
+      {
+        "id": "recCfnMbyUIiHI3PT",
+        "name": "Attention to detail",
+        "description": "This criteria measures ability to use proper naming conventions and formats, meet submission deadlines, check to see that others are able to access submitted materials, and fulfills other specified requirements."
+      },
+      {
+        "id": "recgzIu9wDNGWpJhv",
+        "name": "On time",
+        "description": "This criterion checks to see if the assigned task was submitted on time. This indirectly assesses time management."
+      }
+    ]
+  },
+  {
+    "id": "rec4HpIJX13Q0Oar9",
+    "slug": "project",
+    "name": "Project",
+    "description": "A project assessment type is summative and tends to focus on evaluating mastery of a large scope of competencies and capabilities, defined in the learning objectives.",
+    "criteria": [
+      {
+        "id": "recEjg2iqFDPEmD00",
+        "name": "Concept development",
+        "description": "This criterion attempts to measure your ability to respond to project themes and learning objectives through creative thinking processes, account for technical and causal relationships through systems thinking, and show awareness of cultural contexts and philosophical or ideological mappings through critical thinking."
+      },
+      {
+        "id": "recWVHiInoUGO31VR",
+        "name": "Technical mastery",
+        "description": "This grading criterion measures your ability to quickly gain and apply necessary technical understanding. Working with new digital formats, following technical instructions, using digital and analog tools, and applying formal elements and principles of design can all be considered aspects of technical mastery. Often, learning resources outside of provided course content will need to be consulted to acquire pre-requisite knowledge and skills that may be lacking. Your ability to quickly and efficiently locate and absorb technical knowledge is essential for success after your studies. Consult with instructor where necessary."
+      },
+      {
+        "id": "recDvB7XFqiTA9AX6",
+        "name": "Steps completed",
+        "description": "This criteria assess whether you completed all parts of a given set of instructions."
+      }
+    ]
+  },
+  {
+    "id": "rec13BE3J4oMAdD3S",
+    "slug": "task",
+    "name": "Task",
+    "description": "This formative assessment measures completeness of a given task. It is typically in the context of a larger or  assessment goal.",
+    "criteria": [
+      {
+        "id": "recgzIu9wDNGWpJhv",
+        "name": "On time",
+        "description": "This criterion checks to see if the assigned task was submitted on time. This indirectly assesses time management."
+      },
+      {
+        "id": "recDvB7XFqiTA9AX6",
+        "name": "Steps completed",
+        "description": "This criteria assess whether you completed all parts of a given set of instructions."
+      }
+    ]
+  },
+  {
+    "id": "recILtsGHw8Qheuf8",
+    "slug": "written-statement",
+    "name": "Written statement",
+    "description": "This assessment measures your ability to communicate your ideas and scope of work fully and professionally.",
+    "criteria": [
+      {
+        "id": "reci1lnjIVyGiwSU9",
+        "name": "Articulation",
+        "description": " This measures the ability to synthesize and articulate ideas through a written statement, and to meet the minimum statement requirements. Depending on the associated work, you may be required to talk about what you did, the context of the work in a larger landscape of contemporary or historical work, why the work is interesting, can be considered successful, or what the work may impact."
+      },
+      {
+        "id": "rec8RBn3GbilCke2Q",
+        "name": "Writing quality",
+        "description": "Language should be clear, understandable, free of hyperbole and generalizations, show specific examples, and reference or cite sources where necessary."
+      },
+      {
+        "id": "rectebGWNwSLoMwny",
+        "name": "Spelling and grammar",
+        "description": "Generally free of spelling mistakes, grammar issues, and missing or incomplete sentences."
+      },
+      {
+        "id": "recgzIu9wDNGWpJhv",
+        "name": "On time",
+        "description": "This criterion checks to see if the assigned task was submitted on time. This indirectly assesses time management."
+      }
+    ]
+  }
+]

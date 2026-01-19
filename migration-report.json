@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-01-19T07:01:14.512Z",
+  "stats": {
+    "contentFiles": {
+      "processed": 95,
+      "migrated": 95,
+      "errors": 0
+    },
+    "mediaFiles": {
+      "processed": 717,
+      "copied": 717,
+      "errors": 0
+    },
+    "errors": [],
+    "warnings": []
+  },
+  "config": {
+    "sourceRepo": "/Users/msc227/Documents/repos/3d-pathways-nuxt",
+    "targetRepo": "/Users/msc227/Documents/repos/open-curriculum/oerschema/learning-materials-decapcms",
+    "collections": [
+      "exercises",
+      "projects",
+      "specializations",
+      "pathways",
+      "lectures",
+      "docs"
+    ]
+  }
+}
