@@ -1,6 +1,7 @@
 backend:
-  name: git-gateway
-  branch: main # Branch to update (optional; defaults to main)
+  name: github
+  repo: michael-collins/learning-materials-decapcms
+  branch: main
 
 # Uncomment below for local testing
 # local_backend: true
