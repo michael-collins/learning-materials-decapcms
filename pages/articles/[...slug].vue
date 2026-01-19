@@ -26,6 +26,7 @@ const breadcrumbs = computed(() => [
       :date="article.date"
       :author="article.author"
       :difficulty="article.difficulty"
+      :license="article.license"
       :attachments="article.attachments"
     >
       <ContentRenderer :value="article" />

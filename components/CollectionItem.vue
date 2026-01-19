@@ -23,6 +23,7 @@ interface Props {
   date?: string
   author?: string
   difficulty?: string
+  license?: string
   attachments?: Attachment[]
 }
 
@@ -48,6 +49,24 @@ const getFileSize = (url: string) => {
   const ext = url.split('.').pop()?.toUpperCase()
   return ext ? `${ext} file` : 'File'
 }
+
+const getLicenseUrl = (license: string) => {
+  const licenseMap: Record<string, string> = {
+    'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
+    'CC BY-SA 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
+    'CC BY-NC 4.0': 'https://creativecommons.org/licenses/by-nc/4.0/',
+    'CC BY-NC-SA 4.0': 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+    'CC BY-ND 4.0': 'https://creativecommons.org/licenses/by-nd/4.0/',
+    'CC BY-NC-ND 4.0': 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+    'CC0 1.0': 'https://creativecommons.org/publicdomain/zero/1.0/',
+  }
+  return licenseMap[license] || ''
+}
+
+const route = useRoute()
+const currentUrl = computed(() => {
+  return route.path
+})
 </script>
 
 <template>
@@ -81,6 +100,19 @@ const getFileSize = (url: string) => {
         <p v-if="description" class="mt-4 text-lg text-muted-foreground leading-relaxed">
           {{ description }}
         </p>
+
+        <div v-if="license" class="mt-6 pt-6 border-t flex items-start gap-3">
+          <svg class="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+          </svg>
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors">{{ title }}</a>
+            <span v-if="author"> by {{ author }}</span>
+            is licensed under
+            <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ license }}</a>
+            <span v-else class="font-medium text-foreground">{{ license }}</span>
+          </p>
+        </div>
       </header>
 
       <div class="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-foreground prose-p:text-base prose-p:leading-7 prose-li:text-foreground prose-li:text-base prose-code:text-foreground prose-code:text-sm prose-code:bg-muted/50 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-border/50 prose-pre:bg-muted dark:prose-pre:bg-[#0a0a0a] prose-pre:text-foreground prose-pre:border prose-pre:border-border/50 prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-blockquote:text-foreground prose-blockquote:border-l-primary">
