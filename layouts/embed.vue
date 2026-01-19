@@ -64,8 +64,11 @@ const waitForImages = async () => {
 }
 
 onMounted(async () => {
-  // Wait for Vue to finish rendering
+  // Critical: Wait for Vue hydration to complete in SSG
   await nextTick()
+  
+  // Wait a bit for hydration to settle
+  await new Promise(resolve => setTimeout(resolve, 100))
   
   // Initial resize
   sendCanvasResize()
@@ -74,10 +77,17 @@ onMounted(async () => {
   await waitForImages()
   sendCanvasResize()
   
-  // Additional resize attempts to catch any delayed content
+  // Wait for fonts to load
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready
+    sendCanvasResize()
+  }
+  
+  // Additional resize attempts to catch any delayed content/CSS
   setTimeout(sendCanvasResize, 500)
   setTimeout(sendCanvasResize, 1000)
   setTimeout(sendCanvasResize, 2000)
+  setTimeout(sendCanvasResize, 3000)
   
   // Watch for content changes and resize accordingly
   resizeObserver = new ResizeObserver(debouncedResize)
