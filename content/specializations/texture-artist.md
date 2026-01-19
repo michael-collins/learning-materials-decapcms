@@ -1,0 +1,36 @@
+---
+title: Texture artist
+slug: texture-artist
+type: 'oer:LearningComponent'
+whoItsFor: null
+targetRole: null
+published: true
+oer:
+  '@context': 'https://oerschema.org/'
+  '@type': LearningComponent
+  name: Texture artist
+  componentType: Unit
+  teaches:
+    - objective example texture
+  hasPart: []
+  duration: PT8W
+  educationalLevel: Beginner
+  inLanguage: en-US
+  license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+---
+
+## Who It's For
+
+To be defined
+
+## Learning Objectives
+
+1. objective example texture
+
+
+
+## Lessons
+
+To be defined
+
+

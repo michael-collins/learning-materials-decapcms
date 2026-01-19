@@ -16,18 +16,21 @@ interface CollectionItem {
   date: string
   author?: string
   difficulty?: string
+  image?: string
+  imageAlt?: string
   _path?: string
   path?: string
   slug?: string
 }
 
 interface Props {
-  title: string
+  title?: string
   items: CollectionItem[]
   itemsPerPage?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  title: 'Items',
   itemsPerPage: 10,
 })
 
@@ -104,6 +107,7 @@ const previousPage = () => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead v-if="items.some(i => i.image)" class="w-[80px]"></TableHead>
             <TableHead class="w-[50%]">Title</TableHead>
             <TableHead>Date</TableHead>
             <TableHead v-if="items.some(i => i.author)">Author</TableHead>
@@ -112,6 +116,19 @@ const previousPage = () => {
         </TableHeader>
         <TableBody>
           <TableRow v-for="item in paginatedItems" :key="getItemPath(item)">
+            <TableCell v-if="items.some(i => i.image)" class="py-2">
+              <NuxtLink v-if="item.image" :to="getItemPath(item)" class="block">
+                <NuxtImg
+                  :src="item.image"
+                  :alt="item.imageAlt || item.title"
+                  width="64"
+                  height="64"
+                  fit="cover"
+                  class="rounded object-cover w-16 h-16"
+                  loading="lazy"
+                />
+              </NuxtLink>
+            </TableCell>
             <TableCell>
               <NuxtLink :to="getItemPath(item)" class="font-medium text-primary hover:underline inline-flex items-center gap-1 group">
                 {{ item.title }}

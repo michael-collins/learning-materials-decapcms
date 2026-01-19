@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
 import BreadcrumbSeparator from '~/components/ui/breadcrumb/BreadcrumbSeparator.vue'
-import { Download, FileText, FileArchive, File, Copy, Check, ChevronDown } from 'lucide-vue-next'
+import { Download, ExternalLink, FileText, FileArchive, File, Copy, Check, ChevronDown } from 'lucide-vue-next'
 import Button from '~/components/ui/button/Button.vue'
 
 interface BreadcrumbSegment {
@@ -13,7 +13,8 @@ interface BreadcrumbSegment {
 }
 
 interface Attachment {
-  file: string
+  file?: string
+  url?: string
   title: string
   description?: string
 }
@@ -28,6 +29,9 @@ interface Props {
   license?: string
   allowEmbed?: boolean
   attachments?: Attachment[]
+  image?: string
+  imageAlt?: string
+  tags?: string[]
 }
 
 const props = defineProps<Props>()
@@ -100,6 +104,14 @@ const copyEmbedCode = async () => {
   <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
     <article>
       <header class="mb-8 pb-8" :class="{ 'border-b': breadcrumbs.length > 0 }">
+        <NuxtImg
+          v-if="image"
+          :src="image"
+          :alt="imageAlt || title"
+          class="w-full aspect-[2/1] object-cover rounded-lg mb-6"
+          loading="lazy"
+        />
+        
         <h1 class="text-4xl font-bold tracking-tight mb-4">{{ title }}</h1>
         
         <div class="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -122,6 +134,16 @@ const copyEmbedCode = async () => {
           </div>
         </div>
 
+        <div v-if="tags && tags.length > 0" class="mt-4 flex flex-wrap gap-2">
+          <span
+            v-for="tag in tags"
+            :key="tag"
+            class="inline-flex items-center rounded-full bg-muted border border-border px-3 py-1 text-xs font-medium text-foreground"
+          >
+            {{ tag }}
+          </span>
+        </div>
+
         <p v-if="description" class="mt-4 text-lg text-muted-foreground leading-relaxed">
           {{ description }}
         </p>
@@ -134,9 +156,37 @@ const copyEmbedCode = async () => {
       <div v-if="attachments && attachments.length > 0" class="mt-12 pt-8 border-t">
         <h2 class="text-2xl font-bold mb-6 text-foreground">Downloads & Attachments</h2>
         <div class="space-y-3">
+          <!-- External URL attachments -->
           <a
-            v-for="(attachment, index) in attachments"
-            :key="index"
+            v-for="(attachment, index) in attachments.filter(a => a.url)"
+            :key="`url-${index}`"
+            :href="attachment.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
+          >
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <ExternalLink class="w-5 h-5 text-primary" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">
+                  {{ attachment.title }}
+                </h3>
+                <span class="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                  External Link
+                </span>
+              </div>
+              <p v-if="attachment.description" class="text-sm text-muted-foreground mt-1">
+                {{ attachment.description }}
+              </p>
+            </div>
+            <ExternalLink class="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+          </a>
+          <!-- Local file attachments -->
+          <a
+            v-for="(attachment, index) in attachments.filter(a => a.file)"
+            :key="`file-${index}`"
             :href="attachment.file"
             download
             class="flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
