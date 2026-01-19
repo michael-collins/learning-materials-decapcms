@@ -12,19 +12,43 @@ definePageMeta({
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
 const exercisePath = `/exercises/${slug.join('/')}`
 
-const { data: exercise } = await useAsyncData(`exercise-${exercisePath}`, () =>
-  queryCollection('exercises').path(exercisePath).first()
+console.log('[Exercise Page] Loading exercise:', exercisePath, 'embed mode:', isEmbed.value)
+
+const { data: exercise } = await useAsyncData(
+  `exercise-${exercisePath}`,
+  () => queryCollection('exercises').path(exercisePath).first(),
+  {
+    // Force client-side fetching in embed mode to ensure fresh data
+    server: !isEmbed.value
+  }
 )
+
+console.log('[Exercise Page] Exercise data loaded:', {
+  hasExercise: !!exercise.value,
+  title: exercise.value?.title,
+  isEmbed: isEmbed.value
+})
 
 // Debug logging for embed mode
 if (import.meta.client) {
   watch([exercise, isEmbed], ([exerciseVal, embedVal]) => {
-    console.log('[Exercise Page] Data loaded:', {
+    console.log('[Exercise Page] Data changed:', {
       isEmbed: embedVal,
       hasExercise: !!exerciseVal,
       exerciseTitle: exerciseVal?.title,
       exercisePath
     })
+    
+    // Trigger resize when content loads in embed mode
+    if (embedVal && exerciseVal) {
+      console.log('[Exercise Page] Content loaded, triggering resize')
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'))
+      }, 100)
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'))
+      }, 500)
+    }
   }, { immediate: true })
 }
 
@@ -45,7 +69,7 @@ const oerSchema = computed(() => {
   <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
-    <div v-if="exercise">
+    <div v-if="exercise" key="exercise-content">
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="exercise.title"
