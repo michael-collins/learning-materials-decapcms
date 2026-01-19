@@ -57,6 +57,9 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: image/tiff
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 ---
 
 In this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece

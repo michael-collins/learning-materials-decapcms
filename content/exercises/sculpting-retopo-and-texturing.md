@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrU8K-0aHxzKVRQWLcJt7YAW
 image: /uploads/exercises/rec9LnLexVEqnrZNs_image_sculpting-retopo-header-v2.png
 imageAlt: sculpting-retopo-header-v2.png
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

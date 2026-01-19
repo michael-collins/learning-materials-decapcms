@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrWaCwxTnu9yMGbqFudZtdls
 image: /uploads/exercises/receipHXbIjwRD66T_image_texturing-objects-header.jpg
 imageAlt: texturing-objects-header.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

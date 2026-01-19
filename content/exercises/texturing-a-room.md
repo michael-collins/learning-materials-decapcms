@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrVw5dp65bKPjF6iFdKpF2el
 image: /uploads/exercises/recJabaqMEyrxdB23_image_interior-texture-banner.png
 imageAlt: interior-texture-banner.png
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

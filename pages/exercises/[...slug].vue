@@ -55,6 +55,7 @@ const oerSchema = computed(() => {
         :author="exercise.author"
         :difficulty="exercise.difficulty"
         :license="exercise.license"
+        :aiLicense="exercise.aiLicense"
         :allowEmbed="exercise.allowEmbed"
         :image="exercise.image"
         :imageAlt="exercise.imageAlt"

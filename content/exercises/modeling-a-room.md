@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrVP_vzYSEfaSkkPDhMdPfrK
 image: /uploads/exercises/rec6ebYsG1Dnf08qb_image_room-model.png
 imageAlt: room-model.png
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

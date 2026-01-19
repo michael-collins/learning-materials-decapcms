@@ -40,6 +40,7 @@ const oerSchema = computed(() => {
         :author="project.author"
         :difficulty="project.difficulty"
         :license="project.license"
+        :aiLicense="project.aiLicense"
         :allowEmbed="isEmbed ? false : project.allowEmbed"
         :image="project.image"
         :imageAlt="project.imageAlt"
