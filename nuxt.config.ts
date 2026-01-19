@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   
   modules: [
-    '@nuxt/content'
+    '@nuxt/content',
+    '@nuxt/image'
   ],
 
   css: ['~/assets/css/tailwind.css'],
