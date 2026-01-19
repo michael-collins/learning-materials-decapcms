@@ -1,18 +1,18 @@
-# Learning Materials - Nuxt 3 + DecapCMS
+# Learning Materials - Nuxt 4 + Nuxt Content v3 + DecapCMS
 
-A modern learning materials platform built with **Nuxt 3** (latest stable version), **Nuxt Content**, and **DecapCMS**.
-
-> **Note**: This project uses Nuxt 3.14.159, which represents the latest stable release of Nuxt. Nuxt 4 is currently in development.
+A modern learning materials platform built with **Nuxt 4**, **Nuxt Content v3**, and **DecapCMS** with GitHub OAuth authentication.
 
 ## Features
 
-- 🚀 **Nuxt 3** - The latest stable version of the intuitive Vue framework
-- 📝 **Nuxt Content** - File-based content management with Markdown support
+- 🚀 **Nuxt 4** - The latest version of the intuitive Vue framework
+- 📝 **Nuxt Content v3** - File-based content management with SQL-powered collections
 - ✨ **DecapCMS** - User-friendly CMS interface for content editing
+- 🔐 **GitHub OAuth** - Secure authentication via GitHub
 - 🎨 **Modern UI** - Clean, responsive design
-- 📚 **Content Collections** - Articles and Tutorials with different fields
+- 📚 **Type-safe Collections** - Strongly-typed articles and tutorials with Zod validation
 - 🔍 **Syntax Highlighting** - Beautiful code blocks in content
-- 🎯 **Type-safe** - Built with TypeScript support
+- ⚡ **Optimized Performance** - SQL-based storage for fast queries
+- 🎯 **Full TypeScript** - Complete type safety across the application
 
 ## Quick Start
 
@@ -46,15 +46,16 @@ npm run dev
 ```
 learning-materials-decapcms/
 ├── app.vue                 # Root application component
-├── nuxt.config.ts         # Nuxt configuration
+├── nuxt.config.ts         # Nuxt 4 configuration
+├── content.config.ts      # Nuxt Content collections configuration
 ├── package.json           # Project dependencies
 ├── pages/                 # Application pages
 │   ├── index.vue         # Home page
 │   ├── articles/         # Articles pages
-│   │   ├── index.vue    # Articles list
+│   │   ├── index.vue    # Articles list (queryCollection)
 │   │   └── [...slug].vue # Individual article
 │   └── tutorials/        # Tutorials pages
-│       ├── index.vue    # Tutorials list
+│       ├── index.vue    # Tutorials list (queryCollection)
 │       └── [...slug].vue # Individual tutorial
 ├── content/              # Content files (Markdown)
 │   ├── articles/        # Article content
@@ -62,7 +63,7 @@ learning-materials-decapcms/
 └── public/              # Static assets
     └── admin/          # DecapCMS admin interface
         ├── index.html  # CMS interface
-        └── config.yml  # CMS configuration
+        └── config.yml  # CMS configuration (GitHub backend)
 ```
 
 ## Available Scripts
@@ -74,9 +75,28 @@ learning-materials-decapcms/
 
 ## Content Management
 
-### Using Nuxt Content
+### Using Nuxt Content v3 Collections
 
-Create Markdown files in the `content/` directory:
+Content is managed through type-safe collections defined in `content.config.ts`:
+
+```typescript
+export default defineContentConfig({
+  collections: {
+    articles: defineCollection({
+      type: 'page',
+      source: 'articles/**/*.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        author: z.string().optional(),
+        date: z.string().optional(),
+      })
+    })
+  }
+})
+```
+
+Create Markdown files in the `content/` directory with validated frontmatter:
 
 ```markdown
 ---
@@ -94,31 +114,69 @@ Your markdown content...
 ### Using DecapCMS
 
 1. Navigate to `/admin` in your browser
-2. Log in with your credentials (requires backend setup)
+2. Log in with your GitHub account (OAuth required - see setup below)
 3. Create, edit, and manage content through the visual interface
 
 ## Configuration
 
-### Nuxt Content
+### Nuxt 4
 
-Configure Nuxt Content in `nuxt.config.ts`:
+Configure Nuxt 4 compatibility in `nuxt.config.ts`:
 
 ```typescript
 export default defineNuxtConfig({
+  compatibilityDate: '2024-11-01',
+  future: {
+    compatibilityVersion: 4
+  },
   modules: ['@nuxt/content'],
   content: {
     highlight: {
       theme: 'github-dark'
     }
+  },
+  nitro: {
+    prerender: {
+      routes: ['/'],
+      ignore: ['/articles', '/tutorials', '/admin']
+    }
   }
 })
 ```
 
-### DecapCMS
+### Nuxt Content Collections
 
-Configure collections in `public/admin/config.yml`:
+Define type-safe collections in `content.config.ts`:
+
+```typescript
+import { defineContentConfig, defineCollection, z } from '@nuxt/content'
+
+export default defineContentConfig({
+  collections: {
+    articles: defineCollection({
+      type: 'page',
+      source: 'articles/**/*.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        author: z.string().optional(),
+        date: z.string().optional(),
+      })
+    })
+  }
+})
+```
+
+### DecapCMS with GitHub OAuth
+
+Configure GitHub backend in `public/admin/config.yml`:
 
 ```yaml
+backend:
+  name: github
+  repo: michael-collins/learning-materials-decapcms
+  branch: main
+
 collections:
   - name: "articles"
     label: "Articles"
@@ -126,6 +184,9 @@ collections:
     create: true
     fields:
       - {label: "Title", name: "title", widget: "string"}
+      - {label: "Description", name: "description", widget: "string"}
+      - {label: "Author", name: "author", widget: "string", required: false}
+      - {label: "Date", name: "date", widget: "date", required: false}
       - {label: "Body", name: "body", widget: "markdown"}
 ```
 
@@ -155,27 +216,57 @@ npm run build
 
 Deploy the `.output` directory to a Node.js hosting service.
 
-## Backend Setup for DecapCMS
+## GitHub OAuth Setup for DecapCMS
 
-For production use, you need to configure a backend:
+This project uses GitHub OAuth for authentication. Follow these steps:
 
-1. **Netlify Identity** (Recommended for Netlify deployments)
-   - Enable Netlify Identity in your site settings
-   - Enable Git Gateway
+### 1. Create GitHub OAuth App
 
-2. **GitHub Backend**
-   ```yaml
-   backend:
-     name: github
-     repo: your-username/your-repo
-     branch: main
-   ```
+1. Go to GitHub Settings → Developer settings → OAuth Apps
+2. Click "New OAuth App"
+3. Fill in the details:
+   - **Application name**: Learning Materials CMS
+   - **Homepage URL**: `https://your-site.netlify.app`
+   - **Authorization callback URL**: `https://api.netlify.com/auth/done`
+4. Save the Client ID and Client Secret
 
-3. **Local Development**
-   ```yaml
-   local_backend: true
-   ```
-   Then run: `npx decap-server`
+### 2. Configure Netlify
+
+1. In your Netlify site settings, go to **Access control** → **OAuth**
+2. Click **Install provider**
+3. Select **GitHub**
+4. Enter your Client ID and Client Secret
+5. Save the configuration
+
+### 3. Deploy and Test
+
+1. Push 4](https://nuxt.com/) - Vue.js framework (v4.2.2)
+- [Nuxt Content v3](https://content.nuxt.com/) - Content management with SQL-powered collections (v3.11.0)
+- [DecapCMS](https://decapcms.org/) - Content editor (v3.3.3)
+- [Vue 3](https://vuejs.org/) - JavaScript framework (v3.5.13)
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Zod](https://zod.dev/) - Schema validation for collections
+- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) - SQL database for content storage
+
+### Local Development
+
+For local development with DecapCMS:
+
+```bash
+# Install Decap server
+npm install -g decap-server
+
+# Run the local backend
+npx decap-server
+
+# In another terminal, run your dev server
+npm run dev
+```
+
+Then update `public/admin/config.yml` temporarily:
+```yaml
+local_backend: true
+```
 
 ## Technologies Used
 
@@ -195,8 +286,25 @@ MIT License - feel free to use this project for your own learning materials plat
 
 ## Support
 
-For issues and questions, please open an issue on GitHub.
+## Key Differences from Nuxt 3
+
+This project uses **Nuxt 4** and **Nuxt Content v3**, which introduce several improvements:
+
+### Nuxt Content v3 Changes
+- **Collections API**: Content is now organized into type-safe collections with Zod validation
+- **SQL Storage**: Content is stored in a SQL database (better-sqlite3) for improved performance
+- **New Query API**: Use `queryCollection()` instead of `queryContent()` for defined collections
+- **Type Safety**: Full TypeScript support with auto-generated types from collections
+- **Better Performance**: Smaller bundle sizes and faster queries
+
+### Migration Notes
+- Old: `queryContent('articles').find()` 
+- New: `queryCollection('articles').all()`
+- Collections must be defined in `content.config.ts`
+- `ContentDoc` component replaced with direct collection queries
 
 ---
+
+Built with ❤️ using Nuxt 4, Nuxt Content v3,
 
 Built with ❤️ using Nuxt 3 and DecapCMS
