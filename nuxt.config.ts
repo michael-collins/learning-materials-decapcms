@@ -10,6 +10,14 @@ export default defineNuxtConfig({
     '@nuxt/content'
   ],
 
+  css: ['~/assets/css/tailwind.css'],
+
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+    },
+  },
+
   content: {
     // Nuxt Content configuration
     highlight: {
