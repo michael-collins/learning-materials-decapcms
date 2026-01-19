@@ -2,6 +2,11 @@
 import { buildCourseSchema } from '~/lib/oer-schema-builder'
 
 const route = useRoute()
+const isEmbed = computed(() => route.query.embed === 'true')
+
+definePageMeta({
+  layout: false
+})
 
 // Get the pathway path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
@@ -25,12 +30,12 @@ const oerSchema = computed(() => {
 </script>
 
 <template>
-  <NuxtLayout name="docs">
+  <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
     <div v-if="pathway">
       <CollectionItem
-        :breadcrumbs="breadcrumbs"
+        :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="pathway.title"
         :description="pathway.description"
         :image="pathway.image"

@@ -2,7 +2,7 @@
 recordId: recn4C0llk2Kq5tuH
 title: Animated textures
 slug: animated-textures
-type: 'oer:Practice'
+type: oer:Practice
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrUWRugAsFhfYkUojjO1iZWH
 image: /uploads/exercises/recn4C0llk2Kq5tuH_image_ex-7-intro-banner-compressed.jpg
@@ -14,13 +14,14 @@ tags:
   - AfterEffects
   - Adobe Media Encoder
 author: Michael Collins
-authorUrl: 'https://michaelcollins.xyz'
+authorUrl: https://michaelcollins.xyz
 published: true
 allowEmbed: true
 attachments:
-  - title: Associated Material
-    description: Project files and resources for this exercise
-    url: 'https://drive.google.com/drive/folders/1041M7ilcKVgun7wnHgWrlYLscXjQyOFJ'
+  - title: Image Sequence Download
+    description: This is a link to a Google Drive folder where you can download the
+      image sequence mentioned in the instructions.
+    url: https://drive.google.com/file/d/1b76RfhJXkYOcGn4wCPtNed6XFYwjR6nG/view?usp=sharing
 ---
 
 In this exercise, you will apply an image sequence as texture object in Blender, render a final Blender animation as an image sequence, and import it into after effects. You will create a compressed video in a web streaming format called H.264.

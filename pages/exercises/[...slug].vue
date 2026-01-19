@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { buildPracticeSchema } from '~/lib/oer-schema-builder'
+import { nextTick } from 'vue'
 
 const route = useRoute()
 const isEmbed = computed(() => route.query.embed === 'true')
@@ -12,9 +13,56 @@ definePageMeta({
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
 const exercisePath = `/exercises/${slug.join('/')}`
 
-const { data: exercise } = await useAsyncData(`exercise-${exercisePath}`, () =>
-  queryCollection('exercises').path(exercisePath).first()
+console.log('[Exercise Page] Loading exercise:', exercisePath, 'embed mode:', isEmbed.value)
+
+const { data: exercise } = await useAsyncData(
+  `exercise-${exercisePath}`,
+  () => queryCollection('exercises').path(exercisePath).first(),
+  {
+    // Force client-side fetching in embed mode to ensure fresh data
+    server: !isEmbed.value
+  }
 )
+
+console.log('[Exercise Page] Exercise data loaded:', {
+  hasExercise: !!exercise.value,
+  title: exercise.value?.title,
+  isEmbed: isEmbed.value
+})
+
+// Debug logging for embed mode
+if (import.meta.client) {
+  watch([exercise, isEmbed], async ([exerciseVal, embedVal]) => {
+    console.log('[Exercise Page] Data changed:', {
+      isEmbed: embedVal,
+      hasExercise: !!exerciseVal,
+      exerciseTitle: exerciseVal?.title,
+      exercisePath
+    })
+    
+    // Trigger resize when content loads in embed mode
+    if (embedVal && exerciseVal) {
+      console.log('[Exercise Page] Content loaded, waiting for DOM update...')
+      
+      // Wait for Vue to update the DOM
+      await nextTick()
+      await nextTick() // Double nextTick to ensure all child components render
+      
+      // Wait a bit more for images/content to render
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      console.log('[Exercise Page] DOM should be ready, triggering multiple resizes')
+      
+      // Trigger multiple resize events
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          console.log(`[Exercise Page] Dispatching resize event ${i + 1}`)
+          window.dispatchEvent(new Event('resize'))
+        }, i * 300)
+      }
+    }
+  }, { immediate: true })
+}
 
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
@@ -33,7 +81,7 @@ const oerSchema = computed(() => {
   <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
-    <div v-if="exercise">
+    <div v-if="exercise" key="exercise-content">
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="exercise.title"
