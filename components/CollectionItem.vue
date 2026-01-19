@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
 import BreadcrumbSeparator from '~/components/ui/breadcrumb/BreadcrumbSeparator.vue'
-import { Download, FileText, FileArchive, File } from 'lucide-vue-next'
+import { Download, FileText, FileArchive, File, Copy, Check, ChevronDown } from 'lucide-vue-next'
+import Button from '~/components/ui/button/Button.vue'
 
 interface BreadcrumbSegment {
   label: string
@@ -24,6 +26,7 @@ interface Props {
   author?: string
   difficulty?: string
   license?: string
+  allowEmbed?: boolean
   attachments?: Attachment[]
 }
 
@@ -67,14 +70,36 @@ const route = useRoute()
 const currentUrl = computed(() => {
   return route.path
 })
+
+const isEmbedOpen = ref(false)
+const isCopied = ref(false)
+
+const embedUrl = computed(() => {
+  if (typeof window === 'undefined') return ''
+  return `${window.location.origin}${route.path}?embed=true`
+})
+
+const embedCode = computed(() => {
+  return `<iframe src="${embedUrl.value}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`
+})
+
+const copyEmbedCode = async () => {
+  try {
+    await navigator.clipboard.writeText(embedCode.value)
+    isCopied.value = true
+    setTimeout(() => {
+      isCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
 </script>
 
 <template>
   <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-    
-
     <article>
-      <header class="mb-8 pb-8 border-b">
+      <header class="mb-8 pb-8" :class="{ 'border-b': breadcrumbs.length > 0 }">
         <h1 class="text-4xl font-bold tracking-tight mb-4">{{ title }}</h1>
         
         <div class="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -134,6 +159,46 @@ const currentUrl = computed(() => {
             </div>
             <Download class="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
           </a>
+        </div>
+      </div>
+
+      <div v-if="allowEmbed" class="mt-12 pt-8 border-t">
+        <button
+          @click="isEmbedOpen = !isEmbedOpen"
+          class="flex items-center justify-between w-full text-left group"
+        >
+          <h2 class="text-2xl font-bold text-foreground">Embed</h2>
+          <ChevronDown
+            :class="['w-5 h-5 text-muted-foreground transition-transform', isEmbedOpen ? 'rotate-180' : '']"
+          />
+        </button>
+        <div v-if="isEmbedOpen" class="mt-6 space-y-4">
+          <p class="text-sm text-muted-foreground">
+            Copy the code below to embed this content on your website:
+          </p>
+          <div class="relative">
+            <pre class="p-4 bg-muted dark:bg-[#0a0a0a] rounded-lg border border-border overflow-x-auto text-sm"><code>{{ embedCode }}</code></pre>
+            <Button
+              @click="copyEmbedCode"
+              size="sm"
+              variant="outline"
+              class="absolute top-2 right-2"
+            >
+              <Check v-if="isCopied" class="w-4 h-4 mr-2" />
+              <Copy v-else class="w-4 h-4 mr-2" />
+              {{ isCopied ? 'Copied!' : 'Copy' }}
+            </Button>
+          </div>
+          <div class="mt-4">
+            <p class="text-xs text-muted-foreground mb-2">Preview:</p>
+            <div class="border border-border rounded-lg p-2 bg-muted/30">
+              <iframe
+                :src="embedUrl"
+                class="w-full h-96 rounded"
+                frameborder="0"
+              ></iframe>
+            </div>
+          </div>
         </div>
       </div>
 
