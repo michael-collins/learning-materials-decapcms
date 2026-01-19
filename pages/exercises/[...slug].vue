@@ -19,8 +19,10 @@ const { data: exercise } = await useAsyncData(
   `exercise-${exercisePath}`,
   () => queryCollection('exercises').path(exercisePath).first(),
   {
-    // Force client-side fetching in embed mode to ensure fresh data
-    server: !isEmbed.value
+    // In embed mode, ensure we render on client to properly calculate height
+    // This is critical for production/SSG builds
+    server: !isEmbed.value,
+    lazy: isEmbed.value
   }
 )
 

@@ -5,16 +5,40 @@ let resizeObserver: ResizeObserver | null = null
 let resizeTimeout: ReturnType<typeof setTimeout> | null = null
 
 const getContentHeight = () => {
-  // Get the maximum height from multiple sources to ensure we capture all content
+  // The body/html are being constrained, so measure the actual content inside
   const body = document.body
   const html = document.documentElement
+  
+  // Find the actual content - look for the deepest/largest content containers
+  let actualContentHeight = 0
+  
+  // Check all elements and find the one with the largest bottom position
+  const allElements = document.querySelectorAll('*')
+  allElements.forEach((element) => {
+    const rect = element.getBoundingClientRect()
+    const bottom = rect.bottom + window.scrollY
+    actualContentHeight = Math.max(actualContentHeight, bottom)
+  })
+  
+  // Also specifically check main content containers
+  const mainContent = document.querySelector('#__nuxt') as HTMLElement
+  const contentDivs = document.querySelectorAll('div, article, section, main')
+  
+  let maxContentDivHeight = 0
+  contentDivs.forEach((div) => {
+    const el = div as HTMLElement
+    const bottom = el.offsetTop + el.offsetHeight
+    maxContentDivHeight = Math.max(maxContentDivHeight, bottom, el.scrollHeight)
+  })
   
   const height = Math.max(
     body.scrollHeight,
     body.offsetHeight,
-    html.clientHeight,
     html.scrollHeight,
-    html.offsetHeight
+    html.offsetHeight,
+    actualContentHeight,
+    maxContentDivHeight,
+    mainContent?.scrollHeight || 0
   )
   
   // Debug: Log what we're measuring
@@ -23,9 +47,11 @@ const getContentHeight = () => {
     'body.offsetHeight': body.offsetHeight,
     'html.scrollHeight': html.scrollHeight,
     'html.offsetHeight': html.offsetHeight,
+    'actualContentHeight (deepest element)': actualContentHeight,
+    'maxContentDivHeight': maxContentDivHeight,
+    'mainContent.scrollHeight': mainContent?.scrollHeight || 0,
     'calculated': height,
-    'body.children.length': body.children.length,
-    'body.textContent.length': body.textContent?.length || 0
+    'allElements.length': allElements.length
   })
   
   return height
@@ -164,7 +190,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="w-full bg-background">
     <slot />
   </div>
 </template>

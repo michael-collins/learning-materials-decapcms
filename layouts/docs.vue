@@ -60,7 +60,7 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden bg-background">
+  <div class="flex min-h-screen bg-background">
     <!-- Sidebar -->
     <aside 
       :class="[
