@@ -20,6 +20,7 @@ collections:
       - {label: "Description", name: "description", widget: "text"}
       - {label: "Author", name: "author", widget: "string"}
       - {label: "Date", name: "date", widget: "datetime"}
+      - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
@@ -41,6 +42,7 @@ collections:
       - {label: "Author", name: "author", widget: "string"}
       - {label: "Date", name: "date", widget: "datetime"}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
+      - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
