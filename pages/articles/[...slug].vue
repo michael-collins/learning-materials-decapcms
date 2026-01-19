@@ -1,31 +1,38 @@
 <template>
   <div class="content-page">
-    <ContentDoc v-slot="{ doc }">
-      <article class="article">
-        <header class="article-header">
-          <h1>{{ doc.title }}</h1>
-          <div class="meta">
-            <span v-if="doc.date" class="date">{{ formatDate(doc.date) }}</span>
-            <span v-if="doc.author" class="author">By {{ doc.author }}</span>
-            <span v-if="doc.difficulty" class="difficulty">{{ doc.difficulty }}</span>
-          </div>
-          <p v-if="doc.description" class="description">{{ doc.description }}</p>
-        </header>
-        
-        <div class="article-content">
-          <ContentRenderer :value="doc" />
+    <article v-if="article" class="article">
+      <header class="article-header">
+        <h1>{{ article.title }}</h1>
+        <div class="meta">
+          <span v-if="article.date" class="date">{{ formatDate(article.date) }}</span>
+          <span v-if="article.author" class="author">By {{ article.author }}</span>
+          <span v-if="article.difficulty" class="difficulty">{{ article.difficulty }}</span>
         </div>
-        
-        <footer class="article-footer">
-          <NuxtLink :to="getBackLink()" class="back-link">← Back to list</NuxtLink>
-        </footer>
-      </article>
-    </ContentDoc>
+        <p v-if="article.description" class="description">{{ article.description }}</p>
+      </header>
+      
+      <div class="article-content">
+        <ContentRenderer :value="article" />
+      </div>
+      
+      <footer class="article-footer">
+        <NuxtLink to="/articles" class="back-link">← Back to articles</NuxtLink>
+      </footer>
+    </article>
+    <div v-else class="not-found">
+      <h1>Article not found</h1>
+      <NuxtLink to="/articles">← Back to articles</NuxtLink>
+    </div>
   </div>
 </template>
 
 <script setup>
 const route = useRoute()
+const articlePath = `/articles/${route.params.slug.join('/')}`
+
+const { data: article } = await useAsyncData(`article-${articlePath}`, () =>
+  queryCollection('articles').path(articlePath).first()
+)
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-US', {
@@ -33,11 +40,6 @@ const formatDate = (date) => {
     month: 'long',
     day: 'numeric'
   })
-}
-
-const getBackLink = () => {
-  const pathParts = route.path.split('/')
-  return pathParts[1] ? `/${pathParts[1]}` : '/'
 }
 </script>
 
@@ -174,5 +176,21 @@ const getBackLink = () => {
 
 .back-link:hover {
   color: #5568d3;
+}
+
+.not-found {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.not-found h1 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.not-found a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
 }
 </style>
