@@ -1,9 +1,11 @@
 ---
-title: "Getting Started with Nuxt 3"
-description: "Learn the basics of Nuxt 3, the intuitive Vue framework for building modern web applications."
-author: "Learning Materials Team"
+title: Getting Started with Nuxt 3
+description: Learn the basics of Nuxt 3, the intuitive Vue framework for
+  building modern web applications.
+author: Learning Materials Team
 date: 2024-01-15
 ---
+![Airline Chair](/images/uploads/244141_743985d156708c43_b-1-.jpg "Airline Chair")
 
 # Getting Started with Nuxt 3
 
@@ -15,10 +17,10 @@ Nuxt is a free and open-source framework with an intuitive and extendable way to
 
 ## Key Features
 
-- **File-based routing**: Pages are automatically generated based on your file structure
-- **Server-side rendering**: Improved SEO and performance
-- **Auto imports**: No need to manually import components
-- **TypeScript support**: Built-in TypeScript support out of the box
+* **File-based routing**: Pages are automatically generated based on your file structure
+* **Server-side rendering**: Improved SEO and performance
+* **Auto imports**: No need to manually import components
+* **TypeScript support**: Built-in TypeScript support out of the box
 
 ## Installation
 
@@ -35,11 +37,11 @@ npm run dev
 
 A typical Nuxt project has the following structure:
 
-- `pages/` - Your application views and routes
-- `components/` - Your Vue components
-- `layouts/` - Application layouts
-- `content/` - Your Markdown content (with Nuxt Content)
-- `public/` - Static assets
+* `pages/` - Your application views and routes
+* `components/` - Your Vue components
+* `layouts/` - Application layouts
+* `content/` - Your Markdown content (with Nuxt Content)
+* `public/` - Static assets
 
 ## Creating Your First Page
 
@@ -57,8 +59,8 @@ That's it! Your page is now accessible at the root URL.
 
 ## Next Steps
 
-- Explore the [official documentation](https://nuxt.com)
-- Learn about Nuxt Content for content management
-- Try building your first component
+* Explore the [official documentation](https://nuxt.com)
+* Learn about Nuxt Content for content management
+* Try building your first component
 
 Happy coding with Nuxt 3!
