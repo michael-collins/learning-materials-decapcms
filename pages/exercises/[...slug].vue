@@ -16,6 +16,18 @@ const { data: exercise } = await useAsyncData(`exercise-${exercisePath}`, () =>
   queryCollection('exercises').path(exercisePath).first()
 )
 
+// Debug logging for embed mode
+if (import.meta.client) {
+  watch([exercise, isEmbed], ([exerciseVal, embedVal]) => {
+    console.log('[Exercise Page] Data loaded:', {
+      isEmbed: embedVal,
+      hasExercise: !!exerciseVal,
+      exerciseTitle: exerciseVal?.title,
+      exercisePath
+    })
+  }, { immediate: true })
+}
+
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
   { label: 'Exercises', path: '/exercises' },

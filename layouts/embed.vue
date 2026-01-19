@@ -9,13 +9,26 @@ const getContentHeight = () => {
   const body = document.body
   const html = document.documentElement
   
-  return Math.max(
+  const height = Math.max(
     body.scrollHeight,
     body.offsetHeight,
     html.clientHeight,
     html.scrollHeight,
     html.offsetHeight
   )
+  
+  // Debug: Log what we're measuring
+  console.log('[LTI Embed] Height measurements:', {
+    'body.scrollHeight': body.scrollHeight,
+    'body.offsetHeight': body.offsetHeight,
+    'html.scrollHeight': html.scrollHeight,
+    'html.offsetHeight': html.offsetHeight,
+    'calculated': height,
+    'body.children.length': body.children.length,
+    'body.textContent.length': body.textContent?.length || 0
+  })
+  
+  return height
 }
 
 const sendCanvasResize = () => {
