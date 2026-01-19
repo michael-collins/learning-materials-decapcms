@@ -24,11 +24,18 @@
 </template>
 
 <script setup>
-const { data: tutorials } = await useAsyncData('tutorials', () => 
-  queryContent('/tutorials')
-    .sort({ date: -1 })
-    .find()
+const { data: rawTutorials } = await useAsyncData('tutorials', () =>
+  queryCollection('tutorials').all()
 )
+
+const tutorials = computed(() => {
+  if (!rawTutorials.value) return []
+  return [...rawTutorials.value].sort((a, b) => {
+    const dateA = a.date ? new Date(a.date).getTime() : 0
+    const dateB = b.date ? new Date(b.date).getTime() : 0
+    return dateB - dateA
+  })
+})
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-US', {
