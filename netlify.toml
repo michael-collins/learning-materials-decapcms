@@ -9,11 +9,3 @@
 
 [build.environment]
   NODE_VERSION = "20"
-
-# Enable Identity service
-[context.production]
-  command = "npm run generate"
-
-# Git Gateway settings
-[template]
-  incoming-hooks = ["Git Gateway"]
