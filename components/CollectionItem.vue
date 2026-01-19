@@ -80,7 +80,11 @@ const isCopied = ref(false)
 
 const embedUrl = computed(() => {
   if (typeof window === 'undefined') return ''
-  return `${window.location.origin}${route.path}?embed=true`
+  // Convert /exercises/slug to /embed/exercises/slug
+  const embedPath = route.path.startsWith('/') 
+    ? `/embed${route.path}` 
+    : `/embed/${route.path}`
+  return `${window.location.origin}${embedPath}`
 })
 
 const embedCode = computed(() => {
