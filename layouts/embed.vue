@@ -54,10 +54,12 @@ const sendCanvasResize = () => {
 }
 
 const debouncedResize = () => {
+  console.log('[LTI Embed] debouncedResize called')
   if (resizeTimeout) {
     clearTimeout(resizeTimeout)
   }
   resizeTimeout = setTimeout(() => {
+    console.log('[LTI Embed] Executing debounced resize')
     sendCanvasResize()
   }, 100)
 }
