@@ -6,8 +6,8 @@ backend:
 # Uncomment below for local testing
 # local_backend: true
 
-media_folder: "public/images/uploads" # Media files will be stored in the repo under public/images/uploads
-public_folder: "/images/uploads" # The src attribute for uploaded media will begin with /images/uploads
+media_folder: "public/uploads" # Media files will be stored in the repo under public/uploads
+public_folder: "/uploads" # The src attribute for uploaded media will begin with /uploads
 
 collections:
   - name: "articles" # Used in routes, e.g., /admin/collections/articles
@@ -21,6 +21,14 @@ collections:
       - {label: "Author", name: "author", widget: "string"}
       - {label: "Date", name: "date", widget: "datetime"}
       - {label: "Body", name: "body", widget: "markdown"}
+      - label: "Attachments"
+        name: "attachments"
+        widget: "list"
+        required: false
+        fields:
+          - {label: "File", name: "file", widget: "file"}
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Description", name: "description", widget: "text", required: false}
 
   - name: "tutorials" # Used in routes, e.g., /admin/collections/tutorials
     label: "Tutorials" # Used in the UI
@@ -34,3 +42,11 @@ collections:
       - {label: "Date", name: "date", widget: "datetime"}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "Body", name: "body", widget: "markdown"}
+      - label: "Attachments"
+        name: "attachments"
+        widget: "list"
+        required: false
+        fields:
+          - {label: "File", name: "file", widget: "file"}
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Description", name: "description", widget: "text", required: false}
