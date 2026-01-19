@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { buildPracticeSchema } from '~/lib/oer-schema-builder'
+import { nextTick } from 'vue'
 
 const route = useRoute()
 const isEmbed = computed(() => route.query.embed === 'true')
@@ -31,7 +32,7 @@ console.log('[Exercise Page] Exercise data loaded:', {
 
 // Debug logging for embed mode
 if (import.meta.client) {
-  watch([exercise, isEmbed], ([exerciseVal, embedVal]) => {
+  watch([exercise, isEmbed], async ([exerciseVal, embedVal]) => {
     console.log('[Exercise Page] Data changed:', {
       isEmbed: embedVal,
       hasExercise: !!exerciseVal,
@@ -41,13 +42,24 @@ if (import.meta.client) {
     
     // Trigger resize when content loads in embed mode
     if (embedVal && exerciseVal) {
-      console.log('[Exercise Page] Content loaded, triggering resize')
-      setTimeout(() => {
-        window.dispatchEvent(new Event('resize'))
-      }, 100)
-      setTimeout(() => {
-        window.dispatchEvent(new Event('resize'))
-      }, 500)
+      console.log('[Exercise Page] Content loaded, waiting for DOM update...')
+      
+      // Wait for Vue to update the DOM
+      await nextTick()
+      await nextTick() // Double nextTick to ensure all child components render
+      
+      // Wait a bit more for images/content to render
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      console.log('[Exercise Page] DOM should be ready, triggering multiple resizes')
+      
+      // Trigger multiple resize events
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          console.log(`[Exercise Page] Dispatching resize event ${i + 1}`)
+          window.dispatchEvent(new Event('resize'))
+        }, i * 300)
+      }
     }
   }, { immediate: true })
 }
