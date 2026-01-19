@@ -27,6 +27,9 @@ attachments:
       Knight for the Chavet 121 series no 6. Originally found at this link:
       https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/TheOneCalledMichael/phpKothXC.jpeg
     type: image/jpeg
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 ---
 
 In this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece

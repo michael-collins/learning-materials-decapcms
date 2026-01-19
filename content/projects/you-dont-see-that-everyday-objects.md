@@ -9,6 +9,10 @@ image: >-
   /uploads/projects/rec67LSQtsxBgHxxE_image_youdontseethateveryday-banner-comp2.jpg
 imageAlt: youdontseethateveryday-banner-comp2.jpg
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-CD
+  - AIUL-NA-3D
 rubric: project
 tags:
   - Blender

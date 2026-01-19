@@ -8,6 +8,9 @@ youtubePlaylistID: PL-V2nChTadrVJwkuJN1Ht3GcuzXpue29M
 image: /uploads/exercises/recmjJ85mfZrRGRFu_image_viewport-render.png
 imageAlt: viewport-render.png
 license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 rubric: exercise
 tags:
   - Blender

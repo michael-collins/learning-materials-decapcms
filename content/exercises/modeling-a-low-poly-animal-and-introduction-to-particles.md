@@ -14,6 +14,9 @@ author: Kenneth Ian Brill
 authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 ---
 
 Make a low poly animal and give it a habitat
