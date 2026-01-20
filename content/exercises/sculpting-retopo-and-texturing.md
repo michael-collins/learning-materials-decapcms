@@ -23,14 +23,7 @@ allowEmbed: true
 In this exercise, you continue working on your creature sculpt. You will practice unwrapping UVs, exporting a UV map, and creating textures in 2D image editing software like Photoshop.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrU8K-0aHxzKVRQWLcJt7YAW
-title: Sculpting, retopo, and texturing Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrU8K-0aHxzKVRQWLcJt7YAW" title="Sculpting, retopo, and texturing Tutorial"}
 
 
 ## Learning Objectives
@@ -66,5 +59,4 @@ title: Sculpting, retopo, and texturing Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

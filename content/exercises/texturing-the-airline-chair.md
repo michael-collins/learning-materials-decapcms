@@ -45,14 +45,7 @@ attachments:
 In this exercise, you will practice unwrapping UVs, exporting a UV map, and creating textures in 2D image editing software like Photoshop. You will then apply your textures to a polygonal model of the KEM Weber Airline Chair.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrUGw6OioaTkVBSCP12C9mjq
-title: Texturing the Airline Chair Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUGw6OioaTkVBSCP12C9mjq" title="Texturing the Airline Chair Tutorial"}
 
 
 ## Learning Objectives
@@ -87,5 +80,4 @@ title: Texturing the Airline Chair Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

@@ -23,14 +23,7 @@ allowEmbed: true
 In this exercise, level 1 students will practice keyframe animation, parenting, animating the camera with a target, and manipulating curves in the graph editor.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrUCq3o-AvWZ3A6mQTd8O9uJ
-title: Introduction to animation Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUCq3o-AvWZ3A6mQTd8O9uJ" title="Introduction to animation Tutorial"}
 
 
 ## Learning Objectives
@@ -74,5 +67,4 @@ title: Introduction to animation Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 
