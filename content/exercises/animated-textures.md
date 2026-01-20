@@ -30,14 +30,7 @@ attachments:
 In this exercise, you will apply an image sequence as texture object in Blender, render a final Blender animation as an image sequence, and import it into after effects. You will create a compressed video in a web streaming format called H.264.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrUWRugAsFhfYkUojjO1iZWH
-title: Animated textures Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUWRugAsFhfYkUojjO1iZWH" title="Animated textures Tutorial"}
 
 
 ## Learning Objectives
@@ -68,5 +61,4 @@ title: Animated textures Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

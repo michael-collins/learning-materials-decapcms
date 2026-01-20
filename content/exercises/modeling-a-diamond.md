@@ -22,14 +22,7 @@ aiLicense:
 Model a Diamond
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PLcAjW37cz5Qnq4fsbvQw-IjrZd6EoMX1h
-title: Modeling a Diamond Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5Qnq4fsbvQw-IjrZd6EoMX1h" title="Modeling a Diamond Tutorial"}
 
 
 ## Learning Objectives
@@ -65,5 +58,4 @@ Be sure to upload each file independently to facilitate ease of grading (so that
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

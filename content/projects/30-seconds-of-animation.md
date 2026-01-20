@@ -129,5 +129,4 @@ Do not produce work that could be construed as ‘fan art’ for existing intell
 ## Grading Rubric
 
 ::rubric-component{id="project"}
-::
 

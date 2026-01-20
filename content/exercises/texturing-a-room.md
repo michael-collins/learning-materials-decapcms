@@ -23,14 +23,7 @@ allowEmbed: true
 In this exercise, you will continue working on your objects. Practice unwrapping UVs, exporting UV maps, and create textures in 2D image editing software like Photoshop.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrVw5dp65bKPjF6iFdKpF2el
-title: Texturing a room Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVw5dp65bKPjF6iFdKpF2el" title="Texturing a room Tutorial"}
 
 
 ## Learning Objectives
@@ -63,5 +56,4 @@ title: Texturing a room Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 
