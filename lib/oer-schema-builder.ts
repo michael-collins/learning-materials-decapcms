@@ -237,15 +237,13 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
 }
 
 /**
- * Build OER Schema for Learning Components (Specializations)
- */
 export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
   // Use existing oer object from frontmatter if available
   if (doc.oer && typeof doc.oer === 'object') {
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,'
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,
       // Add image if present in frontmatter
       ...(doc.image && !doc.oer.image && {
         'image': {
@@ -262,7 +260,7 @@ export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string
     '@context': 'https://oerschema.org/',
     '@type': 'oer:LearningComponent',
     'name': doc.title,
-    'url': `${baseUrl}${doc._path || ''}`,'
+    'url': `${baseUrl}${doc._path || ''}`,
     'inLanguage': 'en-US'
   };
 }
@@ -276,7 +274,7 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,'
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,
       // Add image if present in frontmatter
       ...(doc.image && !doc.oer.image && {
         'image': {
@@ -293,7 +291,7 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
     '@context': 'https://oerschema.org/',
     '@type': 'oer:Course',
     'name': doc.title,
-    'url': `${baseUrl}${doc._path || ''}`,'
+    'url': `${baseUrl}${doc._path || ''}`,
     'inLanguage': 'en-US'
   };
 }
@@ -307,7 +305,7 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,'
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,
     };
   }
   
@@ -316,7 +314,7 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
     '@context': 'https://oerschema.org/',
     '@type': 'oer:SupportingMaterial',
     'name': doc.title,
-    'url': `${baseUrl}${doc._path || ''}`,'
+    'url': `${baseUrl}${doc._path || ''}`,
     'inLanguage': 'en-US'
   };
 }
