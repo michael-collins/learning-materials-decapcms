@@ -130,7 +130,8 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
   if (doc.rubric) {
     schema.usesRubric = {
       '@type': 'oer:Rubric',
-      'identifier': doc.rubric
+      'identifier': doc.rubric,
+      'url': `${baseUrl}/rubrics/${doc.rubric}`
     };
   }
   
@@ -245,7 +246,8 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   if (doc.rubric) {
     schema.usesRubric = {
       '@type': 'oer:Rubric',
-      'identifier': doc.rubric
+      'identifier': doc.rubric,
+      'url': `${baseUrl}/rubrics/${doc.rubric}`
     };
   }
   
