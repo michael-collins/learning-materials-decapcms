@@ -40,7 +40,9 @@ const breadcrumbs = computed(() => [
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
   if (!exercise.value) return null
-  return buildPracticeSchema(exercise.value, 'https://yourdomain.com')
+  // Get the base URL from the request
+  const baseUrl = useRequestURL().origin
+  return buildPracticeSchema(exercise.value, baseUrl)
 })
 </script>
 
