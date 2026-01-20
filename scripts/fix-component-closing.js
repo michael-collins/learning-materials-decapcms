@@ -24,17 +24,17 @@ function findMarkdownFiles(dir) {
   return files
 }
 
-// Fix component closing tags
+// Fix component closing tags - put closing :: on a new line
 function fixComponentClosing(content) {
-  // Match component declarations that are NOT already closed (no :: at the end)
-  // This matches ::component-name{...} that is NOT followed by ::
-  const componentPattern = /::([\w-]+)\{([^}]+)\}(?!\s*::)/g
+  // Match component declarations that have :: on the same line
+  // This matches ::component-name{...}:: and moves closing :: to next line
+  const componentPattern = /::([\w-]+)\{([^}]+)\}::/g
   
   let modified = false
   const newContent = content.replace(componentPattern, (match, componentName, props) => {
-    console.log(`  Found unclosed component: ::${componentName}`)
+    console.log(`  Fixed component closing: ::${componentName}`)
     modified = true
-    return `::${componentName}{${props}}::`
+    return `::${componentName}{${props}}\n::`
   })
   
   return { content: newContent, modified }

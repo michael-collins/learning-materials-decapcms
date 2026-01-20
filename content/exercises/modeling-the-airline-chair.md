@@ -45,7 +45,8 @@ attachments:
 In this exercise, you will practice polygonal modeling fundamentals and will use 3D software to build a polygonal model of the 1930s Kem Weber Airline Chair.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXnIBdsAhYlYODx8f45Jk9f" title="Modeling the Airline Chair Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXnIBdsAhYlYODx8f45Jk9f" title="Modeling the Airline Chair Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -77,5 +78,6 @@ In this exercise, you will practice polygonal modeling fundamentals and will use
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

@@ -24,7 +24,8 @@ allowEmbed: true
 In this exercise, you continue working on the sea creature. You will practice lighting and rendering.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrV3t6j1M7_93uLpJq-AXoHV" title="Sea creature: Lighting and rendering Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrV3t6j1M7_93uLpJq-AXoHV" title="Sea creature: Lighting and rendering Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -56,5 +57,6 @@ https://hdri-haven.com/
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

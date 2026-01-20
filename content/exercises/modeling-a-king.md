@@ -44,7 +44,8 @@ aiLicense:
 In this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QmZ7dFmd7KeeCH5h9b3ZlGu" title="Modeling a King Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QmZ7dFmd7KeeCH5h9b3ZlGu" title="Modeling a King Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -63,5 +64,6 @@ Instructions to be added
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

@@ -37,7 +37,8 @@ aiLicense:
 In this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QkyyjlPgk2ZmvzQih_Yk8Dx" title="Modeling a Pawn Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QkyyjlPgk2ZmvzQih_Yk8Dx" title="Modeling a Pawn Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -62,5 +63,6 @@ Make sure that your assignment is titled in the following format:
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

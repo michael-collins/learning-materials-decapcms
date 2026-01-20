@@ -23,7 +23,8 @@ allowEmbed: true
 In this exercise, you will practice modeling a character in a T-pose and rendering using an NPR workflow.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX6h44IeMo7hTkjg9HtJgvb" title="Low poly non-photorealistic rendering Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX6h44IeMo7hTkjg9HtJgvb" title="Low poly non-photorealistic rendering Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -49,5 +50,6 @@ In this exercise, you will practice modeling a character in a T-pose and renderi
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 
