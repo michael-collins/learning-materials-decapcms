@@ -25,11 +25,6 @@ In this exercise, you will create a textured anime-style waterfall in Blender, r
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh" title="Animated procedural textures Tutorial"}
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh" title="Animated procedural textures Tutorial"}
-
-- - -
-
-::
 
 ## Learning Objectives
 
