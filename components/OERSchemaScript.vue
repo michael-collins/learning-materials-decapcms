@@ -8,18 +8,14 @@ interface Props {
 const props = defineProps<Props>();
 
 // Use Nuxt's useHead to inject JSON-LD script tag
-watchEffect(() => {
-  if (props.schema) {
-    useHead({
-      script: [
-        {
-          type: 'application/ld+json',
-          innerHTML: JSON.stringify(props.schema)
-        }
-      ]
-    });
-  }
-});
+useHead(() => ({
+  script: props.schema ? [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify(props.schema)
+    }
+  ] : []
+}));
 </script>
 
 <template>
