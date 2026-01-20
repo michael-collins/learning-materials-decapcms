@@ -46,6 +46,7 @@ In this exercise, you will practice polygonal modeling fundamentals and will use
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXnIBdsAhYlYODx8f45Jk9f" title="Modeling the Airline Chair Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -78,4 +79,5 @@ In this exercise, you will practice polygonal modeling fundamentals and will use
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

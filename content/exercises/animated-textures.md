@@ -31,6 +31,7 @@ In this exercise, you will apply an image sequence as texture object in Blender,
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUWRugAsFhfYkUojjO1iZWH" title="Animated textures Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -61,4 +62,5 @@ In this exercise, you will apply an image sequence as texture object in Blender,
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

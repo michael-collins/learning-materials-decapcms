@@ -53,6 +53,7 @@ In this exercise, you will create a final render of the KEM Weber Airline Chair.
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVabQ0miYe-Oy-PZe6Jab7Q" title="Lighting and Rendering the Airline Chair Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -86,4 +87,5 @@ In this exercise, you will create a final render of the KEM Weber Airline Chair.
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

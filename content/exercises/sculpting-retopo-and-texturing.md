@@ -24,6 +24,7 @@ In this exercise, you continue working on your creature sculpt. You will practic
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrU8K-0aHxzKVRQWLcJt7YAW" title="Sculpting, retopo, and texturing Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -59,4 +60,5 @@ In this exercise, you continue working on your creature sculpt. You will practic
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

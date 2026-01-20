@@ -24,6 +24,7 @@ In this exercise, students will practice modeling, rigging, and animating a hard
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX1grpUd5zHMGYJovRjPN69" title="Rigging a robot arm Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -56,4 +57,5 @@ In this exercise, students will practice modeling, rigging, and animating a hard
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

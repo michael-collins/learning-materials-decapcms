@@ -25,6 +25,7 @@ In this exercise, you continue working on the sea creature. You will practice un
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUU3MSAv9EfORij5j2E3uVv" title="Sea creature: Texturing Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -63,4 +64,5 @@ In this exercise, you continue working on the sea creature. You will practice un
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

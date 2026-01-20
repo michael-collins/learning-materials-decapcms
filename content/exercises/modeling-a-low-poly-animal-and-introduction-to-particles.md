@@ -25,6 +25,7 @@ This week I want you to make a low poly animal. Ideally, you will have more than
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QkTtYtaAa7RjiQgixIJX0kH" title="Modeling a Low Poly Animal and Introduction to Particles Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -36,4 +37,5 @@ This week I want you to make a low poly animal. Ideally, you will have more than
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

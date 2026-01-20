@@ -111,6 +111,16 @@ collections:
     folder: "content/projects"
     create: true
     slug: "{{slug}}"
+    view_filters:
+      - label: "Published"
+        field: published
+        pattern: true
+      - label: "Unpublished"
+        field: published
+        pattern: false
+      - label: "All"
+        field: published
+        pattern: ""
     fields:
       - {label: "Record ID", name: "recordId", widget: "string", required: false, hint: "Original Airtable record ID (for reference)"}
       - {label: "Title", name: "title", widget: "string"}
@@ -145,6 +155,16 @@ collections:
     folder: "content/specializations"
     create: true
     slug: "{{slug}}"
+    view_filters:
+      - label: "Published"
+        field: published
+        pattern: true
+      - label: "Unpublished"
+        field: published
+        pattern: false
+      - label: "All"
+        field: published
+        pattern: ""
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
@@ -176,6 +196,16 @@ collections:
     folder: "content/pathways"
     create: true
     slug: "{{slug}}"
+    view_filters:
+      - label: "Published"
+        field: published
+        pattern: true
+      - label: "Unpublished"
+        field: published
+        pattern: false
+      - label: "All"
+        field: published
+        pattern: ""
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
@@ -207,6 +237,16 @@ collections:
     folder: "content/lectures"
     create: true
     slug: "{{slug}}"
+    view_filters:
+      - label: "Published"
+        field: published
+        pattern: true
+      - label: "Unpublished"
+        field: published
+        pattern: false
+      - label: "All"
+        field: published
+        pattern: ""
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}

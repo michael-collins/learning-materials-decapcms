@@ -35,6 +35,7 @@ In this exercise, level 1 students will practice keyframe animation to animate a
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVJwkuJN1Ht3GcuzXpue29M" title="Animating a bouncing ball Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -70,4 +71,5 @@ In this exercise, level 1 students will practice keyframe animation to animate a
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

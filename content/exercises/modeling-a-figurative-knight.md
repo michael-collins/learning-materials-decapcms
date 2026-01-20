@@ -66,6 +66,7 @@ In this exercise, you will practice polygonal modeling fundamentals and using re
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QlEM8qkrx_rcHaAemZ3oHZH" title="Modeling a Figurative Knight Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -86,4 +87,5 @@ This a demonstration of how to create a more complex Knight that looks more like
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

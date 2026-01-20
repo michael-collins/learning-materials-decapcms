@@ -36,6 +36,7 @@ In this exercise, you will practice polygonal modeling fundamentals and using re
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QlafOnfBirWwtx83ZQ-6K4t" title="Modeling a Chavet 121 series no 6 Knight Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -58,4 +59,5 @@ The image I used was originally found at this link: https://images.chesscomfiles
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

@@ -46,6 +46,7 @@ In this exercise, you will practice unwrapping UVs, exporting a UV map, and crea
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUGw6OioaTkVBSCP12C9mjq" title="Texturing the Airline Chair Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -80,4 +81,5 @@ In this exercise, you will practice unwrapping UVs, exporting a UV map, and crea
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

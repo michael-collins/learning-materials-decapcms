@@ -29,7 +29,9 @@ export default defineNuxtConfig({
       toc: {
         depth: 3,
         searchDepth: 3
-      }
+      },
+      // Enable MDC syntax for inline components
+      mdc: true
     }
   },
 
