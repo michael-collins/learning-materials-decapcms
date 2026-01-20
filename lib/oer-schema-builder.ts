@@ -79,7 +79,10 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
   
   // Main schema as InstructionalPattern
   const schema: OERSchema = {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:InstructionalPattern',
     '@id': baseId,
     'name': doc.title,
@@ -165,7 +168,10 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   const path = doc._path || (doc.slug ? `/projects/${doc.slug}` : '');
   
   const schema: OERSchema = {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': doc.type || 'oer:Assessment',
     'name': doc.title,
     'url': `${baseUrl}${path}`,
@@ -288,7 +294,10 @@ export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string
   
   // Fallback if no oer object
   return {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:LearningComponent',
     'name': doc.title,
     'url': `${baseUrl}${doc._path || ''}`,
@@ -319,7 +328,10 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
   
   // Fallback if no oer object
   return {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:Course',
     'name': doc.title,
     'url': `${baseUrl}${doc._path || ''}`,
@@ -342,7 +354,10 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
   
   // Fallback if no oer object
   return {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:SupportingMaterial',
     'name': doc.title,
     'url': `${baseUrl}${doc._path || ''}`,
