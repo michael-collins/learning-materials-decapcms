@@ -23,14 +23,7 @@ allowEmbed: true
 In this exercise, students will practice modeling, rigging, and animating a hard-surface robot arm.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrX1grpUd5zHMGYJovRjPN69
-title: Rigging a robot arm Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX1grpUd5zHMGYJovRjPN69" title="Rigging a robot arm Tutorial"}
 
 
 ## Learning Objectives
@@ -63,5 +56,4 @@ title: Rigging a robot arm Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

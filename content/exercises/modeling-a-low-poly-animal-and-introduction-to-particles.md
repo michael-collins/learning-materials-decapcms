@@ -24,14 +24,7 @@ aiLicense:
 This week I want you to make a low poly animal. Ideally, you will have more than one reference image. Below is a demonstration of how I would approach resolving a low poly model with only a profile image. For your assignment I encourage you to work from multiple reference images instead. However, some of the techniques I use to calculate volume and resolve topological flow may be of help. There is an additional video in the playlist that demonstrates the use of particles as a means of generating feathers on my Ostrich.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PLcAjW37cz5QkTtYtaAa7RjiQgixIJX0kH
-title: Modeling a Low Poly Animal and Introduction to Particles Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QkTtYtaAa7RjiQgixIJX0kH" title="Modeling a Low Poly Animal and Introduction to Particles Tutorial"}
 
 
 ## Learning Objectives
@@ -43,5 +36,4 @@ title: Modeling a Low Poly Animal and Introduction to Particles Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

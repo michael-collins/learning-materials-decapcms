@@ -23,14 +23,7 @@ allowEmbed: true
 In this exercise, you will practice polygonal modeling fundamentals and will use 3D software to build a polygonal model of three random objects.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrUtPySfHyf4j_w6PGi6AES9
-title: Modeling random objects Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUtPySfHyf4j_w6PGi6AES9" title="Modeling random objects Tutorial"}
 
 
 ## Learning Objectives
@@ -63,5 +56,4 @@ title: Modeling random objects Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

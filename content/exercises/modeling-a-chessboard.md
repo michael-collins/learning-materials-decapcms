@@ -22,14 +22,7 @@ aiLicense:
 How to Make a Chess Board
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PLcAjW37cz5QksJy4ZnxgWrbVFklAoOFvU
-title: Modeling a Chessboard Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QksJy4ZnxgWrbVFklAoOFvU" title="Modeling a Chessboard Tutorial"}
 
 
 ## Learning Objectives
@@ -62,5 +55,4 @@ Brill Ian Lesson x Assignment x
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 
