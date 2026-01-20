@@ -1,0 +1,8 @@
+# CODEOWNERS file
+# This ensures @michael-collins must review all changes before merging
+
+# All files require review from repo owner
+* @michael-collins
+
+# Specific collections (optional - can add more granular rules)
+/content/** @michael-collins
