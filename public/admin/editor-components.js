@@ -70,11 +70,14 @@ CMS.registerEditorComponent({
       required: false
     }
   ],
-  pattern: /::iframe-component\{src="([^"]+)"(?:\s+title="([^"]*)")?\}/,
+  // Support both formats: inline props AND YAML frontmatter
+  pattern: /::iframe-component(?:\{src="([^"]+)"(?:\s+title="([^"]*)")?\}|[\s\n]+src:\s*([^\n]+)[\s\n]+title:\s*([^\n]+))/,
   fromBlock: function(match) {
+    // Inline format: match[1] and match[2]
+    // YAML format: match[3] and match[4]
     return {
-      src: match[1],
-      title: match[2] || "Video"
+      src: match[1] || match[3] || '',
+      title: match[2] || match[4] || 'Video'
     };
   },
   toBlock: function(obj) {
