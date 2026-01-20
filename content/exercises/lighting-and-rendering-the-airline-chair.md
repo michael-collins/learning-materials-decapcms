@@ -52,14 +52,7 @@ attachments:
 In this exercise, you will create a final render of the KEM Weber Airline Chair. You will practice setting up 3-point lighting, adding cameras, creating a backdrop, optionally adding additional textures to the materials, configuring render settings, and doing some post-production cleanup in Photoshop.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrVabQ0miYe-Oy-PZe6Jab7Q
-title: Lighting and Rendering the Airline Chair Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVabQ0miYe-Oy-PZe6Jab7Q" title="Lighting and Rendering the Airline Chair Tutorial"}
 
 
 ## Learning Objectives
@@ -93,5 +86,4 @@ title: Lighting and Rendering the Airline Chair Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

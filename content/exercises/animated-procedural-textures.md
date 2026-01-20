@@ -23,14 +23,9 @@ allowEmbed: true
 ---
 In this exercise, you will create a textured anime-style waterfall in Blender, render a final Blender animation as an image sequence, and import it into after effects. You will create a compressed video in a web streaming format called H.264.
 
-## Tutorial Video
-
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh" title="Animated procedural textures Tutorial"}
 
-## ::iframe-component
-
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh
-title: Animated procedural textures Tutorial
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh" title="Animated procedural textures Tutorial"}
 
 - - -
 
@@ -60,5 +55,3 @@ title: Animated procedural textures Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-
-::

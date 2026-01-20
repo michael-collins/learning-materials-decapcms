@@ -23,14 +23,7 @@ allowEmbed: true
 In this exercise, you will continue working on your objects and create a lighting and background setup for final rendering.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrWaCwxTnu9yMGbqFudZtdls
-title: Rendering random objects Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWaCwxTnu9yMGbqFudZtdls" title="Rendering random objects Tutorial"}
 
 
 ## Learning Objectives
@@ -62,5 +55,4 @@ Random object generator website: [randomlists.com/things](https://www.randomlist
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 

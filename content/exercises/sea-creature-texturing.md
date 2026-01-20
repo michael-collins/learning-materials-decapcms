@@ -24,14 +24,7 @@ allowEmbed: true
 In this exercise, you continue working on the sea creature. You will practice unwrapping UVs, exporting a UV map, and creating textures in 2D image editing software like Substance Painter and/or Photoshop.
 
 
-## Tutorial Video
-
-::iframe-component
----
-src: https://youtube.com/embed/videoseries?list=PL-V2nChTadrUU3MSAv9EfORij5j2E3uVv
-title: Sea creature: Texturing Tutorial
----
-::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUU3MSAv9EfORij5j2E3uVv" title="Sea creature: Texturing Tutorial"}
 
 
 ## Learning Objectives
@@ -70,5 +63,4 @@ title: Sea creature: Texturing Tutorial
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
-::
 
