@@ -7,12 +7,14 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Use Nuxt's useHead to inject JSON-LD script tag
+// Use Nuxt's useHead to inject JSON-LD script tag with a key to prevent duplicates
 useHead(() => ({
   script: props.schema ? [
     {
       type: 'application/ld+json',
-      innerHTML: JSON.stringify(props.schema)
+      innerHTML: JSON.stringify(props.schema),
+      key: 'oer-schema', // This key ensures only one schema exists
+      tagPriority: 'high'
     }
   ] : []
 }));
