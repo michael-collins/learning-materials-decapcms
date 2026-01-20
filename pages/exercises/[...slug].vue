@@ -37,10 +37,13 @@ const breadcrumbs = computed(() => [
   { label: exercise.value?.title || 'Loading...' }
 ])
 
+// Get the base URL from the request
+const baseUrl = useRequestURL().origin
+
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
   if (!exercise.value) return null
-  return buildPracticeSchema(exercise.value, 'https://yourdomain.com')
+  return buildPracticeSchema(exercise.value, baseUrl)
 })
 </script>
 
