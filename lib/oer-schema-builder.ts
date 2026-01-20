@@ -237,6 +237,8 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
 }
 
 /**
+ * Build OER Schema for Learning Components (Specializations)
+ */
 export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
   // Use existing oer object from frontmatter if available
   if (doc.oer && typeof doc.oer === 'object') {
