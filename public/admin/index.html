@@ -4,11 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
-  <link href="/admin/preview-styles.css" rel="stylesheet" />
 </head>
 <body>
   <!-- Include the script that builds the page and powers DecapCMS -->
   <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
+  
+  <!-- Register preview styles -->
+  <script>
+    CMS.registerPreviewStyle("/admin/preview-styles.css");
+  </script>
   
   <!-- Custom widgets -->
   <script src="/admin/youtube-widget.js"></script>
