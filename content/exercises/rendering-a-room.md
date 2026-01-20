@@ -23,7 +23,8 @@ allowEmbed: true
 In this exercise, you will continue working on your objects and create a lighting and background setup for final rendering.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrU-XvcElSlBW7dQn4n1yj54" title="Rendering a room Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrU-XvcElSlBW7dQn4n1yj54" title="Rendering a room Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -53,5 +54,6 @@ In this exercise, you will continue working on your objects and create a lightin
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

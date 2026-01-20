@@ -23,7 +23,8 @@ allowEmbed: true
 In this exercise, students will creatively interpret the game, Tetris created in 1984 by Alexey Pajitnov, into a 10 seconds or longer animation.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUEv-pnXBisI7G3yU_puFGv" title="Animating Tetris Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUEv-pnXBisI7G3yU_puFGv" title="Animating Tetris Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -60,5 +61,6 @@ In this exercise, students will creatively interpret the game, Tetris created in
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

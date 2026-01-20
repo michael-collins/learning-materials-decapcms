@@ -24,7 +24,8 @@ allowEmbed: true
 In this exercise, you will model an environment for your creature from the previous exercises. You will also set up NPR shaders, Freestyle lines, and use the compositor to achieve a comic visual style.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWh22nK2hfnGbeEaxMp3s_e" title="Sea creature: Non-photorealistic rendering Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWh22nK2hfnGbeEaxMp3s_e" title="Sea creature: Non-photorealistic rendering Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -52,5 +53,6 @@ In this exercise, you will model an environment for your creature from the previ
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

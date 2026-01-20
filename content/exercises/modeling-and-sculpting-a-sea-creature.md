@@ -23,7 +23,8 @@ allowEmbed: true
 In this exercise, you will practice sculpting tools and workflows, as well as go through the process of retopology. You will end up with two models, a high resolution sculpt and a base mesh that will be ready for texturing.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrW9SylyEr8DprET38xynl_5" title="Modeling and sculpting a sea creature Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrW9SylyEr8DprET38xynl_5" title="Modeling and sculpting a sea creature Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -51,5 +52,6 @@ In this exercise, you will practice sculpting tools and workflows, as well as go
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

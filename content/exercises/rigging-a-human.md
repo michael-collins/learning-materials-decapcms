@@ -23,7 +23,8 @@ allowEmbed: true
 In this exercise, students will practice modeling, rigging, and animating a human.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWPKLLkM8oVibJ1aKHivoNl" title="Rigging a human Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWPKLLkM8oVibJ1aKHivoNl" title="Rigging a human Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -56,5 +57,6 @@ In this exercise, students will practice modeling, rigging, and animating a huma
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 

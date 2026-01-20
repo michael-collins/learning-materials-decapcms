@@ -23,7 +23,8 @@ allowEmbed: true
 In this exercise, you will practice polygonal modeling fundamentals and will use 3D software to build a polygonal model of an interior space.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVP_vzYSEfaSkkPDhMdPfrK" title="Modeling a room Tutorial"}::
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVP_vzYSEfaSkkPDhMdPfrK" title="Modeling a room Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -55,5 +56,6 @@ In this exercise, you will practice polygonal modeling fundamentals and will use
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}::
+::rubric-component{id="exercise"}
+::
 
