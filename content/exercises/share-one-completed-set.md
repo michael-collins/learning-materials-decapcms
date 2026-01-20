@@ -46,5 +46,5 @@ Develop and refine a single chess set based on observation over time, peer and i
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}
+::rubric-component{id="exercise"}::
 

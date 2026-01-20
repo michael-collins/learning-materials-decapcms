@@ -51,7 +51,7 @@ aiLicense:
 In this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QliQriwysglJwRIE6R8NP2f" title="Modeling a Basic Knight Tutorial"}
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QliQriwysglJwRIE6R8NP2f" title="Modeling a Basic Knight Tutorial"}::
 
 
 ## Learning Objectives
@@ -75,5 +75,5 @@ They will show you how you might use new tools and methods to make your knight m
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}
+::rubric-component{id="exercise"}::
 

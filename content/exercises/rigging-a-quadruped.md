@@ -24,7 +24,7 @@ allowEmbed: true
 In this exercise, students will practice modeling, rigging, and animating a quadruped animal.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrV1SRFV9WFkj605z0HzQLXS" title="Rigging a quadruped Tutorial"}
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrV1SRFV9WFkj605z0HzQLXS" title="Rigging a quadruped Tutorial"}::
 
 
 ## Learning Objectives
@@ -56,5 +56,5 @@ In this exercise, students will practice modeling, rigging, and animating a quad
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}
+::rubric-component{id="exercise"}::
 
