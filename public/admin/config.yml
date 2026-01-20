@@ -67,6 +67,16 @@ collections:
     folder: "content/exercises"
     create: true
     slug: "{{slug}}"
+    view_filters:
+      - label: "Published"
+        field: published
+        pattern: true
+      - label: "Unpublished"
+        field: published
+        pattern: false
+      - label: "All"
+        field: published
+        pattern: ""
     fields:
       - {label: "Record ID", name: "recordId", widget: "string", required: false, hint: "Original Airtable record ID (for reference)"}
       - {label: "Title", name: "title", widget: "string"}
