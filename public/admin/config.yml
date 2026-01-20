@@ -251,71 +251,9 @@ collections:
           - {label: "Name", name: "name", widget: "string"}
           - {label: "Description", name: "description", widget: "text"}
 
-# Editor Components - Custom insertable components for the markdown editor
-# These appear as buttons in the editor toolbar (+ menu)
+# Editor configuration
 editor:
   preview: true
 
-# Register custom editor components
-# These will appear in the "+" menu when editing markdown fields
-editor_components:
-  - label: "YouTube Video"
-    id: "youtube-video"
-    pattern: /::youtube-video\{id="([^"]+)"(?:\s+title="([^"]*)")?\}/
-    fields:
-      - {label: "YouTube URL or Video ID", name: "id", widget: "string", hint: "Paste YouTube URL (e.g., https://youtube.com/watch?v=dQw4w9WgXcQ) or just the ID"}
-      - {label: "Title", name: "title", widget: "string", default: "Video Tutorial", required: false}
-    toBlock: "::youtube-video{id=\"{{id}}\" title=\"{{title}}\"}"
-    toPreview: "<div style=\"border: 2px solid #ff0000; padding: 16px; margin: 16px 0; border-radius: 8px;\"><div style=\"font-weight: bold; color: #ff0000; margin-bottom: 8px;\">🎥 YouTube Video</div><div style=\"background: #000; aspect-ratio: 16/9; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff;\"><iframe src=\"https://www.youtube.com/embed/{{id}}\" style=\"width: 100%; height: 100%; border: none;\" allowfullscreen></iframe></div><div style=\"font-size: 12px; color: #666; margin-top: 8px;\">{{title}}</div></div>"
-
-  - label: "Video Embed"
-    id: "iframe-component"
-    pattern: /::iframe-component\{src="([^"]+)"(?:\s+title="([^"]*)")?\}/
-    fields:
-      - {label: "Video URL", name: "src", widget: "string", hint: "Full YouTube or Vimeo URL"}
-      - {label: "Title", name: "title", widget: "string", default: "Video Tutorial"}
-    toBlock: "::iframe-component{src=\"{{src}}\" title=\"{{title}}\"}"
-    toPreview: "<div style=\"border: 2px solid #4a90e2; padding: 16px; margin: 16px 0; border-radius: 8px;\"><div style=\"font-weight: bold; color: #4a90e2;\">📹 Video Embed: {{title}}</div><div style=\"font-size: 12px; color: #666; margin-top: 4px;\">{{src}}</div></div>"
-
-  - label: "📊 Google Slides Presentation"
-    id: "google-slides-component"
-    pattern: /^::google-slides-component\{id="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+height="([^"]*)"))?\}$/
-    fields:
-      - {label: "Slides ID", name: "id", widget: "string", hint: "The ID from the Google Slides URL (between /d/ and /edit)"}
-      - {label: "Title", name: "title", widget: "string", default: "Presentation"}
-      - {label: "Height", name: "height", widget: "string", default: "600", required: false}
-    toBlock: |
-      ::google-slides-component{id="{{id}}" title="{{title}}" height="{{height}}"}
-    toPreview: |
-      <div style="border: 2px solid #34a853; padding: 16px; margin: 16px 0; border-radius: 8px; background: #f0fff4;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-          <span style="font-size: 24px;">📊</span>
-          <strong style="color: #34a853;">Google Slides</strong>
-        </div>
-        <div style="color: #333; margin-top: 8px;"><strong>{{title}}</strong></div>
-        <div style="color: #666; font-size: 12px; margin-top: 4px;">ID: {{id}}</div>
-      </div>
-
-  - label: "📋 Assessment Rubric"
-    id: "rubric-component"
-    pattern: /^::rubric-component\{id="([^"]+)"\}$/
-    fields:
-      - label: "Rubric"
-        name: "id"
-        widget: "relation"
-        collection: "rubrics"
-        search_fields: ["name", "slug"]
-        value_field: "slug"
-        display_fields: ["name"]
-        hint: "Select which rubric to display"
-    toBlock: |
-      ::rubric-component{id="{{id}}"}
-    toPreview: |
-      <div style="border: 2px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 8px; background: #fffbeb;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-          <span style="font-size: 24px;">📋</span>
-          <strong style="color: #f59e0b;">Grading Rubric</strong>
-        </div>
-        <div style="color: #333; margin-top: 8px;">Rubric: <strong>{{id}}</strong></div>
-      </div>
-
+# Note: Custom editor components are registered via JavaScript in /admin/editor-components.js
+# This includes: YouTube Video, Video Embed, Google Slides, Assessment Rubric
