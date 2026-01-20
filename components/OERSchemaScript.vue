@@ -14,7 +14,7 @@ watchEffect(() => {
       script: [
         {
           type: 'application/ld+json',
-          children: JSON.stringify(props.schema)
+          innerHTML: JSON.stringify(props.schema)
         }
       ]
     });
