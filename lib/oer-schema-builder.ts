@@ -23,17 +23,70 @@ export interface OERSchema {
 
 /**
  * Build OER Schema for Practice activities (Exercises)
+ * Structures as InstructionalPattern with hasComponent for better OER Schema compliance
  */
 export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
   const objectives = extractLearningObjectives(doc.body || '');
   const instructions = extractInstructions(doc.body || '');
   const playlistId = extractYouTubePlaylist(doc.body || '');
   
+  // Get path - use _path from Nuxt Content or fallback to slug
+  const path = doc._path || (doc.slug ? `/exercises/${doc.slug}` : '');
+  const baseId = `${baseUrl}${path}`;
+  
+  // Build hasComponent array with sub-components
+  const components: any[] = [];
+  
+  // Add Learning Objectives as separate components
+  if (objectives.length > 0) {
+    objectives.forEach((obj, idx) => {
+      components.push({
+        '@type': 'oer:LearningObjective',
+        '@id': `${baseId}#learning-objective-${idx + 1}`,
+        'name': `Learning Objective ${idx + 1}`,
+        'description': obj
+      });
+    });
+  }
+  
+  // Add Tutorial Video as LearningComponent
+  if (playlistId) {
+    components.push({
+      '@type': 'oer:SupportingMaterial',
+      '@id': `${baseId}#tutorial-video`,
+      'name': 'Tutorial Video',
+      'materialType': 'Video Tutorial',
+      'encodingFormat': 'video/youtube',
+      'contentUrl': `https://youtube.com/embed/videoseries?list=${playlistId}`,
+      'actionType': ['Observing']
+    });
+  }
+  
+  // Add Instructions as Practice component
+  if (instructions.length > 0) {
+    const actionTypes = inferActionTypes(instructions.join(' '));
+    components.push({
+      '@type': 'oer:Practice',
+      '@id': `${baseId}#practice-instructions`,
+      'name': 'Practice Instructions',
+      'doTask': {
+        '@type': 'Task',
+        'steps': instructions
+      },
+      ...(actionTypes.length > 0 && { 'actionType': actionTypes })
+    });
+  }
+  
+  // Main schema as InstructionalPattern
   const schema: OERSchema = {
-    '@context': 'https://oerschema.org/',
-    '@type': doc.type || 'oer:Practice',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
+    '@type': 'oer:InstructionalPattern',
+    '@id': baseId,
     'name': doc.title,
-    'url': `${baseUrl}/exercises/${doc.slug}`,
+    'url': `${baseUrl}${path}`,
     'inLanguage': 'en-US',
   };
   
@@ -61,34 +114,16 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
     schema.license = getLicenseUrl(doc.license);
   }
   
-  // Learning Objectives
+  // Link to learning objectives
   if (objectives.length > 0) {
-    schema.hasLearningObjective = objectives.map(obj => ({
-      '@type': 'oer:LearningObjective',
-      'description': obj
+    schema.hasLearningObjective = objectives.map((obj, idx) => ({
+      '@id': `${baseId}#learning-objective-${idx + 1}`
     }));
   }
   
-  // Tutorial Video as Supporting Material
-  if (playlistId) {
-    schema.material = {
-      '@type': 'oer:SupportingMaterial',
-      'materialType': 'Video Tutorial',
-      'encodingFormat': 'video/youtube',
-      'contentUrl': `https://youtube.com/embed/videoseries?list=${playlistId}`,
-      'name': 'Tutorial Video'
-    };
-  }
-  
-  // Instructions as Task
-  if (instructions.length > 0) {
-    const actionTypes = inferActionTypes(instructions.join(' '));
-    schema.doTask = {
-      '@type': 'Task',
-      'name': 'Instructions',
-      'steps': instructions,
-      ...(actionTypes.length > 0 && { 'actionType': actionTypes })
-    };
+  // Add all components
+  if (components.length > 0) {
+    schema.hasComponent = components;
   }
   
   // Rubric
@@ -129,11 +164,17 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   const taskSections = parseTaskSections(doc.body || '');
   const playlistId = extractYouTubePlaylist(doc.body || '');
   
+  // Get path - use _path from Nuxt Content or fallback to slug
+  const path = doc._path || (doc.slug ? `/projects/${doc.slug}` : '');
+  
   const schema: OERSchema = {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': doc.type || 'oer:Assessment',
     'name': doc.title,
-    'url': `${baseUrl}/projects/${doc.slug}`,
+    'url': `${baseUrl}${path}`,
     'assessmentType': 'Project',
     'inLanguage': 'en-US',
   };
@@ -239,7 +280,7 @@ export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}/specializations/${doc.slug}`,
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,
       // Add image if present in frontmatter
       ...(doc.image && !doc.oer.image && {
         'image': {
@@ -253,10 +294,13 @@ export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string
   
   // Fallback if no oer object
   return {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:LearningComponent',
     'name': doc.title,
-    'url': `${baseUrl}/specializations/${doc.slug}`,
+    'url': `${baseUrl}${doc._path || ''}`,
     'inLanguage': 'en-US'
   };
 }
@@ -270,7 +314,7 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}/pathways/${doc.slug}`,
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,
       // Add image if present in frontmatter
       ...(doc.image && !doc.oer.image && {
         'image': {
@@ -284,10 +328,13 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
   
   // Fallback if no oer object
   return {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:Course',
     'name': doc.title,
-    'url': `${baseUrl}/pathways/${doc.slug}`,
+    'url': `${baseUrl}${doc._path || ''}`,
     'inLanguage': 'en-US'
   };
 }
@@ -301,16 +348,19 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}/lectures/${doc.slug}`,
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,
     };
   }
   
   // Fallback if no oer object
   return {
-    '@context': 'https://oerschema.org/',
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
     '@type': 'oer:SupportingMaterial',
     'name': doc.title,
-    'url': `${baseUrl}/lectures/${doc.slug}`,
+    'url': `${baseUrl}${doc._path || ''}`,
     'inLanguage': 'en-US'
   };
 }
