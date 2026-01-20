@@ -29,11 +29,14 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
   const instructions = extractInstructions(doc.body || '');
   const playlistId = extractYouTubePlaylist(doc.body || '');
   
+  // Get path - use _path from Nuxt Content or fallback to slug
+  const path = doc._path || (doc.slug ? `/exercises/${doc.slug}` : '');
+  
   const schema: OERSchema = {
     '@context': 'https://oerschema.org/',
     '@type': doc.type || 'oer:Practice',
     'name': doc.title,
-    'url': `${baseUrl}/exercises/${doc.slug}`,
+    'url': `${baseUrl}${path}`,
     'inLanguage': 'en-US',
   };
   
@@ -129,11 +132,14 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   const taskSections = parseTaskSections(doc.body || '');
   const playlistId = extractYouTubePlaylist(doc.body || '');
   
+  // Get path - use _path from Nuxt Content or fallback to slug
+  const path = doc._path || (doc.slug ? `/projects/${doc.slug}` : '');
+  
   const schema: OERSchema = {
     '@context': 'https://oerschema.org/',
     '@type': doc.type || 'oer:Assessment',
     'name': doc.title,
-    'url': `${baseUrl}/projects/${doc.slug}`,
+    'url': `${baseUrl}${path}`,
     'assessmentType': 'Project',
     'inLanguage': 'en-US',
   };
@@ -239,7 +245,7 @@ export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}/specializations/${doc.slug}`,
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,'
       // Add image if present in frontmatter
       ...(doc.image && !doc.oer.image && {
         'image': {
@@ -256,7 +262,7 @@ export function buildLearningComponentSchema(doc: ParsedContent, baseUrl: string
     '@context': 'https://oerschema.org/',
     '@type': 'oer:LearningComponent',
     'name': doc.title,
-    'url': `${baseUrl}/specializations/${doc.slug}`,
+    'url': `${baseUrl}${doc._path || ''}`,'
     'inLanguage': 'en-US'
   };
 }
@@ -270,7 +276,7 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}/pathways/${doc.slug}`,
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,'
       // Add image if present in frontmatter
       ...(doc.image && !doc.oer.image && {
         'image': {
@@ -287,7 +293,7 @@ export function buildCourseSchema(doc: ParsedContent, baseUrl: string = ''): OER
     '@context': 'https://oerschema.org/',
     '@type': 'oer:Course',
     'name': doc.title,
-    'url': `${baseUrl}/pathways/${doc.slug}`,
+    'url': `${baseUrl}${doc._path || ''}`,'
     'inLanguage': 'en-US'
   };
 }
@@ -301,7 +307,7 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
     return {
       ...doc.oer,
       // Add URL if not present
-      'url': doc.oer.url || `${baseUrl}/lectures/${doc.slug}`,
+      'url': doc.oer.url || `${baseUrl}${doc._path || ''}`,'
     };
   }
   
@@ -310,7 +316,7 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
     '@context': 'https://oerschema.org/',
     '@type': 'oer:SupportingMaterial',
     'name': doc.title,
-    'url': `${baseUrl}/lectures/${doc.slug}`,
+    'url': `${baseUrl}${doc._path || ''}`,'
     'inLanguage': 'en-US'
   };
 }
