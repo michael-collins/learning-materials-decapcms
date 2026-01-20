@@ -21,7 +21,7 @@ CMS.registerEditorComponent({
       required: false
     }
   ],
-  pattern: /::youtube-video\{id="([^"]+)"(?:\s+title="([^"]*)")?\}/,
+  pattern: /::youtube-video\{id="([^"]+)"(?:\s+title="([^"]*)")?\}\s*::/s,
   fromBlock: function(match) {
     return {
       id: match[1],
@@ -29,7 +29,8 @@ CMS.registerEditorComponent({
     };
   },
   toBlock: function(obj) {
-    return `::youtube-video{id="${obj.id}" title="${obj.title || 'Video Tutorial'}"}`;
+    return `::youtube-video{id="${obj.id}" title="${obj.title || 'Video Tutorial'}"}
+::`;
   },
   toPreview: function(obj) {
     return `
@@ -71,7 +72,7 @@ CMS.registerEditorComponent({
     }
   ],
   // Support both formats: inline props AND YAML frontmatter
-  pattern: /::iframe-component(?:\{src="([^"]+)"(?:\s+title="([^"]*)")?\}|[\s\n]+src:\s*([^\n]+)[\s\n]+title:\s*([^\n]+))/,
+  pattern: /::iframe-component(?:\{src="([^"]+)"(?:\s+title="([^"]*)")?\}|[\s\n]+src:\s*([^\n]+)[\s\n]+title:\s*([^\n]+))\s*::/s,
   fromBlock: function(match) {
     // Inline format: match[1] and match[2]
     // YAML format: match[3] and match[4]
@@ -81,7 +82,8 @@ CMS.registerEditorComponent({
     };
   },
   toBlock: function(obj) {
-    return `::iframe-component{src="${obj.src}" title="${obj.title || 'Video'}"}`;
+    return `::iframe-component{src="${obj.src}" title="${obj.title || 'Video'}"}
+::`;
   },
   toPreview: function(obj) {
     return `
@@ -115,7 +117,7 @@ CMS.registerEditorComponent({
       required: false
     }
   ],
-  pattern: /::google-slides-component\{id="([^"]+)"(?:\s+title="([^"]*)")?\}/,
+  pattern: /::google-slides-component\{id="([^"]+)"(?:\s+title="([^"]*)")?\}\s*::/s,
   fromBlock: function(match) {
     return {
       id: match[1],
@@ -123,7 +125,8 @@ CMS.registerEditorComponent({
     };
   },
   toBlock: function(obj) {
-    return `::google-slides-component{id="${obj.id}" title="${obj.title || 'Presentation'}"}`;
+    return `::google-slides-component{id="${obj.id}" title="${obj.title || 'Presentation'}"}
+::`;
   },
   toPreview: function(obj) {
     return `
@@ -151,14 +154,15 @@ CMS.registerEditorComponent({
       hint: "Select which rubric to display"
     }
   ],
-  pattern: /::rubric-component\{id="([^"]+)"\}/,
+  pattern: /::rubric-component\{id="([^"]+)"\}\s*::/s,
   fromBlock: function(match) {
     return {
       id: match[1]
     };
   },
   toBlock: function(obj) {
-    return `::rubric-component{id="${obj.id}"}`;
+    return `::rubric-component{id="${obj.id}"}
+::`;
   },
   toPreview: function(obj) {
     return `
