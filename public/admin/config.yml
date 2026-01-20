@@ -251,73 +251,9 @@ collections:
           - {label: "Name", name: "name", widget: "string"}
           - {label: "Description", name: "description", widget: "text"}
 
-# Editor Components - Custom insertable components for the markdown editor
-# These appear as buttons in the editor toolbar (+ menu)
+# Editor configuration
 editor:
   preview: true
 
-# Register custom editor components
-# These will appear in the "+" menu when editing markdown fields
-editor_components:
-  - label: "Video Embed"
-    id: "iframe-component"
-    pattern: /^::iframe-component\n---\n([\s\S]*?)\n---\n::$/m
-    fields:
-      - {label: "Video URL", name: "src", widget: "string", hint: "YouTube or Vimeo URL"}
-      - {label: "Title", name: "title", widget: "string", default: "Video"}
-      - {label: "Width", name: "width", widget: "string", default: "100%", required: false}
-      - {label: "Height", name: "height", widget: "string", default: "600", required: false}
-    toBlock: |
-      ::iframe-component
-      ---
-      src: {{src}}
-      title: {{title}}
-      {{#if width}}width: {{width}}{{/if}}
-      {{#if height}}height: {{height}}{{/if}}
-      ---
-      ::
-    toPreview: |
-      <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px;">
-        <strong>📹 Video Embed:</strong> {{title}}<br>
-        <small>{{src}}</small>
-      </div>
-
-  - label: "Google Slides"
-    id: "google-slides-component"
-    pattern: /^::google-slides-component\n---\n([\s\S]*?)\n---\n::$/m
-    fields:
-      - {label: "Google Slides ID", name: "id", widget: "string", hint: "The presentation ID from the Google Slides URL"}
-      - {label: "Title", name: "title", widget: "string", default: "Presentation"}
-      - {label: "Height", name: "height", widget: "string", default: "600", required: false}
-    toBlock: |
-      ::google-slides-component
-      ---
-      id: {{id}}
-      title: {{title}}
-      {{#if height}}height: {{height}}{{/if}}
-      ---
-      ::
-    toPreview: |
-      <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px; background: #f5f5f5;">
-        <strong>📊 Google Slides:</strong> {{title}}<br>
-        <small>ID: {{id}}</small>
-      </div>
-
-  - label: "Rubric"
-    id: "rubric-component"
-    pattern: /^::rubric-component\{id="([^"]+)"\}\n::$/m
-    fields:
-      - label: "Rubric"
-        name: "id"
-        widget: "relation"
-        collection: "rubrics"
-        search_fields: ["name", "slug"]
-        value_field: "slug"
-        display_fields: ["name"]
-    toBlock: |
-      ::rubric-component{id="{{id}}"}
-      ::
-    toPreview: |
-      <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px; background: #fffbf0;">
-        <strong>📋 Grading Rubric:</strong> {{id}}
-      </div>
+# Note: Custom editor components are registered via JavaScript in /admin/editor-components.js
+# This includes: YouTube Video, Video Embed, Google Slides, Assessment Rubric
