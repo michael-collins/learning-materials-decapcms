@@ -22,10 +22,13 @@ const breadcrumbs = computed(() => [
   { label: pathway.value?.title || 'Loading...' }
 ])
 
+// Get the base URL from the request
+const baseUrl = useRequestURL().origin
+
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
   if (!pathway.value) return null
-  return buildCourseSchema(pathway.value, 'https://yourdomain.com')
+  return buildCourseSchema(pathway.value, baseUrl)
 })
 </script>
 

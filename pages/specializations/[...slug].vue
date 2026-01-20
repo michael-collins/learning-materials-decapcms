@@ -22,10 +22,13 @@ const breadcrumbs = computed(() => [
   { label: specialization.value?.title || 'Loading...' }
 ])
 
+// Get the base URL from the request
+const baseUrl = useRequestURL().origin
+
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
   if (!specialization.value) return null
-  return buildLearningComponentSchema(specialization.value, 'https://yourdomain.com')
+  return buildLearningComponentSchema(specialization.value, baseUrl)
 })
 </script>
 
