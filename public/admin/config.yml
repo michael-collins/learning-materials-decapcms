@@ -259,53 +259,48 @@ editor:
 # Register custom editor components
 # These will appear in the "+" menu when editing markdown fields
 editor_components:
-  - label: "Video Embed"
+  - label: "📹 Video Embed (YouTube/Vimeo)"
     id: "iframe-component"
-    pattern: /^::iframe-component\n---\n([\s\S]*?)\n---\n::$/m
+    pattern: /^::iframe-component\{src="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+width="([^"]*)")?(?:\s+height="([^"]*)"))?\}$/
     fields:
-      - {label: "Video URL", name: "src", widget: "string", hint: "YouTube or Vimeo URL"}
-      - {label: "Title", name: "title", widget: "string", default: "Video"}
+      - {label: "Video URL", name: "src", widget: "string", hint: "Full YouTube or Vimeo URL"}
+      - {label: "Title", name: "title", widget: "string", default: "Video Tutorial"}
       - {label: "Width", name: "width", widget: "string", default: "100%", required: false}
       - {label: "Height", name: "height", widget: "string", default: "600", required: false}
     toBlock: |
-      ::iframe-component
-      ---
-      src: {{src}}
-      title: {{title}}
-      {{#if width}}width: {{width}}{{/if}}
-      {{#if height}}height: {{height}}{{/if}}
-      ---
-      ::
+      ::iframe-component{src="{{src}}" title="{{title}}" width="{{width}}" height="{{height}}"}
     toPreview: |
-      <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px;">
-        <strong>📹 Video Embed:</strong> {{title}}<br>
-        <small>{{src}}</small>
+      <div style="border: 2px solid #4a90e2; padding: 16px; margin: 16px 0; border-radius: 8px; background: #f0f7ff;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span style="font-size: 24px;">📹</span>
+          <strong style="color: #4a90e2;">Video Embed</strong>
+        </div>
+        <div style="color: #333; margin-top: 8px;"><strong>{{title}}</strong></div>
+        <div style="color: #666; font-size: 12px; margin-top: 4px;">{{src}}</div>
       </div>
 
-  - label: "Google Slides"
+  - label: "📊 Google Slides Presentation"
     id: "google-slides-component"
-    pattern: /^::google-slides-component\n---\n([\s\S]*?)\n---\n::$/m
+    pattern: /^::google-slides-component\{id="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+height="([^"]*)"))?\}$/
     fields:
-      - {label: "Google Slides ID", name: "id", widget: "string", hint: "The presentation ID from the Google Slides URL"}
+      - {label: "Slides ID", name: "id", widget: "string", hint: "The ID from the Google Slides URL (between /d/ and /edit)"}
       - {label: "Title", name: "title", widget: "string", default: "Presentation"}
       - {label: "Height", name: "height", widget: "string", default: "600", required: false}
     toBlock: |
-      ::google-slides-component
-      ---
-      id: {{id}}
-      title: {{title}}
-      {{#if height}}height: {{height}}{{/if}}
-      ---
-      ::
+      ::google-slides-component{id="{{id}}" title="{{title}}" height="{{height}}"}
     toPreview: |
-      <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px; background: #f5f5f5;">
-        <strong>📊 Google Slides:</strong> {{title}}<br>
-        <small>ID: {{id}}</small>
+      <div style="border: 2px solid #34a853; padding: 16px; margin: 16px 0; border-radius: 8px; background: #f0fff4;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span style="font-size: 24px;">📊</span>
+          <strong style="color: #34a853;">Google Slides</strong>
+        </div>
+        <div style="color: #333; margin-top: 8px;"><strong>{{title}}</strong></div>
+        <div style="color: #666; font-size: 12px; margin-top: 4px;">ID: {{id}}</div>
       </div>
 
-  - label: "Rubric"
+  - label: "📋 Assessment Rubric"
     id: "rubric-component"
-    pattern: /^::rubric-component\{id="([^"]+)"\}\n::$/m
+    pattern: /^::rubric-component\{id="([^"]+)"\}$/
     fields:
       - label: "Rubric"
         name: "id"
@@ -314,10 +309,15 @@ editor_components:
         search_fields: ["name", "slug"]
         value_field: "slug"
         display_fields: ["name"]
+        hint: "Select which rubric to display"
     toBlock: |
       ::rubric-component{id="{{id}}"}
-      ::
     toPreview: |
-      <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px; background: #fffbf0;">
-        <strong>📋 Grading Rubric:</strong> {{id}}
+      <div style="border: 2px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 8px; background: #fffbeb;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span style="font-size: 24px;">📋</span>
+          <strong style="color: #f59e0b;">Grading Rubric</strong>
+        </div>
+        <div style="color: #333; margin-top: 8px;">Rubric: <strong>{{id}}</strong></div>
       </div>
+
