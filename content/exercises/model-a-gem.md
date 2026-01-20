@@ -23,6 +23,7 @@ model a Custom Gem
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5Qn9XcneFk2URkb8MW1B4lQB" title="Model a Gem Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -55,4 +56,5 @@ Be sure to provide screen grabs or renders from 3 angles and the original blende
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

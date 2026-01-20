@@ -24,6 +24,7 @@ In this exercise, you will practice animation techniques by recreating creatures
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVL5OApws44r45Oz65NJyEi" title="Animating virtual creatures Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -59,4 +60,5 @@ https://www.karlsims.com/papers/siggraph94.pdf
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

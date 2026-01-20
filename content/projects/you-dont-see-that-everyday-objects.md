@@ -141,4 +141,5 @@ A work statement is a clear articulation about what you’ve made. This is not a
 ## Grading Rubric
 
 ::rubric-component{id="project"}
+::
 

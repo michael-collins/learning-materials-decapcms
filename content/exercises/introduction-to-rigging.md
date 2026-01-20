@@ -32,6 +32,7 @@ In this exercise, students will practice correcting a character model's edge-flo
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX4lOk4gv0XjdSVpB31qOtJ" title="Introduction to rigging Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -63,4 +64,5 @@ In this exercise, students will practice correcting a character model's edge-flo
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

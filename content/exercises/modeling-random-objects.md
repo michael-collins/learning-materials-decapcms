@@ -24,6 +24,7 @@ In this exercise, you will practice polygonal modeling fundamentals and will use
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUtPySfHyf4j_w6PGi6AES9" title="Modeling random objects Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -56,4 +57,5 @@ In this exercise, you will practice polygonal modeling fundamentals and will use
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

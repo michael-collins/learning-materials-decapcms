@@ -24,6 +24,7 @@ In this exercise, students will creatively interpret the game, Tetris created in
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUEv-pnXBisI7G3yU_puFGv" title="Animating Tetris Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -61,4 +62,5 @@ In this exercise, students will creatively interpret the game, Tetris created in
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

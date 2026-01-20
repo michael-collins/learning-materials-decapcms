@@ -24,6 +24,7 @@ In this exercise, you will practice sculpting tools and workflows, as well as go
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrW9SylyEr8DprET38xynl_5" title="Modeling and sculpting a sea creature Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -52,4 +53,5 @@ In this exercise, you will practice sculpting tools and workflows, as well as go
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

@@ -24,6 +24,7 @@ In this exercise, you will continue working on your objects. Practice unwrapping
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrVw5dp65bKPjF6iFdKpF2el" title="Texturing a room Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -56,4 +57,5 @@ In this exercise, you will continue working on your objects. Practice unwrapping
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

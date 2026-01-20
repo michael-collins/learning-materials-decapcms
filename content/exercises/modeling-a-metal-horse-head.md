@@ -60,6 +60,7 @@ In this exercise, you will practice polygonal modeling fundamentals and using re
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5Qnmcpc_vs1RGJaQFm4EsuE9" title="Modeling a Metal Horse Head Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -80,4 +81,5 @@ This a demonstration of how to create a more complex Knight-like form that appro
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

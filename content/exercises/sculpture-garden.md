@@ -24,6 +24,7 @@ In this exercise, you will practice using PBR materials, modeling, lighting, and
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrXmwBV0kO-ErBLFnyWukKsD" title="Sculpture Garden Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -91,4 +92,5 @@ https://polyhaven.com/hdris
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

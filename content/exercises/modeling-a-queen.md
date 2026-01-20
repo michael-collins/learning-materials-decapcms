@@ -38,6 +38,7 @@ In this exercise, you will practice polygonal modeling fundamentals and using re
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QkznWA0SSvO8i2iMil7btof" title="Modeling a Queen Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -68,4 +69,5 @@ For this assignment, recreate the steps in basic **Demonstration** or try to 
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

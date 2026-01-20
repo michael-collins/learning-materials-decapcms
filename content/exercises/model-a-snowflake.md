@@ -23,6 +23,7 @@ In this exercise, you will learn how to model 3 snowflakes
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QlA1AFMxpkvj6JQwOxNygMy" title="Model a Snowflake Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -58,4 +59,5 @@ Be sure to provide screen grabs or renders from 3 angles and the original blende
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

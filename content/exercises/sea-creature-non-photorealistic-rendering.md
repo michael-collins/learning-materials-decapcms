@@ -25,6 +25,7 @@ In this exercise, you will model an environment for your creature from the previ
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWh22nK2hfnGbeEaxMp3s_e" title="Sea creature: Non-photorealistic rendering Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -53,4 +54,5 @@ In this exercise, you will model an environment for your creature from the previ
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

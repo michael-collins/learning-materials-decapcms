@@ -32,6 +32,7 @@ In this exercise, you will apply Image textures to a Chess board and pieces
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PLcAjW37cz5QlIH4xCkx3q86mJu84QpGOJ" title="Applying Textures to 3 Unique Chess Sets Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -76,4 +77,5 @@ Create three unique chess sets based on the steps in Demonstrations 1, 2 and tut
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 

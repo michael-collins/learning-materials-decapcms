@@ -24,6 +24,7 @@ In this exercise, level 1 students will practice keyframe animation, parenting, 
 
 
 ::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrUCq3o-AvWZ3A6mQTd8O9uJ" title="Introduction to animation Tutorial"}
+::
 
 
 ## Learning Objectives
@@ -67,4 +68,5 @@ In this exercise, level 1 students will practice keyframe animation, parenting, 
 ## Grading Rubric
 
 ::rubric-component{id="exercise"}
+::
 
