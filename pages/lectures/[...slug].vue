@@ -22,12 +22,11 @@ const breadcrumbs = computed(() => [
   { label: lecture.value?.title || 'Loading...' }
 ])
 
-// Get the base URL from the request
-const baseUrl = useRequestURL().origin
-
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
   if (!lecture.value) return null
+  // Get the base URL from the request
+  const baseUrl = useRequestURL().origin
   return buildSupportingMaterialSchema(lecture.value, baseUrl)
 })
 </script>
