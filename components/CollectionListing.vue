@@ -7,8 +7,8 @@ import TableBody from '~/components/ui/table/TableBody.vue'
 import TableRow from '~/components/ui/table/TableRow.vue'
 import TableHead from '~/components/ui/table/TableHead.vue'
 import TableCell from '~/components/ui/table/TableCell.vue'
-import Button from '~/components/ui/button/Button.vue'
-import { Search, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import Pagination from '~/components/ui/pagination/Pagination.vue'
+import { Search, ChevronRight } from 'lucide-vue-next'
 
 interface CollectionItem {
   title: string
@@ -18,6 +18,7 @@ interface CollectionItem {
   difficulty?: string
   image?: string
   imageAlt?: string
+  tags?: string[]
   _path?: string
   path?: string
   slug?: string
@@ -45,11 +46,20 @@ const filteredItems = computed(() => {
   if (!searchQuery.value) return props.items
   
   const query = searchQuery.value.toLowerCase()
-  return props.items.filter(item => 
-    item.title.toLowerCase().includes(query) ||
-    item.description?.toLowerCase().includes(query) ||
-    item.author?.toLowerCase().includes(query)
-  )
+  return props.items.filter(item => {
+    // Search in title, description, and author
+    const matchesText = 
+      item.title.toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query) ||
+      item.author?.toLowerCase().includes(query)
+    
+    // Search in tags
+    const matchesTags = item.tags?.some(tag => 
+      tag.toLowerCase().includes(query)
+    )
+    
+    return matchesText || matchesTags
+  })
 })
 
 const totalPages = computed(() => 
@@ -70,16 +80,8 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
+const updatePage = (page: number) => {
+  currentPage.value = page
 }
 </script>
 
@@ -107,9 +109,8 @@ const previousPage = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead v-if="items.some(i => i.image)" class="w-[80px]"></TableHead>
+            <TableHead v-if="items.some(i => i.image)" class="w-[160px]"></TableHead>
             <TableHead class="w-[50%]">Title</TableHead>
-            <TableHead>Date</TableHead>
             <TableHead v-if="items.some(i => i.author)">Author</TableHead>
             <TableHead v-if="items.some(i => i.difficulty)">Difficulty</TableHead>
           </TableRow>
@@ -121,10 +122,10 @@ const previousPage = () => {
                 <NuxtImg
                   :src="item.image"
                   :alt="item.imageAlt || item.title"
-                  width="64"
+                  width="128"
                   height="64"
                   fit="cover"
-                  class="rounded object-cover w-16 h-16"
+                  class="rounded object-cover w-32 h-16"
                   loading="lazy"
                 />
               </NuxtLink>
@@ -137,11 +138,6 @@ const previousPage = () => {
               <p v-if="item.description" class="text-sm text-muted-foreground mt-1 line-clamp-2">
                 {{ item.description }}
               </p>
-            </TableCell>
-            <TableCell>
-              <span class="text-sm text-muted-foreground whitespace-nowrap">
-                {{ formatDate(item.date) }}
-              </span>
             </TableCell>
             <TableCell v-if="items.some(i => i.author)">
               <span class="text-sm">{{ item.author || '-' }}</span>
@@ -157,32 +153,17 @@ const previousPage = () => {
       </Table>
     </div>
 
-    <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between">
+    <div v-if="totalPages > 1" class="mt-8 flex flex-col items-center gap-4">
       <p class="text-sm text-muted-foreground">
         Showing <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to 
         <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }}</span> of 
         <span class="font-medium">{{ filteredItems.length }}</span> results
       </p>
-      <div class="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          :disabled="currentPage === 1"
-          @click="previousPage"
-        >
-          <ChevronLeft class="h-4 w-4 mr-1" />
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          :disabled="currentPage === totalPages"
-          @click="nextPage"
-        >
-          Next
-          <ChevronRight class="h-4 w-4 ml-1" />
-        </Button>
-      </div>
+      <Pagination
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        @update:current-page="updatePage"
+      />
     </div>
   </div>
 </template>
