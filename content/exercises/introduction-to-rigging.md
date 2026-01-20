@@ -31,7 +31,7 @@ attachments:
 In this exercise, students will practice correcting a character model's edge-flow and set up an armature rig to pose the character in a sitting position.
 
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX4lOk4gv0XjdSVpB31qOtJ" title="Introduction to rigging Tutorial"}
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrX4lOk4gv0XjdSVpB31qOtJ" title="Introduction to rigging Tutorial"}::
 
 
 ## Learning Objectives
@@ -62,5 +62,5 @@ In this exercise, students will practice correcting a character model's edge-flo
 
 ## Grading Rubric
 
-::rubric-component{id="exercise"}
+::rubric-component{id="exercise"}::
 
