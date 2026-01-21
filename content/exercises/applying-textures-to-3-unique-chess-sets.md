@@ -5,7 +5,7 @@ slug: applying-textures-to-3-unique-chess-sets
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QlIH4xCkx3q86mJu84QpGOJ
-image: /uploads/exercises/rec0apDu2F1wTfIoq_image_ianbrill_chess_set.png
+image: /uploads/rec0apDu2F1wTfIoq_image_ianbrill_chess_set.png
 imageAlt: ianbrill chess set.png
 rubric: exercise
 tags:
@@ -17,7 +17,7 @@ published: true
 allowEmbed: true
 attachments:
   - file: >-
-      /uploads/files/recoFF226YCX63HR5_attachment_pawel-czerwinski-oykbZuvajO0-unsplash.jpg
+      /uploads/recoFF226YCX63HR5_attachment_pawel-czerwinski-oykbZuvajO0-unsplash.jpg
     title: 'Blue And White Water Splash: Pawel Czerwinski'
     description: 'Blue And White Water Splash: Pawel Czerwinski - https://unsplash.com/'
     alt: 'A Texture Image: Blue And White Water Splash: Pawel Czerwinski'

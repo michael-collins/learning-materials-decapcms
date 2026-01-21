@@ -5,7 +5,7 @@ slug: modeling-a-pawn
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QkyyjlPgk2ZmvzQih_Yk8Dx
-image: /uploads/exercises/recsOUAg8kJfB2Czp_image_pawn_image.png
+image: /uploads/recsOUAg8kJfB2Czp_image_pawn_image.png
 imageAlt: pawn image.png
 rubric: exercise
 tags:
@@ -16,14 +16,14 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recJUmokImdWO4AsY_attachment_pawn_top.jpg
+  - file: /uploads/recJUmokImdWO4AsY_attachment_pawn_top.jpg
     title: Illustration of the Top View of Pawn
     description: Illustration of the Top View of a Pawn
     alt: Illustration of the Top View of Pawn
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recf9LNavOZ7IXufM_attachment_pawn_front_back_and_sides.jpg
+  - file: /uploads/recf9LNavOZ7IXufM_attachment_pawn_front_back_and_sides.jpg
     title: Illustration of the Side View of Pawn
     description: Illustration of the Side View of Pawn
     alt: Illustration of the Side View of Pawn

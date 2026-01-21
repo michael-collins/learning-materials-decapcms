@@ -5,7 +5,7 @@ slug: animating-tetris
 type: 'oer:Practice'
 difficulty: Intermediate
 youtubePlaylistID: PL-V2nChTadrUEv-pnXBisI7G3yU_puFGv
-image: /uploads/exercises/recxOxvwqqUAVs2TK_image_banner-tetris-compressed.jpg
+image: /uploads/recxOxvwqqUAVs2TK_image_banner-tetris-compressed.jpg
 imageAlt: banner-tetris-compressed.jpg
 license: CC BY 4.0
 aiLicense:

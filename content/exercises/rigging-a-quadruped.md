@@ -6,7 +6,7 @@ type: 'oer:Practice'
 difficulty: Advanced
 youtubePlaylistID: PL-V2nChTadrV1SRFV9WFkj605z0HzQLXS
 image: >-
-  /uploads/exercises/recF6aLZmbNHI355u_image_ex-6-intermediate-banner-compressed.jpg
+  /uploads/recF6aLZmbNHI355u_image_ex-6-intermediate-banner-compressed.jpg
 imageAlt: ex-6-intermediate-banner-compressed.jpg
 license: CC BY 4.0
 aiLicense:

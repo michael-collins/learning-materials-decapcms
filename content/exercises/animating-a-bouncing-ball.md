@@ -5,7 +5,7 @@ slug: animating-a-bouncing-ball
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrVJwkuJN1Ht3GcuzXpue29M
-image: /uploads/exercises/recmjJ85mfZrRGRFu_image_viewport-render.png
+image: /uploads/recmjJ85mfZrRGRFu_image_viewport-render.png
 imageAlt: viewport-render.png
 license: CC BY 4.0
 aiLicense:
@@ -20,7 +20,7 @@ authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recIeZMcCM9SG8jcK_attachment_ball-bounce-reference.png
+  - file: /uploads/recIeZMcCM9SG8jcK_attachment_ball-bounce-reference.png
     title: Bouncing Ball Reference
     description: Bouncing ball animation reference
     alt: >-

@@ -5,7 +5,7 @@ slug: low-poly-non-photorealistic-rendering
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrX6h44IeMo7hTkjg9HtJgvb
-image: /uploads/exercises/recc8Zz9a0zTOaRyE_image_t-pose-banner.jpg
+image: /uploads/recc8Zz9a0zTOaRyE_image_t-pose-banner.jpg
 imageAlt: t-pose-banner.jpg
 license: CC BY 4.0
 aiLicense:

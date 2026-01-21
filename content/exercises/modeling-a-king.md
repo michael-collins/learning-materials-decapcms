@@ -5,7 +5,7 @@ slug: modeling-a-king
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QmZ7dFmd7KeeCH5h9b3ZlGu
-image: /uploads/exercises/recqV87QKaWerduJM_image_king_image.png
+image: /uploads/recqV87QKaWerduJM_image_king_image.png
 imageAlt: king image.png
 rubric: exercise
 tags:
@@ -16,21 +16,21 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recyxjprS7fsd9qV3_attachment_king_side.jpg
+  - file: /uploads/recyxjprS7fsd9qV3_attachment_king_side.jpg
     title: Reference Image for the Side of a King
     description: Reference Image for the Side of a King
     alt: Reference Image for the Side of a King
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recjjHSNrhLgiXumH_attachment_king_top.jpg
+  - file: /uploads/recjjHSNrhLgiXumH_attachment_king_top.jpg
     title: Reference Image for the Top of a King
     description: Reference Image for the Top of a King
     alt: Reference Image for the Top of a King
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/rec7xvBPAIevKVSWD_attachment_king_front_and_back.jpg
+  - file: /uploads/rec7xvBPAIevKVSWD_attachment_king_front_and_back.jpg
     title: Reference Image for the Front and Back of a King
     description: Reference Image for the Front and Back of a King
     alt: Reference Image for the Front and Back of a King

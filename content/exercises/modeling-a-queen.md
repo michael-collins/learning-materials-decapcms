@@ -5,7 +5,7 @@ slug: modeling-a-queen
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QkznWA0SSvO8i2iMil7btof
-image: /uploads/exercises/rec9QA33OJOpWtn9W_image_queen_image.png
+image: /uploads/rec9QA33OJOpWtn9W_image_queen_image.png
 imageAlt: queen image.png
 rubric: exercise
 tags:
@@ -16,14 +16,14 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/rec6RB7ybJX1eHN8N_attachment_queen_top.jpg
+  - file: /uploads/rec6RB7ybJX1eHN8N_attachment_queen_top.jpg
     title: Reference Image of the Top of a Queen Chess Piece
     description: ''
     alt: Reference Image of the Top of a Queen Chess Piece
     citation: Reference Image of the Top of a Queen Chess Piece
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recMOmgsJxuDlTZ8F_attachment_queen_side.jpg
+  - file: /uploads/recMOmgsJxuDlTZ8F_attachment_queen_side.jpg
     title: Reference Image of the Side of a Queen Chess Piece
     description: Reference Image of the Side of a Queen Chess Piece
     alt: Reference Image of the Side of a Queen Chess Piece

@@ -5,7 +5,7 @@ slug: modeling-a-rook
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5Ql40pEsctlh1xNHLDS8F0cb
-image: /uploads/exercises/recI5o36ru0BbxuCH_image_rook_image.png
+image: /uploads/recI5o36ru0BbxuCH_image_rook_image.png
 imageAlt: rook image.png
 rubric: exercise
 tags:
@@ -16,21 +16,21 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/rec1auFJfWa2Iqw8t_attachment_rook_side.jpg
+  - file: /uploads/rec1auFJfWa2Iqw8t_attachment_rook_side.jpg
     title: Reference Image for the Side of a Basic Rook
     description: Reference Image for the Side of a Basic Rook
     alt: Reference Image for the Side of a Basic Rook
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recK7fGyaYZ1yzD8M_attachment_fixed_rook_side.jpg
+  - file: /uploads/recK7fGyaYZ1yzD8M_attachment_fixed_rook_side.jpg
     title: 90 Degree Turned Reference Image for the Side of a Basic Rook
     description: 90 Degree Turned Reference Image for the Side of a Basic Rook
     alt: 90 Degree Turned Reference Image for the Side of a Basic Rook
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recZr6vSAvtZ4o7VU_attachment_rook_top.jpg
+  - file: /uploads/recZr6vSAvtZ4o7VU_attachment_rook_top.jpg
     title: Reference Image for the Top of a Basic Rook
     description: Reference Image for the Top of a Basic Rook
     alt: Reference Image for the Top of a Basic Rook

@@ -5,7 +5,7 @@ slug: modeling-a-chessboard
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QksJy4ZnxgWrbVFklAoOFvU
-image: /uploads/exercises/recqqIknm5ebQaFmz_image_Chess_Board_Image.png
+image: /uploads/recqqIknm5ebQaFmz_image_Chess_Board_Image.png
 imageAlt: Chess Board Image.png
 rubric: exercise
 tags:

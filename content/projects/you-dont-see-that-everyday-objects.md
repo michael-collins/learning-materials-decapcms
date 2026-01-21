@@ -6,7 +6,7 @@ type: 'oer:Assessment'
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrV1iw9_XUwArDOs5mwu6fAk
 image: >-
-  /uploads/projects/rec67LSQtsxBgHxxE_image_youdontseethateveryday-banner-comp2.jpg
+  /uploads/rec67LSQtsxBgHxxE_image_youdontseethateveryday-banner-comp2.jpg
 imageAlt: youdontseethateveryday-banner-comp2.jpg
 license: CC BY 4.0
 aiLicense:
@@ -22,7 +22,7 @@ authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recc2Pn0D4cExQqgE_attachment_static-image-project.png
+  - file: /uploads/recc2Pn0D4cExQqgE_attachment_static-image-project.png
     title: Project Workflow (Static images)
     description: The 5-step project production process
     alt: >-
@@ -32,7 +32,7 @@ attachments:
     sourceUrl: ''
     type: image/png
   - file: >-
-      /uploads/files/recAhknW8gYC34qZr_attachment_dart303-project-statement-worksheet-1.docx
+      /uploads/recAhknW8gYC34qZr_attachment_dart303-project-statement-worksheet-1.docx
     title: Work Statement Worksheet (.doc)
     description: Work statement worksheet
     alt: Work statement worksheet

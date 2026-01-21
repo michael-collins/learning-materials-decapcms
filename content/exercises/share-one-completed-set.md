@@ -4,7 +4,7 @@ title: Share One Completed Set
 slug: share-one-completed-set
 type: 'oer:Practice'
 difficulty: Beginner
-image: /uploads/exercises/rec3owIe1VzR0OffF_image_ian_brill_icon_chess_set_2.jpg
+image: /uploads/rec3owIe1VzR0OffF_image_ian_brill_icon_chess_set_2.jpg
 imageAlt: ian brill icon chess set 2.jpg
 rubric: exercise
 tags:

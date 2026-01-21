@@ -6,7 +6,7 @@ type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QlafOnfBirWwtx83ZQ-6K4t
 image: >-
-  /uploads/exercises/recOJrvzE8GWdElPz_image_The_One_Called_Michael_Chavet_121_series_no_6_HORSE.png
+  /uploads/recOJrvzE8GWdElPz_image_The_One_Called_Michael_Chavet_121_series_no_6_HORSE.png
 imageAlt: The One Called Michael Chavet 121 series no 6 HORSE.png
 rubric: exercise
 tags:
@@ -18,7 +18,7 @@ published: true
 allowEmbed: true
 attachments:
   - file: >-
-      /uploads/files/recXzR8dSoAygYDHC_attachment_The_One_Called_Michael_Chavet_121_series_no_6.jpeg
+      /uploads/recXzR8dSoAygYDHC_attachment_The_One_Called_Michael_Chavet_121_series_no_6.jpeg
     title: 'Chavet 121 series no 6: Knight '
     description: 'Chavet 121 series no 6: Knight '
     alt: 'Chavet 121 series no 6: Knight Reference Image'

@@ -5,7 +5,7 @@ slug: animated-textures
 type: oer:Practice
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrUWRugAsFhfYkUojjO1iZWH
-image: /uploads/exercises/recn4C0llk2Kq5tuH_image_ex-7-intro-banner-compressed.jpg
+image: /uploads/recn4C0llk2Kq5tuH_image_ex-7-intro-banner-compressed.jpg
 imageAlt: ex-7-intro-banner-compressed.jpg
 license: CC BY 4.0
 aiLicense:

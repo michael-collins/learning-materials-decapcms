@@ -5,7 +5,7 @@ slug: modeling-a-figurative-knight
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QlEM8qkrx_rcHaAemZ3oHZH
-image: /uploads/exercises/rec8Y2xjGTcAffTeB_image_Smooth_Knight.png
+image: /uploads/rec8Y2xjGTcAffTeB_image_Smooth_Knight.png
 imageAlt: Smooth Knight.png
 rubric: exercise
 tags:
@@ -16,42 +16,42 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recUNFzWcDdGNGTA4_attachment_LEFT_KNIGHT.tif
+  - file: /uploads/recUNFzWcDdGNGTA4_attachment_LEFT_KNIGHT.tif
     title: Figurative Knight Left Side Reference Image
     description: Figurative Knight Left Side Reference Image
     alt: Figurative Knight Left Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/tiff
-  - file: /uploads/files/recNmlfaKY3YkIHPe_attachment_RIGHT_KNIGHT.tif
+  - file: /uploads/recNmlfaKY3YkIHPe_attachment_RIGHT_KNIGHT.tif
     title: Figurative Knight Right Side Reference Image
     description: Figurative Knight Right Side Reference Image
     alt: Figurative Knight Right Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/tiff
-  - file: /uploads/files/recBuGV2k35ohfEGa_attachment_BOTTOM_KNIGHT.tif
+  - file: /uploads/recBuGV2k35ohfEGa_attachment_BOTTOM_KNIGHT.tif
     title: Figurative Knight Bottom Side Reference Image
     description: Figurative Knight Bottom Side Reference Image
     alt: Figurative Knight Bottom Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/tiff
-  - file: /uploads/files/recVR1Q6LEFqiXU5A_attachment_TOP_KNIGHT.tif
+  - file: /uploads/recVR1Q6LEFqiXU5A_attachment_TOP_KNIGHT.tif
     title: Figurative Knight Top Side Reference Image
     description: Figurative Knight Top Side Reference Image
     alt: Figurative Knight Top Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/tiff
-  - file: /uploads/files/recZoXFEqXqma0fo6_attachment_REAR_KNIGHT.tif
+  - file: /uploads/recZoXFEqXqma0fo6_attachment_REAR_KNIGHT.tif
     title: Figurative Knight Back Side Reference Image
     description: Figurative Knight Back Side Reference Image
     alt: Figurative Knight Back Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/tiff
-  - file: /uploads/files/recHT0fX4sR5gsUiC_attachment_FRONT_KNIGHT.tif
+  - file: /uploads/recHT0fX4sR5gsUiC_attachment_FRONT_KNIGHT.tif
     title: Figurative Knight Front Side Reference Image
     description: Figurative Knight Front Side Reference Image
     alt: Figurative Knight Front Side Reference Image

@@ -5,7 +5,7 @@ slug: ideas-in-motion
 type: 'oer:Assessment'
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrWRqmkePyLUhIndLHarj7H-
-image: /uploads/projects/recKy155GBMBZKNjJ_image_cycles-banner-compressed2.jpg
+image: /uploads/recKy155GBMBZKNjJ_image_cycles-banner-compressed2.jpg
 imageAlt: cycles-banner-compressed2.jpg
 license: CC BY 4.0
 aiLicense:
@@ -22,14 +22,14 @@ authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recWIZ9by8kdM9JEo_attachment_dart303-project-concepts.docx
+  - file: /uploads/recWIZ9by8kdM9JEo_attachment_dart303-project-concepts.docx
     title: Concept Development Worksheet (.docx)
     description: Concept development worksheet
     alt: Concept development worksheet
     citation: ''
     sourceUrl: ''
     type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
-  - file: /uploads/files/rec5yoxGObqGbFsIn_attachment_storyboard-template.pdf
+  - file: /uploads/rec5yoxGObqGbFsIn_attachment_storyboard-template.pdf
     title: Storyboard Template (pdf)
     description: Storyboard template
     alt: Storyboard template

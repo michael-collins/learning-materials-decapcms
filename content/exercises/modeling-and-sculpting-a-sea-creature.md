@@ -5,7 +5,7 @@ slug: modeling-and-sculpting-a-sea-creature
 type: 'oer:Practice'
 difficulty: Advanced
 youtubePlaylistID: PL-V2nChTadrW9SylyEr8DprET38xynl_5
-image: /uploads/exercises/reckkzm19AZnEIkJE_image_sculpting-retopo-header-v1.jpg
+image: /uploads/reckkzm19AZnEIkJE_image_sculpting-retopo-header-v1.jpg
 imageAlt: sculpting-retopo-header-v1.jpg
 license: CC BY 4.0
 aiLicense:

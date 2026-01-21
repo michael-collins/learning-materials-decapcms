@@ -5,7 +5,7 @@ slug: introduction-to-rigging
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrX4lOk4gv0XjdSVpB31qOtJ
-image: /uploads/exercises/recNVyB0NFX6Uu2Ln_image_ex-6-beginner-banner-compressed.jpg
+image: /uploads/recNVyB0NFX6Uu2Ln_image_ex-6-beginner-banner-compressed.jpg
 imageAlt: ex-6-beginner-banner-compressed.jpg
 license: CC BY 4.0
 aiLicense:
@@ -20,7 +20,7 @@ authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recJjqlGeFw9C431Y_attachment_biped-base-mesh.fbx
+  - file: /uploads/recJjqlGeFw9C431Y_attachment_biped-base-mesh.fbx
     title: Base character mesh
     description: Starter character mesh
     alt: ''

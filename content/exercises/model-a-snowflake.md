@@ -5,7 +5,7 @@ slug: model-a-snowflake
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QlA1AFMxpkvj6JQwOxNygMy
-image: /uploads/exercises/recorR58sjS22oVbk_image_snowflake_image.png
+image: /uploads/recorR58sjS22oVbk_image_snowflake_image.png
 imageAlt: snowflake image.png
 rubric: exercise
 tags:

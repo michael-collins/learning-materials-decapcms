@@ -5,7 +5,7 @@ slug: modeling-a-low-poly-animal-and-introduction-to-particles
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QkTtYtaAa7RjiQgixIJX0kH
-image: /uploads/exercises/recvUlgEohhluSnhU_image_OSTRICH.png
+image: /uploads/recvUlgEohhluSnhU_image_OSTRICH.png
 imageAlt: OSTRICH.png
 rubric: exercise-low-poly
 tags:

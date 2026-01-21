@@ -6,7 +6,7 @@ type: 'oer:Practice'
 difficulty: Advanced
 youtubePlaylistID: PL-V2nChTadrV3t6j1M7_93uLpJq-AXoHV
 image: >-
-  /uploads/exercises/recoSUxGzMnYSAxjn_image_sculpting-retopo-rendering-PBR-header-v1.jpg
+  /uploads/recoSUxGzMnYSAxjn_image_sculpting-retopo-rendering-PBR-header-v1.jpg
 imageAlt: sculpting-retopo-rendering-PBR-header-v1.jpg
 license: CC BY 4.0
 aiLicense:

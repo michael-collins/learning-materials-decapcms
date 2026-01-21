@@ -5,7 +5,7 @@ slug: lighting-and-rendering-the-airline-chair
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PL-V2nChTadrVabQ0miYe-Oy-PZe6Jab7Q
-image: /uploads/exercises/recbAgArvnM20cFKL_image_rendering-banner.jpg
+image: /uploads/recbAgArvnM20cFKL_image_rendering-banner.jpg
 imageAlt: rendering-banner.jpg
 license: CC BY 4.0
 aiLicense:
@@ -21,7 +21,7 @@ authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/reciiBA8GKDiKgnat_attachment_244141_743985d156708c43_b.jpg
+  - file: /uploads/reciiBA8GKDiKgnat_attachment_244141_743985d156708c43_b.jpg
     title: Airline Chair 3/4 view
     description: Airline Chair designed by KEM Weber.
     alt: Airline Chair
@@ -31,7 +31,7 @@ attachments:
       2018-22-28 
     sourceUrl: 'http://cprhw.tt/o/BKmDR/'
     type: image/jpeg
-  - file: /uploads/files/rec7Nk9n27iVbDndb_attachment_244191_5cd7e8666b5a9bfe_b.jpg
+  - file: /uploads/rec7Nk9n27iVbDndb_attachment_244191_5cd7e8666b5a9bfe_b.jpg
     title: Airline Chair side view
     description: Airline Chair designed by KEM Weber.
     alt: Airline Chair
@@ -41,7 +41,7 @@ attachments:
       2018-22-28 
     sourceUrl: 'http://cprhw.tt/o/BKmDR/'
     type: image/jpeg
-  - file: /uploads/files/recjNVy0NcTvHBB5t_attachment_chair-render-compressed.jpg
+  - file: /uploads/recjNVy0NcTvHBB5t_attachment_chair-render-compressed.jpg
     title: Airline Chair Example render
     description: Airline Chair example render
     alt: An example rendering of the KEM Weber Airline Chair
