@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { buildCourseSchema } from '~/lib/oer-schema-builder'
+import { buildSupportingMaterialSchema } from '~/lib/oer-schema-builder'
 
 const route = useRoute()
 
@@ -20,7 +20,7 @@ const { data: lecture } = await useAsyncData(
 const oerSchema = computed(() => {
   if (!lecture.value) return null
   const baseUrl = useRequestURL().origin
-  return buildCourseSchema(lecture.value, baseUrl)
+  return buildSupportingMaterialSchema(lecture.value, baseUrl)
 })
 </script>
 
