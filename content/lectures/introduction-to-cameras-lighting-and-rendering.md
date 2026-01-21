@@ -102,6 +102,15 @@ oer:
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
 ---
 
+## Presentation
+
+::google-slides-component
+---
+id: 2PACX-1vR8tl1dcVeFuKlBa1s1uB-dyXCnqzq_4Mdswke1ppmpOj4Gtby5etm2_aKykcz33GYCLQ4xUyixe61D
+title: Introduction to Modeling
+---
+::
+
 ## Topics Covered
 
 - 1. **Video Screening**

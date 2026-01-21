@@ -36,30 +36,52 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const searchQuery = ref('')
+const selectedAuthor = ref('')
 const currentPage = ref(1)
 
 const getItemPath = (item: CollectionItem) => {
   return item._path || item.path || `/articles/${item.slug}` || '#'
 }
 
-const filteredItems = computed(() => {
-  if (!searchQuery.value) return props.items
-  
-  const query = searchQuery.value.toLowerCase()
-  return props.items.filter(item => {
-    // Search in title, description, and author
-    const matchesText = 
-      item.title.toLowerCase().includes(query) ||
-      item.description?.toLowerCase().includes(query) ||
-      item.author?.toLowerCase().includes(query)
-    
-    // Search in tags
-    const matchesTags = item.tags?.some(tag => 
-      tag.toLowerCase().includes(query)
-    )
-    
-    return matchesText || matchesTags
+// Get unique authors from items
+const authors = computed(() => {
+  const authorSet = new Set<string>()
+  props.items.forEach(item => {
+    if (item.author) {
+      authorSet.add(item.author)
+    }
   })
+  return Array.from(authorSet).sort()
+})
+
+const filteredItems = computed(() => {
+  let filtered = props.items
+  
+  // Filter by author
+  if (selectedAuthor.value) {
+    filtered = filtered.filter(item => item.author === selectedAuthor.value)
+  }
+  
+  // Filter by search query
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(item => {
+      // Search in title, description, and author
+      const matchesText = 
+        item.title.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query) ||
+        item.author?.toLowerCase().includes(query)
+      
+      // Search in tags
+      const matchesTags = item.tags?.some(tag => 
+        tag.toLowerCase().includes(query)
+      )
+      
+      return matchesText || matchesTags
+    })
+  }
+  
+  return filtered
 })
 
 const totalPages = computed(() => 
@@ -94,14 +116,26 @@ const updatePage = (page: number) => {
       </p>
     </div>
 
-    <div class="mb-8">
-      <div class="relative max-w-md">
+    <div class="mb-8 flex flex-col sm:flex-row gap-4">
+      <div class="relative flex-1 max-w-md">
         <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           v-model="searchQuery"
           placeholder="Search..."
           class="pl-10"
         />
+      </div>
+      
+      <div v-if="authors.length > 1" class="w-full sm:w-64">
+        <select
+          v-model="selectedAuthor"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <option value="">All Authors</option>
+          <option v-for="author in authors" :key="author" :value="author">
+            {{ author }}
+          </option>
+        </select>
       </div>
     </div>
 
