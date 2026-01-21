@@ -21,7 +21,7 @@ const exercisePath = `/exercises/${slug.join('/')}`
 
 console.log('[Exercise Page] Loading exercise:', exercisePath)
 
-const { data: exercise } = await useAsyncData(
+const { data: exercise, pending } = await useAsyncData(
   `exercise-${exercisePath}`,
   () => queryCollection('exercises').path(exercisePath).first()
 )
@@ -50,7 +50,12 @@ const oerSchema = computed(() => {
   <div>
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
-    <div v-if="exercise" key="exercise-content">
+    <div v-if="pending" class="container py-8">
+      <div class="flex justify-center items-center min-h-[400px]">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+    <div v-else-if="exercise" key="exercise-content">
       <CollectionItem
         :breadcrumbs="breadcrumbs"
         :title="exercise.title"

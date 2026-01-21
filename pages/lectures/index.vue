@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: lectures } = await useAsyncData('lectures', () =>
+const { data: lectures, pending } = await useAsyncData('lectures', () =>
   queryCollection('lectures').all()
 )
 
@@ -23,6 +23,7 @@ const sortedLectures = computed(() => {
         :items="sortedLectures"
         type="lectures"
         emptyMessage="No lectures available yet."
+        :loading="pending"
       />
     </div>
   </NuxtLayout>

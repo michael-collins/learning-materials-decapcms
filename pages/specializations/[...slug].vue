@@ -12,7 +12,7 @@ definePageMeta({
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
 const specializationPath = `/specializations/${slug.join('/')}`
 
-const { data: specialization } = await useAsyncData(`specialization-${specializationPath}`, () =>
+const { data: specialization, pending } = await useAsyncData(`specialization-${specializationPath}`, () =>
   queryCollection('specializations').path(specializationPath).first()
 )
 
@@ -34,8 +34,11 @@ const oerSchema = computed(() => {
 <template>
   <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
-    
-    <div v-if="specialization">
+        <div v-if="pending" class="container py-8">
+      <div class="flex justify-center items-center min-h-[400px]">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>    <div v-if="specialization">
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="specialization.title"

@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'docs'
 })
 
-const { data: pathways } = await useAsyncData('pathways', () =>
+const { data: pathways, pending } = await useAsyncData('pathways', () =>
   queryCollection('pathways').all()
 )
 
@@ -19,5 +19,6 @@ const sortedPathways = computed(() => {
     description="Course-level learning pathways that guide your educational journey."
     :items="sortedPathways"
     :items-per-page="20"
+    :loading="pending"
   />
 </template>

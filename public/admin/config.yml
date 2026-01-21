@@ -304,6 +304,22 @@ collections:
           - {label: "Name", name: "name", widget: "string"}
           - {label: "Description", name: "description", widget: "text"}
 
+  - name: "resources"
+    label: "Resources"
+    file: "content/data/resources.json"
+    fields:
+      - label: "Resources"
+        name: "body"
+        widget: "list"
+        fields:
+          - {label: "Name", name: "name", widget: "string"}
+          - {label: "Description", name: "description", widget: "text", required: false}
+          - {label: "Body", name: "body", widget: "text", required: false, hint: "Additional details"}
+          - {label: "Type", name: "type", widget: "select", options: ["artist", "assets", "reference", "collective", "tool", "tutorial", "other"]}
+          - {label: "Tags", name: "tags", widget: "list", required: false, hint: "Add relevant tags (e.g., textures, lighting, modeling)"}
+          - {label: "URL", name: "url", widget: "string"}
+          - {label: "Alt Text", name: "alt", widget: "string", required: false, hint: "Defaults to name if not provided"}
+
 # Editor configuration
 editor:
   preview: true

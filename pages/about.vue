@@ -10,13 +10,13 @@ definePageMeta({
       <h1>About</h1>
       
       <p class="lead">
-        This is a collection of open educational resources (OER) for digital arts and technology learning.
+        This is a collection of open educational resources (OER) for digital arts, design and technology.
       </p>
 
       <h2>Our Mission</h2>
       <p>
-        We provide free, accessible, and high-quality learning materials to support students and educators 
-        in digital arts, 3D modeling, animation, and related creative technology fields.
+        We provide free and accessible learning materials to support students and educators 
+        in digital arts and design curricula.
       </p>
 
       <h2>Content & Licensing</h2>
@@ -28,8 +28,8 @@ definePageMeta({
 
       <h2>Contributing Authors</h2>
       <ul>
-        <li><strong>Michael Collins</strong></li>
-        <li><strong>Kenneth Ian Brill</strong></li>
+        <li><strong>Michael Collins, Penn State University</strong></li>
+        <li><strong>Kenneth Ian Brill, Penn State University</strong></li>
       </ul>
 
       <h2>Technology</h2>

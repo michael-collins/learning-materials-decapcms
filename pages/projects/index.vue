@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'docs'
 })
 
-const { data: projects } = await useAsyncData('projects', () =>
+const { data: projects, pending } = await useAsyncData('projects', () =>
   queryCollection('projects').all()
 )
 

@@ -12,7 +12,7 @@ definePageMeta({
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
 const pathwayPath = `/pathways/${slug.join('/')}`
 
-const { data: pathway } = await useAsyncData(`pathway-${pathwayPath}`, () =>
+const { data: pathway, pending } = await useAsyncData(`pathway-${pathwayPath}`, () =>
   queryCollection('pathways').path(pathwayPath).first()
 )
 
@@ -35,7 +35,12 @@ const oerSchema = computed(() => {
   <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
-    <div v-if="pathway">
+    <div v-if="pending" class="container py-8">
+      <div class="flex justify-center items-center min-h-[400px]">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+    <div v-else-if="pathway">
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="pathway.title"

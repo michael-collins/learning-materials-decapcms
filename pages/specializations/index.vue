@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'docs'
 })
 
-const { data: specializations } = await useAsyncData('specializations', () =>
+const { data: specializations, pending } = await useAsyncData('specializations', () =>
   queryCollection('specializations').all()
 )
 
@@ -19,5 +19,6 @@ const sortedSpecializations = computed(() => {
     description="Learning component units focused on specific skill areas and topics."
     :items="sortedSpecializations"
     :items-per-page="20"
+    :loading="pending"
   />
 </template>

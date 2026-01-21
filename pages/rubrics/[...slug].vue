@@ -9,7 +9,7 @@ definePageMeta({
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
 const rubricPath = `/rubrics/${slug.join('/')}`
 
-const { data: rubric } = await useAsyncData(
+const { data: rubric, pending } = await useAsyncData(
   `rubric-${rubricPath}`,
   () => queryCollection('rubrics').path(rubricPath).first()
 )
@@ -23,7 +23,10 @@ const breadcrumbs = computed(() => [
 
 <template>
   <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-    <div v-if="rubric" key="rubric-content">
+    <div v-if="pending" class="flex justify-center items-center min-h-[400px]">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+    <div v-else-if="rubric" key="rubric-content">
       <article>
         <!-- Rubric Display -->
         <div class="border border-border rounded-lg p-4">
@@ -57,8 +60,11 @@ const breadcrumbs = computed(() => [
       </article>
     </div>
 
-    <div v-else key="rubric-loading" class="flex items-center justify-center min-h-[400px]">
-      <p class="text-muted-foreground">Loading rubric...</p>
+    <div v-else key="rubric-not-found" class="text-center py-8">
+      <h1 class="text-2xl font-bold mb-4">Rubric not found</h1>
+      <NuxtLink to="/rubrics" class="text-primary hover:underline">
+        ← Back to rubrics
+      </NuxtLink>
     </div>
   </div>
 </template>

@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'docs'
 })
 
-const { data: rawRubrics } = await useAsyncData('rubrics', () =>
+const { data: rawRubrics, pending } = await useAsyncData('rubrics', () =>
   queryCollection('rubrics').all()
 )
 
@@ -27,5 +27,6 @@ const rubrics = computed(() => {
     title="Rubrics"
     :items="rubrics"
     :items-per-page="20"
+    :loading="pending"
   />
 </template>

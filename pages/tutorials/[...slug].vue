@@ -8,7 +8,7 @@ definePageMeta({
 
 const tutorialPath = `/tutorials/${route.params.slug.join('/')}`
 
-const { data: tutorial } = await useAsyncData(`tutorial-${tutorialPath}`, () =>
+const { data: tutorial, pending } = await useAsyncData(`tutorial-${tutorialPath}`, () =>
   queryCollection('tutorials').path(tutorialPath).first()
 )
 
@@ -21,7 +21,12 @@ const breadcrumbs = computed(() => [
 
 <template>
   <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
-    <div v-if="tutorial">
+    <div v-if="pending" class="container py-8">
+      <div class="flex justify-center items-center min-h-[400px]">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    </div>
+    <div v-else-if="tutorial">
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="tutorial.title"

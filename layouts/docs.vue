@@ -44,6 +44,7 @@ const navigationGroups = [
       { title: 'Lectures', path: '/lectures' },
       { title: 'Tutorials', path: '/tutorials' },
       { title: 'Articles', path: '/articles' },
+      { title: 'Resources', path: '/resources' },
     ]
   }
 ]
