@@ -1,12 +1,13 @@
 ---
 title: 3D Model Viewer Test
 slug: 3d-viewer-test
-type: 'oer:Practice'
+type: oer:Practice
 difficulty: Beginner
+rubric: exercise
+author: Michael Collins
 published: true
 allowEmbed: true
 ---
-
 # 3D Model Viewer Test Page
 
 This page demonstrates the 3D Model Viewer component capabilities.
@@ -15,19 +16,16 @@ This page demonstrates the 3D Model Viewer component capabilities.
 
 This example shows how to embed a Sketchfab model:
 
-::threed-viewer-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Haus"}
+
+
+::sketchfab-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Haus" height="600px"}
 ::
 
 ## Example 2: Uploaded GLTF File (Placeholder)
 
 Once you upload a .glb or .gltf file, you can reference it like this:
 
-::threed-viewer-component{src="/uploads/3d-models/example-model.glb" title="Student Project Example" height="700px"}
-::
-
-## Example 3: Without Auto-Rotation
-
-::threed-viewer-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Character Model" autoRotate="true"}
+::threed-viewer-component{src="/uploads/boxes-sculpt-2.glb" title="Boxes!" height="600px"}
 ::
 
 ## Instructions for Students
