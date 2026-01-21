@@ -12,6 +12,12 @@ export default defineNuxtConfig({
     '@nuxt/icon'
   ],
 
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => tag === 'model-viewer'
+    }
+  },
+
   css: ['~/assets/css/tailwind.css'],
 
   postcss: {
