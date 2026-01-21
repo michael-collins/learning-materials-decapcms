@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X } from 'lucide-vue-next'
+import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 import Button from '~/components/ui/button/Button.vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
@@ -22,20 +22,28 @@ const isDesktopCollapsed = ref(false)
 
 const navigationGroups = [
   {
-    label: 'Content',
-    items: [
-      { title: 'Articles', path: '/articles' },
-      { title: 'Tutorials', path: '/tutorials' },
-    ]
-  },
-  {
-    label: 'Learning',
+    label: 'Assessments',
+    icon: ClipboardCheck,
     items: [
       { title: 'Exercises', path: '/exercises' },
       { title: 'Projects', path: '/projects' },
-      { title: 'Specializations', path: '/specializations' },
+    ]
+  },
+  {
+    label: 'Curriculum',
+    icon: Compass,
+    items: [
       { title: 'Pathways', path: '/pathways' },
+      { title: 'Specializations', path: '/specializations' },
+    ]
+  },
+  {
+    label: 'Library',
+    icon: Library,
+    items: [
       { title: 'Lectures', path: '/lectures' },
+      { title: 'Tutorials', path: '/tutorials' },
+      { title: 'Articles', path: '/articles' },
     ]
   }
 ]
@@ -187,20 +195,26 @@ onUnmounted(() => {
 
         <!-- Content -->
         <nav class="flex-1 overflow-auto py-2 px-3">
-          <div v-for="group in navigationGroups" :key="group.label" class="space-y-1">
-            <NuxtLink
-              v-for="item in group.items"
-              :key="item.path"
-              :to="item.path"
-              :class="[
-                'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive(item.path)
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              ]"
-            >
-              {{ item.title }}
-            </NuxtLink>
+          <div v-for="group in navigationGroups" :key="group.label" class="mb-6">
+            <h3 class="mb-2 px-3 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60 flex items-center gap-2">
+              <component :is="group.icon" class="h-3.5 w-3.5" />
+              {{ group.label }}
+            </h3>
+            <div class="space-y-1">
+              <NuxtLink
+                v-for="item in group.items"
+                :key="item.path"
+                :to="item.path"
+                :class="[
+                  'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  isActive(item.path)
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                ]"
+              >
+                {{ item.title }}
+              </NuxtLink>
+            </div>
           </div>
         </nav>
       </div>
@@ -226,12 +240,12 @@ onUnmounted(() => {
           <BreadcrumbItem v-for="(crumb, index) in breadcrumbs" :key="index">
             <BreadcrumbLink v-if="index < breadcrumbs.length - 1" as-child>
               <NuxtLink :to="crumb.path" class="flex items-center">
-                <Icon v-if="index === 0" name="mdi:home" class="h-5 w-5" />
+                <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" />
                 <span v-else>{{ crumb.label }}</span>
               </NuxtLink>
             </BreadcrumbLink>
             <BreadcrumbPage v-else class="flex items-center">
-              <Icon v-if="index === 0" name="mdi:home" class="h-5 w-5" />
+              <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" />
               <span v-else>{{ crumb.label }}</span>
             </BreadcrumbPage>
             <BreadcrumbSeparator v-if="index < breadcrumbs.length - 1">
