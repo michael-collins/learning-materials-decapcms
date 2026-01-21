@@ -29,11 +29,13 @@ interface Props {
   description?: string
   items: CollectionItem[]
   itemsPerPage?: number
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Items',
   itemsPerPage: 10,
+  loading: false,
 })
 
 const searchQuery = ref('')
@@ -146,7 +148,14 @@ watch([searchQuery, selectedAuthor], () => {
     </div>
 
     <div class="rounded-lg border bg-card shadow-sm">
-      <Table>
+      <div v-if="loading" class="p-12 text-center">
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+        <p class="mt-4 text-sm text-muted-foreground">Loading...</p>
+      </div>
+      <div v-else-if="paginatedItems.length === 0" class="p-12 text-center">
+        <p class="text-muted-foreground">No {{ title.toLowerCase() }} found.</p>
+      </div>
+      <Table v-else>
         <TableHeader>
           <TableRow>
             <TableHead v-if="items.some(i => i.image)" class="w-[160px]"></TableHead>

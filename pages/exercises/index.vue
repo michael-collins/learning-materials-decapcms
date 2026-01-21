@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'docs'
 })
 
-const { data: rawExercises } = await useAsyncData('exercises', () =>
+const { data: rawExercises, pending } = await useAsyncData('exercises', () =>
   queryCollection('exercises').all()
 )
 
@@ -25,5 +25,6 @@ const exercises = computed(() => {
     description="Practice activities designed to build and reinforce specific skills and techniques."
     :items="exercises"
     :items-per-page="20"
+    :loading="pending"
   />
 </template>
