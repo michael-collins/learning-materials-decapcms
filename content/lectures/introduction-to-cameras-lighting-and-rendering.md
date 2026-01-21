@@ -46,7 +46,7 @@ topics:
         3. Shadows: Increase the shadow map to 4K
 
 author: Michael Collins
-course:
+course: DART 303
 allowEmbed: true
 license: CC BY 4.0
 published: true
