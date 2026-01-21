@@ -182,19 +182,35 @@ CMS.registerEditorComponent({
   label: "3D Model Viewer",
   fields: [
     {
+      name: "sourceType",
+      label: "Model Source",
+      widget: "select",
+      options: ["upload", "url"],
+      default: "upload",
+      hint: "Choose whether to upload a file or use a URL"
+    },
+    {
       name: "file",
       label: "Upload 3D File",
       widget: "file",
       required: false,
       media_folder: "/uploads/3d-models",
-      hint: "Upload .gltf or .glb file, OR use URL field below"
+      hint: "Upload .gltf or .glb file",
+      condition: {
+        field: "sourceType",
+        equals: "upload"
+      }
     },
     {
       name: "src",
-      label: "Or Sketchfab/Model URL",
+      label: "Sketchfab/Model URL",
       widget: "string",
       required: false,
-      hint: "Paste Sketchfab URL or direct link to .gltf/.glb file"
+      hint: "Paste Sketchfab URL or direct link to .gltf/.glb file",
+      condition: {
+        field: "sourceType",
+        equals: "url"
+      }
     },
     {
       name: "title",
