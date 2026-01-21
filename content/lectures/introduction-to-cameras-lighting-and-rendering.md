@@ -45,9 +45,10 @@ topics:
         2. Enable render settings including: Ambient Occlusion, Depth of Field, and Screen Space Reflections
         3. Shadows: Increase the shadow map to 4K
 
-author: |+
+author: Michael Collins
 course:
-
+allowEmbed: true
+license: CC BY 4.0
 published: true
 oer:
   '@context': 'https://oerschema.org/'
