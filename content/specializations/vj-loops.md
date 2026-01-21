@@ -17,6 +17,7 @@ oer:
   educationalLevel: Beginner
   inLanguage: en-US
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+course:
 ---
 
 ## Who It's For
