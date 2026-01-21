@@ -7,11 +7,10 @@ date: 2024-01-15
 license: CC BY 4.0
 allowEmbed: true
 attachments:
-  - file: /uploads/full-professor-career-path_2026-01-15_16-00-32.png
-    title: Diagram
-    description: This is the description of the diagram. Thanks.
+  - file:
+    title:
+    description:
 ---
-![Airline Chair](/images/uploads/244141_743985d156708c43_b-1-.jpg "Airline Chair")
 
 # Getting Started with Nuxt 3
 
