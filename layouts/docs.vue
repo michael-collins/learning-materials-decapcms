@@ -80,9 +80,8 @@ const toggleSidebar = () => {
 }
 
 const closeMobileMenu = () => {
-  if (isMobile.value) {
-    isMobileMenuOpen.value = false
-  }
+  isMobileMenuOpen.value = false
+  document.body.style.overflow = ''
 }
 
 // Close mobile menu when route changes
@@ -125,6 +124,10 @@ watch(isMobile, (mobile, wasMobile) => {
 })
 
 onMounted(() => {
+  // Ensure mobile menu is closed on initial load
+  isMobileMenuOpen.value = false
+  document.body.style.overflow = ''
+  
   document.addEventListener('keydown', handleEscape)
   document.addEventListener('mousedown', handleClickOutside)
 })
@@ -159,16 +162,14 @@ onUnmounted(() => {
       ref="sidebarRef"
       :class="[
         'bg-card transition-all duration-200 ease-in-out flex-shrink-0',
-        // Mobile styles: fixed overlay
-        'md:border-r md:relative',
-        isMobile ? [
-          'fixed inset-y-0 left-0 z-50 w-64 border-r shadow-lg',
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        ] : [
-          // Desktop styles: inline with push
-          'relative',
-          isDesktopCollapsed ? 'w-0 border-r-0' : 'w-64'
-        ]
+        // Mobile styles: fixed overlay (default hidden)
+        'fixed inset-y-0 left-0 z-50 w-64 border-r shadow-lg -translate-x-full',
+        // Desktop styles: relative positioning, always visible
+        'md:relative md:translate-x-0 md:shadow-none',
+        // Mobile open state
+        isMobile && isMobileMenuOpen && 'translate-x-0',
+        // Desktop collapsed state
+        !isMobile && (isDesktopCollapsed ? 'md:w-0 md:border-r-0' : 'md:w-64')
       ]"
     >
       <div :class="['h-full flex flex-col', !isMobile && isDesktopCollapsed && 'invisible']">
@@ -229,9 +230,9 @@ onUnmounted(() => {
           @click="toggleSidebar"
           class="h-7 w-7"
         >
-          <Menu v-if="isMobile" class="h-4 w-4" />
-          <PanelLeft v-else class="h-4 w-4" />
-          <span class="sr-only">{{ isMobile ? 'Open menu' : 'Toggle sidebar' }}</span>
+          <Menu class="h-4 w-4 md:hidden" />
+          <PanelLeft class="h-4 w-4 hidden md:block" />
+          <span class="sr-only">Toggle sidebar</span>
         </Button>
         
         <div class="h-4 w-px bg-border mx-2" />
