@@ -39,6 +39,7 @@ topics:
         1. [Blender Foundation: Introduction to Blender 2.8](https://www.youtube.com/playlist?list=PLa1F2ddGya_-UvuAqHAksYnB0qL9yWDO6)
 
 author: |+
+course:
 
 published: true
 oer:

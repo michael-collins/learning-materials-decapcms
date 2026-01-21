@@ -46,6 +46,7 @@ topics:
         3. Shadows: Increase the shadow map to 4K
 
 author: |+
+course:
 
 published: true
 oer:

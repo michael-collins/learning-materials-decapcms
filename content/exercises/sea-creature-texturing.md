@@ -16,6 +16,7 @@ tags:
   - Blender
   - Substance Painter
 author: Michael Collins
+course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
