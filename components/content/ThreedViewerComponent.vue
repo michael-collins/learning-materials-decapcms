@@ -16,62 +16,9 @@ const props = withDefaults(defineProps<Props>(), {
   cameraControls: true
 })
 
-// Detect if it's a Sketchfab URL
-const isSketchfab = computed(() => {
-  return props.src.includes('sketchfab.com')
-})
-
-// Detect if it's a GLTF/GLB file
-const is3DFile = computed(() => {
-  return props.src.endsWith('.gltf') || props.src.endsWith('.glb')
-})
-
-// For Sketchfab, convert URL to embed format
-const sketchfabEmbedUrl = computed(() => {
-  if (!isSketchfab.value) return ''
-  
-  let url = props.src
-  
-  // Handle various Sketchfab URL formats
-  // https://sketchfab.com/3d-models/model-name-<id>
-  // https://sketchfab.com/models/<id>
-  
-  // Extract model ID from URL
-  let modelId = ''
-  
-  if (url.includes('/3d-models/')) {
-    // Extract ID from pattern: /3d-models/name-<id>
-    const parts = url.split('/')
-    const lastPart = parts[parts.length - 1]
-    if (lastPart) {
-      const match = lastPart.match(/([a-f0-9]{32})/)
-      if (match && match[1]) {
-        modelId = match[1]
-      }
-    }
-  } else if (url.includes('/models/')) {
-    // Extract ID from pattern: /models/<id>
-    const parts = url.split('/models/')
-    const modelPart = parts[1]
-    if (modelPart) {
-      const withoutQuery = modelPart.split('?')[0]
-      const cleanId = withoutQuery ? withoutQuery.split('#')[0] : ''
-      if (cleanId) {
-        modelId = cleanId
-      }
-    }
-  }
-  
-  if (modelId) {
-    return `https://sketchfab.com/models/${modelId}/embed?autostart=1&ui_theme=dark`
-  }
-  
-  // If it's already an embed URL, return as is
-  if (url.includes('/embed')) {
-    return url
-  }
-  
-  return url
+// Check if src is provided and valid
+const hasValidSrc = computed(() => {
+  return props.src && props.src.trim().length > 0
 })
 
 // Model viewer attributes
@@ -86,23 +33,8 @@ const modelViewerAttrs = computed(() => ({
 
 <template>
   <div class="threed-viewer-container my-8">
-    <!-- Sketchfab Embed -->
-    <div v-if="isSketchfab" class="relative w-full overflow-hidden rounded-lg border border-border bg-muted/30">
-      <iframe
-        :src="sketchfabEmbedUrl"
-        :title="title"
-        :style="`width: ${width}; height: ${height};`"
-        frameborder="0"
-        allow="autoplay; fullscreen; xr-spatial-tracking"
-        allowfullscreen
-        mozallowfullscreen="true"
-        webkitallowfullscreen="true"
-        class="w-full"
-      />
-    </div>
-    
     <!-- GLTF/GLB File Viewer -->
-    <div v-else-if="is3DFile" class="relative w-full overflow-hidden rounded-lg border border-border bg-muted/30">
+    <div v-if="hasValidSrc" class="relative w-full overflow-hidden rounded-lg border border-border bg-muted/30">
       <model-viewer
         v-bind="modelViewerAttrs"
         shadow-intensity="1"
@@ -117,16 +49,18 @@ const modelViewerAttrs = computed(() => ({
       </model-viewer>
     </div>
     
-    <!-- Fallback for unsupported formats -->
+    <!-- Fallback for missing src -->
     <div v-else class="p-8 border border-border rounded-lg bg-muted/30 text-center">
-      <p class="text-muted-foreground">
-        Unsupported 3D format. Please use Sketchfab URLs or upload .gltf/.glb files.
+      <p class="text-muted-foreground mb-2">
+        <strong>No 3D model file provided</strong>
       </p>
-      <p class="text-sm text-muted-foreground mt-2">Source: {{ src }}</p>
+      <p class="text-sm text-muted-foreground">
+        Please upload a .gltf or .glb file using the editor.
+      </p>
     </div>
     
     <!-- Title caption -->
-    <p v-if="title" class="text-sm text-muted-foreground mt-2 text-center">
+    <p v-if="title && hasValidSrc" class="text-sm text-muted-foreground mt-2 text-center">
       {{ title }}
     </p>
   </div>
