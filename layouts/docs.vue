@@ -179,7 +179,7 @@ onUnmounted(() => {
             to="/" 
             class="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
           >
-            Learning Materials
+            OER Platform
           </NuxtLink>
           <!-- Mobile close button -->
           <Button
