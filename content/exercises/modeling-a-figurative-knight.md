@@ -16,48 +16,48 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/recUNFzWcDdGNGTA4_attachment_LEFT_KNIGHT.tif
+  - file: /uploads/recUNFzWcDdGNGTA4_attachment_LEFT_KNIGHT.jpeg
     title: Figurative Knight Left Side Reference Image
     description: Figurative Knight Left Side Reference Image
     alt: Figurative Knight Left Side Reference Image
     citation: ''
     sourceUrl: ''
-    type: image/tiff
-  - file: /uploads/recNmlfaKY3YkIHPe_attachment_RIGHT_KNIGHT.tif
+    type: image/jpeg
+  - file: /uploads/recNmlfaKY3YkIHPe_attachment_RIGHT_KNIGHT.jpeg
     title: Figurative Knight Right Side Reference Image
     description: Figurative Knight Right Side Reference Image
     alt: Figurative Knight Right Side Reference Image
     citation: ''
     sourceUrl: ''
-    type: image/tiff
-  - file: /uploads/recBuGV2k35ohfEGa_attachment_BOTTOM_KNIGHT.tif
+    type: image/jpeg
+  - file: /uploads/recBuGV2k35ohfEGa_attachment_BOTTOM_KNIGHT.jpeg
     title: Figurative Knight Bottom Side Reference Image
     description: Figurative Knight Bottom Side Reference Image
     alt: Figurative Knight Bottom Side Reference Image
     citation: ''
     sourceUrl: ''
-    type: image/tiff
-  - file: /uploads/recVR1Q6LEFqiXU5A_attachment_TOP_KNIGHT.tif
+    type: image/jpeg
+  - file: /uploads/recVR1Q6LEFqiXU5A_attachment_TOP_KNIGHT.jpeg
     title: Figurative Knight Top Side Reference Image
     description: Figurative Knight Top Side Reference Image
     alt: Figurative Knight Top Side Reference Image
     citation: ''
     sourceUrl: ''
-    type: image/tiff
-  - file: /uploads/recZoXFEqXqma0fo6_attachment_REAR_KNIGHT.tif
+    type: image/jpeg
+  - file: /uploads/recZoXFEqXqma0fo6_attachment_REAR_KNIGHT.jpeg
     title: Figurative Knight Back Side Reference Image
     description: Figurative Knight Back Side Reference Image
     alt: Figurative Knight Back Side Reference Image
     citation: ''
     sourceUrl: ''
-    type: image/tiff
-  - file: /uploads/recHT0fX4sR5gsUiC_attachment_FRONT_KNIGHT.tif
+    type: image/jpeg
+  - file: /uploads/recHT0fX4sR5gsUiC_attachment_FRONT_KNIGHT.jpeg
     title: Figurative Knight Front Side Reference Image
     description: Figurative Knight Front Side Reference Image
     alt: Figurative Knight Front Side Reference Image
     citation: ''
     sourceUrl: ''
-    type: image/tiff
+    type: image/jpeg
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
