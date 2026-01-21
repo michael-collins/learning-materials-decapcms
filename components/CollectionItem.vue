@@ -225,6 +225,8 @@ const copyEmbedCode = async () => {
         <button
           @click="isEmbedOpen = !isEmbedOpen"
           class="flex items-center justify-between w-full text-left group"
+          :aria-label="isEmbedOpen ? 'Hide embed code' : 'Show embed code'"
+          :aria-expanded="isEmbedOpen"
         >
           <h2 class="text-2xl font-bold text-foreground">Embed</h2>
           <ChevronDown
@@ -267,10 +269,10 @@ const copyEmbedCode = async () => {
       <!-- Creative Commons License -->
       <div v-if="license" class="mt-12 pt-8 border-t">
         <p class="text-sm text-muted-foreground leading-relaxed">
-          <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors">{{ title }}</a>
+          <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
           <span v-if="author"> by {{ author }}</span>
           is licensed under
-          <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ license }}</a>
+          <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
           <span v-else class="font-medium text-foreground">{{ license }}</span>
         </p>
       </div>

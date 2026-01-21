@@ -240,13 +240,13 @@ onUnmounted(() => {
         <Breadcrumb>
           <BreadcrumbItem v-for="(crumb, index) in breadcrumbs" :key="index">
             <BreadcrumbLink v-if="index < breadcrumbs.length - 1" as-child>
-              <NuxtLink :to="crumb.path" class="flex items-center">
-                <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" />
+              <NuxtLink :to="crumb.path" class="flex items-center" :aria-label="index === 0 ? 'Home' : crumb.label" :title="index === 0 ? 'Home' : crumb.label">
+                <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" aria-hidden="true" />
                 <span v-else>{{ crumb.label }}</span>
               </NuxtLink>
             </BreadcrumbLink>
-            <BreadcrumbPage v-else class="flex items-center">
-              <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" />
+            <BreadcrumbPage v-else class="flex items-center" :aria-label="index === 0 ? 'Home' : crumb.label">
+              <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" aria-hidden="true" />
               <span v-else>{{ crumb.label }}</span>
             </BreadcrumbPage>
             <BreadcrumbSeparator v-if="index < breadcrumbs.length - 1">

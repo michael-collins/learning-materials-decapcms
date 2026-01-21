@@ -304,6 +304,8 @@ const licenseDetails = computed(() => {
           <button
             @click="toggleExpanded(index)"
             class="flex items-center gap-2 text-xs font-medium text-primary hover:underline transition-colors"
+            :aria-label="expandedStates[index] ? 'Hide detailed guidance' : 'Show detailed guidance'"
+            :aria-expanded="expandedStates[index]"
           >
             <ChevronDown 
               class="h-3 w-3 transition-transform duration-200"
