@@ -52,6 +52,16 @@ const getFileIcon = (filename: string) => {
   return File
 }
 
+const isWebImageFile = (filename: string) => {
+  const ext = filename.split('.').pop()?.toLowerCase()
+  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext || '')
+}
+
+const isImageFile = (filename: string) => {
+  const ext = filename.split('.').pop()?.toLowerCase()
+  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tif', 'tiff'].includes(ext || '')
+}
+
 const getFileSize = (url: string) => {
   // This would typically come from the backend, but for now we'll show the extension
   const ext = url.split('.').pop()?.toUpperCase()
@@ -113,40 +123,91 @@ const copyEmbedCode = async () => {
           v-if="image"
           :src="image"
           :alt="imageAlt || title"
-          class="w-full aspect-[2/1] object-cover rounded-lg mb-6"
+          class="w-full object-cover rounded-lg mb-6"
           loading="eager"
         />
         
         <h1 class="text-4xl font-bold tracking-tight mb-4">{{ title }}</h1>
         
-        <div class="flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <div v-if="date" class="flex items-center gap-2">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <time>{{ formatDate(date) }}</time>
           </div>
-          <div v-if="author" class="flex items-center gap-2">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span>{{ author }}</span>
-          </div>
           <div v-if="difficulty">
             <span class="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-semibold text-primary">
               {{ difficulty }}
             </span>
           </div>
+          <div v-if="difficulty && tags && tags.length > 0" class="h-4 w-px bg-border"></div>
+          <div v-if="tags && tags.length > 0" class="flex flex-wrap gap-2">
+            <span
+              v-for="tag in tags"
+              :key="tag"
+              class="inline-flex items-center rounded-full bg-muted border border-border px-3 py-1 text-xs font-medium text-foreground"
+            >
+              {{ tag }}
+            </span>
+          </div>
         </div>
 
-        <div v-if="tags && tags.length > 0" class="mt-4 flex flex-wrap gap-2">
-          <span
-            v-for="tag in tags"
-            :key="tag"
-            class="inline-flex items-center rounded-full bg-muted border border-border px-3 py-1 text-xs font-medium text-foreground"
-          >
-            {{ tag }}
-          </span>
+        <div v-if="attachments && attachments.length > 0" class="mt-6 pt-6 border-t">
+          <div class="space-y-2 max-w-2xl">
+            <!-- External URL attachments -->
+            <a
+              v-for="(attachment, index) in attachments.filter(a => a.url)"
+              :key="`url-${index}`"
+              :href="attachment.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
+            >
+              <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <ExternalLink class="w-4 h-4 text-primary" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-medium text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                  {{ attachment.title }}
+                </h4>
+              </div>
+              <ExternalLink class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+            </a>
+            <!-- Local file attachments -->
+            <a
+              v-for="(attachment, index) in attachments.filter(a => a.file)"
+              :key="`file-${index}`"
+              :href="attachment.file"
+              download
+              class="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
+            >
+              <div v-if="isWebImageFile(attachment.file)" class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-muted">
+                <NuxtImg
+                  :src="attachment.file"
+                  :alt="attachment.title"
+                  class="w-full h-full object-cover pointer-events-none"
+                  width="64"
+                  height="64"
+                  loading="lazy"
+                />
+              </div>
+              <div v-else-if="isImageFile(attachment.file)" class="flex-shrink-0 w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div v-else class="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <component :is="getFileIcon(attachment.file)" class="w-4 h-4 text-primary" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-medium text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                  {{ attachment.title }}
+                </h4>
+              </div>
+              <Download class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+            </a>
+          </div>
         </div>
 
         <p v-if="description" class="mt-4 text-lg text-muted-foreground leading-relaxed">
@@ -158,64 +219,7 @@ const copyEmbedCode = async () => {
         <slot />
       </div>
 
-      <div v-if="attachments && attachments.length > 0" class="mt-12 pt-8 border-t">
-        <h2 class="text-2xl font-bold mb-6 text-foreground">Downloads & Attachments</h2>
-        <div class="space-y-3">
-          <!-- External URL attachments -->
-          <a
-            v-for="(attachment, index) in attachments.filter(a => a.url)"
-            :key="`url-${index}`"
-            :href="attachment.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
-          >
-            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <ExternalLink class="w-5 h-5 text-primary" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">
-                  {{ attachment.title }}
-                </h3>
-                <span class="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                  External Link
-                </span>
-              </div>
-              <p v-if="attachment.description" class="text-sm text-muted-foreground mt-1">
-                {{ attachment.description }}
-              </p>
-            </div>
-            <ExternalLink class="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-          </a>
-          <!-- Local file attachments -->
-          <a
-            v-for="(attachment, index) in attachments.filter(a => a.file)"
-            :key="`file-${index}`"
-            :href="attachment.file"
-            download
-            class="flex items-start gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
-          >
-            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <component :is="getFileIcon(attachment.file)" class="w-5 h-5 text-primary" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">
-                  {{ attachment.title }}
-                </h3>
-                <span class="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                  {{ getFileSize(attachment.file) }}
-                </span>
-              </div>
-              <p v-if="attachment.description" class="text-sm text-muted-foreground mt-1">
-                {{ attachment.description }}
-              </p>
-            </div>
-            <Download class="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-          </a>
-        </div>
-      </div>
+
 
       <div v-if="allowEmbed" class="mt-12 pt-8 border-t">
         <button
