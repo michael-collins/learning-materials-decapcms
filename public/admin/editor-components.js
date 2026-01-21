@@ -245,7 +245,6 @@ CMS.registerEditorComponent({
       name: "src",
       label: "Upload 3D File",
       widget: "file",
-      media_folder: "/uploads/3d-models",
       hint: "Upload .gltf or .glb file"
     },
     {
