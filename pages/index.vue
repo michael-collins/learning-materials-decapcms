@@ -6,9 +6,12 @@ definePageMeta({
 
 <template>
   <div class="container max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-    <div class="hero mb-16 rounded-xl bg-gradient-to-br from-primary via-primary to-purple-600 dark:from-primary/80 dark:via-primary/70 dark:to-purple-600/80 p-16 text-center text-primary-foreground shadow-xl">
-      <h1 class="mb-6 text-5xl font-bold tracking-tight">Open Educational Resources Platform</h1>
-      <p class="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">A comprehensive system for creating, managing, and sharing educational content with proper metadata, licensing, and LMS integration</p>
+    <div class="hero mb-16 rounded-xl bg-gradient-to-br from-transparent to-black p-16 text-center text-white shadow-xl relative overflow-hidden">
+      <div class="absolute inset-0 opacity-90 dark:opacity-10 bg-center" style="background-image: url('/images/isometric-grid10.png'); background-size: cover;"></div>
+      <div class="relative z-10">
+        <h1 class="mb-6 text-5xl font-bold tracking-tight">Open Educational Resources Platform</h1>
+        <p class="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">A comprehensive system for creating, managing, and sharing educational content with proper metadata, licensing, and LMS integration</p>
+      </div>
     </div>
 
     <!-- Purpose -->
