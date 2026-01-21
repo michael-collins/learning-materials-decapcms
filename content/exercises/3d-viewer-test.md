@@ -16,14 +16,16 @@ This page demonstrates the 3D Model Viewer component capabilities.
 
 This example shows how to embed a Sketchfab model:
 
-::threed-viewer-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Haus" height="600px"}
+
+
+::sketchfab-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Haus" height="600px"}
 ::
 
 ## Example 2: Uploaded GLTF File (Placeholder)
 
 Once you upload a .glb or .gltf file, you can reference it like this:
 
-::threed-viewer-component{src="/uploads/boxes-sculpt-2.glb" title="3D Model" height="600px"}
+::threed-viewer-component{src="/uploads/boxes-sculpt-2.glb" title="Boxes!" height="600px"}
 ::
 
 ## Instructions for Students
