@@ -177,4 +177,96 @@ CMS.registerEditorComponent({
   }
 });
 
-console.log('✅ Custom editor components registered: YouTube Video, Video Embed, Google Slides, Assessment Rubric');
+CMS.registerEditorComponent({
+  id: "threed-viewer",
+  label: "3D Model Viewer",
+  fields: [
+    {
+      name: "src",
+      label: "3D Model Source",
+      widget: "string",
+      hint: "Sketchfab URL, or upload a .gltf/.glb file"
+    },
+    {
+      name: "file",
+      label: "Or Upload 3D File",
+      widget: "file",
+      required: false,
+      media_folder: "/uploads/3d-models",
+      hint: "Upload .gltf or .glb file (alternative to URL)"
+    },
+    {
+      name: "title",
+      label: "Model Title",
+      widget: "string",
+      default: "3D Model",
+      required: false
+    },
+    {
+      name: "height",
+      label: "Viewer Height",
+      widget: "string",
+      default: "600px",
+      required: false,
+      hint: "CSS height value (e.g., 600px, 80vh)"
+    },
+    {
+      name: "autoRotate",
+      label: "Auto-rotate model",
+      widget: "boolean",
+      default: true,
+      required: false
+    }
+  ],
+  pattern: /::threed-viewer-component\{src="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+height="([^"]*)")?(?:\s+autoRotate="(true|false)")?\}\s*::/s,
+  fromBlock: function(match) {
+    return {
+      src: match[1],
+      title: match[2] || "3D Model",
+      height: match[3] || "600px",
+      autoRotate: match[4] === "false" ? false : true
+    };
+  },
+  toBlock: function(obj) {
+    // Use uploaded file if available, otherwise use src URL
+    const source = obj.file || obj.src;
+    const autoRotateStr = obj.autoRotate === false ? ' autoRotate="false"' : '';
+    return `::threed-viewer-component{src="${source}" title="${obj.title || '3D Model'}" height="${obj.height || '600px'}"${autoRotateStr}}
+::`;
+  },
+  toPreview: function(obj) {
+    const source = obj.file || obj.src;
+    const isSketchfab = source.includes('sketchfab.com');
+    const is3DFile = source.endsWith('.gltf') || source.endsWith('.glb');
+    
+    let fileTypeLabel = '3D Model';
+    if (isSketchfab) {
+      fileTypeLabel = 'Sketchfab Model';
+    } else if (is3DFile) {
+      fileTypeLabel = source.endsWith('.gltf') ? 'GLTF Model' : 'GLB Model';
+    }
+    
+    return `
+      <div style="border: 2px solid #8b5cf6; padding: 16px; margin: 16px 0; border-radius: 8px; background: #faf5ff;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 20px;">🎲</span>
+          <strong style="color: #8b5cf6; font-size: 16px;">3D Model Viewer</strong>
+          <span style="background: #8b5cf6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${fileTypeLabel}</span>
+        </div>
+        <div style="background: #1a1a1a; border-radius: 8px; height: ${obj.height || '400px'}; display: flex; align-items: center; justify-content: center; color: #888; font-size: 14px;">
+          <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 8px;">🎲</div>
+            <div>${obj.title || '3D Model'}</div>
+            <div style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Preview not available in editor</div>
+          </div>
+        </div>
+        <div style="color: #666; font-size: 12px; margin-top: 8px; word-break: break-all;">
+          <strong>Source:</strong> ${source}
+        </div>
+        ${obj.autoRotate !== false ? '<div style="color: #666; font-size: 11px; margin-top: 4px;">⟳ Auto-rotate enabled</div>' : ''}
+      </div>
+    `;
+  }
+});
+
+console.log('✅ Custom editor components registered: YouTube Video, Video Embed, Google Slides, Assessment Rubric, 3D Model Viewer');
