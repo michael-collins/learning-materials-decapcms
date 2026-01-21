@@ -29,9 +29,10 @@ topics:
     5. **UV Unwrapping Tips:**
         1. [UV Unwrapping - Blender 2.80 Fundamentals](https://www.youtube.com/watch?v=Y7M-B6xnaEM)
 
-author: |+
+author: Michael Collins
 course:
-
+allowEmbed: true
+license: CC BY 4.0
 published: true
 oer:
   '@context': 'https://oerschema.org/'

@@ -16,6 +16,18 @@ const { data: lecture } = await useAsyncData(`lecture-${lecturePath}`, () =>
   queryCollection('lectures').path(lecturePath).first()
 )
 
+// Debug log
+watch(lecture, (newValue) => {
+  if (newValue) {
+    console.log('[Lectures Page] Lecture data:', {
+      title: newValue.title,
+      allowEmbed: newValue.allowEmbed,
+      hasLicense: !!newValue.license,
+      hasAiLicense: !!newValue.aiLicense
+    })
+  }
+}, { immediate: true })
+
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
   { label: 'Lectures', path: '/lectures' },
@@ -40,6 +52,13 @@ const oerSchema = computed(() => {
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="lecture.title"
         :author="lecture.author"
+        :license="lecture.license"
+        :aiLicense="lecture.aiLicense"
+        :allowEmbed="lecture.allowEmbed"
+        :image="lecture.image"
+        :imageAlt="lecture.imageAlt"
+        :tags="lecture.tags"
+        :attachments="lecture.attachments"
       >
         <ContentRenderer :value="lecture" />
       </CollectionItem>
