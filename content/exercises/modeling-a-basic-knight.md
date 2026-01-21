@@ -5,7 +5,7 @@ slug: modeling-a-basic-knight
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5QliQriwysglJwRIE6R8NP2f
-image: /uploads/exercises/recPXvg0DlanTkyO2_image_Simple_Knight.png
+image: /uploads/recPXvg0DlanTkyO2_image_Simple_Knight.png
 imageAlt: Simple Knight.png
 rubric: exercise
 tags:
@@ -16,28 +16,28 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/rec7UZcG6Ic2StuPB_attachment_knight_side.jpg
+  - file: /uploads/rec7UZcG6Ic2StuPB_attachment_knight_side.jpg
     title: Knight Side Reference
     description: Knight Side Reference
     alt: Knight Side Reference
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/reciWQYtYaDynWpPM_attachment_knight_top.jpg
+  - file: /uploads/reciWQYtYaDynWpPM_attachment_knight_top.jpg
     title: 'Knight Top Reference '
     description: 'Knight Top Reference '
     alt: 'Knight Top Reference '
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recTGi87fakDenf1c_attachment_knight_front.jpg
+  - file: /uploads/recTGi87fakDenf1c_attachment_knight_front.jpg
     title: 'Knight Front Reference '
     description: 'Knight Front Reference '
     alt: 'Knight Front Reference '
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recjZvvY8D39hkMz6_attachment_knight_back.jpg
+  - file: /uploads/recjZvvY8D39hkMz6_attachment_knight_back.jpg
     title: Knight Back Reference
     description: Knight Back Reference
     alt: Knight Back Reference

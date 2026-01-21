@@ -5,7 +5,7 @@ slug: rigging-a-human
 type: 'oer:Practice'
 difficulty: Advanced
 youtubePlaylistID: PL-V2nChTadrWPKLLkM8oVibJ1aKHivoNl
-image: /uploads/exercises/recaLI7LYZgUjk4bg_image_human-rig-banner.png
+image: /uploads/recaLI7LYZgUjk4bg_image_human-rig-banner.png
 imageAlt: human-rig-banner.png
 license: CC BY 4.0
 aiLicense:

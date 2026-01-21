@@ -5,7 +5,7 @@ slug: sea-creature-texturing
 type: 'oer:Practice'
 difficulty: Advanced
 youtubePlaylistID: PL-V2nChTadrUU3MSAv9EfORij5j2E3uVv
-image: /uploads/exercises/recc827jhaiZue5as_image_sculpting-retopo-header-v2.png
+image: /uploads/recc827jhaiZue5as_image_sculpting-retopo-header-v2.png
 imageAlt: sculpting-retopo-header-v2.png
 license: CC BY 4.0
 aiLicense:

@@ -5,7 +5,7 @@ slug: animated-procedural-textures
 type: oer:Practice
 difficulty: Intermediate
 youtubePlaylistID: PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh
-image: /uploads/exercises/recHfTCKlxhMVb30g_image_waterfall.png
+image: /uploads/recHfTCKlxhMVb30g_image_waterfall.png
 imageAlt: waterfall.png
 license: CC BY 4.0
 aiLicense:

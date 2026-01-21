@@ -5,7 +5,7 @@ slug: rendering-random-objects
 type: 'oer:Practice'
 difficulty: Intermediate
 youtubePlaylistID: PL-V2nChTadrWaCwxTnu9yMGbqFudZtdls
-image: /uploads/exercises/receipHXbIjwRD66T_image_texturing-objects-header.jpg
+image: /uploads/receipHXbIjwRD66T_image_texturing-objects-header.jpg
 imageAlt: texturing-objects-header.jpg
 license: CC BY 4.0
 aiLicense:

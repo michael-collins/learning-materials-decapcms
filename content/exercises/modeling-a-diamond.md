@@ -5,7 +5,7 @@ slug: modeling-a-diamond
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5Qnq4fsbvQw-IjrZd6EoMX1h
-image: /uploads/exercises/rec2Od2fcMVgDSQyg_image_diamond_image.png
+image: /uploads/rec2Od2fcMVgDSQyg_image_diamond_image.png
 imageAlt: diamond image.png
 rubric: exercise
 tags:

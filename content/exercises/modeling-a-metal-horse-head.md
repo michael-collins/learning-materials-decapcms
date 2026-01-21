@@ -5,7 +5,7 @@ slug: modeling-a-metal-horse-head
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5Qnmcpc_vs1RGJaQFm4EsuE9
-image: /uploads/exercises/recJa9PrmESgMr9Zw_image_METAL_KNIGHT_IMAGE.png
+image: /uploads/recJa9PrmESgMr9Zw_image_METAL_KNIGHT_IMAGE.png
 imageAlt: METAL KNIGHT IMAGE.png
 rubric: exercise
 tags:
@@ -16,7 +16,7 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recaFPOVVtr8OO5Ad_attachment_HORSE_FRONT.jpeg
+  - file: /uploads/recaFPOVVtr8OO5Ad_attachment_HORSE_FRONT.jpeg
     title: Metal Horse Front Reference Imagecfb vhg
     description: Metal Horse Front Reference Image
     alt: Metal Horse Front Reference Image
@@ -25,7 +25,7 @@ attachments:
       III. Used with permission.
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recTCLCgvt1b7LKT5_attachment_HORSE_BACK.jpeg
+  - file: /uploads/recTCLCgvt1b7LKT5_attachment_HORSE_BACK.jpeg
     title: Metal Horse Rear Reference Image
     description: Metal Horse Rear Reference Image
     alt: ''
@@ -34,7 +34,7 @@ attachments:
       III. Used with permission.
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/rec2wljYDjeqxgtUq_attachment_HORSE_RIGHT.jpeg
+  - file: /uploads/rec2wljYDjeqxgtUq_attachment_HORSE_RIGHT.jpeg
     title: Metal Horse Right Reference Image
     description: Metal Horse Right Reference Image
     alt: Metal Horse Right Reference Image
@@ -43,7 +43,7 @@ attachments:
       III. Used with permission.
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/rectoIVjHo70ZPS2Q_attachment_HORSE_LEFT.jpeg
+  - file: /uploads/rectoIVjHo70ZPS2Q_attachment_HORSE_LEFT.jpeg
     title: Metal Horse Left Reference Image
     description: Metal Horse Left Reference Image
     alt: Metal Horse Left Reference Image

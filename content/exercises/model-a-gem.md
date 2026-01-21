@@ -5,7 +5,7 @@ slug: model-a-gem
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5Qn9XcneFk2URkb8MW1B4lQB
-image: /uploads/exercises/rec14hI66d4Hl61SA_image_gem_image.png
+image: /uploads/rec14hI66d4Hl61SA_image_gem_image.png
 imageAlt: gem image.png
 rubric: exercise
 tags:

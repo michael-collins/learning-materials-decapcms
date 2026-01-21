@@ -5,7 +5,7 @@ slug: modeling-a-room
 type: 'oer:Practice'
 difficulty: Intermediate
 youtubePlaylistID: PL-V2nChTadrVP_vzYSEfaSkkPDhMdPfrK
-image: /uploads/exercises/rec6ebYsG1Dnf08qb_image_room-model.png
+image: /uploads/rec6ebYsG1Dnf08qb_image_room-model.png
 imageAlt: room-model.png
 license: CC BY 4.0
 aiLicense:

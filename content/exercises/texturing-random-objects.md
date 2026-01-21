@@ -5,7 +5,7 @@ slug: texturing-random-objects
 type: 'oer:Practice'
 difficulty: Intermediate
 youtubePlaylistID: PL-V2nChTadrWipZPDR5ZYk4-EgwFzMahg
-image: /uploads/exercises/reczUhTIOSSFk77BH_image_texturing-objects-header-v2.jpg
+image: /uploads/reczUhTIOSSFk77BH_image_texturing-objects-header-v2.jpg
 imageAlt: texturing-objects-header-v2.jpg
 license: CC BY 4.0
 aiLicense:

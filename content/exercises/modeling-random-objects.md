@@ -5,7 +5,7 @@ slug: modeling-random-objects
 type: 'oer:Practice'
 difficulty: Intermediate
 youtubePlaylistID: PL-V2nChTadrUtPySfHyf4j_w6PGi6AES9
-image: /uploads/exercises/recLtYP0nJUL7RK8O_image_modeling-objects-header.jpg
+image: /uploads/recLtYP0nJUL7RK8O_image_modeling-objects-header.jpg
 imageAlt: modeling-objects-header.jpg
 license: CC BY 4.0
 aiLicense:

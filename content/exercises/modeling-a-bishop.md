@@ -5,7 +5,7 @@ slug: modeling-a-bishop
 type: 'oer:Practice'
 difficulty: Beginner
 youtubePlaylistID: PLcAjW37cz5Qn9EwcL-Arvg3QWeQ_h-WVg
-image: /uploads/exercises/rectzJhf833zBC9T3_image_bishop_image.png
+image: /uploads/rectzJhf833zBC9T3_image_bishop_image.png
 imageAlt: bishop image.png
 rubric: exercise
 tags:
@@ -16,28 +16,28 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/files/recoyG0w7HAA9wb65_attachment_bishop_side.jpg
+  - file: /uploads/recoyG0w7HAA9wb65_attachment_bishop_side.jpg
     title: Reference illustration of Bishop from additional front or back view
     description: Reference illustration of Bishop from additional front or back view
     alt: Reference illustration of Bishop from additional front or back view
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/rec6SYnnD3RNzwulo_attachment_bishop_top.jpg
+  - file: /uploads/rec6SYnnD3RNzwulo_attachment_bishop_top.jpg
     title: Reference illustration of Bishop from additional top view
     description: Reference illustration of Bishop from additional top view
     alt: Reference illustration of Bishop from additional top view
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/rec1LAWAkqQy58t4q_attachment_bishop_back.jpg
+  - file: /uploads/rec1LAWAkqQy58t4q_attachment_bishop_back.jpg
     title: Reference illustration of Bishop from additional side view
     description: Reference illustration of Bishop from additional side view
     alt: Reference illustration of Bishop from additional side view
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/files/recRVR3xWtgoMs6Zd_attachment_bishop_front.jpg
+  - file: /uploads/recRVR3xWtgoMs6Zd_attachment_bishop_front.jpg
     title: Reference illustration of a Bishop from side view
     description: Reference illustration of a Bishop from side view
     alt: Reference illustration of a Bishop from side view
