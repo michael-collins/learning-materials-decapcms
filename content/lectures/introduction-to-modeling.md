@@ -39,7 +39,7 @@ topics:
         1. [Blender Foundation: Introduction to Blender 2.8](https://www.youtube.com/playlist?list=PLa1F2ddGya_-UvuAqHAksYnB0qL9yWDO6)
 
 author: Michael Collins
-course:
+course: DART 303
 allowEmbed: true
 license: CC BY 4.0
 published: true

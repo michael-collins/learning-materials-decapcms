@@ -30,7 +30,7 @@ topics:
         1. [UV Unwrapping - Blender 2.80 Fundamentals](https://www.youtube.com/watch?v=Y7M-B6xnaEM)
 
 author: Michael Collins
-course:
+course: DART 303
 allowEmbed: true
 license: CC BY 4.0
 published: true

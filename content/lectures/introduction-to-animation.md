@@ -41,7 +41,7 @@ topics:
         - [Illusion of Life](https://www.amazon.com/Illusion-Life-Disney-Animation/dp/0786860707/)
 
 author: Michael Collins
-course:
+course: DART 303
 allowEmbed: true
 license: CC BY 4.0
 published: true
