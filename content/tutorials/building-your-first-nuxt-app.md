@@ -1,9 +1,9 @@
 ---
-title: "Building Your First Nuxt App"
-description: "A step-by-step tutorial on creating a complete Nuxt application from scratch."
-author: "Learning Materials Team"
+title: Building Your First Nuxt App
+description: A step-by-step tutorial on creating a complete Nuxt application from scratch.
+author: Learning Materials Team
 date: 2024-01-16
-difficulty: "Beginner"
+difficulty: Beginner
 ---
 
 # Building Your First Nuxt App
