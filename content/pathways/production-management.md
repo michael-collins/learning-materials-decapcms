@@ -19,6 +19,7 @@ oer:
   inLanguage: en-US
   isAccessibleForFree: true
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+course:
 ---
 
  Oversees the planning and execution of 3D projects, ensuring deadlines and budgets are met.

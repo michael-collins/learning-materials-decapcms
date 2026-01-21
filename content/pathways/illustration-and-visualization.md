@@ -21,6 +21,7 @@ oer:
   inLanguage: en-US
   isAccessibleForFree: true
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+course:
 ---
 
 Creates realistic architectural visualizations for design, marketing, or presentations.

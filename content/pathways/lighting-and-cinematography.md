@@ -17,6 +17,7 @@ oer:
   inLanguage: en-US
   isAccessibleForFree: true
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+course:
 ---
 
 Sets up lighting and camera angles to create visually compelling 3D scenes.

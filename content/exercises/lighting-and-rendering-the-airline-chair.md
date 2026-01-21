@@ -16,6 +16,7 @@ tags:
   - Blender
   - Lighting
 author: Michael Collins
+course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
