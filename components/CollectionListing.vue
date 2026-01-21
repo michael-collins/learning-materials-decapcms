@@ -26,6 +26,7 @@ interface CollectionItem {
 
 interface Props {
   title?: string
+  description?: string
   items: CollectionItem[]
   itemsPerPage?: number
 }
@@ -116,8 +117,8 @@ watch([searchQuery, selectedAuthor], () => {
   <div class="container max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
     <div class="mb-10">
       <h1 class="text-4xl font-bold tracking-tight mb-2">{{ title }}</h1>
-      <p class="text-lg text-muted-foreground">
-        Browse all {{ items.length }} {{ title.toLowerCase() }}
+      <p v-if="description" class="text-lg text-muted-foreground">
+        {{ description }}
       </p>
     </div>
 
