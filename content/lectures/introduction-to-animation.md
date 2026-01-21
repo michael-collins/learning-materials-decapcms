@@ -41,6 +41,7 @@ topics:
         - [Illusion of Life](https://www.amazon.com/Illusion-Life-Disney-Animation/dp/0786860707/)
 
 author: |+
+course:
 
 published: true
 oer:

@@ -15,6 +15,7 @@ rubric: exercise
 tags:
   - Blender
 author: Michael Collins
+course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
@@ -54,7 +55,7 @@ In this exercise, students will practice correcting a character model's edge-flo
 9. Parent (bind) the mesh to the armature. Do this by selecting the mesh first, select the armature, and then press ‘CTRL-P,’ and choose “with automatic weights.” If you do not see this option, you have selected in the reverse order.
 10. If you are getting any unwanted deformation, watch the weight paint tutorials and use the weight painting tool to clean up the vertex weights.
 11. Pose the biped to be in a sitting pose on a prop like a bench or chair.
-12. Save as `LASTNAME-`r`igging.blend` and upload to the submission dropbox.
+12. Save as `LASTNAME-rigging.blend` and upload to the submission dropbox.
 13. Double check that you’ve included all files and that your .zip file can be downloaded and opened.
 
 

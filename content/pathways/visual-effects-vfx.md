@@ -17,6 +17,7 @@ oer:
   inLanguage: en-US
   isAccessibleForFree: true
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+course:
 ---
 
 Integrates CGI elements into live-action footage and blends them seamlessly.

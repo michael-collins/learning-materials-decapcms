@@ -30,6 +30,7 @@ topics:
         1. [UV Unwrapping - Blender 2.80 Fundamentals](https://www.youtube.com/watch?v=Y7M-B6xnaEM)
 
 author: |+
+course:
 
 published: true
 oer:

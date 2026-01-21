@@ -10,6 +10,7 @@ rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
+course: DART 203
 authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true

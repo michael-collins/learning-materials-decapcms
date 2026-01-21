@@ -17,6 +17,7 @@ oer:
   inLanguage: en-US
   isAccessibleForFree: true
   license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+course:
 ---
 
 Designs gameplay mechanics, levels, and user experiences for video games.
