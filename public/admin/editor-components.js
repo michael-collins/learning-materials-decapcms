@@ -178,39 +178,75 @@ CMS.registerEditorComponent({
 });
 
 CMS.registerEditorComponent({
-  id: "threed-viewer",
-  label: "3D Model Viewer",
+  id: "sketchfab-viewer",
+  label: "Sketchfab Model",
   fields: [
     {
-      name: "sourceType",
-      label: "Model Source",
-      widget: "select",
-      options: ["upload", "url"],
-      default: "upload",
-      hint: "Choose whether to upload a file or use a URL"
+      name: "src",
+      label: "Sketchfab URL",
+      widget: "string",
+      hint: "Paste the Sketchfab model URL (e.g., https://sketchfab.com/3d-models/...)"
     },
     {
-      name: "file",
-      label: "Upload 3D File",
-      widget: "file",
-      required: false,
-      media_folder: "/uploads/3d-models",
-      hint: "Upload .gltf or .glb file",
-      condition: {
-        field: "sourceType",
-        equals: "upload"
-      }
+      name: "title",
+      label: "Model Title",
+      widget: "string",
+      default: "Sketchfab Model",
+      required: false
     },
+    {
+      name: "height",
+      label: "Viewer Height",
+      widget: "string",
+      default: "600px",
+      required: false,
+      hint: "CSS height value (e.g., 600px, 80vh)"
+    }
+  ],
+  pattern: /::sketchfab-component\{src="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+height="([^"]*)")?\}\s*::/s,
+  fromBlock: function(match) {
+    return {
+      src: match[1],
+      title: match[2] || "Sketchfab Model",
+      height: match[3] || "600px"
+    };
+  },
+  toBlock: function(obj) {
+    return `::sketchfab-component{src="${obj.src}" title="${obj.title || 'Sketchfab Model'}" height="${obj.height || '600px'}"}
+::`;
+  },
+  toPreview: function(obj) {
+    return `
+      <div style="border: 2px solid #1caad9; padding: 16px; margin: 16px 0; border-radius: 8px; background: #e8f7fb;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 20px;">🎨</span>
+          <strong style="color: #1caad9; font-size: 16px;">Sketchfab Model</strong>
+        </div>
+        <div style="background: #1a1a1a; border-radius: 8px; height: ${obj.height || '600px'}; display: flex; align-items: center; justify-content: center; color: #888; font-size: 14px;">
+          <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 8px;">🎨</div>
+            <div>${obj.title || 'Sketchfab Model'}</div>
+            <div style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Sketchfab embed preview</div>
+          </div>
+        </div>
+        <div style="color: #666; font-size: 12px; margin-top: 8px; word-break: break-all;">
+          <strong>URL:</strong> ${obj.src}
+        </div>
+      </div>
+    `;
+  }
+});
+
+CMS.registerEditorComponent({
+  id: "threed-viewer",
+  label: "3D Model (Upload)",
+  fields: [
     {
       name: "src",
-      label: "Sketchfab/Model URL",
-      widget: "string",
-      required: false,
-      hint: "Paste Sketchfab URL or direct link to .gltf/.glb file",
-      condition: {
-        field: "sourceType",
-        equals: "url"
-      }
+      label: "Upload 3D File",
+      widget: "file",
+      media_folder: "/uploads/3d-models",
+      hint: "Upload .gltf or .glb file"
     },
     {
       name: "title",
@@ -245,44 +281,29 @@ CMS.registerEditorComponent({
     };
   },
   toBlock: function(obj) {
-    // Use uploaded file if available, otherwise use src URL
-    const source = obj.file || obj.src || "";
-    if (!source) {
-      return `::threed-viewer-component{src="" title="${obj.title || '3D Model'}" height="${obj.height || '600px'}"}
-::`;
-    }
     const autoRotateStr = obj.autoRotate === false ? ' autoRotate="false"' : '';
-    return `::threed-viewer-component{src="${source}" title="${obj.title || '3D Model'}" height="${obj.height || '600px'}"${autoRotateStr}}
+    return `::threed-viewer-component{src="${obj.src}" title="${obj.title || '3D Model'}" height="${obj.height || '600px'}"${autoRotateStr}}
 ::`;
   },
   toPreview: function(obj) {
-    const source = obj.file || obj.src;
-    const isSketchfab = source.includes('sketchfab.com');
-    const is3DFile = source.endsWith('.gltf') || source.endsWith('.glb');
-    
-    let fileTypeLabel = '3D Model';
-    if (isSketchfab) {
-      fileTypeLabel = 'Sketchfab Model';
-    } else if (is3DFile) {
-      fileTypeLabel = source.endsWith('.gltf') ? 'GLTF Model' : 'GLB Model';
-    }
+    const fileTypeLabel = obj.src.endsWith('.gltf') ? 'GLTF Model' : 'GLB Model';
     
     return `
       <div style="border: 2px solid #8b5cf6; padding: 16px; margin: 16px 0; border-radius: 8px; background: #faf5ff;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
           <span style="font-size: 20px;">🎲</span>
-          <strong style="color: #8b5cf6; font-size: 16px;">3D Model Viewer</strong>
+          <strong style="color: #8b5cf6; font-size: 16px;">Uploaded 3D Model</strong>
           <span style="background: #8b5cf6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${fileTypeLabel}</span>
         </div>
         <div style="background: #1a1a1a; border-radius: 8px; height: ${obj.height || '400px'}; display: flex; align-items: center; justify-content: center; color: #888; font-size: 14px;">
           <div style="text-align: center;">
             <div style="font-size: 48px; margin-bottom: 8px;">🎲</div>
             <div>${obj.title || '3D Model'}</div>
-            <div style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Preview not available in editor</div>
+            <div style="font-size: 11px; margin-top: 4px; opacity: 0.7;">Interactive 3D viewer</div>
           </div>
         </div>
         <div style="color: #666; font-size: 12px; margin-top: 8px; word-break: break-all;">
-          <strong>Source:</strong> ${source}
+          <strong>File:</strong> ${obj.src}
         </div>
         ${obj.autoRotate !== false ? '<div style="color: #666; font-size: 11px; margin-top: 4px;">⟳ Auto-rotate enabled</div>' : ''}
       </div>
@@ -290,4 +311,4 @@ CMS.registerEditorComponent({
   }
 });
 
-console.log('✅ Custom editor components registered: YouTube Video, Video Embed, Google Slides, Assessment Rubric, 3D Model Viewer');
+console.log('✅ Custom editor components registered: YouTube Video, Video Embed, Google Slides, Assessment Rubric, Sketchfab Model, 3D Model Upload');
