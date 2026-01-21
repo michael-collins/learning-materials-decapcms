@@ -38,9 +38,10 @@ topics:
     5. **Introductory Blender Learning Materials**
         1. [Blender Foundation: Introduction to Blender 2.8](https://www.youtube.com/playlist?list=PLa1F2ddGya_-UvuAqHAksYnB0qL9yWDO6)
 
-author: |+
+author: Michael Collins
 course:
-
+allowEmbed: true
+license: CC BY 4.0
 published: true
 oer:
   '@context': 'https://oerschema.org/'

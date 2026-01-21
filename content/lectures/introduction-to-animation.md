@@ -40,9 +40,10 @@ topics:
         - [Animators Survival Kit](https://www.amazon.com/Animators-Survival-Kit-Principles-Classical/dp/086547897X)
         - [Illusion of Life](https://www.amazon.com/Illusion-Life-Disney-Animation/dp/0786860707/)
 
-author: |+
+author: Michael Collins
 course:
-
+allowEmbed: true
+license: CC BY 4.0
 published: true
 oer:
   '@context': 'https://oerschema.org/'
