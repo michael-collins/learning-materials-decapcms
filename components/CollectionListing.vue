@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Input from '~/components/ui/input/Input.vue'
 import Table from '~/components/ui/table/Table.vue'
 import TableHeader from '~/components/ui/table/TableHeader.vue'
@@ -105,6 +105,11 @@ const formatDate = (dateString: string) => {
 const updatePage = (page: number) => {
   currentPage.value = page
 }
+
+// Reset to first page when filters change
+watch([searchQuery, selectedAuthor], () => {
+  currentPage.value = 1
+})
 </script>
 
 <template>
