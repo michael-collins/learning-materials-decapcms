@@ -182,18 +182,35 @@ CMS.registerEditorComponent({
   label: "3D Model Viewer",
   fields: [
     {
-      name: "src",
-      label: "3D Model Source",
-      widget: "string",
-      hint: "Sketchfab URL, or upload a .gltf/.glb file"
+      name: "sourceType",
+      label: "Model Source",
+      widget: "select",
+      options: ["upload", "url"],
+      default: "upload",
+      hint: "Choose whether to upload a file or use a URL"
     },
     {
       name: "file",
-      label: "Or Upload 3D File",
+      label: "Upload 3D File",
       widget: "file",
       required: false,
       media_folder: "/uploads/3d-models",
-      hint: "Upload .gltf or .glb file (alternative to URL)"
+      hint: "Upload .gltf or .glb file",
+      condition: {
+        field: "sourceType",
+        equals: "upload"
+      }
+    },
+    {
+      name: "src",
+      label: "Sketchfab/Model URL",
+      widget: "string",
+      required: false,
+      hint: "Paste Sketchfab URL or direct link to .gltf/.glb file",
+      condition: {
+        field: "sourceType",
+        equals: "url"
+      }
     },
     {
       name: "title",
@@ -229,7 +246,11 @@ CMS.registerEditorComponent({
   },
   toBlock: function(obj) {
     // Use uploaded file if available, otherwise use src URL
-    const source = obj.file || obj.src;
+    const source = obj.file || obj.src || "";
+    if (!source) {
+      return `::threed-viewer-component{src="" title="${obj.title || '3D Model'}" height="${obj.height || '600px'}"}
+::`;
+    }
     const autoRotateStr = obj.autoRotate === false ? ' autoRotate="false"' : '';
     return `::threed-viewer-component{src="${source}" title="${obj.title || '3D Model'}" height="${obj.height || '600px'}"${autoRotateStr}}
 ::`;
