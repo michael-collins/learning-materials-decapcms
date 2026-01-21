@@ -59,7 +59,10 @@
       "description": "",
       "body": "",
       "type": "artist",
-      "tags": [],
+      "tags": [
+        "3d animation",
+        "film"
+      ],
       "url": "http://www.chrislandreth.com/",
       "alt": "Chris Landreth"
     },
