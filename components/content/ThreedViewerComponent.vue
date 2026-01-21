@@ -43,9 +43,7 @@ const modelViewerAttrs = computed(() => ({
         max-camera-orbit="auto auto 100%"
         class="w-full"
       >
-        <div slot="progress-bar" class="progress-bar">
-          <div class="update-bar"></div>
-        </div>
+        <!-- Let model-viewer use its default progress bar -->
       </model-viewer>
     </div>
     
@@ -69,29 +67,5 @@ const modelViewerAttrs = computed(() => ({
 <style scoped>
 model-viewer {
   background-color: transparent;
-}
-
-.progress-bar {
-  display: block;
-  width: 33%;
-  height: 10%;
-  max-height: 2%;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate3d(-50%, -50%, 0);
-  border-radius: 25px;
-  box-shadow: 0px 3px 10px 3px rgba(0, 0, 0, 0.5), 0px 0px 5px 1px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.progress-bar .update-bar {
-  background-color: rgba(255, 255, 255, 0.9);
-  width: 0%;
-  height: 100%;
-  border-radius: 25px;
-  float: left;
-  transition: width 0.3s;
 }
 </style>
