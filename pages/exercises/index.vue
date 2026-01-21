@@ -22,6 +22,7 @@ const exercises = computed(() => {
 <template>
   <CollectionListing
     title="Exercises"
+    description="Practice activities designed to build and reinforce specific skills and techniques."
     :items="exercises"
     :items-per-page="20"
   />
