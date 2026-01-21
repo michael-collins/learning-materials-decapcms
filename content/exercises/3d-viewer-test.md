@@ -23,7 +23,7 @@ This example shows how to embed a Sketchfab model:
 
 Once you upload a .glb or .gltf file, you can reference it like this:
 
-::threed-viewer-component{src="/uploads/boxes-sculpt-1.glb" title="Box" height="700px"}
+::threed-viewer-component{src="/uploads/boxes-sculpt-2.glb" title="3D Model" height="600px"}
 ::
 
 ## Instructions for Students
