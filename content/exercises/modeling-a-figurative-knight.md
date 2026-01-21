@@ -16,42 +16,42 @@ authorUrl: 'https://www.ianbrill.com/'
 published: true
 allowEmbed: true
 attachments:
-  - file: /uploads/recUNFzWcDdGNGTA4_attachment_LEFT_KNIGHT.jpeg
+  - file: /uploads/recUNFzWcDdGNGTA4_attachment_LEFT_KNIGHT.jpg
     title: Figurative Knight Left Side Reference Image
     description: Figurative Knight Left Side Reference Image
     alt: Figurative Knight Left Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/recNmlfaKY3YkIHPe_attachment_RIGHT_KNIGHT.jpeg
+  - file: /uploads/recNmlfaKY3YkIHPe_attachment_RIGHT_KNIGHT.jpg
     title: Figurative Knight Right Side Reference Image
     description: Figurative Knight Right Side Reference Image
     alt: Figurative Knight Right Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/recBuGV2k35ohfEGa_attachment_BOTTOM_KNIGHT.jpeg
+  - file: /uploads/recBuGV2k35ohfEGa_attachment_BOTTOM_KNIGHT.jpg
     title: Figurative Knight Bottom Side Reference Image
     description: Figurative Knight Bottom Side Reference Image
     alt: Figurative Knight Bottom Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/recVR1Q6LEFqiXU5A_attachment_TOP_KNIGHT.jpeg
+  - file: /uploads/recVR1Q6LEFqiXU5A_attachment_TOP_KNIGHT.jpg
     title: Figurative Knight Top Side Reference Image
     description: Figurative Knight Top Side Reference Image
     alt: Figurative Knight Top Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/recZoXFEqXqma0fo6_attachment_REAR_KNIGHT.jpeg
+  - file: /uploads/recZoXFEqXqma0fo6_attachment_REAR_KNIGHT.jpg
     title: Figurative Knight Back Side Reference Image
     description: Figurative Knight Back Side Reference Image
     alt: Figurative Knight Back Side Reference Image
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-  - file: /uploads/recHT0fX4sR5gsUiC_attachment_FRONT_KNIGHT.jpeg
+  - file: /uploads/recHT0fX4sR5gsUiC_attachment_FRONT_KNIGHT.jpg
     title: Figurative Knight Front Side Reference Image
     description: Figurative Knight Front Side Reference Image
     alt: Figurative Knight Front Side Reference Image
