@@ -22,11 +22,14 @@ const isDesktopCollapsed = ref(false)
 
 const navigationGroups = [
   {
-    label: 'Assessments',
-    icon: ClipboardCheck,
+    label: 'Library',
+    icon: Library,
     items: [
-      { title: 'Exercises', path: '/exercises' },
-      { title: 'Projects', path: '/projects' },
+      { title: 'Lessons', path: '/lessons' },
+      { title: 'Lectures', path: '/lectures' },
+      { title: 'Tutorials', path: '/tutorials' },
+      { title: 'Articles', path: '/articles' },
+      { title: 'Resources', path: '/resources' },
     ]
   },
   {
@@ -38,13 +41,11 @@ const navigationGroups = [
     ]
   },
   {
-    label: 'Library',
-    icon: Library,
+    label: 'Assessments',
+    icon: ClipboardCheck,
     items: [
-      { title: 'Lectures', path: '/lectures' },
-      { title: 'Tutorials', path: '/tutorials' },
-      { title: 'Articles', path: '/articles' },
-      { title: 'Resources', path: '/resources' },
+      { title: 'Exercises', path: '/exercises' },
+      { title: 'Projects', path: '/projects' },
     ]
   }
 ]
