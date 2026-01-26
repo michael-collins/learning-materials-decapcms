@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { buildCourseSchema } from '~/lib/oer-schema-builder'
-
 const route = useRoute()
 
 definePageMeta({
@@ -11,24 +9,20 @@ definePageMeta({
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
 const articlePath = `/articles/${slug.join('/')}`
 
-const { data: article } = await useAsyncData(
+const { data: article, pending } = await useAsyncData(
   `article-${articlePath}`,
   () => queryCollection('articles').path(articlePath).first()
 )
-
-// Generate OER Schema
-const oerSchema = computed(() => {
-  if (!article.value) return null
-  const baseUrl = useRequestURL().origin
-  return buildCourseSchema(article.value, baseUrl)
-})
 </script>
 
 <template>
   <div>
-    <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
-    
-    <div v-if="article" key="article-content">
+    <div v-if="pending" class="container py-8">
+      <div class="flex justify-center items-center min-h-[300px]">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      </div>
+    </div>
+    <div v-else-if="article" key="article-content">
       <CollectionItem
         :breadcrumbs="[]"
         :title="article.title"
