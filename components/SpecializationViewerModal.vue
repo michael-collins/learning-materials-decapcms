@@ -631,63 +631,28 @@ onBeforeUnmount(() => {
                   <div class="h-4 w-5/6 rounded bg-muted animate-pulse" />
                 </div>
 
-                <div v-else-if="!selectedLesson" class="h-full rounded-lg border border-dashed border-border flex items-center justify-center text-center text-sm text-muted-foreground">
-                  Select a lesson to preview
-                </div>
-
-                <div v-else class="space-y-6">
-                  <!-- Breadcrumb, More Menu, and Close Button -->
-                  <div class="flex items-center justify-between gap-2 lg:flex-row-reverse">
+                <div v-else-if="!selectedLesson" class="flex flex-col h-full rounded-lg border border-dashed border-border">
+                  <!-- Header with close button when no lessons -->
+                  <div class="flex items-center justify-between gap-2 p-4 sm:p-6 border-b border-border">
+                    <span class="text-sm text-muted-foreground">No lessons available</span>
                     <Button
                       size="icon"
                       variant="ghost"
                       @click.stop="close"
                       aria-label="Close modal"
-                      class="shrink-0"
                     >
                       <X class="w-5 h-5" />
                     </Button>
-                    
-                    <!-- More menu dropdown -->
-                    <div class="relative group">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        aria-label="More options"
-                        class="shrink-0"
-                      >
-                        <MoreVertical class="w-5 h-5" />
-                      </Button>
-                      <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <NuxtLink
-                          v-if="isOverviewMode && selectedLesson"
-                          :to="`/lessons/${selectedLesson.slug}`"
-                          class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
-                          @click.stop
-                        >
-                          View full page
-                          <ExternalLink class="w-4 h-4" />
-                        </NuxtLink>
-                        <NuxtLink
-                          v-else-if="!isOverviewMode && selectedItem"
-                          :to="getItemPath(selectedItem.type, selectedItem.slug)"
-                          class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
-                          @click.stop
-                        >
-                          View full page
-                          <ExternalLink class="w-4 h-4" />
-                        </NuxtLink>
-                        <div v-if="(isOverviewMode && selectedLesson) || (!isOverviewMode && selectedItem)" class="h-px bg-border" />
-                        <button
-                          @click.stop="exportCommonCartridge"
-                          class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"
-                        >
-                          Export Common Cartridge
-                          <Download class="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                    
+                  </div>
+                  <!-- Center content -->
+                  <div class="flex-1 flex items-center justify-center text-center text-sm text-muted-foreground px-4 sm:px-6">
+                    Select a lesson to preview
+                  </div>
+                </div>
+
+                <div v-else class="space-y-6">
+                  <!-- Breadcrumb, More Menu, and Close Button -->
+                  <div class="flex items-center gap-2 border-b border-border pb-3">
                     <!-- Hamburger menu button for mobile -->
                     <Button
                       size="icon"
@@ -700,7 +665,7 @@ onBeforeUnmount(() => {
                     </Button>
                     
                     <!-- Breadcrumb -->
-                    <div class="flex items-center border-b border-border pb-3 gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground min-w-0 flex-1">
+                    <div class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground min-w-0 flex-1">
                       <span class="font-medium text-foreground">{{ selectedLesson.title }}</span>
                       <template v-if="!isOverviewMode && selectedItem">
                         <span>/</span>
@@ -710,6 +675,58 @@ onBeforeUnmount(() => {
                         <span>/</span>
                         <span class="font-medium text-foreground">Overview</span>
                       </template>
+                    </div>
+
+                    <!-- Action buttons (right-aligned) -->
+                    <div class="flex items-center gap-2 shrink-0">
+                      <!-- More menu dropdown -->
+                      <div class="relative group">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          aria-label="More options"
+                        >
+                          <MoreVertical class="w-5 h-5" />
+                        </Button>
+                        <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                          <NuxtLink
+                            v-if="isOverviewMode && selectedLesson"
+                            :to="`/lessons/${selectedLesson.slug}`"
+                            class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
+                            @click.stop
+                          >
+                            View full page
+                            <ExternalLink class="w-4 h-4" />
+                          </NuxtLink>
+                          <NuxtLink
+                            v-else-if="!isOverviewMode && selectedItem"
+                            :to="getItemPath(selectedItem.type, selectedItem.slug)"
+                            class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
+                            @click.stop
+                          >
+                            View full page
+                            <ExternalLink class="w-4 h-4" />
+                          </NuxtLink>
+                          <div v-if="(isOverviewMode && selectedLesson) || (!isOverviewMode && selectedItem)" class="h-px bg-border" />
+                          <button
+                            @click.stop="exportCommonCartridge"
+                            class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"
+                          >
+                            Export Common Cartridge
+                            <Download class="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <!-- Close button -->
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        @click.stop="close"
+                        aria-label="Close modal"
+                      >
+                        <X class="w-5 h-5" />
+                      </Button>
                     </div>
                   </div>
 
