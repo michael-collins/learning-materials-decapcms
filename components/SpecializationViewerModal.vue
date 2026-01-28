@@ -925,13 +925,13 @@ onBeforeUnmount(() => {
               </div>
 
               <!-- Sticky footer with item navigation -->
-              <div v-if="selectedLesson" class="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-border bg-muted/30 flex-wrap">
+              <div v-if="selectedLesson" class="flex items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-border bg-muted/30 dark:bg-muted/50 flex-wrap">
                 <Button
                   size="sm"
                   variant="outline"
                   :disabled="!canNavigatePrev()"
                   @click="prevItem"
-                  class="text-xs sm:text-sm"
+                  class="text-xs sm:text-sm text-foreground"
                 >
                   <ChevronLeft class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   <span class="hidden sm:inline">Previous</span>
@@ -943,7 +943,7 @@ onBeforeUnmount(() => {
                   variant="outline"
                   :disabled="!canNavigateNext()"
                   @click="nextItem"
-                  class="text-xs sm:text-sm"
+                  class="text-xs sm:text-sm text-foreground"
                 >
                   <span class="hidden sm:inline">Next</span>
                   <span class="sm:hidden">Next</span>

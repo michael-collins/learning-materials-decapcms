@@ -1,18 +1,32 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
+const route = useRoute()
+
 interface Props {
   id: string
 }
 
 const props = defineProps<Props>()
 
-// Query the rubric data
-const { data: rubric } = await useAsyncData(`rubric-component-${props.id}`, () =>
-  queryCollection('rubrics').path(`/rubrics/${props.id}`).first()
-)
+// Check if rubric should be hidden based on query parameter
+const shouldShow = computed(() => {
+  return route.query.hideRubric !== 'true'
+})
+
+// Only query the rubric data if it should be shown
+const { data: rubric } = await useAsyncData(`rubric-component-${props.id}`, async () => {
+  if (!shouldShow.value) {
+    return null
+  }
+  return queryCollection('rubrics').path(`/rubrics/${props.id}`).first()
+}, {
+  watch: [shouldShow]
+})
 </script>
 
 <template>
-  <div v-if="rubric" class="border border-border rounded-lg my-8 p-4">
+  <div v-if="rubric && shouldShow" class="border border-border rounded-lg my-8 p-4">
     <h3 class="pt-4 uppercase text-left text-lg pl-4 font-semibold text-foreground">
       {{ rubric.name }} Rubric
     </h3>
@@ -40,7 +54,7 @@ const { data: rubric } = await useAsyncData(`rubric-component-${props.id}`, () =
       </table>
     </div>
   </div>
-  <div v-else class="my-8 p-4 rounded-lg border border-border bg-muted/30 text-muted-foreground">
+  <div v-else-if="shouldShow" class="my-8 p-4 rounded-lg border border-border bg-muted/30 text-muted-foreground">
     Rubric not found
   </div>
 </template>
