@@ -650,7 +650,7 @@ onBeforeUnmount(() => {
                       @click.stop="close"
                       aria-label="Close modal"
                     >
-                      <X class="w-5 h-5" />
+                      <X class="w-5 h-5 text-foreground" />
                     </Button>
                   </div>
                   <!-- Center content -->
@@ -695,7 +695,7 @@ onBeforeUnmount(() => {
                           variant="ghost"
                           aria-label="More options"
                         >
-                          <MoreVertical class="w-5 h-5" />
+                          <MoreVertical class="w-5 h-5 text-foreground" />
                         </Button>
                         <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                           <!-- Edit button -->
@@ -749,13 +749,13 @@ onBeforeUnmount(() => {
                         @click.stop="close"
                         aria-label="Close modal"
                       >
-                        <X class="w-5 h-5" />
+                        <X class="w-5 h-5 text-foreground" />
                       </Button>
                     </div>
                   </div>
 
                   <!-- Overview content (lesson details) -->
-                  <div v-if="isOverviewMode" class="space-y-6">
+                  <div v-if="isOverviewMode" class="space-y-6 prose dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight prose-h3:text-2xl prose-h4:text-sm prose-p:text-foreground prose-p:text-base prose-p:leading-7 prose-li:text-foreground prose-li:text-sm prose-strong:text-foreground">
                     <div class="space-y-2">
                       <div class="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-[0.08em]">
                         <span>Lesson {{ selectedLesson.order || selectedLessonIndex + 1 }}</span>
