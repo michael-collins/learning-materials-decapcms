@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useSpecializationBundle } from '~/composables/useSpecializationBundle'
 import { useBodyOverflow } from '~/composables/useBodyOverflow'
 import Button from '~/components/ui/button/Button.vue'
-import { X, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, Book, FileText, Dumbbell, Lightbulb, FolderKanban, Download, Copy, Check, Menu, MoreVertical } from 'lucide-vue-next'
+import { X, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, Book, FileText, Dumbbell, Lightbulb, FolderKanban, Download, Copy, Check, Menu, MoreVertical, Pencil, Eye } from 'lucide-vue-next'
 
 interface Props {
   open: boolean
@@ -310,6 +310,15 @@ const canNavigatePrev = () => {
 
 const getItemPath = (type: string, slug: string) => {
   return `/${type}/${slug}`
+}
+
+const getDecapEditUrl = () => {
+  if (isOverviewMode.value && selectedLesson.value) {
+    return `/admin/#/collections/lessons/${selectedLesson.value.slug}`
+  } else if (!isOverviewMode.value && selectedItem.value) {
+    return `/admin/#/collections/${selectedItem.value.type}/${selectedItem.value.slug}`
+  }
+  return null
 }
 
 const closeDrawer = () => {
@@ -689,31 +698,46 @@ onBeforeUnmount(() => {
                           <MoreVertical class="w-5 h-5" />
                         </Button>
                         <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                          <NuxtLink
-                            v-if="isOverviewMode && selectedLesson"
-                            :to="`/lessons/${selectedLesson.slug}`"
+                          <!-- Edit button -->
+                          <a
+                            v-if="getDecapEditUrl()"
+                            :href="getDecapEditUrl()"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
                             @click.stop
                           >
+                            <Pencil class="w-4 h-4" />
+                            Edit page
+                          </a>
+                          <div v-if="getDecapEditUrl()" class="h-px bg-border" />
+                          <NuxtLink
+                            v-if="isOverviewMode && selectedLesson"
+                            :to="`/lessons/${selectedLesson.slug}`"
+                            class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                            :class="getDecapEditUrl() ? '' : 'rounded-t-lg'"
+                            @click.stop
+                          >
+                            <Eye class="w-4 h-4" />
                             View full page
-                            <ExternalLink class="w-4 h-4" />
                           </NuxtLink>
                           <NuxtLink
                             v-else-if="!isOverviewMode && selectedItem"
                             :to="getItemPath(selectedItem.type, selectedItem.slug)"
-                            class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
+                            class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                            :class="getDecapEditUrl() ? '' : 'rounded-t-lg'"
                             @click.stop
                           >
+                            <Eye class="w-4 h-4" />
                             View full page
-                            <ExternalLink class="w-4 h-4" />
                           </NuxtLink>
                           <div v-if="(isOverviewMode && selectedLesson) || (!isOverviewMode && selectedItem)" class="h-px bg-border" />
                           <button
                             @click.stop="exportCommonCartridge"
                             class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"
                           >
-                            Export Common Cartridge
                             <Download class="w-4 h-4" />
+                            Export Common Cartridge
                           </button>
                         </div>
                       </div>
