@@ -79,6 +79,16 @@ const oerSchema = computed(() => {
   const baseUrl = useRequestURL().origin
   return buildCourseSchema(pathway.value, specializations.value || [], baseUrl)
 })
+
+const selectedSpecSlug = ref<string | null>(null)
+
+const openViewer = (spec: any) => {
+  selectedSpecSlug.value = spec.slug
+}
+
+const closeViewer = () => {
+  selectedSpecSlug.value = null
+}
 </script>
 
 <template>
@@ -120,6 +130,8 @@ const oerSchema = computed(() => {
               :imageAlt="spec.imageAlt"
               :targetRole="spec.targetRole"
               :skills="spec.skills"
+              :preview="true"
+              @select="openViewer"
             />
           </div>
         </div>
@@ -129,6 +141,12 @@ const oerSchema = computed(() => {
           <p class="text-muted-foreground">Specializations are being loaded...</p>
         </div>
       </div>
+      
+      <SpecializationViewerModal
+        :open="!!selectedSpecSlug"
+        :slug="selectedSpecSlug"
+        @close="closeViewer"
+      />
     </div>
     <div v-else class="container py-8">
       <div class="text-center">
