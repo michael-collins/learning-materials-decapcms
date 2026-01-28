@@ -12,6 +12,12 @@ export default defineContentConfig({
         date: z.string().optional(),
         license: z.string().optional(),
         allowEmbed: z.boolean().optional(),
+        // Version control fields
+        version: z.string().optional(),
+        versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
+        changelog: z.string().optional(),
+        breakingChanges: z.array(z.string()).optional(),
+        publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
           url: z.string().optional(),
@@ -30,6 +36,12 @@ export default defineContentConfig({
         date: z.string().optional(),
         license: z.string().optional(),
         allowEmbed: z.boolean().optional(),
+        // Version control fields
+        version: z.string().optional(),
+        versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
+        changelog: z.string().optional(),
+        breakingChanges: z.array(z.string()).optional(),
+        publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
           url: z.string().optional(),
@@ -58,6 +70,12 @@ export default defineContentConfig({
         authorUrl: z.string().optional(),
         published: z.boolean().optional(),
         allowEmbed: z.boolean().optional(),
+        // Version control fields
+        version: z.string().optional(),
+        versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
+        changelog: z.string().optional(),
+        breakingChanges: z.array(z.string()).optional(),
+        publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
           url: z.string().optional(),

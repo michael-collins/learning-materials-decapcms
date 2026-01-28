@@ -12,7 +12,11 @@
     "migrate": "node scripts/migrate-content.js",
     "migrate:dry-run": "node scripts/migrate-content.js --dry-run",
     "migrate:verbose": "node scripts/migrate-content.js --verbose",
-    "migrate:test": "node scripts/migrate-test.js"
+    "migrate:test": "node scripts/migrate-test.js",
+    "version:check": "node scripts/check-version-edits.js",
+    "version:validate": "node scripts/validate-version-integrity.js",
+    "version:snapshot": "node scripts/create-version-snapshot.js",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/model-viewer": "^4.1.0",
@@ -37,6 +41,7 @@
     "fs-extra": "^11.3.3",
     "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
+    "husky": "^9.0.11",
     "lucide-vue-next": "^0.562.0",
     "postcss": "^8.5.6",
     "tailwind-merge": "^3.4.0",

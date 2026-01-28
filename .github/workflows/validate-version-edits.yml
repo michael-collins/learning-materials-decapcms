@@ -1,0 +1,149 @@
+name: Validate Version File Edits
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'content/exercises/**/v*.md'
+      - 'content/tutorials/**/v*.md'
+      - 'content/lectures/**/v*.md'
+      - 'content/articles/**/v*.md'
+      - 'content/projects/**/v*.md'
+
+jobs:
+  check-version-edits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full history to compare
+      
+      - name: Get changed files
+        id: changed-files
+        run: |
+          # Get list of changed version files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E 'content/.*/v[0-9]+\.[0-9]+\.[0-9]+\.md$' || echo "")
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Count the files
+          if [ -n "$CHANGED_FILES" ]; then
+            COUNT=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
+          else
+            COUNT=0
+          fi
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+      
+      - name: Check if archived versions were modified
+        id: check-archived
+        if: steps.changed-files.outputs.count > 0
+        run: |
+          node scripts/check-version-edits.js "${{ steps.changed-files.outputs.changed_files }}"
+        continue-on-error: true
+      
+      - name: Add warning comment to PR
+        if: steps.changed-files.outputs.count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changedFiles = `${{ steps.changed-files.outputs.changed_files }}`.split('\n').filter(f => f);
+            const count = changedFiles.length;
+            
+            const comment = `## ⚠️ Version File Edit Warning
+            
+            This PR modifies **${count}** archived/immutable version file(s):
+            
+            ${changedFiles.map(f => `- \`${f}\``).join('\n')}
+            
+            ### ⚠️ Important
+            These are immutable version snapshots that users may be embedding in their courses.
+            
+            **Editing these files will change content for existing embeds without user consent.**
+            
+            ### ✅ If this is intentional:
+            - Ensure you have a valid reason (critical bug, security fix, etc.)
+            - Document the change thoroughly in the PR description
+            - Bump the patch version if needed
+            - Consider creating a new version instead
+            
+            ### ❌ If this was accidental:
+            - Edit the current/latest version instead (without \`v\` prefix)
+            - Close this PR and create a new one with the correct file
+            
+            ---
+            
+            This PR requires **admin approval** before merging. See CODEOWNERS.`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+      
+      - name: Add warning labels
+        if: steps.changed-files.outputs.count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['⚠️ version-edit', 'needs-admin-review']
+            });
+      
+      - name: Update PR description
+        if: steps.changed-files.outputs.count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const warningBanner = `
+            
+            ---
+            
+            ## ⚠️ AUTOMATED WARNING: Archived Version Files Modified
+            
+            This PR modifies immutable version snapshot files. Please review carefully before merging.
+            See the bot comment below for details.
+            
+            ---`;
+            
+            // Only add banner if not already present
+            if (!pr.body.includes('AUTOMATED WARNING: Archived Version Files Modified')) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: (pr.body || '') + warningBanner
+              });
+            }
+      
+      - name: Fail check if critical files modified
+        if: steps.changed-files.outputs.count > 0
+        run: |
+          echo "::error::Archived version files were modified. This requires manual review and approval."
+          exit 1  # This fails the check, blocking auto-merge
+
+  validate-version-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Validate version file integrity
+        run: |
+          node scripts/validate-version-integrity.js
