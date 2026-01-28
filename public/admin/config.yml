@@ -83,6 +83,8 @@ collections:
       - {label: "Slug", name: "slug", widget: "string", hint: "URL-friendly version of title"}
       - {label: "Type", name: "type", widget: "string", default: "oer:Practice", hint: "OER Schema type"}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
+      - {label: "Lesson", name: "lesson", widget: "relation", required: false, collection: "lessons", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent lesson (optional)"}
+      - {label: "Specialization", name: "specialization", widget: "relation", required: false, collection: "specializations", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent specialization (optional)"}
       - {label: "YouTube Playlist ID", name: "youtubePlaylistID", widget: "string", required: false, hint: "YouTube playlist ID for tutorial videos"}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
@@ -127,6 +129,8 @@ collections:
       - {label: "Slug", name: "slug", widget: "string", hint: "URL-friendly version of title"}
       - {label: "Type", name: "type", widget: "string", default: "oer:Assessment", hint: "OER Schema type"}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
+      - {label: "Lesson", name: "lesson", widget: "relation", required: false, collection: "lessons", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent lesson (optional)"}
+      - {label: "Specialization", name: "specialization", widget: "relation", required: false, collection: "specializations", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent specialization (optional)"}
       - {label: "YouTube Playlist ID", name: "youtubePlaylistID", widget: "string", required: false, hint: "YouTube playlist ID for tutorial videos"}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
@@ -168,27 +172,39 @@ collections:
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
-      - {label: "Type", name: "type", widget: "string", default: "oer:LearningComponent"}
+      - {label: "Type", name: "type", widget: "hidden", default: "oer:InstructionalPattern"}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
+      - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '8 weeks', '3 months'"}
+      - {label: "Pathway", name: "pathway", widget: "relation", required: false, collection: "pathways", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent pathway for this specialization"}
       - {label: "Who It's For", name: "whoItsFor", widget: "text", required: false}
-      - {label: "Target Role", name: "targetRole", widget: "string", required: false}
+      - {label: "Target Role", name: "targetRole", widget: "string", required: false, hint: "e.g., '3D Modeler', 'Animator'"}
+      - label: "Skills"
+        name: "skills"
+        widget: "list"
+        required: false
+        hint: "Key skills students will develop"
+        field: {label: "Skill", name: "skill", widget: "string"}
+      - label: "Tools"
+        name: "tools"
+        widget: "list"
+        required: false
+        hint: "Software and hardware used"
+        field: {label: "Tool", name: "tool", widget: "string"}
+      - label: "Learning Objectives"
+        name: "learningObjectives"
+        widget: "list"
+        required: false
+        field: {label: "Objective", name: "objective", widget: "text"}
+      - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
+      - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
+      - {label: "Author", name: "author", widget: "string", required: false}
       - {label: "Published", name: "published", widget: "boolean", default: true}
-      - label: "OER Schema Metadata"
-        name: "oer"
-        widget: "object"
-        required: false
-        fields:
-          - {label: "Context", name: "@context", widget: "string", default: "https://oerschema.org/"}
-          - {label: "Type", name: "@type", widget: "string", default: "LearningComponent"}
-          - {label: "Name", name: "name", widget: "string"}
-          - {label: "Component Type", name: "componentType", widget: "string", default: "Unit"}
-          - {label: "Learning Objectives", name: "teaches", widget: "list", required: false}
-          - {label: "Has Parts", name: "hasPart", widget: "list", required: false}
-          - {label: "Duration", name: "duration", widget: "string", hint: "ISO 8601 duration (e.g., PT8W)"}
-          - {label: "Educational Level", name: "educationalLevel", widget: "string"}
-          - {label: "Language", name: "inLanguage", widget: "string", default: "en-US"}
-          - {label: "License URL", name: "license", widget: "string"}
+      - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true}
+      - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
+      - {label: "AI Usage Licenses", name: "aiLicense", widget: "select", required: false, multiple: true, options: ["AIUL-NA", "AIUL-NA-WR", "AIUL-NA-IM", "AIUL-NA-VD", "AIUL-NA-AU", "AIUL-NA-3D", "AIUL-NA-TR", "AIUL-NA-MX", "AIUL-NA-CO", "AIUL-WA", "AIUL-WA-WR", "AIUL-WA-IM", "AIUL-WA-VD", "AIUL-WA-AU", "AIUL-WA-3D", "AIUL-WA-TR", "AIUL-WA-MX", "AIUL-WA-CO", "AIUL-CD", "AIUL-CD-WR", "AIUL-CD-IM", "AIUL-CD-VD", "AIUL-CD-AU", "AIUL-CD-3D", "AIUL-CD-TR", "AIUL-CD-MX", "AIUL-CD-CO", "AIUL-TC", "AIUL-TC-WR", "AIUL-TC-IM", "AIUL-TC-VD", "AIUL-TC-AU", "AIUL-TC-3D", "AIUL-TC-TR", "AIUL-TC-MX", "AIUL-TC-CO", "AIUL-DP", "AIUL-DP-WR", "AIUL-DP-IM", "AIUL-DP-VD", "AIUL-DP-AU", "AIUL-DP-3D", "AIUL-DP-TR", "AIUL-DP-MX", "AIUL-DP-CO", "AIUL-IU", "AIUL-IU-WR", "AIUL-IU-IM", "AIUL-IU-VD", "AIUL-IU-AU", "AIUL-IU-3D", "AIUL-IU-TR", "AIUL-IU-MX", "AIUL-IU-CO"], hint: "Select one or more AI usage policies"}
       - {label: "Body", name: "body", widget: "markdown"}
 
   - name: "pathways"
@@ -209,27 +225,34 @@ collections:
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
-      - {label: "Type", name: "type", widget: "string", default: "oer:Course"}
+      - {label: "Type", name: "type", widget: "hidden", default: "oer:Course"}
       - {label: "Description", name: "description", widget: "text"}
+      - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
+      - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '12 weeks', '6 months'"}
+      - label: "Specializations"
+        name: "specializations"
+        widget: "relation"
+        required: false
+        collection: "specializations"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select specializations included in this pathway (in order)"
+      - label: "Learning Objectives"
+        name: "learningObjectives"
+        widget: "list"
+        required: false
+        field: {label: "Objective", name: "objective", widget: "text"}
+      - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
+      - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
+      - {label: "Author", name: "author", widget: "string", required: false}
       - {label: "Published", name: "published", widget: "boolean", default: true}
-      - label: "OER Schema Metadata"
-        name: "oer"
-        widget: "object"
-        required: false
-        fields:
-          - {label: "Context", name: "@context", widget: "string", default: "https://oerschema.org/"}
-          - {label: "Type", name: "@type", widget: "string", default: "Course"}
-          - {label: "Course Code", name: "courseCode", widget: "string"}
-          - {label: "Name", name: "name", widget: "string"}
-          - {label: "Description", name: "description", widget: "text"}
-          - {label: "Learning Objectives", name: "teaches", widget: "list", required: false}
-          - {label: "Course Parts", name: "hasPart", widget: "list", required: false}
-          - {label: "Duration", name: "duration", widget: "string", hint: "ISO 8601 duration"}
-          - {label: "Language", name: "inLanguage", widget: "string", default: "en-US"}
-          - {label: "Free Access", name: "isAccessibleForFree", widget: "boolean", default: true}
-          - {label: "License URL", name: "license", widget: "string"}
+      - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true}
+      - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
+      - {label: "AI Usage Licenses", name: "aiLicense", widget: "select", required: false, multiple: true, options: ["AIUL-NA", "AIUL-NA-WR", "AIUL-NA-IM", "AIUL-NA-VD", "AIUL-NA-AU", "AIUL-NA-3D", "AIUL-NA-TR", "AIUL-NA-MX", "AIUL-NA-CO", "AIUL-WA", "AIUL-WA-WR", "AIUL-WA-IM", "AIUL-WA-VD", "AIUL-WA-AU", "AIUL-WA-3D", "AIUL-WA-TR", "AIUL-WA-MX", "AIUL-WA-CO", "AIUL-CD", "AIUL-CD-WR", "AIUL-CD-IM", "AIUL-CD-VD", "AIUL-CD-AU", "AIUL-CD-3D", "AIUL-CD-TR", "AIUL-CD-MX", "AIUL-CD-CO", "AIUL-TC", "AIUL-TC-WR", "AIUL-TC-IM", "AIUL-TC-VD", "AIUL-TC-AU", "AIUL-TC-3D", "AIUL-TC-TR", "AIUL-TC-MX", "AIUL-TC-CO", "AIUL-DP", "AIUL-DP-WR", "AIUL-DP-IM", "AIUL-DP-VD", "AIUL-DP-AU", "AIUL-DP-3D", "AIUL-DP-TR", "AIUL-DP-MX", "AIUL-DP-CO", "AIUL-IU", "AIUL-IU-WR", "AIUL-IU-IM", "AIUL-IU-VD", "AIUL-IU-AU", "AIUL-IU-3D", "AIUL-IU-TR", "AIUL-IU-MX", "AIUL-IU-CO"], hint: "Select one or more AI usage policies"}
       - {label: "Body", name: "body", widget: "markdown"}
 
   - name: "lectures"
@@ -251,6 +274,8 @@ collections:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
       - {label: "Type", name: "type", widget: "string", default: "oer:SupportingMaterial"}
+      - {label: "Lesson", name: "lesson", widget: "relation", required: false, collection: "lessons", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent lesson (optional)"}
+      - {label: "Specialization", name: "specialization", widget: "relation", required: false, collection: "specializations", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent specialization (optional)"}
       - {label: "Google Slides ID", name: "googleSlidesID", widget: "string", required: false, hint: "Long ID from Google Slides embed URL"}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
@@ -271,6 +296,100 @@ collections:
           - {label: "Duration", name: "duration", widget: "string", hint: "ISO 8601 duration (e.g., PT45M)"}
           - {label: "Language", name: "inLanguage", widget: "string", default: "en-US"}
           - {label: "License URL", name: "license", widget: "string"}
+      - {label: "Body", name: "body", widget: "markdown"}
+
+  - name: "lessons"
+    label: "Lessons"
+    folder: "content/lessons"
+    create: true
+    slug: "{{slug}}"
+    view_filters:
+      - label: "All"
+        field: published
+        pattern: ""
+      - label: "Published"
+        field: published
+        pattern: true
+      - label: "Unpublished"
+        field: published
+        pattern: false
+    sortable_fields: ["title", "order", "specialization", "published"]
+    sort: {field: "order", direction: "asc"}
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Slug", name: "slug", widget: "string"}
+      - {label: "Type", name: "type", widget: "hidden", default: "oer:LearningComponent"}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '3 hours', '2 days'"}
+      - {label: "Specialization", name: "specialization", widget: "relation", required: false, collection: "specializations", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent specialization"}
+      - {label: "Order", name: "order", widget: "number", required: false, default: 1, hint: "Sequence position in specialization"}
+      - label: "Learning Objectives"
+        name: "learningObjectives"
+        widget: "list"
+        required: false
+        field: {label: "Objective", name: "objective", widget: "text"}
+      - label: "Lectures"
+        name: "lectures"
+        widget: "relation"
+        required: false
+        collection: "lectures"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select supporting material/lectures for this lesson"
+      - label: "Tutorials"
+        name: "tutorials"
+        widget: "relation"
+        required: false
+        collection: "tutorials"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select tutorials for this lesson"
+      - label: "Exercises"
+        name: "exercises"
+        widget: "relation"
+        required: false
+        collection: "exercises"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select practice activities for this lesson"
+      - label: "Articles"
+        name: "articles"
+        widget: "relation"
+        required: false
+        collection: "articles"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select related articles for this lesson"
+      - label: "Resources"
+        name: "resources"
+        widget: "file"
+        required: false
+        multiple: true
+        hint: "Upload or link to additional resources for this lesson"
+      - label: "Projects"
+        name: "projects"
+        widget: "relation"
+        required: false
+        collection: "projects"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select assessments/projects for this lesson"
+      - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
+      - {label: "Tags", name: "tags", widget: "list", required: false}
+      - {label: "Author", name: "author", widget: "string", required: false}
+      - {label: "Published", name: "published", widget: "boolean", default: true}
+      - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
+      - {label: "AI Usage Licenses", name: "aiLicense", widget: "select", required: false, multiple: true, options: ["AIUL-NA", "AIUL-NA-WR", "AIUL-NA-IM", "AIUL-NA-VD", "AIUL-NA-AU", "AIUL-NA-3D", "AIUL-NA-TR", "AIUL-NA-MX", "AIUL-NA-CO", "AIUL-WA", "AIUL-WA-WR", "AIUL-WA-IM", "AIUL-WA-VD", "AIUL-WA-AU", "AIUL-WA-3D", "AIUL-WA-TR", "AIUL-WA-MX", "AIUL-WA-CO", "AIUL-CD", "AIUL-CD-WR", "AIUL-CD-IM", "AIUL-CD-VD", "AIUL-CD-AU", "AIUL-CD-3D", "AIUL-CD-TR", "AIUL-CD-MX", "AIUL-CD-CO", "AIUL-TC", "AIUL-TC-WR", "AIUL-TC-IM", "AIUL-TC-VD", "AIUL-TC-AU", "AIUL-TC-3D", "AIUL-TC-TR", "AIUL-TC-MX", "AIUL-TC-CO", "AIUL-DP", "AIUL-DP-WR", "AIUL-DP-IM", "AIUL-DP-VD", "AIUL-DP-AU", "AIUL-DP-3D", "AIUL-DP-TR", "AIUL-DP-MX", "AIUL-DP-CO", "AIUL-IU", "AIUL-IU-WR", "AIUL-IU-IM", "AIUL-IU-VD", "AIUL-IU-AU", "AIUL-IU-3D", "AIUL-IU-TR", "AIUL-IU-MX", "AIUL-IU-CO"], hint: "Select one or more AI usage policies"}
       - {label: "Body", name: "body", widget: "markdown"}
 
   - name: "docs"

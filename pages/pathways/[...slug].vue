@@ -16,6 +16,57 @@ const { data: pathway, pending } = await useAsyncData(`pathway-${pathwayPath}`, 
   queryCollection('pathways').path(pathwayPath).first()
 )
 
+// Fetch related specializations - separate async call
+const specializations = ref([])
+const specializationsLoading = ref(false)
+
+const fetchSpecializations = async () => {
+  if (!pathway.value?.specializations || pathway.value.specializations.length === 0) {
+    console.log('No specializations found in pathway')
+    specializations.value = []
+    return
+  }
+
+  specializationsLoading.value = true
+  console.log('Pathway specializations array:', pathway.value.specializations)
+
+  try {
+    const specs = await Promise.all(
+      pathway.value.specializations.map((spec: any) => {
+        const specSlug = typeof spec === 'string' ? spec : spec.slug
+        const specPath = `/specializations/${specSlug}`
+        console.log('Querying specialization:', specPath)
+        return queryCollection('specializations').path(specPath).first()
+          .then((result: any) => {
+            console.log(`Result for ${specPath}:`, result ? `Found (${result.title})` : 'Not found')
+            return result
+          })
+          .catch((err: any) => {
+            console.error(`Error fetching ${specPath}:`, err)
+            return null
+          })
+      })
+    )
+    const filtered = specs.filter(Boolean)
+    console.log('Final filtered specializations:', filtered.length, filtered)
+    specializations.value = filtered
+  } catch (err) {
+    console.error('Error fetching specializations:', err)
+    specializations.value = []
+  } finally {
+    specializationsLoading.value = false
+  }
+}
+
+// Watch pathway and fetch specializations when it loads
+watch(() => pathway.value, (newVal) => {
+  if (newVal) {
+    console.log('Pathway loaded:', newVal.title)
+    console.log('Raw specializations field:', newVal.specializations)
+    fetchSpecializations()
+  }
+}, { immediate: true })
+
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
   { label: 'Pathways', path: '/pathways' },
@@ -25,10 +76,19 @@ const breadcrumbs = computed(() => [
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
   if (!pathway.value) return null
-  // Get the base URL from the request
   const baseUrl = useRequestURL().origin
-  return buildCourseSchema(pathway.value, baseUrl)
+  return buildCourseSchema(pathway.value, specializations.value || [], baseUrl)
 })
+
+const selectedSpecSlug = ref<string | null>(null)
+
+const openViewer = (spec: any) => {
+  selectedSpecSlug.value = spec.slug
+}
+
+const closeViewer = () => {
+  selectedSpecSlug.value = null
+}
 </script>
 
 <template>
@@ -50,6 +110,43 @@ const oerSchema = computed(() => {
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>
+      
+      <!-- Specializations Section -->
+      <div v-if="!specializationsLoading && specializations && specializations.length > 0" class="border-t bg-muted/30">
+        <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+          <h2 class="text-3xl font-bold mb-2">Specializations in This Pathway</h2>
+          <p class="text-muted-foreground mb-8">Choose a specialization to dive deeper into a specific area of focus.</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SpecializationCard
+              v-for="spec in specializations"
+              :key="spec.slug"
+              :title="spec.title"
+              :slug="spec.slug"
+              :description="spec.description"
+              :difficulty="spec.difficulty"
+              :duration="spec.estimatedDuration"
+              :image="spec.image"
+              :imageAlt="spec.imageAlt"
+              :targetRole="spec.targetRole"
+              :skills="spec.skills"
+              :preview="true"
+              @select="openViewer"
+            />
+          </div>
+        </div>
+      </div>
+      <div v-else-if="specializationsLoading" class="border-t bg-muted/30">
+        <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+          <p class="text-muted-foreground">Specializations are being loaded...</p>
+        </div>
+      </div>
+      
+      <SpecializationViewerModal
+        :open="!!selectedSpecSlug"
+        :slug="selectedSpecSlug"
+        @close="closeViewer"
+      />
     </div>
     <div v-else class="container py-8">
       <div class="text-center">

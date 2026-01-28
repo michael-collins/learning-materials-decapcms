@@ -22,6 +22,7 @@ interface CollectionItem {
   _path?: string
   path?: string
   slug?: string
+  previewable?: boolean
 }
 
 interface Props {
@@ -30,13 +31,21 @@ interface Props {
   items: CollectionItem[]
   itemsPerPage?: number
   loading?: boolean
+  selectable?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Items',
   itemsPerPage: 10,
   loading: false,
+  selectable: false,
 })
+
+const emit = defineEmits<{
+  (e: 'select', item: CollectionItem): void
+}>()
+
+const selectable = computed(() => props.selectable)
 
 const searchQuery = ref('')
 const selectedAuthor = ref('')
@@ -96,6 +105,14 @@ const paginatedItems = computed(() => {
   const end = start + props.itemsPerPage
   return filteredItems.value.slice(start, end)
 })
+
+const canPreview = (item: CollectionItem) => props.selectable && item.previewable !== false
+
+const handleSelect = (item: CollectionItem, event?: Event) => {
+  if (!canPreview(item)) return
+  event?.preventDefault()
+  emit('select', item)
+}
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -180,13 +197,30 @@ watch([searchQuery, selectedAuthor], () => {
               </NuxtLink>
             </TableCell>
             <TableCell>
-              <NuxtLink :to="getItemPath(item)" class="font-medium text-primary hover:underline inline-flex items-center gap-1 group">
-                {{ item.title }}
-                <ChevronRight class="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </NuxtLink>
-              <p v-if="item.description" class="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {{ item.description }}
-              </p>
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <NuxtLink
+                    :to="getItemPath(item)"
+                    class="font-medium text-primary hover:underline inline-flex items-center gap-1 group"
+                    @click="handleSelect(item, $event)"
+                  >
+                    {{ item.title }}
+                    <ChevronRight class="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </NuxtLink>
+                  <p v-if="item.description" class="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {{ item.description }}
+                  </p>
+                </div>
+                <button
+                  v-if="canPreview(item)"
+                  type="button"
+                  class="shrink-0 inline-flex items-center gap-1 rounded-md border border-border bg-muted px-3 py-1 text-xs font-medium text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                  @click="handleSelect(item, $event)"
+                >
+                  <Icon name="mingcute:layout-11-line" class="w-4 h-4" />
+                  Preview
+                </button>
+              </div>
             </TableCell>
             <TableCell v-if="items.some(i => i.author)">
               <span class="text-sm">{{ item.author || '-' }}</span>
