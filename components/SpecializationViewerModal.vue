@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, computed, ref, watch, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useSpecializationBundle } from '~/composables/useSpecializationBundle'
 import { useBodyOverflow } from '~/composables/useBodyOverflow'
 import Button from '~/components/ui/button/Button.vue'
@@ -12,6 +13,9 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits(['close'])
+
+const route = useRoute()
+const router = useRouter()
 
 const { toggle } = useBodyOverflow()
 
@@ -107,11 +111,13 @@ const selectLesson = (index: number) => {
   selectedLessonIndex.value = index
   selectedItemIndex.value = null // Start in overview mode
   announceForA11y(`Selected lesson: ${lessons.value[index]?.title}`)
+  updateURL()
 }
 
 const selectOverview = () => {
   selectedItemIndex.value = null
   announceForA11y(`Viewing lesson overview`)
+  updateURL()
 }
 
 const selectItem = (index: number) => {
@@ -120,6 +126,54 @@ const selectItem = (index: number) => {
   expandedLessonIndices.value = new Set([selectedLessonIndex.value])
   if (selectedLesson.value?.items[index]) {
     announceForA11y(`Selected ${selectedLesson.value.items[index].type}: ${selectedLesson.value.items[index].title}`)
+  }
+  updateURL()
+}
+
+// URL state management
+const updateURL = () => {
+  if (!props.open || !specialization.value) return
+  
+  const lesson = lessons.value[selectedLessonIndex.value]
+  if (!lesson) return
+  
+  const query: Record<string, string> = {
+    modal: specialization.value.slug,
+    lesson: lesson.slug
+  }
+  
+  if (selectedItemIndex.value !== null && selectedLesson.value?.items[selectedItemIndex.value]) {
+    const item = selectedLesson.value.items[selectedItemIndex.value]
+    query.item = item.slug
+  }
+  
+  router.replace({ query })
+}
+
+const syncFromURL = () => {
+  if (!props.open || !lessons.value.length) return
+  
+  const lessonSlug = route.query.lesson as string
+  const itemSlug = route.query.item as string
+  
+  if (lessonSlug) {
+    const lessonIndex = lessons.value.findIndex(l => l.slug === lessonSlug)
+    if (lessonIndex !== -1) {
+      selectedLessonIndex.value = lessonIndex
+      expandedLessonIndices.value = new Set([lessonIndex])
+      
+      if (itemSlug) {
+        const lesson = lessons.value[lessonIndex]
+        const itemIndex = lesson.items?.findIndex((i: any) => i.slug === itemSlug)
+        if (itemIndex !== undefined && itemIndex !== -1) {
+          selectedItemIndex.value = itemIndex
+        } else {
+          selectedItemIndex.value = null
+        }
+      } else {
+        selectedItemIndex.value = null
+      }
+    }
   }
 }
 
@@ -289,6 +343,12 @@ const close = () => {
   selectedLessonIndex.value = 0
   selectedItemIndex.value = null
   announceForA11y('Specialization modal closed')
+  // Clear URL parameters
+  const query = { ...route.query }
+  delete query.modal
+  delete query.lesson
+  delete query.item
+  router.replace({ query })
   // Restore focus to trigger element
   nextTick(() => {
     triggerElementRef.value?.focus()
@@ -333,9 +393,16 @@ const onKey = (e: KeyboardEvent) => {
 
 // Auto-select first lesson and expand it when lessons load
 watch(lessons, (newLessons) => {
-  if (newLessons.length > 0 && selectedLessonIndex.value === 0) {
-    selectLesson(0)
-    expandedLessonIndices.value = new Set([0])
+  if (newLessons.length > 0) {
+    // Try to sync from URL first
+    const hasURLState = route.query.lesson || route.query.item
+    if (hasURLState) {
+      syncFromURL()
+    } else if (selectedLessonIndex.value === 0) {
+      // If no URL state and still on first lesson, initialize and update URL
+      expandedLessonIndices.value = new Set([0])
+      updateURL()
+    }
   }
 })
 
@@ -344,11 +411,19 @@ watch(selectedItem, () => {
   loadItemContent()
 })
 
+// Watch for URL changes (browser back/forward)
+watch(() => route.query, (newQuery, oldQuery) => {
+  if (props.open && (newQuery.lesson !== oldQuery.lesson || newQuery.item !== oldQuery.item)) {
+    syncFromURL()
+  }
+}, { deep: true })
+
 // Handle body overflow when modal opens/closes
 watch(() => props.open, (isOpen) => {
   toggle(isOpen)
   if (isOpen) {
     announceForA11y(`${specialization.value?.title || 'Specialization'} modal opened. ${lessons.value.length} lessons available.`)
+    syncFromURL()
     nextTick(() => {
       closeButtonRef.value?.$el?.focus()
     })
@@ -585,7 +660,16 @@ onBeforeUnmount(() => {
                       </Button>
                       <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <NuxtLink
-                          v-if="!isOverviewMode && selectedItem"
+                          v-if="isOverviewMode && selectedLesson"
+                          :to="`/lessons/${selectedLesson.slug}`"
+                          class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
+                          @click.stop
+                        >
+                          View full page
+                          <ExternalLink class="w-4 h-4" />
+                        </NuxtLink>
+                        <NuxtLink
+                          v-else-if="!isOverviewMode && selectedItem"
                           :to="getItemPath(selectedItem.type, selectedItem.slug)"
                           class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
                           @click.stop
@@ -593,7 +677,7 @@ onBeforeUnmount(() => {
                           View full page
                           <ExternalLink class="w-4 h-4" />
                         </NuxtLink>
-                        <div v-if="!isOverviewMode && selectedItem" class="h-px bg-border" />
+                        <div v-if="(isOverviewMode && selectedLesson) || (!isOverviewMode && selectedItem)" class="h-px bg-border" />
                         <button
                           @click.stop="exportCommonCartridge"
                           class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"

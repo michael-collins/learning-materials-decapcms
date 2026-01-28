@@ -80,14 +80,12 @@ const oerSchema = computed(() => {
   return buildCourseSchema(pathway.value, specializations.value || [], baseUrl)
 })
 
-const selectedSpecSlug = ref<string | null>(null)
+// Use the shared specialization modal composable
+const { isModalOpen, currentModalSlug, openViewer, closeViewer } = useSpecializationModal()
 
-const openViewer = (spec: any) => {
-  selectedSpecSlug.value = spec.slug
-}
-
-const closeViewer = () => {
-  selectedSpecSlug.value = null
+const handleSelectSpec = (spec: any) => {
+  // Store the pathway page path when opening the modal
+  openViewer(spec.slug, route.fullPath)
 }
 </script>
 
@@ -131,7 +129,7 @@ const closeViewer = () => {
               :targetRole="spec.targetRole"
               :skills="spec.skills"
               :preview="true"
-              @select="openViewer"
+              @select="handleSelectSpec"
             />
           </div>
         </div>
@@ -142,11 +140,13 @@ const closeViewer = () => {
         </div>
       </div>
       
-      <SpecializationViewerModal
-        :open="!!selectedSpecSlug"
-        :slug="selectedSpecSlug"
-        @close="closeViewer"
-      />
+      <ClientOnly>
+        <SpecializationViewerModal
+          :open="isModalOpen"
+          :slug="currentModalSlug"
+          @close="() => closeViewer(true)"
+        />
+      </ClientOnly>
     </div>
     <div v-else class="container py-8">
       <div class="text-center">
