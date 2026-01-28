@@ -304,15 +304,17 @@ collections:
     create: true
     slug: "{{slug}}"
     view_filters:
+      - label: "All"
+        field: published
+        pattern: ""
       - label: "Published"
         field: published
         pattern: true
       - label: "Unpublished"
         field: published
         pattern: false
-      - label: "All"
-        field: published
-        pattern: ""
+    sortable_fields: ["title", "order", "specialization", "published"]
+    sort: {field: "order", direction: "asc"}
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
