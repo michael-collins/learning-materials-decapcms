@@ -41,6 +41,7 @@ const oerSchema = computed(() => {
         :imageAlt="pathway.imageAlt"
         :tags="pathway.tags"
         :attachments="pathway.attachments"
+        :versionStatus="pathway.versionStatus"
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>

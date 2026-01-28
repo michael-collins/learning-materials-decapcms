@@ -94,6 +94,22 @@ definePageMeta({
             </div>
           </div>
         </div>
+
+        <div class="rounded-xl border bg-card p-8 shadow-sm">
+          <div class="flex items-start gap-4">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-3">Content Versioning & Embed Stability</h3>
+              <p class="text-muted-foreground leading-relaxed">
+                Semantic versioning system protects embedded content from unintended changes. Educators can pin to specific versions for stability or opt into latest updates. Multi-layer protection prevents accidental edits to archived versions, ensuring course materials remain consistent for students.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

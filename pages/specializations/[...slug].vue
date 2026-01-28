@@ -10,11 +10,21 @@ definePageMeta({
 
 // Get the specialization path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
-const specializationPath = `/specializations/${slug.join('/')}`
+const baseSlug = slug.join('/');
+const versionParam = route.query.version;
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
-const { data: specialization, pending } = await useAsyncData(`specialization-${specializationPath}`, () =>
-  queryCollection('specializations').path(specializationPath).first()
-)
+const { data: specialization, pending } = await useAsyncData(`specialization-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/specializations/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('specializations').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('specializations').path(`/specializations/${baseSlug}`).first()
+})
 
 // Fetch related lessons
 const lessons = ref([])
@@ -83,6 +93,7 @@ const oerSchema = computed(() => {
         :description="specialization.whoItsFor"
         :image="specialization.image"
         :imageAlt="specialization.imageAlt"
+        :versionStatus="specialization.versionStatus"
       >
         <ContentRenderer :value="specialization" />
       </CollectionItem>

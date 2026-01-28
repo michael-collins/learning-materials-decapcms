@@ -256,6 +256,11 @@ onUnmounted(() => {
             </BreadcrumbSeparator>
           </BreadcrumbItem>
         </Breadcrumb>
+        
+        <!-- Version badge for archived content -->
+        <span v-if="route.query.version" class="ml-3 inline-flex items-center rounded-full bg-warning/10 border border-warning/20 px-3 py-1 text-xs font-semibold text-warning">
+          Version {{ route.query.version }}
+        </span>
       </header>
       <main class="flex-1">
         <slot />

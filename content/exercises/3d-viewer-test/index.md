@@ -1,0 +1,48 @@
+---
+title: 3D Model Viewer Test
+slug: 3d-viewer-test
+type: oer:Practice
+difficulty: Beginner
+rubric: exercise
+author: Michael Collins
+published: true
+allowEmbed: true
+version: "2.0.0"
+versionStatus: latest
+publishEmbed: true
+changelog: "Updated example content"
+breakingChanges: []
+date: 2026-01-28
+---
+# 3D Model Viewer Test Page
+
+This page demonstrates the 3D Model Viewer component capabilities.
+
+## Example 1: Sketchfab Embed
+
+This example shows how to embed a Sketchfab model:
+
+
+
+::sketchfab-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Haus" height="600px"}
+::
+
+## Example 2: Uploaded GLTF File (Placeholder)
+
+Once you upload a .glb or .gltf file, you can reference it like this:
+
+::threed-viewer-component{src="/uploads/boxes-sculpt-1.glb" title="Box Sculpture"}
+::
+
+## Instructions for Students
+
+To submit your 3D model:
+
+1. Export your model from Blender as GLB format
+2. In the Decap CMS editor, click the "+" button
+3. Select "3D Model Viewer"
+4. Upload your .glb file
+5. Add a descriptive title
+6. Save your work
+
+Alternatively, you can upload your model to Sketchfab and paste the URL.

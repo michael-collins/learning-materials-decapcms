@@ -33,9 +33,13 @@ interface Props {
   image?: string
   imageAlt?: string
   tags?: string[]
+  versionStatus?: string
+  version?: string
 }
 
 const props = defineProps<Props>()
+
+console.log('[CollectionItem] Props received:', { title: props.title, versionStatus: props.versionStatus })
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -108,6 +112,16 @@ const getDecapEditUrl = computed(() => {
     const collection = pathParts[0] // e.g., 'exercises', 'lectures', 'tutorials'
     const slug = pathParts.slice(1).join('/') // e.g., 'some-exercise'
     return `/admin/#/collections/${collection}/${slug}`
+  }
+  return null
+})
+
+const getContentTypeAndSlug = computed(() => {
+  const pathParts = route.path.split('/').filter(Boolean)
+  if (pathParts.length >= 2) {
+    const contentType = pathParts[0] as 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons'
+    const slug = pathParts.slice(1).join('/')
+    return { contentType, slug }
   }
   return null
 })
@@ -250,6 +264,16 @@ const copyCitation = async () => {
                 Edit page
               </a>
               <div v-if="getDecapEditUrl" class="h-px bg-border" />
+              
+              <!-- Versions submenu -->
+              <VersionsDropdown 
+                v-if="getContentTypeAndSlug"
+                :content-type="getContentTypeAndSlug.contentType"
+                :slug="getContentTypeAndSlug.slug"
+                :current-version="undefined"
+              />
+              <div class="h-px bg-border" />
+              
               <button
                 @click.stop="copyCitation"
                 class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
@@ -277,7 +301,15 @@ const copyCitation = async () => {
           loading="eager"
         />
         
-        <h1 class="text-4xl font-bold tracking-tight mb-4">{{ title }}</h1>
+        <h1 class="text-4xl font-bold tracking-tight mb-4 flex items-center gap-3">
+          {{ title }}
+          <span
+            v-if="versionStatus === 'archived' && !version"
+            class="inline-flex items-center rounded-full bg-warning/10 border border-warning/20 px-3 py-1 text-xs font-semibold text-warning"
+          >
+            Archived
+          </span>
+        </h1>
         
         <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <div v-if="date" class="flex items-center gap-2">

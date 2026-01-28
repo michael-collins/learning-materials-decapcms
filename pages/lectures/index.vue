@@ -5,7 +5,17 @@ const { data: lectures, pending } = await useAsyncData('lectures', () =>
 
 const sortedLectures = computed(() => {
   if (!lectures.value) return []
-  return [...lectures.value].sort((a, b) => a.title.localeCompare(b.title))
+  
+  // Filter to only show the latest version of each item
+  const filtered = lectures.value.filter(item => {
+    const pathParts = item._path?.split('/').filter(Boolean) || []
+    const filename = pathParts[pathParts.length - 1] || ''
+    const isVersionFile = filename.match(/^v\d+\.\d+\.\d+$/)
+    const isArchivedVersion = item.versionStatus === 'archived'
+    return !isVersionFile && !isArchivedVersion
+  })
+  
+  return [...filtered].sort((a, b) => a.title.localeCompare(b.title))
 })
 </script>
 

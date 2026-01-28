@@ -10,11 +10,21 @@ definePageMeta({
 
 // Get the lecture path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
-const lecturePath = `/lectures/${slug.join('/')}`
+const baseSlug = slug.join('/');
+const versionParam = route.query.version;
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
-const { data: lecture, pending } = await useAsyncData(`lecture-${lecturePath}`, () =>
-  queryCollection('lectures').path(lecturePath).first()
-)
+const { data: lecture, pending } = await useAsyncData(`lecture-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/lectures/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('lectures').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('lectures').path(`/lectures/${baseSlug}`).first()
+})
 
 // Debug log
 watch(lecture, (newValue) => {
@@ -64,6 +74,8 @@ const oerSchema = computed(() => {
         :imageAlt="lecture.imageAlt"
         :tags="lecture.tags"
         :attachments="lecture.attachments"
+        :versionStatus="lecture.versionStatus"
+        :version="displayVersion"
       >
         <ContentRenderer :value="lecture" />
       </CollectionItem>

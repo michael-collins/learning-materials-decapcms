@@ -27,7 +27,6 @@ export async function resolveContentVersion(
     // First, try to get the main file (e.g., animation-basics.md)
     try {
       const mainContent = await queryContent<VersionedContent>(`${type}/${slug}`)
-        .where({ _path: { $eq: `/content/${type}/${slug}` } })
         .findOne()
       
       if (mainContent && mainContent.publishEmbed !== false) {
@@ -40,8 +39,7 @@ export async function resolveContentVersion(
     // If no main file, get the latest versioned file
     const versionedFiles = await queryContent<VersionedContent>(`${type}`)
       .where({ 
-        _path: { $regex: `/${type}/v\\d+\\.\\d+\\.\\d+$` },
-        publishEmbed: true 
+        _path: { $regex: `/${type}/${slug}/v\\d+\\.\\d+\\.\\d+$` }
       })
       .sort({ version: -1 })
       .findOne()
@@ -55,8 +53,7 @@ export async function resolveContentVersion(
     
     const versionedFiles = await queryContent<VersionedContent>(`${type}`)
       .where({ 
-        _path: { $regex: `/${type}/v${majorVersion}\\.\\d+\\.\\d+$` },
-        publishEmbed: true 
+        _path: { $regex: `/${type}/${slug}/v${majorVersion}\\.\\d+\\.\\d+$` }
       })
       .sort({ version: -1 })
       .findOne()
@@ -64,19 +61,16 @@ export async function resolveContentVersion(
     return versionedFiles
   }
 
-  // Exact version (e.g., '1.2.0')
-  if (/^\d+\.\d+\.\d+$/.test(versionParam)) {
-    const versionedFile = await queryContent<VersionedContent>(`${type}`)
-      .where({ 
-        _path: { $eq: `/content/${type}/v${versionParam}` },
-        publishEmbed: true 
-      })
-      .findOne()
+  // Exact version (e.g., '1.2.0' or 'v1.2.0')
+  const versionStr = versionParam.startsWith('v') ? versionParam : `v${versionParam}`
+  
+  const versionedFile = await queryContent<VersionedContent>(`${type}`)
+    .where({ 
+      _path: { $regex: `/${type}/${slug}/${versionStr}$` }
+    })
+    .findOne()
 
-    return versionedFile
-  }
-
-  return null
+  return versionedFile
 }
 
 /**

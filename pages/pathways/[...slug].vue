@@ -10,11 +10,21 @@ definePageMeta({
 
 // Get the pathway path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
-const pathwayPath = `/pathways/${slug.join('/')}`
+const baseSlug = slug.join('/');
+const versionParam = route.query.version;
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
-const { data: pathway, pending } = await useAsyncData(`pathway-${pathwayPath}`, () =>
-  queryCollection('pathways').path(pathwayPath).first()
-)
+const { data: pathway, pending } = await useAsyncData(`pathway-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/pathways/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('pathways').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('pathways').path(`/pathways/${baseSlug}`).first()
+})
 
 // Fetch related specializations - separate async call
 const specializations = ref([])
@@ -105,6 +115,7 @@ const handleSelectSpec = (spec: any) => {
         :description="pathway.description"
         :image="pathway.image"
         :imageAlt="pathway.imageAlt"
+        :versionStatus="pathway.versionStatus"
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>

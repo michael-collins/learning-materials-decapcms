@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useSpecializationBundle } from '~/composables/useSpecializationBundle'
 import { useBodyOverflow } from '~/composables/useBodyOverflow'
 import Button from '~/components/ui/button/Button.vue'
+import VersionsDropdown from '~/components/VersionsDropdown.vue'
 import { X, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, Book, FileText, Dumbbell, Lightbulb, FolderKanban, Download, Copy, Check, Menu, MoreVertical, Pencil, Eye } from 'lucide-vue-next'
 
 interface Props {
@@ -34,6 +35,7 @@ const loadingItemContent = ref(false)
 const isEmbedOpen = ref(false)
 const isCopied = ref(false)
 const showLessonsSidebar = ref(false)
+const selectedModalVersion = ref<string | undefined>(undefined)
 
 const selectedLesson = computed(() => lessons.value[selectedLessonIndex.value] || null)
 const selectedItem = computed(() => {
@@ -64,9 +66,25 @@ const loadItemContent = async () => {
   try {
     const { type, slug } = selectedItem.value
     const basePath = type === 'articles' ? '/articles' : `/${type}`
-    const content = await queryCollection(type === 'articles' ? 'articles' : type)
-      .path(`${basePath}/${slug}`)
-      .first()
+    
+    let content = null
+    
+    // Try to load versioned content if a version is selected
+    if (selectedModalVersion.value) {
+      const versionedPath = `${basePath}/${slug}/v${selectedModalVersion.value}`
+      content = await queryCollection(type === 'articles' ? 'articles' : type)
+        .path(versionedPath)
+        .first()
+    }
+    
+    // If no versioned content found or no version selected, load latest
+    if (!content) {
+      const latestPath = `${basePath}/${slug}`
+      content = await queryCollection(type === 'articles' ? 'articles' : type)
+        .path(latestPath)
+        .first()
+    }
+    
     selectedItemContent.value = content
   } catch (error) {
     console.error('Failed to load content:', error)
@@ -417,6 +435,7 @@ watch(lessons, (newLessons) => {
 
 // Load content when selected item changes
 watch(selectedItem, () => {
+  selectedModalVersion.value = undefined
   loadItemContent()
 })
 
@@ -436,6 +455,20 @@ watch(() => props.open, (isOpen) => {
     nextTick(() => {
       closeButtonRef.value?.$el?.focus()
     })
+  }
+})
+
+// Handle version selection in modal
+const handleModalVersionSelect = (version: string) => {
+  selectedModalVersion.value = version === 'latest' ? undefined : version
+  // Reload content with new version
+  loadItemContent()
+}
+
+// Watch for version changes and reload content
+watch(selectedModalVersion, () => {
+  if (selectedItem.value) {
+    loadItemContent()
   }
 })
 
@@ -679,6 +712,9 @@ onBeforeUnmount(() => {
                       <template v-if="!isOverviewMode && selectedItem">
                         <span>/</span>
                         <span class="font-medium text-foreground">{{ selectedItem.title }}</span>
+                        <span v-if="selectedModalVersion" class="ml-1 inline-flex items-center rounded-full bg-warning/10 border border-warning/20 px-2 py-0.5 text-xs font-semibold text-warning">
+                          Version {{ selectedModalVersion }}
+                        </span>
                       </template>
                       <template v-else>
                         <span>/</span>
@@ -711,6 +747,17 @@ onBeforeUnmount(() => {
                             Edit page
                           </a>
                           <div v-if="getDecapEditUrl()" class="h-px bg-border" />
+                          
+                          <!-- Versions dropdown -->
+                          <VersionsDropdown 
+                            v-if="!isOverviewMode && selectedItem"
+                            :content-type="selectedItem.type"
+                            :slug="selectedItem.slug"
+                            :current-version="selectedModalVersion"
+                            :on-version-select="handleModalVersionSelect"
+                          />
+                          <div v-if="!isOverviewMode && selectedItem" class="h-px bg-border" />
+                          
                           <NuxtLink
                             v-if="isOverviewMode && selectedLesson"
                             :to="`/lessons/${selectedLesson.slug}`"

@@ -1,16 +1,26 @@
 <script setup>
 const route = useRoute()
 const isEmbed = computed(() => route.query.embed === 'true')
+const versionParam = route.query.version
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
 definePageMeta({
   layout: false
 })
 
-const articlePath = `/articles/${route.params.slug.join('/')}`
+const baseSlug = route.params.slug.join('/')
 
-const { data: article, pending } = await useAsyncData(`article-${articlePath}`, () =>
-  queryCollection('articles').path(articlePath).first()
-)
+const { data: article, pending } = await useAsyncData(`article-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/articles/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('articles').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('articles').path(`/articles/${baseSlug}`).first()
+})
 
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
@@ -37,6 +47,8 @@ const breadcrumbs = computed(() => [
         :license="article.license"
         :allowEmbed="isEmbed ? false : article.allowEmbed"
         :attachments="article.attachments"
+        :versionStatus="article.versionStatus"
+        :version="displayVersion"
       >
         <ContentRenderer :value="article" />
       </CollectionItem>
