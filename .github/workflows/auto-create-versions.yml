@@ -60,12 +60,12 @@ jobs:
             
             echo "Processing: $file"
             
-            # Extract version from new version (current) - simpler extraction
-            NEW_VERSION=$(git show $CURRENT_SHA:"$file" 2>/dev/null | awk '/^version:/ {print $2}' | tr -d '"'"'" | head -1)
+            # Extract version from new version (current)
+            NEW_VERSION=$(git show $CURRENT_SHA:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/^version: *"//' | sed 's/".*//' | sed "s/^version: *'//" | sed "s/'.*//")
             echo "  New version: [$NEW_VERSION]"
             
-            # Extract version from old version (previous) - simpler extraction
-            OLD_VERSION=$(git show $PREVIOUS_SHA:"$file" 2>/dev/null | awk '/^version:/ {print $2}' | tr -d '"'"'" | head -1) || OLD_VERSION=""
+            # Extract version from old version (previous)
+            OLD_VERSION=$(git show $PREVIOUS_SHA:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/^version: *"//' | sed 's/".*//' | sed "s/^version: *'//" | sed "s/'.*//") || OLD_VERSION=""
             echo "  Old version: [$OLD_VERSION]"
             
             # Check if version changed
