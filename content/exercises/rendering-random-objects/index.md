@@ -19,7 +19,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: '1.0.1'
 versionStatus: latest
 publishEmbed: true
 ---
