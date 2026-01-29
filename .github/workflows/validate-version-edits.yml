@@ -130,7 +130,7 @@ jobs:
             ---`;
             
             // Only add banner if not already present
-            if (!pr.body.includes('AUTOMATED WARNING: Archived Version Files Modified')) {
+            if (!(pr.body || '').includes('AUTOMATED WARNING: Archived Version Files Modified')) {
               await github.rest.pulls.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
