@@ -25,6 +25,7 @@ interface Props {
   description?: string
   date?: string
   author?: string
+  authorUrl?: string
   difficulty?: string
   license?: string
   aiLicense?: string | string[]
@@ -87,6 +88,10 @@ const getLicenseUrl = (license: string) => {
 
 const route = useRoute()
 const currentUrl = computed(() => {
+  const versionParam = route.query.version
+  if (versionParam && typeof versionParam === 'string') {
+    return `${route.path}?version=${versionParam}`
+  }
   return route.path
 })
 
@@ -111,7 +116,8 @@ const getDecapEditUrl = computed(() => {
   if (pathParts.length >= 2) {
     const collection = pathParts[0] // e.g., 'exercises', 'lectures', 'tutorials'
     const slug = pathParts.slice(1).join('/') // e.g., 'some-exercise'
-    return `/admin/#/collections/${collection}/${slug}`
+    // Always link to the latest version (index), not archived versions
+    return `/admin/#/collections/${collection}/entries/${slug}/index`
   }
   return null
 })
@@ -519,7 +525,11 @@ const copyCitation = async () => {
       <div v-if="license" class="mt-12 pt-8 border-t">
         <p class="text-sm text-muted-foreground leading-relaxed">
           <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
-          <span v-if="author"> by {{ author }}</span>
+          <span v-if="author">
+            by 
+            <a v-if="authorUrl" :href="authorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-foreground hover:text-primary transition-colors">{{ author }}</a>
+            <span v-else>{{ author }}</span>
+          </span>
           is licensed under
           <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
           <span v-else class="font-medium text-foreground">{{ license }}</span>

@@ -623,5 +623,489 @@
         "breakingChanges": []
       }
     }
+  },
+  "compositor": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.353Z",
+        "status": "latest",
+        "changelog": "Initial version of Compositor Pathway",
+        "breakingChanges": []
+      }
+    }
+  },
+  "digital-fabrication": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.358Z",
+        "status": "latest",
+        "changelog": "Initial version of Digital fabrication",
+        "breakingChanges": []
+      }
+    }
+  },
+  "fundamentals": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.358Z",
+        "status": "latest",
+        "changelog": "Initial version of Fundamentals",
+        "breakingChanges": []
+      }
+    }
+  },
+  "game-artist": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.359Z",
+        "status": "latest",
+        "changelog": "Initial version of Game Artist Pathway",
+        "breakingChanges": []
+      }
+    }
+  },
+  "game-design-and-development": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.359Z",
+        "status": "latest",
+        "changelog": "Initial version of Game design and development",
+        "breakingChanges": []
+      }
+    }
+  },
+  "illustration-and-visualization": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.359Z",
+        "status": "latest",
+        "changelog": "Initial version of Illustration and visualization",
+        "breakingChanges": []
+      }
+    }
+  },
+  "lighting-and-cinematography": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.359Z",
+        "status": "latest",
+        "changelog": "Initial version of Lighting and cinematography",
+        "breakingChanges": []
+      }
+    }
+  },
+  "motion-graphics": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.360Z",
+        "status": "latest",
+        "changelog": "Initial version of Motion graphics",
+        "breakingChanges": []
+      }
+    }
+  },
+  "product-design": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.360Z",
+        "status": "latest",
+        "changelog": "Initial version of Product design",
+        "breakingChanges": []
+      }
+    }
+  },
+  "production-management": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.361Z",
+        "status": "latest",
+        "changelog": "Initial version of Production management",
+        "breakingChanges": []
+      }
+    }
+  },
+  "short-film": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.361Z",
+        "status": "latest",
+        "changelog": "Initial version of Short Film Pathway",
+        "breakingChanges": []
+      }
+    }
+  },
+  "short-film-and-vfx": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.361Z",
+        "status": "latest",
+        "changelog": "Initial version of Short Film and VFX Pathway",
+        "breakingChanges": []
+      }
+    }
+  },
+  "visual-effects-vfx": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.362Z",
+        "status": "latest",
+        "changelog": "Initial version of Visual Effects (VFX)",
+        "breakingChanges": []
+      }
+    }
+  },
+  "3d-design": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.362Z",
+        "status": "latest",
+        "changelog": "Initial version of 3D Design",
+        "breakingChanges": []
+      }
+    }
+  },
+  "3d-illustration": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.362Z",
+        "status": "latest",
+        "changelog": "Initial version of 3D Illustration",
+        "breakingChanges": []
+      }
+    }
+  },
+  "3d-printing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.363Z",
+        "status": "latest",
+        "changelog": "Initial version of 3D printing",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animation-for-film-production": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.363Z",
+        "status": "latest",
+        "changelog": "Initial version of Animation for Film Production",
+        "breakingChanges": []
+      }
+    }
+  },
+  "archviz": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.363Z",
+        "status": "latest",
+        "changelog": "Initial version of Archviz",
+        "breakingChanges": []
+      }
+    }
+  },
+  "cgi-foundations": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.364Z",
+        "status": "latest",
+        "changelog": "Initial version of CGI Foundations",
+        "breakingChanges": []
+      }
+    }
+  },
+  "character-animation": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.364Z",
+        "status": "latest",
+        "changelog": "Initial version of Character animation",
+        "breakingChanges": []
+      }
+    }
+  },
+  "character-design-for-games-or-film": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.364Z",
+        "status": "latest",
+        "changelog": "Initial version of Character design for games or film",
+        "breakingChanges": []
+      }
+    }
+  },
+  "comic-illustration": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.364Z",
+        "status": "latest",
+        "changelog": "Initial version of Comic illustration",
+        "breakingChanges": []
+      }
+    }
+  },
+  "compositing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.364Z",
+        "status": "latest",
+        "changelog": "Initial version of Compositing\n",
+        "breakingChanges": []
+      }
+    }
+  },
+  "environment-design": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.365Z",
+        "status": "latest",
+        "changelog": "Initial version of Environment design",
+        "breakingChanges": []
+      }
+    }
+  },
+  "generalist": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.365Z",
+        "status": "latest",
+        "changelog": "Initial version of Generalist",
+        "breakingChanges": []
+      }
+    }
+  },
+  "introductory-animation": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.365Z",
+        "status": "latest",
+        "changelog": "Initial version of Introductory Animation",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeler": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.366Z",
+        "status": "latest",
+        "changelog": "Initial version of Modeler",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-and-texturing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.366Z",
+        "status": "latest",
+        "changelog": "Initial version of Modeling and texturing",
+        "breakingChanges": []
+      }
+    }
+  },
+  "previz-art": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.366Z",
+        "status": "latest",
+        "changelog": "Initial version of Previz art",
+        "breakingChanges": []
+      }
+    }
+  },
+  "product-id-design": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.366Z",
+        "status": "latest",
+        "changelog": "Initial version of Product (ID) design",
+        "breakingChanges": []
+      }
+    }
+  },
+  "projection-mapping": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.366Z",
+        "status": "latest",
+        "changelog": "Initial version of Projection mapping",
+        "breakingChanges": []
+      }
+    }
+  },
+  "realistic-sculpting": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.366Z",
+        "status": "latest",
+        "changelog": "Initial version of Realistic Sculpting",
+        "breakingChanges": []
+      }
+    }
+  },
+  "realtime-for-immersive-environments": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.367Z",
+        "status": "latest",
+        "changelog": "Initial version of Realtime for Immersive Environments",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rigging": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.367Z",
+        "status": "latest",
+        "changelog": "Initial version of Rigging",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rigging-artist": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.367Z",
+        "status": "latest",
+        "changelog": "Initial version of Rigging artist",
+        "breakingChanges": []
+      }
+    }
+  },
+  "scientific-visualization": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.368Z",
+        "status": "latest",
+        "changelog": "Initial version of Scientific visualization",
+        "breakingChanges": []
+      }
+    }
+  },
+  "shader-writing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.368Z",
+        "status": "latest",
+        "changelog": "Initial version of Shader writing",
+        "breakingChanges": []
+      }
+    }
+  },
+  "simulation-and-character-effects": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.368Z",
+        "status": "latest",
+        "changelog": "Initial version of Simulation and character effects",
+        "breakingChanges": []
+      }
+    }
+  },
+  "storyboarding-and-animatics": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.368Z",
+        "status": "latest",
+        "changelog": "Initial version of Storyboarding and animatics",
+        "breakingChanges": []
+      }
+    }
+  },
+  "texture-artist": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.369Z",
+        "status": "latest",
+        "changelog": "Initial version of Texture artist",
+        "breakingChanges": []
+      }
+    }
+  },
+  "tool-building": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.369Z",
+        "status": "latest",
+        "changelog": "Initial version of Tool building",
+        "breakingChanges": []
+      }
+    }
+  },
+  "transportation-design": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.369Z",
+        "status": "latest",
+        "changelog": "Initial version of Transportation design",
+        "breakingChanges": []
+      }
+    }
+  },
+  "vfx-and-simulation": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.369Z",
+        "status": "latest",
+        "changelog": "Initial version of VFX and Simulation",
+        "breakingChanges": []
+      }
+    }
+  },
+  "vj-loops": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T17:09:23.369Z",
+        "status": "latest",
+        "changelog": "Initial version of VJ Loops",
+        "breakingChanges": []
+      }
+    }
   }
 }

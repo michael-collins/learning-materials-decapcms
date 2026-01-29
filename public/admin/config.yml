@@ -19,6 +19,9 @@ collections:
     create: true # Allow users to create new documents in this collection
     slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
     path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     fields: # The fields for each document, usually in front matter
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Description", name: "description", widget: "text"}
@@ -44,6 +47,9 @@ collections:
     create: true # Allow users to create new documents in this collection
     slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
     path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     fields: # The fields for each document, usually in front matter
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Description", name: "description", widget: "text"}
@@ -121,6 +127,9 @@ collections:
     create: true
     slug: "{{slug}}"
     path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     view_filters:
       - label: "Published"
         field: published
@@ -178,6 +187,9 @@ collections:
     create: true
     slug: "{{slug}}"
     path: "{{slug}}/index" # Files are stored as {slug}/index.md
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     view_filters:
       - label: "Published"
         field: published
@@ -232,6 +244,9 @@ collections:
     create: true
     slug: "{{slug}}"
     path: "{{slug}}/index" # Files are stored as {slug}/index.md
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     view_filters:
       - label: "Published"
         field: published
@@ -281,6 +296,9 @@ collections:
     create: true
     slug: "{{slug}}"
     path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     view_filters:
       - label: "Published"
         field: published
@@ -336,6 +354,9 @@ collections:
     create: true
     slug: "{{slug}}"
     path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     view_filters:
       - label: "All"
         field: published

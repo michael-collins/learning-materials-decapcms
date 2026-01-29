@@ -116,6 +116,7 @@ const handleSelectSpec = (spec: any) => {
         :image="pathway.image"
         :imageAlt="pathway.imageAlt"
         :versionStatus="pathway.versionStatus"
+        :version="displayVersion"
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>

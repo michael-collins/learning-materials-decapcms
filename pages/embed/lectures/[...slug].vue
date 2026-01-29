@@ -44,6 +44,7 @@ const oerSchema = computed(() => {
         :breadcrumbs="[]"
         :title="lecture.title"
         :author="lecture.author"
+        :authorUrl="lecture.authorUrl"
         :difficulty="lecture.difficulty"
         :license="lecture.license"
         :aiLicense="lecture.aiLicense"

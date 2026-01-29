@@ -332,9 +332,11 @@ const getItemPath = (type: string, slug: string) => {
 
 const getDecapEditUrl = () => {
   if (isOverviewMode.value && selectedLesson.value) {
-    return `/admin/#/collections/lessons/${selectedLesson.value.slug}`
+    // Always link to the latest version (index), not archived versions
+    return `/admin/#/collections/lessons/entries/${selectedLesson.value.slug}/index`
   } else if (!isOverviewMode.value && selectedItem.value) {
-    return `/admin/#/collections/${selectedItem.value.type}/${selectedItem.value.slug}`
+    // Always link to the latest version (index), not archived versions
+    return `/admin/#/collections/${selectedItem.value.type}/entries/${selectedItem.value.slug}/index`
   }
   return null
 }
@@ -750,13 +752,13 @@ onBeforeUnmount(() => {
                           
                           <!-- Versions dropdown -->
                           <VersionsDropdown 
-                            v-if="!isOverviewMode && selectedItem"
-                            :content-type="selectedItem.type"
-                            :slug="selectedItem.slug"
+                            v-if="selectedItem || (isOverviewMode && selectedLesson)"
+                            :content-type="selectedItem?.type || 'lessons'"
+                            :slug="selectedItem?.slug || (selectedLesson?.slug || '')"
                             :current-version="selectedModalVersion"
                             :on-version-select="handleModalVersionSelect"
                           />
-                          <div v-if="!isOverviewMode && selectedItem" class="h-px bg-border" />
+                          <div v-if="selectedItem || (isOverviewMode && selectedLesson)" class="h-px bg-border" />
                           
                           <NuxtLink
                             v-if="isOverviewMode && selectedLesson"

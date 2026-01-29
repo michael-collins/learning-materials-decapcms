@@ -33,6 +33,7 @@ const { content: article, versionParam, currentVersion, latestVersion, isOutdate
         :breadcrumbs="[]"
         :title="article.title"
         :author="article.author"
+        :authorUrl="article.authorUrl"
         :license="article.license"
         :aiLicense="article.aiLicense"
         :allowEmbed="false"

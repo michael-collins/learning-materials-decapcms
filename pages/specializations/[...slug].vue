@@ -94,6 +94,7 @@ const oerSchema = computed(() => {
         :image="specialization.image"
         :imageAlt="specialization.imageAlt"
         :versionStatus="specialization.versionStatus"
+        :version="displayVersion"
       >
         <ContentRenderer :value="specialization" />
       </CollectionItem>

@@ -13,7 +13,7 @@ const baseSlug = route.params.slug.join('/')
 const { data: tutorial, pending } = await useAsyncData(`tutorial-${baseSlug}-${versionParam || 'latest'}`, async () => {
   // If version param is provided, try the versioned path first
   if (versionParam) {
-    const versionedPath = `/tutorials/${baseSlug}/v/${versionParam}`
+    const versionedPath = `/tutorials/${baseSlug}/v${versionParam}`
     const versioned = await queryCollection('tutorials').path(versionedPath).first()
     if (versioned) return versioned
   }
@@ -43,6 +43,7 @@ const breadcrumbs = computed(() => [
         :description="tutorial.description"
         :date="tutorial.date"
         :author="tutorial.author"
+        :authorUrl="tutorial.authorUrl"
         :difficulty="tutorial.difficulty"
         :license="tutorial.license"
         :allowEmbed="isEmbed ? false : tutorial.allowEmbed"
