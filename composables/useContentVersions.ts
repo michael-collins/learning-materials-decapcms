@@ -67,6 +67,9 @@ export const useContentVersions = async (
       }
       
       if (allContent && Array.isArray(allContent)) {
+        // Get the latest version number to avoid duplicates
+        const latestVersionNumber = latestContent?.version
+        
         allContent.forEach((item: any) => {
           // Use the slug and id fields which are properly available
           const itemSlug = item.slug || ''
@@ -81,6 +84,13 @@ export const useContentVersions = async (
           // Only process items that are in the same slug folder, in v/ subdirectory, and are version files
           if (itemSlug === baseSlug && parentFolder === 'v' && fileNameWithoutExt.match(/^\d+\.\d+\.\d+$/)) {
             console.log(`[useContentVersions] ✓ Found version file: ${fileNameWithoutExt}, versionStatus=${item.versionStatus}`)
+            
+            // Skip if this archived version has the same version number as the latest
+            if (item.version === latestVersionNumber) {
+              console.log(`[useContentVersions] ✗ Skipping archived version ${item.version} - duplicate of latest`)
+              return
+            }
+            
             if (item.version && item.publishEmbed && item.versionStatus === 'archived') {
               console.log(`[useContentVersions] ✓ Adding archived version: ${item.version}`)
               versions.value.push({
