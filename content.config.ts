@@ -128,7 +128,7 @@ export default defineContentConfig({
     }),
     specializations: defineCollection({
       type: 'page',
-      source: 'specializations/**/*.md',
+      source: 'specializations/*/index.md',
       schema: z.object({
         recordId: z.string().optional(),
         title: z.string(),
@@ -144,7 +144,7 @@ export default defineContentConfig({
     }),
     pathways: defineCollection({
       type: 'page',
-      source: 'pathways/**/*.md',
+      source: 'pathways/*/index.md',
       schema: z.object({
         recordId: z.string().optional(),
         title: z.string(),
@@ -167,7 +167,7 @@ export default defineContentConfig({
     }),
     lectures: defineCollection({
       type: 'page',
-      source: 'lectures/**/*.md',
+      source: 'lectures/*/index.md',
       schema: z.object({
         recordId: z.string().optional(),
         title: z.string(),
@@ -200,7 +200,7 @@ export default defineContentConfig({
     }),
     lessons: defineCollection({
       type: 'page',
-      source: 'lessons/**/*.md',
+      source: 'lessons/*/index.md',
       schema: z.object({
         title: z.string(),
         slug: z.string().optional(),
