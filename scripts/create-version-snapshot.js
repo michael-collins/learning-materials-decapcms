@@ -43,40 +43,50 @@ for (const type of contentTypes) {
     continue;
   }
 
-  const files = fs.readdirSync(typeDir).filter(f => 
-    f.endsWith('.md') && 
-    !f.startsWith('v') && // Skip existing version files
-    f !== 'index.md'
-  );
+  // Read subdirectories (each content item folder)
+  const contentFolders = fs.readdirSync(typeDir).filter(f => {
+    const itemPath = path.join(typeDir, f);
+    return fs.statSync(itemPath).isDirectory();
+  });
 
-  if (files.length === 0) {
+  if (contentFolders.length === 0) {
     continue;
   }
 
   console.log(`📁 ${type}:`);
 
-  files.forEach(file => {
-    const filePath = path.join(typeDir, file);
+  contentFolders.forEach(folder => {
+    const indexPath = path.join(typeDir, folder, 'index.md');
+    
+    if (!fs.existsSync(indexPath)) {
+      return;
+    }
     
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = fs.readFileSync(indexPath, 'utf-8');
       const { data: frontmatter, content: markdown } = matter(content);
 
       // Only create snapshot if version is set
       if (!frontmatter.version) {
-        console.log(`   ⊘ ${file} - No version field, skipping`);
+        console.log(`   ⊘ ${folder}/index.md - No version field, skipping`);
         return;
       }
 
       const version = frontmatter.version;
-      const slug = path.basename(file, '.md');
-      const snapshotFileName = `v${version}.md`;
-      const snapshotPath = path.join(typeDir, snapshotFileName);
+      const slug = folder;
+      const versionDir = path.join(typeDir, folder, 'v');
+      const snapshotFileName = `${version}.md`;
+      const snapshotPath = path.join(versionDir, snapshotFileName);
 
       // Check if snapshot already exists
       if (fs.existsSync(snapshotPath)) {
-        console.log(`   − ${file} → ${snapshotFileName} (already exists)`);
+        console.log(`   − ${folder}/index.md → v/${snapshotFileName} (already exists)`);
         return;
+      }
+
+      // Create v/ directory if it doesn't exist
+      if (!fs.existsSync(versionDir)) {
+        fs.mkdirSync(versionDir, { recursive: true });
       }
 
       // Create snapshot with modified frontmatter
@@ -85,13 +95,13 @@ for (const type of contentTypes) {
         versionStatus: 'archived',
         publishEmbed: true,
         _snapshotCreatedAt: new Date().toISOString(),
-        _snapshotFrom: file
+        _snapshotFrom: 'index.md'
       };
 
       const snapshotContent = matter.stringify(markdown, snapshotFrontmatter);
       fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
 
-      console.log(`   ✓ ${file} → ${snapshotFileName} (v${version})`);
+      console.log(`   ✓ ${folder}/index.md → v/${snapshotFileName}`);
       snapshotsCreated++;
 
       // Update registry
@@ -116,7 +126,7 @@ for (const type of contentTypes) {
       }
 
     } catch (error) {
-      console.error(`   ✗ ${file} - Error: ${error.message}`);
+      console.error(`   ✗ ${folder}/index.md - Error: ${error.message}`);
       errors++;
     }
   });

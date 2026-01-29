@@ -46,12 +46,15 @@ for (const type of contentTypes) {
       const content = fs.readFileSync(filePath, 'utf-8');
       const { data: frontmatter } = matter(content);
       const fileName = path.basename(filePath);
-      const versionMatch = fileName.match(/v(\d+\.\d+\.\d+)\.md$/);
+      // Check if file is in v/ subdirectory: content/exercises/slug/v/1.0.0.md
+      const pathParts = filePath.split('/');
+      const isInVersionDir = pathParts[pathParts.length - 2] === 'v';
+      const versionMatch = isInVersionDir ? fileName.match(/(\d+\.\d+\.\d+)\.md$/) : null;
       
       if (!versionMatch) {
         errors.push({
           file: filePath,
-          message: 'Invalid version file naming pattern'
+          message: 'Invalid version file naming pattern or not in v/ subdirectory'
         });
         return;
       }

@@ -14,9 +14,581 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-28T18:03:21.726Z",
+        "publishedAt": "2026-01-29T03:35:16.031Z",
         "status": "archived",
         "changelog": "Initial release with version control",
+        "breakingChanges": []
+      }
+    }
+  },
+  "3d-viewer-test": {
+    "latest": "2.0.0",
+    "versions": {
+      "2.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.027Z",
+        "status": "archived",
+        "changelog": "Updated example content",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animated-procedural-textures": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.029Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animating-a-bouncing-ball": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.033Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animating-tetris": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.033Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animating-virtual-creatures": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.035Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "applying-textures-to-3-unique-chess-sets": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.036Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "introduction-to-animation": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.066Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "introduction-to-rigging": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.037Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "lighting-and-rendering-the-airline-chair": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.039Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "low-poly-non-photorealistic-rendering": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.039Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "model-a-gem": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.040Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "model-a-snowflake": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.041Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-basic-knight": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.042Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-bishop": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.043Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-chavet-121-series-no-6-knight": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.044Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-chessboard": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.044Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-diamond": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.045Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-figurative-knight": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.046Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-king": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.047Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-low-poly-animal-and-introduction-to-particles": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.047Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-metal-horse-head": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.048Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-pawn": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.049Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-queen": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.050Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-rook": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.051Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-a-room": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.052Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-and-sculpting-a-sea-creature": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.052Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-random-objects": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.053Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "modeling-the-airline-chair": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.054Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rendering-a-room": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.055Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rendering-random-objects": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.055Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rigging-a-human": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.056Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rigging-a-quadruped": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.056Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "rigging-a-robot-arm": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.057Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "sculpting-retopo-and-texturing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.058Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "sculpture-garden": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.059Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "sea-creature-lighting-and-rendering": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.060Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "sea-creature-non-photorealistic-rendering": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.060Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "sea-creature-texturing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.061Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "share-one-completed-set": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.062Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "texturing-a-room": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.062Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "texturing-random-objects": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.063Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "texturing-the-airline-chair": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.064Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "building-your-first-nuxt-app": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.064Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "working-with-decapcms": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.065Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "introduction-to-cameras-lighting-and-rendering": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.068Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "introduction-to-modeling": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.069Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "introduction-to-texturing": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.070Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "3d-career-development": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.071Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "3d-communities": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.071Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "getting-started-in-3d-animation": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.072Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "ideas-in-motion": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.073Z",
+        "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "you-dont-see-that-everyday-objects": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T03:35:16.073Z",
+        "status": "archived",
+        "changelog": "",
         "breakingChanges": []
       }
     }

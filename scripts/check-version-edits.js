@@ -34,7 +34,8 @@ changedFiles.forEach(filePath => {
     const { data: frontmatter } = matter(content);
     
     const fileName = path.basename(filePath);
-    const isVersionFile = /v\d+\.\d+\.\d+\.md$/.test(fileName);
+    // Check if file is in v/ subdirectory with version pattern: /v/1.0.0.md
+    const isVersionFile = /\/v\/\d+\.\d+\.\d+\.md$/.test(filePath);
     
     if (isVersionFile) {
       console.log(`📄 ${filePath}`);

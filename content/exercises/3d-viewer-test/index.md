@@ -7,10 +7,10 @@ rubric: exercise
 author: Michael Collins
 published: true
 allowEmbed: true
-version: "2.0.0"
+version: "2.1.0"
 versionStatus: latest
 publishEmbed: true
-changelog: "Updated example content"
+changelog: "Working version for future edits"
 breakingChanges: []
 date: 2026-01-28
 ---

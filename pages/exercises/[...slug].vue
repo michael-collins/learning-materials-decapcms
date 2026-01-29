@@ -30,7 +30,7 @@ const { data: exercise, pending } = await useAsyncData(
   async () => {
     // If version param is provided, try the versioned path first
     if (versionParam) {
-      const versionedPath = `/exercises/${baseSlug}/v${versionParam}`
+      const versionedPath = `/exercises/${baseSlug}/v/${versionParam}`
       console.log('[Exercise Page] Trying versioned path:', versionedPath)
       const versioned = await queryCollection('exercises').path(versionedPath).first()
       if (versioned) {

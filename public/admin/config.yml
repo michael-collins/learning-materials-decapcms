@@ -18,9 +18,7 @@ collections:
     folder: "content/articles" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
-    path: "{{slug}}/index" # Files are stored as {slug}/index.md
-    # Exclude version snapshot files from CMS UI to prevent accidental edits
-    exclude: "**/v[0-9]*.md"
+    path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
     fields: # The fields for each document, usually in front matter
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Description", name: "description", widget: "text"}
@@ -45,9 +43,7 @@ collections:
     folder: "content/tutorials" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
-    path: "{{slug}}/index" # Files are stored as {slug}/index.md
-    # Exclude version snapshot files from CMS UI to prevent accidental edits
-    exclude: "**/v[0-9]*.md"
+    path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
     fields: # The fields for each document, usually in front matter
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Description", name: "description", widget: "text"}
@@ -73,9 +69,10 @@ collections:
     folder: "content/exercises"
     create: true
     slug: "{{slug}}"
-    path: "{{slug}}/index" # Files are stored as {slug}/index.md
-    # Exclude version snapshot files from CMS UI to prevent accidental edits
-    exclude: "**/v[0-9]*.md"
+    path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
+    identifier_field: "slug"
+    extension: "md"
+    format: "frontmatter"
     view_filters:
       - label: "Published"
         field: published
@@ -123,9 +120,7 @@ collections:
     folder: "content/projects"
     create: true
     slug: "{{slug}}"
-    path: "{{slug}}/index" # Files are stored as {slug}/index.md
-    # Exclude version snapshot files from CMS UI to prevent accidental edits
-    exclude: "**/v[0-9]*.md"
+    path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
     view_filters:
       - label: "Published"
         field: published
@@ -285,9 +280,7 @@ collections:
     folder: "content/lectures"
     create: true
     slug: "{{slug}}"
-    path: "{{slug}}/index" # Files are stored as {slug}/index.md
-    # Exclude version snapshot files from CMS UI to prevent accidental edits
-    exclude: "**/v[0-9]*.md"
+    path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
     view_filters:
       - label: "Published"
         field: published
@@ -342,9 +335,7 @@ collections:
     folder: "content/lessons"
     create: true
     slug: "{{slug}}"
-    path: "{{slug}}/index" # Files are stored as {slug}/index.md
-    # Exclude version snapshot files from CMS UI to prevent accidental edits
-    exclude: "**/v[0-9]*.md"
+    path: "{{slug}}/index" # Files are stored as {slug}/index.md - version snapshots in v/ subdirectory are automatically excluded
     view_filters:
       - label: "All"
         field: published

@@ -4,11 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'content/exercises/**/v*.md'
-      - 'content/tutorials/**/v*.md'
-      - 'content/lectures/**/v*.md'
-      - 'content/articles/**/v*.md'
-      - 'content/projects/**/v*.md'
+      - 'content/exercises/**/v/*.md'
+      - 'content/tutorials/**/v/*.md'
+      - 'content/lectures/**/v/*.md'
+      - 'content/articles/**/v/*.md'
+      - 'content/projects/**/v/*.md'
 
 permissions:
   pull-requests: write
@@ -34,8 +34,8 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          # Get list of changed version files
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E 'content/.*/v[0-9]+\.[0-9]+\.[0-9]+\.md$' || echo "")
+          # Get list of changed version files in v/ subdirectory
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$' || echo "")
           echo "changed_files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT

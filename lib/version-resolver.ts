@@ -36,10 +36,10 @@ export async function resolveContentVersion(
       // Main file not found, continue to versioned files
     }
 
-    // If no main file, get the latest versioned file
+    // If no main file, get the latest versioned file from v/ subdirectory
     const versionedFiles = await queryContent<VersionedContent>(`${type}`)
       .where({ 
-        _path: { $regex: `/${type}/${slug}/v\\d+\\.\\d+\\.\\d+$` }
+        _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` }
       })
       .sort({ version: -1 })
       .findOne()
@@ -47,13 +47,13 @@ export async function resolveContentVersion(
     return versionedFiles
   }
 
-  // Major version (e.g., '1' gets latest 1.x.x)
+  // Major version (e.g., '1' gets latest 1.x.x) from v/ subdirectory
   if (/^\d+$/.test(versionParam)) {
     const majorVersion = parseInt(versionParam)
     
     const versionedFiles = await queryContent<VersionedContent>(`${type}`)
       .where({ 
-        _path: { $regex: `/${type}/${slug}/v${majorVersion}\\.\\d+\\.\\d+$` }
+        _path: { $regex: `/${type}/${slug}/v/${majorVersion}\\.\\d+\\.\\d+$` }
       })
       .sort({ version: -1 })
       .findOne()
@@ -61,12 +61,12 @@ export async function resolveContentVersion(
     return versionedFiles
   }
 
-  // Exact version (e.g., '1.2.0' or 'v1.2.0')
-  const versionStr = versionParam.startsWith('v') ? versionParam : `v${versionParam}`
+  // Exact version (e.g., '1.2.0' or 'v1.2.0') from v/ subdirectory
+  const versionStr = versionParam.startsWith('v') ? versionParam.substring(1) : versionParam
   
   const versionedFile = await queryContent<VersionedContent>(`${type}`)
     .where({ 
-      _path: { $regex: `/${type}/${slug}/${versionStr}$` }
+      _path: { $regex: `/${type}/${slug}/v/${versionStr}$` }
     })
     .findOne()
 
@@ -84,7 +84,7 @@ export async function getAvailableVersions(
   
   const versions = await queryContent<VersionedContent>(`${type}`)
     .where({ 
-      _path: { $regex: `/${type}/v\\d+\\.\\d+\\.\\d+$` },
+      _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` },
       publishEmbed: true 
     })
     .sort({ version: -1 })
@@ -115,10 +115,10 @@ export async function getLatestVersionNumber(
     // Continue to versioned files
   }
 
-  // Check versioned files
+  // Check versioned files in v/ subdirectory
   const latestVersion = await queryContent<VersionedContent>(`${type}`)
     .where({ 
-      _path: { $regex: `/${type}/v\\d+\\.\\d+\\.\\d+$` },
+      _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` },
       publishEmbed: true 
     })
     .sort({ version: -1 })
