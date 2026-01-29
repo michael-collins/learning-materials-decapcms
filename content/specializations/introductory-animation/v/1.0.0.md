@@ -26,6 +26,11 @@ learningObjectives:
   - Analyze and critique animated works to identify effective animation techniques and storytelling
 prerequisites:
   - CGI Foundations
+lessons:
+  - animation-principles
+  - character-rigging
+  - constraints-animation-controls
+  - deformers-shape-keys
 published: true
 allowEmbed: true
 license: CC BY 4.0

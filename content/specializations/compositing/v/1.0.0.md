@@ -5,6 +5,11 @@ slug: compositing
 type: oer:InstructionalPattern
 whoItsFor: null
 targetRole: null
+lessons:
+  - procedural-compositing-workflows
+  - render-layers-passes
+  - post-effects-color-grading
+  - exporting-delivery
 published: true
 oer:
   '@context': 'https://oerschema.org/'

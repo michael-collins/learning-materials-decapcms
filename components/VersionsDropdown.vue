@@ -71,7 +71,7 @@ import { GitBranch, Check } from 'lucide-vue-next'
 import type { ContentVersion } from '~/composables/useContentVersions'
 
 interface Props {
-  contentType: 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons'
+  contentType: 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons' | 'specializations' | 'pathways'
   slug: string
   currentVersion?: string
   onVersionSelect?: (version: string) => void

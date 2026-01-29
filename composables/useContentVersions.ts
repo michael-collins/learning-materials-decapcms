@@ -9,7 +9,7 @@ export interface ContentVersion {
  * Includes the latest version and all archived versions from the same slug folder
  */
 export const useContentVersions = async (
-  contentType: 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons',
+  contentType: 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons' | 'specializations' | 'pathways',
   slug: string
 ) => {
   const versions = ref<ContentVersion[]>([])
@@ -38,15 +38,15 @@ export const useContentVersions = async (
     
     console.log(`[useContentVersions] Latest content result:`, {
       found: !!latestContent,
-      hasVersion: latestContent?.version,
-      version: latestContent?.version,
-      hasPublishEmbed: latestContent?.publishEmbed,
+      hasVersion: latestContent?.version || latestContent?.meta?.version,
+      version: latestContent?.version || latestContent?.meta?.version,
+      hasPublishEmbed: latestContent?.publishEmbed || latestContent?.meta?.publishEmbed,
       _path: latestContent?._path
     })
     
     if (latestContent) {
       const latestVersion: ContentVersion = {
-        version: latestContent.version,
+        version: latestContent.version || latestContent.meta?.version,
         versionStatus: 'latest',
         publishedAt: latestContent.date
       }
@@ -68,7 +68,7 @@ export const useContentVersions = async (
       
       if (allContent && Array.isArray(allContent)) {
         // Get the latest version number to avoid duplicates
-        const latestVersionNumber = latestContent?.version
+        const latestVersionNumber = latestContent?.version || latestContent?.meta?.version
         
         allContent.forEach((item: any) => {
           // Use the slug and id fields which are properly available
@@ -85,21 +85,26 @@ export const useContentVersions = async (
           if (itemSlug === baseSlug && parentFolder === 'v' && fileNameWithoutExt.match(/^\d+\.\d+\.\d+$/)) {
             console.log(`[useContentVersions] ✓ Found version file: ${fileNameWithoutExt}, versionStatus=${item.versionStatus}`)
             
+            // Get version from item.version or item.meta.version
+            const itemVersion = item.version || item.meta?.version
+            const itemPublishEmbed = item.publishEmbed || item.meta?.publishEmbed
+            const itemVersionStatus = item.versionStatus || item.meta?.versionStatus
+            
             // Skip if this archived version has the same version number as the latest
-            if (item.version === latestVersionNumber) {
-              console.log(`[useContentVersions] ✗ Skipping archived version ${item.version} - duplicate of latest`)
+            if (itemVersion === latestVersionNumber) {
+              console.log(`[useContentVersions] ✗ Skipping archived version ${itemVersion} - duplicate of latest`)
               return
             }
             
-            if (item.version && item.publishEmbed && item.versionStatus === 'archived') {
-              console.log(`[useContentVersions] ✓ Adding archived version: ${item.version}`)
+            if (itemVersion && itemPublishEmbed && itemVersionStatus === 'archived') {
+              console.log(`[useContentVersions] ✓ Adding archived version: ${itemVersion}`)
               versions.value.push({
-                version: item.version,
-                versionStatus: item.versionStatus || 'archived',
+                version: itemVersion,
+                versionStatus: itemVersionStatus || 'archived',
                 publishedAt: item.date
               })
             } else {
-              console.log(`[useContentVersions] ✗ Skipping - version=${!!item.version}, publishEmbed=${!!item.publishEmbed}, versionStatus=${item.versionStatus}`)
+              console.log(`[useContentVersions] ✗ Skipping - version=${!!itemVersion}, publishEmbed=${!!itemPublishEmbed}, versionStatus=${itemVersionStatus}`)
             }
           } else {
             if (itemSlug !== baseSlug) {

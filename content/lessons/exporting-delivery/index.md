@@ -1,21 +1,19 @@
 ---
-title: Exporting and Delivery
-slug: exporting-delivery
-type: oer:LearningComponent
-description: Master export settings, file formats, and delivery workflows for various output requirements and platforms.
-estimatedDuration: 2 hours
-specialization: compositing
-order: 4
+title: 'Exporting and Delivery'
+slug: 'exporting-delivery'
+type: 'oer:LearningComponent'
+description: 'Master export settings, file formats, and delivery workflows for various output requirements and platforms.'
+estimatedDuration: '2 hours'
 learningObjectives:
-  - Understand file formats and codecs
-  - Configure export settings appropriately
-  - Prepare files for different delivery platforms
-  - Manage file sizes and quality
-  - Create delivery packages and documentation
+  - 'Understand file formats and codecs'
+  - 'Configure export settings appropriately'
+  - 'Prepare files for different delivery platforms'
+  - 'Manage file sizes and quality'
+  - 'Create delivery packages and documentation'
 published: true
-license: CC BY 4.0
+license: 'CC BY 4.0'
 version: '1.0.0'
-versionStatus: latest
+versionStatus: 'latest'
 publishEmbed: true
 ---
 

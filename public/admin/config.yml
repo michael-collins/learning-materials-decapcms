@@ -4,7 +4,7 @@ backend:
   branch: main
 
 # Uncomment below for local testing
-# local_backend: true
+local_backend: true
 
 # Enable editorial workflow (Draft -> In Review -> Ready)
 publish_mode: editorial_workflow
@@ -207,7 +207,16 @@ collections:
       - {label: "Description", name: "description", widget: "text"}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '8 weeks', '3 months'"}
-      - {label: "Pathway", name: "pathway", widget: "relation", required: false, collection: "pathways", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent pathway for this specialization"}
+      - label: "Lessons"
+        name: "lessons"
+        widget: "relation"
+        required: false
+        collection: "lessons"
+        value_field: "slug"
+        search_fields: ["title"]
+        display_fields: ["title"]
+        multiple: true
+        hint: "Select and order the lessons in this specialization"
       - {label: "Who It's For", name: "whoItsFor", widget: "text", required: false}
       - {label: "Target Role", name: "targetRole", widget: "string", required: false, hint: "e.g., '3D Modeler', 'Animator'"}
       - label: "Skills"
@@ -367,77 +376,55 @@ collections:
       - label: "Unpublished"
         field: published
         pattern: false
-    sortable_fields: ["title", "order", "specialization", "published"]
-    sort: {field: "order", direction: "asc"}
+    sortable_fields: ["title", "published"]
+    sort: {field: "title", direction: "asc"}
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string"}
       - {label: "Type", name: "type", widget: "hidden", default: "oer:LearningComponent"}
       - {label: "Description", name: "description", widget: "text"}
       - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '3 hours', '2 days'"}
-      - {label: "Specialization", name: "specialization", widget: "relation", required: false, collection: "specializations", value_field: "slug", search_fields: ["title"], display_fields: ["title"], hint: "Parent specialization"}
-      - {label: "Order", name: "order", widget: "number", required: false, default: 1, hint: "Sequence position in specialization"}
       - label: "Learning Objectives"
         name: "learningObjectives"
         widget: "list"
         required: false
         field: {label: "Objective", name: "objective", widget: "text"}
-      - label: "Lectures"
-        name: "lectures"
-        widget: "relation"
+      - label: "Content Items"
+        name: "items"
+        widget: "list"
         required: false
-        collection: "lectures"
-        value_field: "slug"
-        search_fields: ["title"]
-        display_fields: ["title"]
-        multiple: true
-        hint: "Select supporting material/lectures for this lesson"
-      - label: "Tutorials"
-        name: "tutorials"
-        widget: "relation"
-        required: false
-        collection: "tutorials"
-        value_field: "slug"
-        search_fields: ["title"]
-        display_fields: ["title"]
-        multiple: true
-        hint: "Select tutorials for this lesson"
-      - label: "Exercises"
-        name: "exercises"
-        widget: "relation"
-        required: false
-        collection: "exercises"
-        value_field: "slug"
-        search_fields: ["title"]
-        display_fields: ["title"]
-        multiple: true
-        hint: "Select practice activities for this lesson"
-      - label: "Articles"
-        name: "articles"
-        widget: "relation"
-        required: false
-        collection: "articles"
-        value_field: "slug"
-        search_fields: ["title"]
-        display_fields: ["title"]
-        multiple: true
-        hint: "Select related articles for this lesson"
-      - label: "Resources"
-        name: "resources"
-        widget: "file"
-        required: false
-        multiple: true
-        hint: "Upload or link to additional resources for this lesson"
-      - label: "Projects"
-        name: "projects"
-        widget: "relation"
-        required: false
-        collection: "projects"
-        value_field: "slug"
-        search_fields: ["title"]
-        display_fields: ["title"]
-        multiple: true
-        hint: "Select assessments/projects for this lesson"
+        hint: "Add and order content items"
+        types:
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
       - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Author", name: "author", widget: "string", required: false}
