@@ -158,7 +158,9 @@ async function main() {
 
     for (const [specSlug, lessonArray] of Object.entries(mapping)) {
       try {
+        // Only update index.md (NOT versioned files - they are immutable snapshots)
         const specPath = path.join(specializationsDir, specSlug, 'index.md');
+        
         if (!fs.existsSync(specPath)) {
           report.errors.push({ slug: specSlug, error: 'File not found' });
           continue;
