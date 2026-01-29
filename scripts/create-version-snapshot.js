@@ -62,14 +62,9 @@ for (const type of contentTypes) {
       const content = fs.readFileSync(filePath, 'utf-8');
       const { data: frontmatter, content: markdown } = matter(content);
 
-      // Only create snapshot if version is set and publishEmbed is true
+      // Only create snapshot if version is set
       if (!frontmatter.version) {
         console.log(`   ⊘ ${file} - No version field, skipping`);
-        return;
-      }
-
-      if (frontmatter.publishEmbed !== true) {
-        console.log(`   ⊘ ${file} - publishEmbed not enabled, skipping`);
         return;
       }
 

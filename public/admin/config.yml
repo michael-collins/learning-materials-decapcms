@@ -105,6 +105,7 @@ collections:
       - {label: "Author URL", name: "authorUrl", widget: "string", required: false}
       - {label: "Published", name: "published", widget: "boolean", default: true}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true, hint: "Enable iframe embedding for this content"}
+      - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0). Bump this to auto-create a version snapshot."}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
