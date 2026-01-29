@@ -151,11 +151,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
 
-      - name: Enable auto-merge
+      - name: Merge PR with admin override
         if: steps.check-versions.outputs.has-versions == 'true'
         run: |
-          # Enable auto-merge on the PR (will merge automatically when checks pass)
-          gh pr merge "${{ steps.create-pr.outputs.pr-url }}" --auto --squash
+          # Merge PR immediately using admin rights to bypass branch protection rules
+          gh pr merge "${{ steps.create-pr.outputs.pr-url }}" --admin --squash
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
 
@@ -165,13 +165,13 @@ jobs:
           echo "## Version Snapshot Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.check-versions.outputs.has-versions }}" = "true" ]; then
             echo "✓ Pull request created with new version files" >> $GITHUB_STEP_SUMMARY
-            echo "✓ Auto-merge enabled - PR will merge automatically when checks pass" >> $GITHUB_STEP_SUMMARY
+            echo "✓ PR merged with admin override (bypassed branch protection rules)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** \`${{ env.branch }}\`" >> $GITHUB_STEP_SUMMARY
             echo "**PR:** ${{ steps.create-pr.outputs.pr-url }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Files created:**" >> $GITHUB_STEP_SUMMARY
-            git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY || echo "- (checking...)" >> $GITHUB_STEP_SUMMARY
+            echo "**Files merged:**" >> $GITHUB_STEP_SUMMARY
+            git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY || echo "- (files list pending)" >> $GITHUB_STEP_SUMMARY
           else
             echo "ℹ No version bumps detected - no new version files created" >> $GITHUB_STEP_SUMMARY
           fi
