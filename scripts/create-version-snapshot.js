@@ -97,7 +97,6 @@ for (const type of contentTypes) {
         const snapshotFileName = `${versionToSnapshot}.md`;
         const snapshotPath = path.join(versionDir, snapshotFileName);
 
-
         // Check if snapshot of previous version already exists
         if (!fs.existsSync(snapshotPath)) {
           // Create v/ directory if it doesn't exist
@@ -123,22 +122,24 @@ for (const type of contentTypes) {
             : `initialized with default version`;
           console.log(`   ✓ ${folder}/index.md v${currentVersion} → v/${snapshotFileName} (${actionText})`);
           snapshotsCreated++;
+        } else {
+          console.log(`   − ${folder}/index.md v${currentVersion} (snapshot v${versionToSnapshot} already exists)`);
+        }
 
-          // Update registry with archived version
-          if (!registry[slug]) {
-            registry[slug] = {
-              latest: currentVersion,
-              versions: {}
-            };
-          }
-
-          registry[slug].versions[versionToSnapshot] = {
-            publishedAt: new Date().toISOString(),
-            status: 'archived',
-            changelog: frontmatter.changelog || '',
-            breakingChanges: frontmatter.breakingChanges || []
+        // Update registry with archived version (outside file existence check)
+        if (!registry[slug]) {
+          registry[slug] = {
+            latest: currentVersion,
+            versions: {}
           };
         }
+
+        registry[slug].versions[versionToSnapshot] = {
+          publishedAt: new Date().toISOString(),
+          status: 'archived',
+          changelog: frontmatter.changelog || '',
+          breakingChanges: frontmatter.breakingChanges || []
+        };
       }
 
       // Update registry with new latest version
