@@ -22,7 +22,7 @@
     }
   },
   "3d-viewer-test": {
-    "latest": "2.9.0",
+    "latest": "3.1.0",
     "versions": {
       "2.0.0": {
         "publishedAt": "2026-01-29T03:35:16.027Z",
@@ -49,8 +49,14 @@
         "breakingChanges": []
       },
       "2.9.0": {
-        "publishedAt": "2026-01-29T05:08:34.813Z",
+        "publishedAt": "2026-01-29T05:50:41.130Z",
         "status": "archived",
+        "changelog": "Working version for future edits",
+        "breakingChanges": []
+      },
+      "3.1.0": {
+        "publishedAt": "2026-01-29T05:50:41.136Z",
+        "status": "latest",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       }
@@ -365,11 +371,17 @@
     }
   },
   "rendering-random-objects": {
-    "latest": "1.0.0",
+    "latest": "1.0.2",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.055Z",
+        "publishedAt": "2026-01-29T05:50:41.149Z",
         "status": "archived",
+        "changelog": "",
+        "breakingChanges": []
+      },
+      "1.0.2": {
+        "publishedAt": "2026-01-29T05:50:41.149Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
