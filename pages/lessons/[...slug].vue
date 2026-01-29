@@ -40,7 +40,7 @@ const { data: specialization } = await useAsyncData(
 
 // Fetch related content (lectures, tutorials, exercises, articles, projects)
 const { data: relatedContent } = await useAsyncData(
-  `lesson-content-${lessonPath}`,
+  `lesson-content-${baseSlug}`,
   async () => {
     if (!lesson.value) return { lectures: [], tutorials: [], exercises: [], articles: [], projects: [] }
     
