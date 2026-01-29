@@ -165,6 +165,10 @@ const updateURL = () => {
     query.item = item.slug
   }
   
+  if (selectedModalVersion.value) {
+    query.version = selectedModalVersion.value
+  }
+  
   router.replace({ query })
 }
 
@@ -173,6 +177,7 @@ const syncFromURL = () => {
   
   const lessonSlug = route.query.lesson as string
   const itemSlug = route.query.item as string
+  const version = route.query.version as string
   
   if (lessonSlug) {
     const lessonIndex = lessons.value.findIndex(l => l.slug === lessonSlug)
@@ -190,6 +195,10 @@ const syncFromURL = () => {
         }
       } else {
         selectedItemIndex.value = null
+      }
+      
+      if (version) {
+        selectedModalVersion.value = version
       }
     }
   }
@@ -463,6 +472,8 @@ watch(() => props.open, (isOpen) => {
 // Handle version selection in modal
 const handleModalVersionSelect = (version: string) => {
   selectedModalVersion.value = version === 'latest' ? undefined : version
+  // Update URL with new version
+  updateURL()
   // Reload content with new version
   loadItemContent()
 }
@@ -721,6 +732,9 @@ onBeforeUnmount(() => {
                       <template v-else>
                         <span>/</span>
                         <span class="font-medium text-foreground">Overview</span>
+                        <span v-if="selectedModalVersion" class="ml-1 inline-flex items-center rounded-full bg-warning/10 border border-warning/20 px-2 py-0.5 text-xs font-semibold text-warning">
+                          Version {{ selectedModalVersion }}
+                        </span>
                       </template>
                     </div>
 
@@ -752,13 +766,13 @@ onBeforeUnmount(() => {
                           
                           <!-- Versions dropdown -->
                           <VersionsDropdown 
-                            v-if="selectedItem || (isOverviewMode && selectedLesson)"
-                            :content-type="selectedItem?.type || 'lessons'"
-                            :slug="selectedItem?.slug || (selectedLesson?.slug || '')"
+                            v-if="selectedItem || isOverviewMode"
+                            :content-type="selectedItem?.type || (selectedLesson ? 'lessons' : 'specializations')"
+                            :slug="selectedItem?.slug || (selectedLesson?.slug || specialization?.slug || '')"
                             :current-version="selectedModalVersion"
                             :on-version-select="handleModalVersionSelect"
                           />
-                          <div v-if="selectedItem || (isOverviewMode && selectedLesson)" class="h-px bg-border" />
+                          <div v-if="selectedItem || isOverviewMode" class="h-px bg-border" />
                           
                           <NuxtLink
                             v-if="isOverviewMode && selectedLesson"

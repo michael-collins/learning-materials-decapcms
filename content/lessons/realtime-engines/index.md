@@ -1,22 +1,20 @@
 ---
-title: Real-time Engines
-slug: realtime-engines
-type: oer:LearningComponent
-description: Learn to work with game engines like Unity and Unreal Engine, implementing 3D assets and creating interactive experiences.
-estimatedDuration: 6 hours
-specialization: realtime-for-immersive-environments
-order: 2
+title: 'Real-time Engines'
+slug: 'realtime-engines'
+type: 'oer:LearningComponent'
+description: 'Learn to work with game engines like Unity and Unreal Engine, implementing 3D assets and creating interactive experiences.'
+estimatedDuration: '6 hours'
 learningObjectives:
-  - Navigate game engine interfaces
-  - Import and configure 3D assets
-  - Set up materials and shaders
-  - Implement real-time lighting
-  - Create basic interactive elements
-  - Optimize performance and build settings
+  - 'Navigate game engine interfaces'
+  - 'Import and configure 3D assets'
+  - 'Set up materials and shaders'
+  - 'Implement real-time lighting'
+  - 'Create basic interactive elements'
+  - 'Optimize performance and build settings'
 published: true
-license: CC BY 4.0
+license: 'CC BY 4.0'
 version: '1.0.0'
-versionStatus: latest
+versionStatus: 'latest'
 publishEmbed: true
 ---
 

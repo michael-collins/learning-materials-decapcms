@@ -1,21 +1,19 @@
 ---
-title: Rendering Techniques
-slug: rendering-techniques
-type: oer:LearningComponent
-description: Learn rendering workflows, engine settings, and optimization techniques to produce high-quality final images.
-estimatedDuration: 3 hours
-specialization: cgi-foundations
-order: 6
+title: 'Rendering Techniques'
+slug: 'rendering-techniques'
+type: 'oer:LearningComponent'
+description: 'Learn rendering workflows, engine settings, and optimization techniques to produce high-quality final images.'
+estimatedDuration: '3 hours'
 learningObjectives:
-  - Understand rendering engines and their settings
-  - Configure render settings for quality output
-  - Optimize render times effectively
-  - Set up render layers and passes
-  - Export renders in appropriate formats
+  - 'Understand rendering engines and their settings'
+  - 'Configure render settings for quality output'
+  - 'Optimize render times effectively'
+  - 'Set up render layers and passes'
+  - 'Export renders in appropriate formats'
 published: true
-license: CC BY 4.0
+license: 'CC BY 4.0'
 version: '1.0.0'
-versionStatus: latest
+versionStatus: 'latest'
 publishEmbed: true
 ---
 

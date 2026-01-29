@@ -1,21 +1,19 @@
 ---
-title: Post Effects and Color Grading
-slug: post-effects-color-grading
-type: oer:LearningComponent
-description: Apply post-production effects and color grading techniques to enhance and finalize composited images.
-estimatedDuration: 4 hours
-specialization: compositing
-order: 3
+title: 'Post Effects and Color Grading'
+slug: 'post-effects-color-grading'
+type: 'oer:LearningComponent'
+description: 'Apply post-production effects and color grading techniques to enhance and finalize composited images.'
+estimatedDuration: '4 hours'
 learningObjectives:
-  - Apply color correction and grading
-  - Use effects like glow, blur, and grain
-  - Match colors across different elements
-  - Create consistent visual style
-  - Apply final polish and finishing touches
+  - 'Apply color correction and grading'
+  - 'Use effects like glow, blur, and grain'
+  - 'Match colors across different elements'
+  - 'Create consistent visual style'
+  - 'Apply final polish and finishing touches'
 published: true
-license: CC BY 4.0
+license: 'CC BY 4.0'
 version: '1.0.0'
-versionStatus: latest
+versionStatus: 'latest'
 publishEmbed: true
 ---
 

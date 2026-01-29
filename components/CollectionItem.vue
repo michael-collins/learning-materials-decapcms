@@ -125,7 +125,7 @@ const getDecapEditUrl = computed(() => {
 const getContentTypeAndSlug = computed(() => {
   const pathParts = route.path.split('/').filter(Boolean)
   if (pathParts.length >= 2) {
-    const contentType = pathParts[0] as 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons'
+    const contentType = pathParts[0] as 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons' | 'specializations' | 'pathways'
     const slug = pathParts.slice(1).join('/')
     return { contentType, slug }
   }
