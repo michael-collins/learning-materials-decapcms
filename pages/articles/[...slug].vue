@@ -13,7 +13,7 @@ const baseSlug = route.params.slug.join('/')
 const { data: article, pending } = await useAsyncData(`article-${baseSlug}-${versionParam || 'latest'}`, async () => {
   // If version param is provided, try the versioned path first
   if (versionParam) {
-    const versionedPath = `/articles/${baseSlug}/v${versionParam}`
+    const versionedPath = `/articles/${baseSlug}/v/${versionParam}`
     const versioned = await queryCollection('articles').path(versionedPath).first()
     if (versioned) return versioned
   }

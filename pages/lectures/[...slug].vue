@@ -17,7 +17,7 @@ const displayVersion = versionParam && typeof versionParam === 'string' ? versio
 const { data: lecture, pending } = await useAsyncData(`lecture-${baseSlug}-${versionParam || 'latest'}`, async () => {
   // If version param is provided, try the versioned path first
   if (versionParam) {
-    const versionedPath = `/lectures/${baseSlug}/v${versionParam}`
+    const versionedPath = `/lectures/${baseSlug}/v/${versionParam}`
     const versioned = await queryCollection('lectures').path(versionedPath).first()
     if (versioned) return versioned
   }

@@ -71,7 +71,7 @@ const loadItemContent = async () => {
     
     // Try to load versioned content if a version is selected
     if (selectedModalVersion.value) {
-      const versionedPath = `${basePath}/${slug}/v${selectedModalVersion.value}`
+      const versionedPath = `${basePath}/${slug}/v/${selectedModalVersion.value}`
       content = await queryCollection(type === 'articles' ? 'articles' : type)
         .path(versionedPath)
         .first()
