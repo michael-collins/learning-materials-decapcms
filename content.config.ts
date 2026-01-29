@@ -140,6 +140,7 @@ export default defineContentConfig({
         imageAlt: z.string().optional(),
         published: z.boolean().optional(),
         oer: z.any().optional(),
+        lessons: z.array(z.string()).optional(),
       })
     }),
     pathways: defineCollection({
@@ -216,6 +217,7 @@ export default defineContentConfig({
         articles: z.array(z.string()).optional(),
         resources: z.array(z.string()).optional(),
         projects: z.array(z.string()).optional(),
+        items: z.array(z.any()).optional(),
         published: z.boolean().optional(),
         allowEmbed: z.boolean().optional(),
         license: z.string().optional(),
