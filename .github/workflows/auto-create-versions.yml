@@ -91,7 +91,7 @@ jobs:
       - name: Check for new version files
         id: check-versions
         run: |
-          if git status --porcelain | grep -E '^.*v[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null; then
+          if git status --porcelain | grep -E '^.*v/[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null; then
             echo "has-versions=true" >> $GITHUB_OUTPUT
             echo "Version files detected:"
             git status --porcelain
@@ -106,7 +106,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add 'content/**/v[0-9]*.md'
+          git add 'content/**/v/*.md'
           git add 'content/data/version-registry.json'
           
           git commit -m "chore: auto-create content version snapshots [skip ci]"

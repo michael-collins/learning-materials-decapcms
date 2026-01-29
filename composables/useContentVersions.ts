@@ -70,14 +70,16 @@ export const useContentVersions = async (
         allContent.forEach((item: any) => {
           // Use the slug and id fields which are properly available
           const itemSlug = item.slug || ''
-          // Extract filename from id: e.g., "exercises/exercises/3d-viewer-test/v1.0.0.md" -> "v1.0.0.md"
-          const fileName = item.id?.split('/').pop() || ''
+          // Extract path from id: e.g., "exercises/exercises/3d-viewer-test/v/1.0.0.md" -> check if in v/ folder
+          const idParts = item.id?.split('/') || []
+          const fileName = idParts.pop() || ''
           const fileNameWithoutExt = fileName.replace('.md', '')
+          const parentFolder = idParts[idParts.length - 1] || ''
           
-          console.log(`[useContentVersions] Checking item: slug=${itemSlug}, fileName=${fileName}, baseSlug=${baseSlug}`)
+          console.log(`[useContentVersions] Checking item: slug=${itemSlug}, fileName=${fileName}, parentFolder=${parentFolder}, baseSlug=${baseSlug}`)
           
-          // Only process items that are in the same slug folder and are version files
-          if (itemSlug === baseSlug && fileNameWithoutExt.match(/^v\d+\.\d+\.\d+$/)) {
+          // Only process items that are in the same slug folder, in v/ subdirectory, and are version files
+          if (itemSlug === baseSlug && parentFolder === 'v' && fileNameWithoutExt.match(/^\d+\.\d+\.\d+$/)) {
             console.log(`[useContentVersions] ✓ Found version file: ${fileNameWithoutExt}, versionStatus=${item.versionStatus}`)
             if (item.version && item.publishEmbed && item.versionStatus === 'archived') {
               console.log(`[useContentVersions] ✓ Adding archived version: ${item.version}`)
