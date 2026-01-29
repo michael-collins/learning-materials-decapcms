@@ -1,6 +1,12 @@
 # Pre-commit hook to validate version file edits
 # Prevents accidental commits to archived version files
 
+# Skip check in CI/GitHub Actions - automated version creation is allowed
+if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+  echo "✅ Running in CI - skipping version file check"
+  exit 0
+fi
+
 echo "🔍 Checking for version file modifications..."
 
 # Get staged files that match version pattern in v/ subdirectory
