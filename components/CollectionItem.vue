@@ -194,7 +194,19 @@ const exportCommonCartridge = async () => {
 
 const generateCitation = () => {
   const currentYear = new Date().getFullYear()
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
+  // Get current URL including version parameter
+  let pageUrl = ''
+  if (typeof window !== 'undefined') {
+    pageUrl = window.location.href
+  } else if (props.version && props.versionStatus !== 'latest') {
+    // For SSR, construct URL with version parameter
+    const route = useRoute()
+    pageUrl = `${route.path}?version=${props.version}`
+  } else {
+    const route = useRoute()
+    pageUrl = route.path
+  }
+  
   const accessDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   
   // Generate APA-style citation
@@ -215,6 +227,11 @@ const generateCitation = () => {
   
   if (props.license) {
     citation += `[${props.license}]. `
+  }
+  
+  // Add version information if viewing a specific archived version
+  if (props.version && props.versionStatus === 'archived') {
+    citation += `[Version ${props.version}]. `
   }
   
   citation += `Retrieved ${accessDate}, from ${pageUrl}`
