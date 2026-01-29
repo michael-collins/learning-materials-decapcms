@@ -1,0 +1,124 @@
+name: Auto-Create Content Versions
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths:
+      - 'content/exercises/**/index.md'
+      - 'content/tutorials/**/index.md'
+      - 'content/lectures/**/index.md'
+      - 'content/articles/**/index.md'
+      - 'content/projects/**/index.md'
+
+jobs:
+  check-version-bumps:
+    # Only run if PR was actually merged (not just closed)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      version-bumped: ${{ steps.detect-bumps.outputs.version-bumped }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full history to compare
+
+      - name: Detect version bumps
+        id: detect-bumps
+        run: |
+          # Get the list of changed files in this PR
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- 'content/**/index.md' || echo "")
+          
+          VERSION_BUMPED=false
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "version-bumped=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Check each changed file for version changes
+          while IFS= read -r file; do
+            if [ -z "$file" ]; then
+              continue
+            fi
+            
+            # Extract version from new version (merged)
+            NEW_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/version: *"//' | sed 's/".*//' | sed "s/version: *'//" | sed "s/'.*//")
+            
+            # Extract version from old version (before merge)
+            OLD_VERSION=$(git show ${{ github.event.pull_request.base.sha }}:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/version: *"//' | sed 's/".*//' | sed "s/version: *'//" | sed "s/'.*//") || OLD_VERSION=""
+            
+            # Check if version changed
+            if [ ! -z "$NEW_VERSION" ] && [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
+              echo "✓ Version bump detected in $file: $OLD_VERSION → $NEW_VERSION"
+              VERSION_BUMPED=true
+            elif [ ! -z "$NEW_VERSION" ] && [ -z "$OLD_VERSION" ]; then
+              echo "✓ Version added in $file: $NEW_VERSION"
+              VERSION_BUMPED=true
+            fi
+          done <<< "$CHANGED_FILES"
+          
+          echo "version-bumped=$VERSION_BUMPED" >> $GITHUB_OUTPUT
+
+  create-versions:
+    needs: check-version-bumps
+    if: needs.check-version-bumps.outputs.version-bumped == 'true'
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create version snapshots
+        run: npm run version:snapshot
+
+      - name: Check for new version files
+        id: check-versions
+        run: |
+          if git status --porcelain | grep -E '^.*v[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null; then
+            echo "has-versions=true" >> $GITHUB_OUTPUT
+            echo "Version files detected:"
+            git status --porcelain
+          else
+            echo "has-versions=false" >> $GITHUB_OUTPUT
+            echo "No new version files created"
+          fi
+
+      - name: Commit version snapshots
+        if: steps.check-versions.outputs.has-versions == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add 'content/**/v[0-9]*.md'
+          git add 'content/data/version-registry.json'
+          
+          git commit -m "chore: auto-create content version snapshots [skip ci]"
+          git push
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## Version Snapshot Summary" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check-versions.outputs.has-versions }}" = "true" ]; then
+            echo "✓ New version files created and committed" >> $GITHUB_STEP_SUMMARY
+            git diff HEAD~1 --name-only | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ No version bumps detected - no new version files created" >> $GITHUB_STEP_SUMMARY
+          fi

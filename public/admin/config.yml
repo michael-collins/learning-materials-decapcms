@@ -75,7 +75,6 @@ collections:
     slug: "{{slug}}"
     path: "{{slug}}/index" # Files are stored as {slug}/index.md
     # Exclude version snapshot files from CMS UI to prevent accidental edits
-    filter: {field: "draft", value: false}
     exclude: "**/v[0-9]*.md"
     view_filters:
       - label: "Published"
