@@ -22,7 +22,7 @@
     }
   },
   "3d-viewer-test": {
-    "latest": "2.6.0",
+    "latest": "2.7.0",
     "versions": {
       "2.0.0": {
         "publishedAt": "2026-01-29T03:35:16.027Z",
@@ -32,6 +32,12 @@
       },
       "2.6.0": {
         "publishedAt": "2026-01-29T04:38:47.638Z",
+        "status": "archived",
+        "changelog": "Working version for future edits",
+        "breakingChanges": []
+      },
+      "2.7.0": {
+        "publishedAt": "2026-01-29T04:54:06.115Z",
         "status": "archived",
         "changelog": "Working version for future edits",
         "breakingChanges": []
