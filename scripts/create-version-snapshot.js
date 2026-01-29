@@ -66,64 +66,99 @@ for (const type of contentTypes) {
       const content = fs.readFileSync(indexPath, 'utf-8');
       const { data: frontmatter, content: markdown } = matter(content);
 
-      // Only create snapshot if version is set
-      if (!frontmatter.version) {
-        console.log(`   ⊘ ${folder}/index.md - No version field, skipping`);
-        return;
-      }
-
-      const version = frontmatter.version;
+      // Get current version and previous version from registry
+      const currentVersion = frontmatter.version;
       const slug = folder;
-      const versionDir = path.join(typeDir, folder, 'v');
-      const snapshotFileName = `${version}.md`;
-      const snapshotPath = path.join(versionDir, snapshotFileName);
+      const previousVersion = registry[slug]?.latest;
 
-      // Check if snapshot already exists
-      if (fs.existsSync(snapshotPath)) {
-        console.log(`   − ${folder}/index.md → v/${snapshotFileName} (already exists)`);
+      // Check if version field is missing
+      if (!currentVersion) {
+        if (previousVersion) {
+          console.log(`   ⚠️  ${folder}/index.md - Version field removed (was ${previousVersion}), please restore it`);
+        } else {
+          console.log(`   ⊘ ${folder}/index.md - No version field, skipping`);
+        }
         return;
       }
 
-      // Create v/ directory if it doesn't exist
-      if (!fs.existsSync(versionDir)) {
-        fs.mkdirSync(versionDir, { recursive: true });
+      // Check if version has changed from registry
+      if (previousVersion && previousVersion === currentVersion) {
+        console.log(`   − ${folder}/index.md v${currentVersion} (no version change detected)`);
+        return;
       }
 
-      // Create snapshot with modified frontmatter
-      const snapshotFrontmatter = {
-        ...frontmatter,
-        versionStatus: 'archived',
-        publishEmbed: true,
-        _snapshotCreatedAt: new Date().toISOString(),
-        _snapshotFrom: 'index.md'
-      };
+      const versionDir = path.join(typeDir, folder, 'v');
+      
+      // Determine which version to snapshot (previous or default 0.0.1 for new content)
+      const versionToSnapshot = previousVersion || '0.0.1';
 
-      const snapshotContent = matter.stringify(markdown, snapshotFrontmatter);
-      fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
+      // If there's a version change (or new content with version), archive the previous version
+      if (!previousVersion || (previousVersion && previousVersion !== currentVersion)) {
+        const snapshotFileName = `${versionToSnapshot}.md`;
+        const snapshotPath = path.join(versionDir, snapshotFileName);
 
-      console.log(`   ✓ ${folder}/index.md → v/${snapshotFileName}`);
-      snapshotsCreated++;
 
-      // Update registry
+        // Check if snapshot of previous version already exists
+        if (!fs.existsSync(snapshotPath)) {
+          // Create v/ directory if it doesn't exist
+          if (!fs.existsSync(versionDir)) {
+            fs.mkdirSync(versionDir, { recursive: true });
+          }
+
+          // Create snapshot with modified frontmatter (archiving the previous version)
+          const snapshotFrontmatter = {
+            ...frontmatter,
+            version: versionToSnapshot,
+            versionStatus: 'archived',
+            publishEmbed: true,
+            _snapshotCreatedAt: new Date().toISOString(),
+            _snapshotFrom: 'index.md'
+          };
+
+          const snapshotContent = matter.stringify(markdown, snapshotFrontmatter);
+          fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
+
+          const actionText = previousVersion 
+            ? `archived previous version` 
+            : `initialized with default version`;
+          console.log(`   ✓ ${folder}/index.md v${currentVersion} → v/${snapshotFileName} (${actionText})`);
+          snapshotsCreated++;
+
+          // Update registry with archived version
+          if (!registry[slug]) {
+            registry[slug] = {
+              latest: currentVersion,
+              versions: {}
+            };
+          }
+
+          registry[slug].versions[versionToSnapshot] = {
+            publishedAt: new Date().toISOString(),
+            status: 'archived',
+            changelog: frontmatter.changelog || '',
+            breakingChanges: frontmatter.breakingChanges || []
+          };
+        }
+      }
+
+      // Update registry with new latest version
       if (!registry[slug]) {
         registry[slug] = {
-          latest: version,
+          latest: currentVersion,
           versions: {}
         };
       }
 
-      registry[slug].versions[version] = {
+      registry[slug].latest = currentVersion;
+      registry[slug].versions[currentVersion] = {
         publishedAt: new Date().toISOString(),
-        status: 'archived',
+        status: 'latest',
         changelog: frontmatter.changelog || '',
         breakingChanges: frontmatter.breakingChanges || []
       };
 
-      // Update latest version
-      const existingLatest = registry[slug].latest;
-      if (compareVersions(version, existingLatest) > 0) {
-        registry[slug].latest = version;
-      }
+      console.log(`   ✓ ${folder}/index.md v${currentVersion} (new latest)`);
+
 
     } catch (error) {
       console.error(`   ✗ ${folder}/index.md - Error: ${error.message}`);
