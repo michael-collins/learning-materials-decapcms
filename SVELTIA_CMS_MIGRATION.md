@@ -158,14 +158,59 @@ All of these Decap CMS features are fully compatible:
 
 ### What Doesn't Work (Yet) ⚠️
 
+- ⚠️ **Editorial Workflow** - Draft → In Review → Ready workflow for content approval
+  - Your config has: `publish_mode: editorial_workflow` 
+  - **Current Status**: Not yet implemented in Sveltia CMS
+  - **Impact**: All changes save directly to your main branch (simple mode)
+  - **Workaround**: Use branches, PRs, or Git workflow for review process
+  - **When Available**: Feature is in development (UI components exist but disabled)
+  - **Tracking**: Monitor [Sveltia CMS releases](https://github.com/sveltia/sveltia-cms/releases) for updates
+
 - ⚠️ **YouTube field widget** - Custom input control for YouTube fields
   - Workaround: Use string field or editor component
   - Status: Feature planned, coming soon
-- ⚠️ **toPreview in editor components** - Preview rendering in editor
-  - Impact: Minimal, components still insert correctly
-  - Status: Coming soon
 
 ## Potential Limitations
+
+### Editorial Workflow - Not Yet Implemented 📋
+
+**Background:**
+Decap CMS supports an **Editorial Workflow** mode that provides a Kanban-style content review process with three columns:
+- **Drafts** - Work in progress
+- **In Review** - Ready for team review
+- **Ready** - Approved and ready to publish
+
+Each content state corresponds to a pull request status, allowing teams to review and approve content before it goes live.
+
+**Your Current Config:**
+Your `config.yml` has `publish_mode: editorial_workflow` enabled.
+
+**Sveltia CMS Status:**
+- ⚠️ **Not yet supported** - The feature is under development
+- UI components exist (workflow-page.svelte) but are currently disabled
+- Config option is recognized but ignored
+- Warning message appears in console: "Editorial workflow is not yet supported in Sveltia CMS"
+
+**What This Means:**
+When using Sveltia CMS, **all changes will save directly to your main branch** (simple mode), bypassing the draft/review/ready workflow.
+
+**Workarounds:**
+1. **Git Branch Workflow**: Use Git branches manually for drafts, create PRs for review
+2. **GitHub PR Process**: Create PRs directly in GitHub for content review
+3. **Temporary Branches**: Create feature branches for new content, merge after review
+4. **External Review Tools**: Use Google Docs or similar for content review before CMS entry
+5. **Keep Decap CMS**: Continue using Decap CMS for projects requiring editorial workflow
+
+**When Will It Be Available?**
+- The feature is actively being developed (code exists, just not enabled)
+- No official timeline announced
+- Monitor [Sveltia CMS releases](https://github.com/sveltia/sveltia-cms/releases) and [GitHub issues](https://github.com/sveltia/sveltia-cms/issues)
+
+**Migration Decision:**
+If editorial workflow is critical for your team, you may want to:
+- ✅ **Wait** - Stay on Decap CMS until Sveltia implements this feature
+- ✅ **Adapt** - Switch to Sveltia and use Git-based review workflows
+- ✅ **Hybrid** - Use Decap for production, Sveltia for development/testing
 
 ### Custom Field Types (Widgets) - Not Yet Implemented
 
@@ -219,10 +264,43 @@ After successful migration, consider:
 4. **AI Translation**: Explore multilingual features if needed
 5. **Local Workflow**: Implement improved local development workflow
 
+## Known Issue: Body Field Not Loading - FIXED ✅
+
+**Problem:** The markdown/body field was not loading in Sveltia CMS editor.
+
+**Root Cause:** Sveltia's Lexical editor calls `toPreview` functions during initialization, sometimes before component properties are fully set. This caused `TypeError: Cannot read properties of undefined (reading 'endsWith')` at line 288 of `editor-components.js`.
+
+**Solution Applied:**
+Added defensive null checks to all `toPreview` functions in `/public/admin/editor-components.js`:
+
+```javascript
+toPreview: function(obj) {
+  // Guard clause for undefined/null obj or properties
+  if (!obj || !obj.src) {
+    return '<div style="...">Component (loading...)</div>';
+  }
+  // ... rest of preview code using obj.src safely
+}
+```
+
+**Affected Components (All Fixed):**
+- ✅ YouTube Video
+- ✅ Video Embed (iframe)
+- ✅ Google Slides
+- ✅ Assessment Rubric
+- ✅ Sketchfab Model
+- ✅ 3D Model Upload (was the original crash)
+
+**Result:** All editor components now work correctly with Sveltia's Lexical editor. The body/markdown field loads properly.
+
+**Key Learning:** When migrating from Decap CMS to Sveltia CMS, always add null checks in `toPreview` functions because Lexical's initialization differs from Remark's.
+
 ## Status
 
 - [x] Branch created: `sveltiacms`
-- [ ] Script updated
-- [ ] Initial testing
-- [ ] Custom widgets verified
-- [ ] Production deployment
+- [x] Script updated in admin HTML
+- [x] Editor component bug fixed (null checks added)
+- [x] Body field now loads correctly
+- [ ] Full testing of editor components and features
+- [ ] Custom widgets verified (YouTube widget - known limitation)
+- [ ] Production deployment decision

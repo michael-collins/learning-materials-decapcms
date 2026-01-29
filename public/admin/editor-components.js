@@ -33,6 +33,11 @@ CMS.registerEditorComponent({
 ::`;
   },
   toPreview: function(obj) {
+    // Guard clause for undefined/null obj or properties
+    if (!obj || !obj.id) {
+      return '<div style="border: 2px solid #ff0000; padding: 16px; border-radius: 8px;"><strong>YouTube Video</strong> (loading...)</div>';
+    }
+    
     return `
       <div style="border: 2px solid #ff0000; padding: 16px; margin: 16px 0; border-radius: 8px; background: #fff;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
@@ -86,13 +91,18 @@ CMS.registerEditorComponent({
 ::`;
   },
   toPreview: function(obj) {
+    // Guard clause for undefined/null obj or properties
+    if (!obj || !obj.src) {
+      return '<div style="border: 2px solid #4a90e2; padding: 16px; border-radius: 8px;"><strong>Video Embed</strong> (loading...)</div>';
+    }
+    
     return `
       <div style="border: 2px solid #4a90e2; padding: 16px; margin: 16px 0; border-radius: 8px; background: #f0f7ff;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
           <span style="font-size: 20px;">📹</span>
           <strong style="color: #4a90e2; font-size: 16px;">Video Embed</strong>
         </div>
-        <div style="color: #333; margin-top: 8px; font-weight: 500;">${obj.title}</div>
+        <div style="color: #333; margin-top: 8px; font-weight: 500;">${obj.title || 'Video'}</div>
         <div style="color: #666; font-size: 12px; margin-top: 4px; word-break: break-all;">${obj.src}</div>
       </div>
     `;
@@ -129,13 +139,18 @@ CMS.registerEditorComponent({
 ::`;
   },
   toPreview: function(obj) {
+    // Guard clause for undefined/null obj or properties
+    if (!obj || !obj.id) {
+      return '<div style="border: 2px solid #34a853; padding: 16px; border-radius: 8px;"><strong>Google Slides</strong> (loading...)</div>';
+    }
+    
     return `
       <div style="border: 2px solid #34a853; padding: 16px; margin: 16px 0; border-radius: 8px; background: #f0fff4;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
           <span style="font-size: 20px;">📊</span>
           <strong style="color: #34a853; font-size: 16px;">Google Slides</strong>
         </div>
-        <div style="color: #333; margin-top: 8px; font-weight: 500;">${obj.title}</div>
+        <div style="color: #333; margin-top: 8px; font-weight: 500;">${obj.title || 'Presentation'}</div>
         <div style="color: #666; font-size: 11px; margin-top: 4px; font-family: monospace;">ID: ${obj.id}</div>
       </div>
     `;
@@ -165,6 +180,11 @@ CMS.registerEditorComponent({
 ::`;
   },
   toPreview: function(obj) {
+    // Guard clause for undefined/null obj or properties
+    if (!obj || !obj.id) {
+      return '<div style="border: 2px solid #f59e0b; padding: 16px; border-radius: 8px;"><strong>Grading Rubric</strong> (loading...)</div>';
+    }
+    
     return `
       <div style="border: 2px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 8px; background: #fffbeb;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
@@ -216,6 +236,11 @@ CMS.registerEditorComponent({
 ::`;
   },
   toPreview: function(obj) {
+    // Guard clause for undefined/null obj or properties
+    if (!obj || !obj.src) {
+      return '<div style="border: 2px solid #1caad9; padding: 16px; border-radius: 8px;"><strong>Sketchfab Model</strong> (loading...)</div>';
+    }
+    
     return `
       <div style="border: 2px solid #1caad9; padding: 16px; margin: 16px 0; border-radius: 8px; background: #e8f7fb;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
@@ -230,8 +255,7 @@ CMS.registerEditorComponent({
           </div>
         </div>
         <div style="color: #666; font-size: 12px; margin-top: 8px; word-break: break-all;">
-          <strong>URL:</strong> ${obj.src}
-        </div>
+          <strong>URL:</strong> ${obj.src}</div>
       </div>
     `;
   }
@@ -285,6 +309,11 @@ CMS.registerEditorComponent({
 ::`;
   },
   toPreview: function(obj) {
+    // Guard clause for undefined/null obj or properties (this was causing the crash!)
+    if (!obj || !obj.src) {
+      return '<div style="border: 2px solid #8b5cf6; padding: 16px; border-radius: 8px;"><strong>Uploaded 3D Model</strong> (loading...)</div>';
+    }
+    
     const fileTypeLabel = obj.src.endsWith('.gltf') ? 'GLTF Model' : 'GLB Model';
     
     return `
