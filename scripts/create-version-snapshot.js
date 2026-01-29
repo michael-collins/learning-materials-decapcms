@@ -75,36 +75,62 @@ for (const type of contentTypes) {
       const version = frontmatter.version;
       const slug = folder;
       const versionDir = path.join(typeDir, folder, 'v');
-      const snapshotFileName = `${version}.md`;
-      const snapshotPath = path.join(versionDir, snapshotFileName);
 
-      // Check if snapshot already exists
-      if (fs.existsSync(snapshotPath)) {
-        console.log(`   − ${folder}/index.md → v/${snapshotFileName} (already exists)`);
+      // Check if we need to create a snapshot (version changed)
+      const previousVersion = registry[slug]?.latest;
+      
+      // Only create snapshot if version has changed from what's in registry
+      if (previousVersion && previousVersion === version) {
+        console.log(`   − ${folder}/index.md v${version} (no version change detected)`);
         return;
       }
 
-      // Create v/ directory if it doesn't exist
-      if (!fs.existsSync(versionDir)) {
-        fs.mkdirSync(versionDir, { recursive: true });
+      // If there was a previous version, create a snapshot of it
+      if (previousVersion) {
+        const snapshotFileName = `${previousVersion}.md`;
+        const snapshotPath = path.join(versionDir, snapshotFileName);
+
+        // Check if snapshot of previous version already exists
+        if (!fs.existsSync(snapshotPath)) {
+          // Create v/ directory if it doesn't exist
+          if (!fs.existsSync(versionDir)) {
+            fs.mkdirSync(versionDir, { recursive: true });
+          }
+
+          // Create snapshot with modified frontmatter (archiving the previous version)
+          const snapshotFrontmatter = {
+            ...frontmatter,
+            version: previousVersion,
+            versionStatus: 'archived',
+            publishEmbed: true,
+            _snapshotCreatedAt: new Date().toISOString(),
+            _snapshotFrom: 'index.md'
+          };
+
+          const snapshotContent = matter.stringify(markdown, snapshotFrontmatter);
+          fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
+
+          console.log(`   ✓ ${folder}/index.md v${previousVersion} → v/${snapshotFileName} (archived previous version)`);
+          snapshotsCreated++;
+
+          // Update registry with archived version
+          if (!registry[slug]) {
+            registry[slug] = {
+              latest: version,
+              versions: {}
+            };
+          }
+
+          registry[slug].versions[previousVersion] = {
+            publishedAt: new Date().toISOString(),
+            status: 'archived',
+            changelog: frontmatter.changelog || '',
+            breakingChanges: frontmatter.breakingChanges || []
+          };
+        }
       }
 
-      // Create snapshot with modified frontmatter
-      const snapshotFrontmatter = {
-        ...frontmatter,
-        versionStatus: 'archived',
-        publishEmbed: true,
-        _snapshotCreatedAt: new Date().toISOString(),
-        _snapshotFrom: 'index.md'
-      };
-
-      const snapshotContent = matter.stringify(markdown, snapshotFrontmatter);
-      fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
-
-      console.log(`   ✓ ${folder}/index.md → v/${snapshotFileName}`);
-      snapshotsCreated++;
-
-      // Update registry
+      // Update registry with new latest version
       if (!registry[slug]) {
         registry[slug] = {
           latest: version,
@@ -112,18 +138,16 @@ for (const type of contentTypes) {
         };
       }
 
+      registry[slug].latest = version;
       registry[slug].versions[version] = {
         publishedAt: new Date().toISOString(),
-        status: 'archived',
+        status: 'latest',
         changelog: frontmatter.changelog || '',
         breakingChanges: frontmatter.breakingChanges || []
       };
 
-      // Update latest version
-      const existingLatest = registry[slug].latest;
-      if (compareVersions(version, existingLatest) > 0) {
-        registry[slug].latest = version;
-      }
+      console.log(`   ✓ ${folder}/index.md v${version} (new latest)`);
+
 
     } catch (error) {
       console.error(`   ✗ ${folder}/index.md - Error: ${error.message}`);
