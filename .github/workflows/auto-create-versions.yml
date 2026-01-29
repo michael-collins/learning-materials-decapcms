@@ -60,12 +60,12 @@ jobs:
             
             echo "Processing: $file"
             
-            # Extract version from new version (current)
-            NEW_VERSION=$(git show $CURRENT_SHA:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/^version: *"//' | sed 's/".*//' | sed "s/^version: *'//" | sed "s/'.*//")
+            # Extract version from new version (current) - simpler extraction
+            NEW_VERSION=$(git show $CURRENT_SHA:"$file" 2>/dev/null | awk '/^version:/ {print $2}' | tr -d '"'"'" | head -1)
             echo "  New version: [$NEW_VERSION]"
             
-            # Extract version from old version (previous)
-            OLD_VERSION=$(git show $PREVIOUS_SHA:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/^version: *"//' | sed 's/".*//' | sed "s/^version: *'//" | sed "s/'.*//") || OLD_VERSION=""
+            # Extract version from old version (previous) - simpler extraction
+            OLD_VERSION=$(git show $PREVIOUS_SHA:"$file" 2>/dev/null | awk '/^version:/ {print $2}' | tr -d '"'"'" | head -1) || OLD_VERSION=""
             echo "  Old version: [$OLD_VERSION]"
             
             # Check if version changed
@@ -113,16 +113,16 @@ jobs:
       - name: Check for new version files
         id: check-versions
         run: |
-          # Check if any v/*.md files were created or modified
-          if git diff origin/main --name-only | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null 2>&1; then
+          # Check if any v/*.md files were created or modified (locally, before commit)
+          if git status --porcelain | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null 2>&1; then
             echo "has-versions=true" >> $GITHUB_OUTPUT
             echo "Version files detected:"
-            git diff origin/main --name-only | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$'
+            git status --porcelain | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$'
           else
             echo "has-versions=false" >> $GITHUB_OUTPUT
             echo "No new version files created"
-            echo "Git diff output:"
-            git diff origin/main --name-only | grep 'v/' || echo "No v/ files in diff"
+            echo "Git status output:"
+            git status --porcelain | grep 'v/' || echo "No v/ files in status"
           fi
 
       - name: Commit and push version snapshots
@@ -161,7 +161,7 @@ jobs:
           - Updated version registry
           
           ## Version Files Created
-          $(git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' || echo '- (files list pending)')
+          $(git status --porcelain | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^.../- /' || echo '- (files list pending)')
           
           **Note:** This PR can be safely merged. Version files are immutable snapshots."
           
@@ -195,7 +195,7 @@ jobs:
             echo "**PR:** ${{ steps.create-pr.outputs.pr-url }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Files merged:**" >> $GITHUB_STEP_SUMMARY
-            git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY || echo "- (files list pending)" >> $GITHUB_STEP_SUMMARY
+            git status --porcelain | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^.../- /' >> $GITHUB_STEP_SUMMARY || echo "- (files list)" >> $GITHUB_STEP_SUMMARY
           else
             echo "ℹ No version bumps detected - no new version files created" >> $GITHUB_STEP_SUMMARY
           fi
