@@ -26,13 +26,13 @@ const { data: specialization, pending } = await useAsyncData(`specialization-${b
   return queryCollection('specializations').path(`/specializations/${baseSlug}`).first()
 })
 
-// Fetch related lessons
+// Fetch related lessons from specialization.lessons array
 const lessons = ref([])
 const lessonsLoading = ref(false)
 
 const fetchLessons = async () => {
-  if (!specialization.value?.slug) {
-    console.log('No specialization slug found')
+  if (!specialization.value?.lessons || specialization.value.lessons.length === 0) {
+    console.log('No lessons in specialization')
     lessons.value = []
     return
   }
@@ -41,14 +41,23 @@ const fetchLessons = async () => {
   console.log('Fetching lessons for specialization:', specialization.value.slug)
 
   try {
-    const allLessons = await queryCollection('lessons').all()
-    const filtered = allLessons.filter((lesson: any) => lesson.specialization === specialization.value.slug)
+    // Get lesson slugs from specialization frontmatter
+    const lessonSlugs = specialization.value.lessons.map((l: any) =>
+      typeof l === 'string' ? l : l.slug
+    )
+
+    // Fetch lessons by slug in order
+    const lessonData = await Promise.all(
+      lessonSlugs.map((slug: string) =>
+        queryCollection('lessons').path(`/lessons/${slug}`).first()
+      )
+    )
+
+    // Filter out any missing lessons
+    const filtered = lessonData.filter(Boolean)
     
-    // Sort by order
-    const sorted = filtered.sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-    
-    console.log('Found lessons:', sorted.length)
-    lessons.value = sorted
+    console.log('Found lessons:', filtered.length)
+    lessons.value = filtered
   } catch (err) {
     console.error('Error fetching lessons:', err)
     lessons.value = []

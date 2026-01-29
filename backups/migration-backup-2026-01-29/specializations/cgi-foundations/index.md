@@ -24,13 +24,6 @@ learningObjectives:
   - Learn to create and manipulate 3D assets, including characters, environments, and props
   - Explore the pipeline and workflow of a typical CGI project from concept to final output
   - Analyze the history and evolution of CGI in various industries such as film, gaming, and advertising
-lessons:
-  - history-of-cgi
-  - 3d-modeling-fundamentals
-  - texturing-uv-mapping
-  - lighting-principles
-  - camera-composition
-  - rendering-techniques
 published: true
 allowEmbed: true
 license: CC BY 4.0

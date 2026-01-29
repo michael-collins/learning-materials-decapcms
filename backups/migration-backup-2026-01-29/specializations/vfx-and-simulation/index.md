@@ -28,11 +28,6 @@ learningObjectives:
 prerequisites:
   - CGI Foundations
   - Compositing
-lessons:
-  - physics-simulation-fundamentals
-  - particle-simulation
-  - match-moving-camera-tracking
-  - vfx-compositing-integration
 published: true
 allowEmbed: true
 license: CC BY 4.0

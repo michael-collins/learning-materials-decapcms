@@ -29,10 +29,6 @@ learningObjectives:
   - Analyze and evaluate real-time projects to understand best practices in design, interactivity, and performance
 prerequisites:
   - CGI Foundations
-lessons:
-  - environment-design-realtime
-  - realtime-engines
-  - ar-vr-development
 published: true
 allowEmbed: true
 license: CC BY 4.0

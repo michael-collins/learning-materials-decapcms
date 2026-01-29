@@ -30,10 +30,6 @@ learningObjectives:
   - Analyze and apply artistic principles such as composition, color theory, and perspective in 3D illustrations
 prerequisites:
   - CGI Foundations
-lessons:
-  - drawing-for-3d-design
-  - digital-sculpting
-  - hard-surface-modeling
 published: true
 allowEmbed: true
 license: CC BY 4.0

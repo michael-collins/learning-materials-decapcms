@@ -1,0 +1,1 @@
+/Users/msc227/Documents/repos/open-curriculum/oerschema/learning-materials-decapcms/content/lessons/camera-composition/index.md
