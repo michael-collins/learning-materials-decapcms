@@ -126,22 +126,25 @@ jobs:
       - name: Create pull request
         if: steps.check-versions.outputs.has-versions == 'true'
         run: |
+          # Create PR body content
+          PR_BODY="🤖 Automated version snapshot creation
+          
+          This PR was automatically created after merging PR #${{ github.event.pull_request.number }}.
+          
+          ## Changes
+          - Created new version snapshot files for content with bumped version numbers
+          - Updated version registry
+          
+          ## Version Files Created
+          $(git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' || echo '- (files list pending)')
+          
+          **Note:** This PR can be safely merged. Version files are immutable snapshots."
+          
           gh pr create \
             --base main \
             --head "${{ env.branch }}" \
             --title "chore: auto-create content version snapshots" \
-            --body "🤖 Automated version snapshot creation
-
-This PR was automatically created after merging PR #${{ github.event.pull_request.number }}.
-
-## Changes
-- Created new version snapshot files for content with bumped version numbers
-- Updated version registry
-
-## Version Files Created
-$(git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /')
-
-**Note:** This PR can be safely merged. Version files are immutable snapshots."
+            --body "$PR_BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
