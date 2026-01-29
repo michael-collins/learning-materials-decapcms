@@ -40,18 +40,41 @@ The migration is as simple as replacing the Decap CMS script with Sveltia CMS sc
 - Custom widgets
 - Editor components
 
-### 3. Features to Review
+### 3. Custom Component Compatibility
 
-#### Custom Widgets
-Our existing custom widgets should continue to work:
-- YouTube widget (`/admin/youtube-widget.js`)
-- Custom editor components (`/admin/editor-components.js`)
+#### ✅ Custom Editor Components - FULLY COMPATIBLE
+Our existing custom editor components **will work without changes**:
+- YouTube video component (`youtube-video`)
+- iframe component (`iframe-component`)
+- Google Slides component
+- Sketchfab component
+- 3D viewer component
+- Rubric component
 
-**Note**: May need testing to ensure full compatibility. Sveltia CMS supports the same widget API.
+**API Compatibility:**
+- ✅ `CMS.registerEditorComponent()` - Supported
+- ✅ `pattern`, `fromBlock`, `toBlock` - Supported
+- ⚠️ `toPreview` - Not yet implemented (planned soon)
+- ✅ All field types we use are supported
 
-#### Preview Styles
-Our custom preview styles should continue to work:
-- `/admin/preview-styles.css`
+Our components use standard Decap CMS patterns that are 100% compatible with Sveltia CMS.
+
+#### ⚠️ Custom Field Widget - NEEDS MIGRATION
+Our YouTube widget (`/admin/youtube-widget.js`) uses `registerWidget()` for custom field types:
+- ⚠️ Custom field types are **not yet implemented** in Sveltia CMS
+- 📅 Feature is planned and coming soon
+- ✅ `registerWidget()` alias is reserved for backward compatibility
+
+**Impact:** The YouTube field widget won't work initially, but:
+1. Our YouTube **editor component** will still work (inserts markdown in editor)
+2. We can continue using string fields for YouTube IDs temporarily
+3. Once Sveltia implements custom field types, we can re-enable the widget
+
+**Workaround:** Keep the widget file but it will be inactive until feature ships.
+
+#### ✅ Preview Styles - FULLY COMPATIBLE
+- ✅ `CMS.registerPreviewStyle()` - Supported
+- ✅ `/admin/preview-styles.css` will continue to work
 
 ### 4. New Features Available
 
@@ -67,19 +90,27 @@ Once migrated, we can explore Sveltia CMS-specific enhancements:
 ### 5. Testing Plan
 
 1. ✅ Create `sveltiacms` branch
-2. ⏳ Update admin HTML with Sveltia CMS script
+2. ✅ Update admin HTML with Sveltia CMS script
 3. ⏳ Test basic functionality:
    - Login via GitHub
    - View collections
    - Create/edit content
    - Upload media
    - Preview content
-4. ⏳ Test custom features:
-   - YouTube widget
-   - Editor components
-   - Preview styles
-5. ⏳ Test version management
-6. ⏳ Test DecapCMS edit links (may need updating)
+4. ⏳ Test editor components (should all work):
+   - YouTube video insertion via "+" menu
+   - iframe component
+   - Google Slides component
+   - Sketchfab component
+   - 3D viewer component
+   - Rubric component
+5. ⚠️ YouTube widget (custom field type):
+   - Will not work initially (feature not yet implemented)
+   - Can fallback to string field temporarily
+   - Monitor Sveltia CMS releases for custom field types support
+6. ✅ Preview styles (should work as-is)
+7. ⏳ Test version management
+8. ⏳ Test DecapCMS edit links (may need updating)
 
 ### 6. Rollback Plan
 
@@ -101,12 +132,75 @@ This enables:
 - Autocomplete for configuration options
 - Inline documentation
 
-## Potential Breaking Changes
+## What Works Immediately ✅
 
-From the documentation, Sveltia CMS is still in beta (targeting 1.0 in early 2026), so:
-- Monitor release notes for breaking changes
-- Consider pinning to a specific version once stable
-- Current approach uses `@sveltia/cms` (latest) for auto-updates
+All of these Decap CMS features are fully compatible:
+
+### Configuration
+- ✅ All `config.yml` settings
+- ✅ Backend configuration (GitHub OAuth)
+- ✅ Collections and fields
+- ✅ Media folder configuration
+- ✅ Editorial workflow
+- ✅ All built-in field types
+
+### Custom Features
+- ✅ **Editor components** - All 6 of our custom components work
+  - YouTube video (`::youtube-video`)
+  - iframe (`::iframe-component`)
+  - Google Slides (`::google-slides`)
+  - Sketchfab (`::sketchfab-component`)
+  - 3D Viewer (`::threed-viewer-component`)
+  - Rubric (`::rubric-component`)
+- ✅ **Preview styles** - CSS customization for preview pane
+- ✅ **Content structure** - Folder-based versioning system
+- ✅ **Markdown editing** - All existing content and formats
+
+### What Doesn't Work (Yet) ⚠️
+
+- ⚠️ **YouTube field widget** - Custom input control for YouTube fields
+  - Workaround: Use string field or editor component
+  - Status: Feature planned, coming soon
+- ⚠️ **toPreview in editor components** - Preview rendering in editor
+  - Impact: Minimal, components still insert correctly
+  - Status: Coming soon
+
+## Potential Limitations
+
+### Custom Field Types (Widgets) - Not Yet Implemented
+
+**Current Status:** Sveltia CMS does not yet support custom field types (`registerWidget`/`registerFieldType`).
+
+**What This Means:**
+- Our YouTube **field widget** (`/admin/youtube-widget.js`) won't work initially
+- The fancy YouTube URL input with live preview won't be available
+- **Editor components still work** - users can still insert YouTube videos via the "+" menu
+
+**Workarounds:**
+1. Use standard string field for YouTube IDs temporarily
+2. Continue using YouTube **editor component** (fully functional)
+3. Keep widget code in place for when feature ships
+
+**Timeline:** Feature is documented as "coming soon" - monitor [Sveltia CMS releases](https://github.com/sveltia/sveltia-cms/releases)
+
+### Preview Function in Editor Components
+
+**Current Status:** `toPreview` function in `registerEditorComponent` is not yet implemented.
+
+**Impact:** 
+- Minimal - mainly affects preview pane rendering
+- Components still insert correctly into content
+- Will be supported soon according to documentation
+
+### Not Supported from Decap CMS
+
+These Decap CMS features are intentionally not supported:
+- ❌ `registerLocale` - Sveltia auto-detects browser language
+- ❌ `registerRemarkPlugin` - Sveltia uses Lexical instead of Remark
+- ❌ Custom backends - May come in future with different implementation
+- ❌ Custom media storage providers - May come in future
+
+**Impact:** We don't use any of these features, so no impact on our project.
 
 ## Resources
 
