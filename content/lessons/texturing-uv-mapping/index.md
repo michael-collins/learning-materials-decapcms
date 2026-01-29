@@ -1,22 +1,25 @@
 ---
-title: 'Texturing and UV Mapping'
-slug: 'texturing-uv-mapping'
+title: Texturing and UV Mapping
+slug: texturing-uv-mapping
 type: 'oer:LearningComponent'
-description: 'Learn how to unwrap 3D models and apply textures through proper UV mapping techniques and material creation workflows.'
-estimatedDuration: '4 hours'
+description: >-
+  Learn how to unwrap 3D models and apply textures through proper UV mapping
+  techniques and material creation workflows.
+estimatedDuration: 4 hours
 learningObjectives:
-  - 'Understand UV coordinate systems'
-  - 'Create efficient UV layouts'
-  - 'Apply textures to 3D models'
-  - 'Create and configure PBR materials'
-  - 'Minimize texture stretching and distortion'
+  - Understand UV coordinate systems
+  - Create efficient UV layouts
+  - Apply textures to 3D models
+  - Create and configure PBR materials
+  - Minimize texture stretching and distortion
 items:
   - type: lectures
-    slug: introduction-to-texturing
+    __typename: lectures
+    lecture: introduction-to-texturing
 published: true
-license: 'CC BY 4.0'
-version: '1.0.0'
-versionStatus: 'latest'
+license: CC BY 4.0
+version: 1.0.0
+versionStatus: latest
 publishEmbed: true
 ---
 

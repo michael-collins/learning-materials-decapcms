@@ -4,7 +4,7 @@ backend:
   branch: main
 
 # Uncomment below for local testing
-# local_backend: true
+local_backend: true
 
 # Enable editorial workflow (Draft -> In Review -> Ready)
 publish_mode: editorial_workflow
@@ -393,12 +393,38 @@ collections:
         name: "items"
         widget: "list"
         required: false
-        hint: "Add and order content items (lectures, exercises, tutorials, articles, projects) for this lesson"
-        collapsed: true
-        fields:
-          - {label: "Type", name: "type", widget: "select", options: ["lectures", "tutorials", "exercises", "articles", "projects"]}
-          - {label: "Item Slug", name: "slug", widget: "string", hint: "Slug of the item to include"}
-          - {label: "Title", name: "title", widget: "string", required: false, hint: "Optional override title"}
+        hint: "Add and order content items"
+        types:
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "slug", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
       - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Author", name: "author", widget: "string", required: false}
