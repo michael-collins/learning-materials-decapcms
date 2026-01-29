@@ -29,12 +29,25 @@ jobs:
       - name: Detect version bumps
         id: detect-bumps
         run: |
+          # After merge, the PR head is now the merged commit on main
+          # We need to compare the merged commit against its parent
+          CURRENT_SHA=$(git rev-parse HEAD)
+          PREVIOUS_SHA=$(git rev-parse HEAD~1)
+          
+          echo "Current commit: $CURRENT_SHA"
+          echo "Previous commit: $PREVIOUS_SHA"
+          
           # Get the list of changed files in this PR
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- 'content/**/index.md' || echo "")
+          CHANGED_FILES=$(git diff --name-only $PREVIOUS_SHA..$CURRENT_SHA -- 'content/**/index.md' 2>&1 || echo "")
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          echo "---"
           
           VERSION_BUMPED=false
           
           if [ -z "$CHANGED_FILES" ]; then
+            echo "No changed content files detected"
             echo "version-bumped=false" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -45,11 +58,15 @@ jobs:
               continue
             fi
             
-            # Extract version from new version (merged)
-            NEW_VERSION=$(git show ${{ github.event.pull_request.head.sha }}:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/version: *"//' | sed 's/".*//' | sed "s/version: *'//" | sed "s/'.*//")
+            echo "Processing: $file"
             
-            # Extract version from old version (before merge)
-            OLD_VERSION=$(git show ${{ github.event.pull_request.base.sha }}:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/version: *"//' | sed 's/".*//' | sed "s/version: *'//" | sed "s/'.*//") || OLD_VERSION=""
+            # Extract version from new version (current)
+            NEW_VERSION=$(git show $CURRENT_SHA:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/^version: *"//' | sed 's/".*//' | sed "s/^version: *'//" | sed "s/'.*//")
+            echo "  New version: [$NEW_VERSION]"
+            
+            # Extract version from old version (previous)
+            OLD_VERSION=$(git show $PREVIOUS_SHA:"$file" 2>/dev/null | grep "^version:" | head -1 | sed 's/^version: *"//' | sed 's/".*//' | sed "s/^version: *'//" | sed "s/'.*//") || OLD_VERSION=""
+            echo "  Old version: [$OLD_VERSION]"
             
             # Check if version changed
             if [ ! -z "$NEW_VERSION" ] && [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
@@ -58,9 +75,13 @@ jobs:
             elif [ ! -z "$NEW_VERSION" ] && [ -z "$OLD_VERSION" ]; then
               echo "✓ Version added in $file: $NEW_VERSION"
               VERSION_BUMPED=true
+            else
+              echo "✗ No version change in $file"
             fi
           done <<< "$CHANGED_FILES"
           
+          echo ""
+          echo "Final result: VERSION_BUMPED=$VERSION_BUMPED"
           echo "version-bumped=$VERSION_BUMPED" >> $GITHUB_OUTPUT
 
   create-versions:
@@ -92,13 +113,16 @@ jobs:
       - name: Check for new version files
         id: check-versions
         run: |
-          if git status --porcelain | grep -E '^.*v/[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null; then
+          # Check if any v/*.md files were created or modified
+          if git diff origin/main --name-only | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$' > /dev/null 2>&1; then
             echo "has-versions=true" >> $GITHUB_OUTPUT
             echo "Version files detected:"
-            git status --porcelain
+            git diff origin/main --name-only | grep -E 'content/.*/v/[0-9]+\.[0-9]+\.[0-9]+\.md$'
           else
             echo "has-versions=false" >> $GITHUB_OUTPUT
             echo "No new version files created"
+            echo "Git diff output:"
+            git diff origin/main --name-only | grep 'v/' || echo "No v/ files in diff"
           fi
 
       - name: Commit and push version snapshots
