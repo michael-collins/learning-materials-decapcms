@@ -12,7 +12,7 @@ published: true
 date: 2026-01-28
 allowEmbed: true
 changelog: Working version for future edits
-version: 3.0.0
+version: 3.1.0
 ---
 # 3D Model Viewer Test Page
 
