@@ -1,68 +1,46 @@
 {
-  "animation-basics-example": {
-    "latest": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "publishedAt": "2026-01-28T00:00:00Z",
-        "status": "published",
-        "changelog": "Initial release",
-        "breakingChanges": []
-      }
-    }
-  },
-  "animated-textures": {
-    "latest": "1.0.0",
-    "versions": {
-      "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.031Z",
-        "status": "archived",
-        "changelog": "Initial release with version control",
-        "breakingChanges": []
-      }
-    }
-  },
   "3d-viewer-test": {
     "latest": "3.2.0",
     "versions": {
-      "2.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.027Z",
+      "3.2.0": {
+        "publishedAt": "2026-01-29T06:18:05.592Z",
+        "status": "latest",
+        "changelog": "Working version for future edits",
+        "breakingChanges": []
+      },
+      "1.0.0": {
+        "publishedAt": "2026-01-29T06:18:05.599Z",
         "status": "archived",
-        "changelog": "Updated example content",
+        "changelog": "Initial version of 3D Model Viewer Test",
         "breakingChanges": []
       },
       "2.6.0": {
-        "publishedAt": "2026-01-29T04:38:47.638Z",
+        "publishedAt": "2026-01-29T06:18:05.600Z",
         "status": "archived",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       },
       "2.7.0": {
-        "publishedAt": "2026-01-29T04:54:06.115Z",
+        "publishedAt": "2026-01-29T06:18:05.600Z",
         "status": "archived",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       },
       "2.8.0": {
-        "publishedAt": "2026-01-29T05:00:08.957Z",
+        "publishedAt": "2026-01-29T06:18:05.601Z",
         "status": "archived",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       },
       "2.9.0": {
-        "publishedAt": "2026-01-29T05:50:41.130Z",
+        "publishedAt": "2026-01-29T06:18:05.601Z",
         "status": "archived",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       },
       "3.1.0": {
-        "publishedAt": "2026-01-29T05:59:07.908Z",
+        "publishedAt": "2026-01-29T06:18:05.601Z",
         "status": "archived",
-        "changelog": "Working version for future edits",
-        "breakingChanges": []
-      },
-      "3.2.0": {
-        "publishedAt": "2026-01-29T05:59:07.908Z",
-        "status": "latest",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       }
@@ -72,9 +50,20 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.029Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.602Z",
+        "status": "latest",
         "changelog": "",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animated-textures": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-29T06:18:05.603Z",
+        "status": "latest",
+        "changelog": "Initial release with version control",
         "breakingChanges": []
       }
     }
@@ -83,8 +72,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.033Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.604Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -94,8 +83,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.033Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.605Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -105,8 +94,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.035Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.606Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -116,8 +105,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.036Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.607Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -127,8 +116,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.066Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.635Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -138,8 +127,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.037Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.609Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -149,8 +138,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.039Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.610Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -160,8 +149,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.039Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.611Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -171,8 +160,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.040Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.612Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -182,8 +171,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.041Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.613Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -193,8 +182,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.042Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.614Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -204,8 +193,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.043Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.615Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -215,8 +204,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.044Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.615Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -226,8 +215,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.044Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.616Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -237,8 +226,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.045Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.616Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -248,8 +237,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.046Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.617Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -259,8 +248,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.047Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.618Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -270,8 +259,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.047Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.619Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -281,8 +270,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.048Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.619Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -292,8 +281,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.049Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.620Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -303,8 +292,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.050Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.621Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -314,8 +303,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.051Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.621Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -325,8 +314,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.052Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.622Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -336,8 +325,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.052Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.622Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -347,8 +336,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.053Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.623Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -358,8 +347,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.054Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.623Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -369,30 +358,18 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.055Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.624Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
     }
   },
   "rendering-random-objects": {
-    "latest": "1.0.3",
+    "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T05:50:41.149Z",
-        "status": "archived",
-        "changelog": "",
-        "breakingChanges": []
-      },
-      "1.0.2": {
-        "publishedAt": "2026-01-29T05:59:07.928Z",
-        "status": "archived",
-        "changelog": "",
-        "breakingChanges": []
-      },
-      "1.0.3": {
-        "publishedAt": "2026-01-29T05:59:07.928Z",
+        "publishedAt": "2026-01-29T06:18:05.625Z",
         "status": "latest",
         "changelog": "",
         "breakingChanges": []
@@ -403,8 +380,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.056Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.626Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -414,8 +391,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.056Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.626Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -425,8 +402,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.057Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.627Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -436,8 +413,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.058Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.627Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -447,8 +424,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.059Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.628Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -458,8 +435,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.060Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.629Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -469,8 +446,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.060Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.629Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -480,8 +457,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.061Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.630Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -491,8 +468,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.062Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.631Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -502,8 +479,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.062Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.631Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -513,8 +490,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.063Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.632Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -524,8 +501,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.064Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.632Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -535,8 +512,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.064Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.634Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -546,8 +523,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.065Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.634Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -557,8 +534,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.068Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.637Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -568,8 +545,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.069Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.638Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -579,8 +556,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.070Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.639Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -590,8 +567,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.071Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.641Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -601,8 +578,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.071Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.641Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -612,8 +589,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.072Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.642Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -623,8 +600,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.073Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.643Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
@@ -634,8 +611,8 @@
     "latest": "1.0.0",
     "versions": {
       "1.0.0": {
-        "publishedAt": "2026-01-29T03:35:16.073Z",
-        "status": "archived",
+        "publishedAt": "2026-01-29T06:18:05.644Z",
+        "status": "latest",
         "changelog": "",
         "breakingChanges": []
       }
