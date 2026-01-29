@@ -1,4 +1,7 @@
 ---
+breakingChanges: []
+versionStatus: latest
+publishEmbed: true
 title: 3D Model Viewer Test
 slug: 3d-viewer-test
 type: oer:Practice
@@ -6,13 +9,10 @@ difficulty: Beginner
 rubric: exercise
 author: Michael Collins
 published: true
-allowEmbed: true
-version: "2.1.0"
-versionStatus: latest
-publishEmbed: true
-changelog: "Working version for future edits"
-breakingChanges: []
 date: 2026-01-28
+allowEmbed: true
+changelog: Working version for future edits
+version: 2.2.0
 ---
 # 3D Model Viewer Test Page
 
