@@ -7,22 +7,28 @@ definePageMeta({
 
 // Get the article path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
-const articlePath = `/articles/${slug.join('/')}`
+const slugString = slug.join('/')
 
-const { data: article, pending } = await useAsyncData(
-  `article-${articlePath}`,
-  () => queryCollection('articles').path(articlePath).first()
-)
+// Use versioned embed composable
+const { content: article, versionParam, currentVersion, latestVersion, isOutdated, pending } = useVersionedEmbed('articles', slugString)
 </script>
 
 <template>
   <div>
-    <div v-if="pending" class="container py-8">
-      <div class="flex justify-center items-center min-h-[300px]">
-        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+    <!-- Version notice banner -->
+    <div v-if="isOutdated && currentVersion && latestVersion" 
+         class="bg-amber-50 border-b border-amber-200 px-4 py-3 text-sm">
+      <div class="container mx-auto flex items-center justify-between">
+        <span class="text-amber-800">
+          📌 Using version {{ currentVersion }}. 
+          <a :href="`?version=latest`" class="underline font-medium hover:text-amber-900">
+            Upgrade to {{ latestVersion }} →
+          </a>
+        </span>
       </div>
     </div>
-    <div v-else-if="article" key="article-content">
+    
+    <div v-if="article" key="article-content">
       <CollectionItem
         :breadcrumbs="[]"
         :title="article.title"
@@ -34,6 +40,7 @@ const { data: article, pending } = await useAsyncData(
         :imageAlt="article.imageAlt"
         :tags="article.tags"
         :attachments="article.attachments"
+        :versionStatus="article.versionStatus"
       >
         <ContentRenderer :value="article" />
       </CollectionItem>
@@ -41,6 +48,7 @@ const { data: article, pending } = await useAsyncData(
     <div v-else class="container py-8">
       <div class="text-center">
         <h1 class="text-2xl font-bold mb-4">Article not found</h1>
+        <p class="text-gray-600">The requested article{{ versionParam ? ` (version ${versionParam})` : '' }} could not be found.</p>
       </div>
     </div>
   </div>

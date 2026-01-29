@@ -6,3 +6,19 @@
 
 # Specific collections (optional - can add more granular rules)
 /content/** @michael-collins
+
+# CRITICAL: Versioned/archived content files require extra scrutiny
+# These are immutable snapshots that users may be embedding
+content/exercises/**/v*.md @michael-collins
+content/tutorials/**/v*.md @michael-collins
+content/lectures/**/v*.md @michael-collins
+content/articles/**/v*.md @michael-collins
+content/projects/**/v*.md @michael-collins
+
+# Version registry requires admin review
+content/data/*-versions.json @michael-collins
+
+# Version management scripts require admin review
+scripts/create-version-snapshot.js @michael-collins
+scripts/check-version-edits.js @michael-collins
+scripts/validate-version-integrity.js @michael-collins

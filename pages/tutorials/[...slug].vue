@@ -1,16 +1,26 @@
 <script setup>
 const route = useRoute()
 const isEmbed = computed(() => route.query.embed === 'true')
+const versionParam = route.query.version
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
 definePageMeta({
   layout: false
 })
 
-const tutorialPath = `/tutorials/${route.params.slug.join('/')}`
+const baseSlug = route.params.slug.join('/')
 
-const { data: tutorial, pending } = await useAsyncData(`tutorial-${tutorialPath}`, () =>
-  queryCollection('tutorials').path(tutorialPath).first()
-)
+const { data: tutorial, pending } = await useAsyncData(`tutorial-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/tutorials/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('tutorials').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('tutorials').path(`/tutorials/${baseSlug}`).first()
+})
 
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
@@ -37,6 +47,8 @@ const breadcrumbs = computed(() => [
         :license="tutorial.license"
         :allowEmbed="isEmbed ? false : tutorial.allowEmbed"
         :attachments="tutorial.attachments"
+        :versionStatus="tutorial.versionStatus"
+        :version="displayVersion"
       >
         <ContentRenderer :value="tutorial" />
       </CollectionItem>

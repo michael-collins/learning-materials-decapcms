@@ -9,7 +9,17 @@ const { data: projects, pending } = await useAsyncData('projects', () =>
 
 const sortedProjects = computed(() => {
   if (!projects.value) return []
-  return [...projects.value].sort((a, b) => a.title.localeCompare(b.title))
+  
+  // Filter to only show the latest version of each item
+  const filtered = projects.value.filter(item => {
+    const pathParts = item._path?.split('/').filter(Boolean) || []
+    const filename = pathParts[pathParts.length - 1] || ''
+    const isVersionFile = filename.match(/^v\d+\.\d+\.\d+$/)
+    const isArchivedVersion = item.versionStatus === 'archived'
+    return !isVersionFile && !isArchivedVersion
+  })
+  
+  return [...filtered].sort((a, b) => a.title.localeCompare(b.title))
 })
 </script>
 

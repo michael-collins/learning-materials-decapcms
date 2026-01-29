@@ -10,11 +10,21 @@ definePageMeta({
 
 // Get the lesson path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
-const lessonPath = `/lessons/${slug.join('/')}`
+const baseSlug = slug.join('/');
+const versionParam = route.query.version;
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
-const { data: lesson, pending } = await useAsyncData(`lesson-${lessonPath}`, () =>
-  queryCollection('lessons').path(lessonPath).first()
-)
+const { data: lesson, pending } = await useAsyncData(`lesson-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/lessons/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('lessons').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('lessons').path(`/lessons/${baseSlug}`).first()
+})
 
 // Fetch related specialization if available
 const { data: specialization } = await useAsyncData(
@@ -130,6 +140,7 @@ const oerSchema = computed(() => {
         :image="lesson.image"
         :imageAlt="lesson.imageAlt"
         :tags="lesson.tags"
+        :versionStatus="lesson.versionStatus"
       >
         <template #metadata>
           <div class="flex flex-wrap gap-4 text-sm">

@@ -4,7 +4,7 @@ import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
 import BreadcrumbSeparator from '~/components/ui/breadcrumb/BreadcrumbSeparator.vue'
-import { Download, ExternalLink, FileText, FileArchive, File, Copy, Check, ChevronDown } from 'lucide-vue-next'
+import { Download, ExternalLink, FileText, FileArchive, File, Copy, Check, ChevronDown, Pencil } from 'lucide-vue-next'
 import Button from '~/components/ui/button/Button.vue'
 
 interface BreadcrumbSegment {
@@ -33,9 +33,13 @@ interface Props {
   image?: string
   imageAlt?: string
   tags?: string[]
+  versionStatus?: string
+  version?: string
 }
 
 const props = defineProps<Props>()
+
+console.log('[CollectionItem] Props received:', { title: props.title, versionStatus: props.versionStatus })
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -86,8 +90,49 @@ const currentUrl = computed(() => {
   return route.path
 })
 
+const isEmbed = computed(() => route.query.embed === 'true')
+
+const shouldShowRubric = computed(() => {
+  // Show rubric unless hideRubric query param is set
+  return route.query.hideRubric !== 'true'
+})
+
+const shouldShowAILicense = computed(() => {
+  // Show AI license unless hideAILicense query param is set
+  return route.query.hideAILicense !== 'true'
+})
+
+const getDecapEditUrl = computed(() => {
+  // Don't show edit link in embed mode
+  if (isEmbed.value) return null
+  
+  // Extract collection type and slug from the route path
+  const pathParts = route.path.split('/').filter(Boolean)
+  if (pathParts.length >= 2) {
+    const collection = pathParts[0] // e.g., 'exercises', 'lectures', 'tutorials'
+    const slug = pathParts.slice(1).join('/') // e.g., 'some-exercise'
+    return `/admin/#/collections/${collection}/${slug}`
+  }
+  return null
+})
+
+const getContentTypeAndSlug = computed(() => {
+  const pathParts = route.path.split('/').filter(Boolean)
+  if (pathParts.length >= 2) {
+    const contentType = pathParts[0] as 'exercises' | 'tutorials' | 'articles' | 'projects' | 'lectures' | 'lessons'
+    const slug = pathParts.slice(1).join('/')
+    return { contentType, slug }
+  }
+  return null
+})
+
 const isEmbedOpen = ref(false)
 const isCopied = ref(false)
+const isCitationCopied = ref(false)
+const isEmbedConfigOpen = ref(false)
+const isEmbedPreviewOpen = ref(false)
+const embedShowRubric = ref(true)
+const embedShowAILicense = ref(true)
 
 const embedUrl = computed(() => {
   if (typeof window === 'undefined') return ''
@@ -95,7 +140,16 @@ const embedUrl = computed(() => {
   const embedPath = route.path.startsWith('/') 
     ? `/embed${route.path}` 
     : `/embed/${route.path}`
-  return `${window.location.origin}${embedPath}`
+  
+  // Add query parameters for config options
+  const params = new URLSearchParams()
+  if (!embedShowRubric.value) params.append('hideRubric', 'true')
+  if (!embedShowAILicense.value) params.append('hideAILicense', 'true')
+  
+  const queryString = params.toString()
+  const fullPath = queryString ? `${embedPath}?${queryString}` : embedPath
+  
+  return `${window.location.origin}${fullPath}`
 })
 
 const embedCode = computed(() => {
@@ -113,12 +167,132 @@ const copyEmbedCode = async () => {
     console.error('Failed to copy:', err)
   }
 }
+
+const exportCommonCartridge = async () => {
+  try {
+    // Extract slug from route path
+    const pathParts = route.path.split('/').filter(Boolean)
+    if (pathParts.length < 2) return
+    
+    const slug = pathParts.slice(1).join('/')
+    const response = await fetch(`/api/export-common-cartridge?slug=${slug}`)
+    if (!response.ok) throw new Error('Export failed')
+    
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${slug}-cartridge.zip`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  } catch (error) {
+    console.error('Failed to export Common Cartridge:', error)
+  }
+}
+
+const generateCitation = () => {
+  const currentYear = new Date().getFullYear()
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const accessDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  
+  // Generate APA-style citation
+  let citation = ''
+  
+  if (props.author) {
+    citation += `${props.author}. `
+  }
+  
+  if (props.date) {
+    const year = new Date(props.date).getFullYear()
+    citation += `(${year}). `
+  } else {
+    citation += `(n.d.). `
+  }
+  
+  citation += `${props.title}. `
+  
+  if (props.license) {
+    citation += `[${props.license}]. `
+  }
+  
+  citation += `Retrieved ${accessDate}, from ${pageUrl}`
+  
+  return citation
+}
+
+const copyCitation = async () => {
+  try {
+    const citation = generateCitation()
+    await navigator.clipboard.writeText(citation)
+    isCitationCopied.value = true
+    setTimeout(() => {
+      isCitationCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy citation:', err)
+  }
+}
 </script>
 
 <template>
   <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
     <article>
       <header class="mb-8 pb-8" :class="{ 'border-b': breadcrumbs.length > 0 }">
+        <!-- More menu dropdown -->
+        <div v-if="!isEmbed" class="flex justify-end mb-4">
+          <div class="relative group">
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="More options"
+            >
+              <ChevronDown class="w-5 h-5 text-foreground" />
+            </Button>
+            <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <!-- Edit button -->
+              <a
+                v-if="getDecapEditUrl"
+                :href="getDecapEditUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
+                @click.stop
+              >
+                <Pencil class="w-4 h-4" />
+                Edit page
+              </a>
+              <div v-if="getDecapEditUrl" class="h-px bg-border" />
+              
+              <!-- Versions submenu -->
+              <VersionsDropdown 
+                v-if="getContentTypeAndSlug"
+                :content-type="getContentTypeAndSlug.contentType"
+                :slug="getContentTypeAndSlug.slug"
+                :current-version="undefined"
+              />
+              <div class="h-px bg-border" />
+              
+              <button
+                @click.stop="copyCitation"
+                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+              >
+                <Copy class="w-4 h-4" />
+                Copy page citation
+              </button>
+              <div class="h-px bg-border" />
+              <button
+                @click.stop="exportCommonCartridge"
+                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"
+              >
+                <Download class="w-4 h-4" />
+                Export Common Cartridge
+              </button>
+            </div>
+          </div>
+        </div>
+        
         <NuxtImg
           v-if="image"
           :src="image"
@@ -127,7 +301,15 @@ const copyEmbedCode = async () => {
           loading="eager"
         />
         
-        <h1 class="text-4xl font-bold tracking-tight mb-4">{{ title }}</h1>
+        <h1 class="text-4xl font-bold tracking-tight mb-4 flex items-center gap-3">
+          {{ title }}
+          <span
+            v-if="versionStatus === 'archived' && !version"
+            class="inline-flex items-center rounded-full bg-warning/10 border border-warning/20 px-3 py-1 text-xs font-semibold text-warning"
+          >
+            Archived
+          </span>
+        </h1>
         
         <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <div v-if="date" class="flex items-center gap-2">
@@ -233,38 +415,88 @@ const copyEmbedCode = async () => {
             :class="['w-5 h-5 text-muted-foreground transition-transform', isEmbedOpen ? 'rotate-180' : '']"
           />
         </button>
-        <div v-if="isEmbedOpen" class="mt-6 space-y-4">
-          <p class="text-sm text-muted-foreground">
-            Copy the code below to embed this content on your website:
-          </p>
-          <div class="relative">
-            <pre class="p-4 bg-muted dark:bg-[#0a0a0a] rounded-lg border border-border overflow-x-auto text-sm"><code>{{ embedCode }}</code></pre>
-            <Button
-              @click="copyEmbedCode"
-              size="sm"
-              variant="outline"
-              class="absolute top-2 right-2"
+        <div v-if="isEmbedOpen" class="mt-6 space-y-6">
+          <!-- Configuration Section -->
+          <div class="border border-border rounded-lg">
+            <button
+              @click="isEmbedConfigOpen = !isEmbedConfigOpen"
+              class="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors rounded-t-lg"
+              :aria-label="isEmbedConfigOpen ? 'Hide embed configuration' : 'Show embed configuration'"
+              :aria-expanded="isEmbedConfigOpen"
             >
-              <Check v-if="isCopied" class="w-4 h-4 mr-2" />
-              <Copy v-else class="w-4 h-4 mr-2" />
-              {{ isCopied ? 'Copied!' : 'Copy' }}
-            </Button>
+              <h3 class="text-sm font-semibold text-foreground">Configuration</h3>
+              <ChevronDown
+                :class="['w-4 h-4 text-muted-foreground transition-transform', isEmbedConfigOpen ? 'rotate-180' : '']"
+              />
+            </button>
+            <div v-if="isEmbedConfigOpen" class="px-4 py-3 border-t border-border space-y-3">
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  v-model="embedShowRubric"
+                  class="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <span class="text-sm text-foreground">Display rubric</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  v-model="embedShowAILicense"
+                  class="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <span class="text-sm text-foreground">Display AI license</span>
+              </label>
+            </div>
           </div>
-          <div class="mt-4">
-            <p class="text-xs text-muted-foreground mb-2">Preview:</p>
-            <div class="border border-border rounded-lg p-2 bg-muted/30">
-              <iframe
-                :src="embedUrl"
-                class="w-full h-96 rounded"
-                frameborder="0"
-              ></iframe>
+
+          <!-- Embed Code -->
+          <div>
+            <p class="text-sm text-muted-foreground mb-3">
+              Copy the code below to embed this content on your website:
+            </p>
+            <div class="relative">
+              <pre class="p-4 bg-muted dark:bg-[#0a0a0a] rounded-lg border border-border overflow-x-auto text-sm"><code>{{ embedCode }}</code></pre>
+              <Button
+                @click="copyEmbedCode"
+                size="sm"
+                variant="outline"
+                class="absolute top-2 right-2"
+              >
+                <Check v-if="isCopied" class="w-4 h-4 mr-2" />
+                <Copy v-else class="w-4 h-4 mr-2" />
+                {{ isCopied ? 'Copied!' : 'Copy' }}
+              </Button>
+            </div>
+          </div>
+
+          <!-- Preview Section -->
+          <div class="border border-border rounded-lg">
+            <button
+              @click="isEmbedPreviewOpen = !isEmbedPreviewOpen"
+              class="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors rounded-t-lg"
+              :aria-label="isEmbedPreviewOpen ? 'Hide embed preview' : 'Show embed preview'"
+              :aria-expanded="isEmbedPreviewOpen"
+            >
+              <h3 class="text-sm font-semibold text-foreground">Preview</h3>
+              <ChevronDown
+                :class="['w-4 h-4 text-muted-foreground transition-transform', isEmbedPreviewOpen ? 'rotate-180' : '']"
+              />
+            </button>
+            <div v-if="isEmbedPreviewOpen" class="p-4 border-t border-border">
+              <div class="bg-muted/30 rounded-lg overflow-hidden">
+                <iframe
+                  :src="embedUrl"
+                  class="w-full h-96"
+                  frameborder="0"
+                ></iframe>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- AI Usage License (AIUL) -->
-      <AIULComponent v-if="aiLicense" :license="aiLicense" />
+      <AIULComponent v-if="aiLicense && shouldShowAILicense" :license="aiLicense" />
 
       <!-- Creative Commons License -->
       <div v-if="license" class="mt-12 pt-8 border-t">
@@ -277,6 +509,19 @@ const copyEmbedCode = async () => {
         </p>
       </div>
     </article>
+    
+    <!-- Citation copied toast -->
+    <Transition name="fade">
+      <div
+        v-if="isCitationCopied"
+        class="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50"
+        role="status"
+        aria-live="polite"
+      >
+        <Check class="w-4 h-4" />
+        <span class="text-sm font-medium">Citation copied to clipboard</span>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -299,5 +544,13 @@ const copyEmbedCode = async () => {
 :deep(.prose h6 a) {
   color: hsl(var(--foreground));
   text-decoration: none;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

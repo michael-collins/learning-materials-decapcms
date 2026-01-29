@@ -3,6 +3,8 @@ definePageMeta({
   layout: 'docs'
 })
 
+const route = useRoute()
+
 const { data: specializations, pending } = await useAsyncData('specializations', () =>
   queryCollection('specializations').all()
 )
@@ -36,7 +38,7 @@ const specializationsWithPreview = computed(() => {
   })
 })
 
-const selectedSlug = ref<string | null>(null)
+const { isModalOpen, currentModalSlug, openViewer, closeViewer } = useSpecializationModal()
 
 const deriveSlug = (item: any) => {
   if (item?.slug) return item.slug
@@ -47,13 +49,15 @@ const deriveSlug = (item: any) => {
   return null
 }
 
-const openViewer = (item: any) => {
-  selectedSlug.value = deriveSlug(item)
+const handleOpenViewer = (item: any) => {
+  const slug = deriveSlug(item)
+  if (slug) {
+    // Store the specializations page path
+    openViewer(slug, route.fullPath)
+  }
 }
 
-const closeViewer = () => {
-  selectedSlug.value = null
-}
+
 </script>
 
 <template>
@@ -64,12 +68,14 @@ const closeViewer = () => {
     :items-per-page="20"
     :loading="pending"
     :selectable="true"
-    @select="openViewer"
+    @select="handleOpenViewer"
   />
 
-  <SpecializationViewerModal
-    :open="!!selectedSlug"
-    :slug="selectedSlug"
-    @close="closeViewer"
-  />
+  <ClientOnly>
+    <SpecializationViewerModal
+      :open="isModalOpen"
+      :slug="currentModalSlug"
+      @close="() => closeViewer(true)"
+    />
+  </ClientOnly>
 </template>

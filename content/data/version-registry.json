@@ -1,0 +1,24 @@
+{
+  "animation-basics-example": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-28T00:00:00Z",
+        "status": "published",
+        "changelog": "Initial release",
+        "breakingChanges": []
+      }
+    }
+  },
+  "animated-textures": {
+    "latest": "1.0.0",
+    "versions": {
+      "1.0.0": {
+        "publishedAt": "2026-01-28T18:03:21.726Z",
+        "status": "archived",
+        "changelog": "Initial release with version control",
+        "breakingChanges": []
+      }
+    }
+  }
+}

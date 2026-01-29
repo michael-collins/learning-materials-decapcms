@@ -10,11 +10,21 @@ definePageMeta({
 
 // Get the project path
 const slug = Array.isArray(route.params.slug) ? route.params.slug : [route.params.slug]
-const projectPath = `/projects/${slug.join('/')}`
+const baseSlug = slug.join('/');
+const versionParam = route.query.version;
+const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
-const { data: project, pending } = await useAsyncData(`project-${projectPath}`, () =>
-  queryCollection('projects').path(projectPath).first()
-)
+const { data: project, pending } = await useAsyncData(`project-${baseSlug}-${versionParam || 'latest'}`, async () => {
+  // If version param is provided, try the versioned path first
+  if (versionParam) {
+    const versionedPath = `/projects/${baseSlug}/v${versionParam}`
+    const versioned = await queryCollection('projects').path(versionedPath).first()
+    if (versioned) return versioned
+  }
+  
+  // Fallback to latest (index)
+  return queryCollection('projects').path(`/projects/${baseSlug}`).first()
+})
 
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
@@ -53,7 +63,7 @@ const oerSchema = computed(() => {
         :imageAlt="project.imageAlt"
         :tags="project.tags"
         :attachments="project.attachments"
-      >
+        :versionStatus="project.versionStatus"        :version="displayVersion"      >
         <ContentRenderer :value="project" />
       </CollectionItem>
     </div>

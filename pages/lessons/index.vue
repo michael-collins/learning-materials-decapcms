@@ -25,7 +25,17 @@ const itemsPerPage = 20
 
 const sortedLessons = computed(() => {
   if (!lessons.value) return []
-  return [...lessons.value].sort((a, b) => {
+  
+  // Filter to only show the latest version of each item
+  const filtered = lessons.value.filter(item => {
+    const pathParts = item._path?.split('/').filter(Boolean) || []
+    const filename = pathParts[pathParts.length - 1] || ''
+    const isVersionFile = filename.match(/^v\d+\.\d+\.\d+$/)
+    const isArchivedVersion = item.versionStatus === 'archived'
+    return !isVersionFile && !isArchivedVersion
+  })
+  
+  return [...filtered].sort((a, b) => {
     // Sort by specialization first, then by order
     if (a.specialization !== b.specialization) {
       return (a.specialization || '').localeCompare(b.specialization || '')
@@ -36,9 +46,9 @@ const sortedLessons = computed(() => {
 
 // Get unique specializations
 const specializations = computed(() => {
-  if (!lessons.value) return []
+  if (!sortedLessons.value) return []
   const specs = new Set<string>()
-  lessons.value.forEach(lesson => {
+  sortedLessons.value.forEach(lesson => {
     if (lesson.specialization) {
       specs.add(lesson.specialization)
     }
