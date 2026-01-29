@@ -125,6 +125,7 @@ jobs:
 
       - name: Create pull request
         if: steps.check-versions.outputs.has-versions == 'true'
+        id: create-pr
         run: |
           # Create PR body content
           PR_BODY="🤖 Automated version snapshot creation
@@ -140,11 +141,21 @@ jobs:
           
           **Note:** This PR can be safely merged. Version files are immutable snapshots."
           
-          gh pr create \
+          PR_URL=$(gh pr create \
             --base main \
             --head "${{ env.branch }}" \
             --title "chore: auto-create content version snapshots" \
-            --body "$PR_BODY"
+            --body "$PR_BODY")
+          
+          echo "pr-url=$PR_URL" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+
+      - name: Enable auto-merge
+        if: steps.check-versions.outputs.has-versions == 'true'
+        run: |
+          # Enable auto-merge on the PR (will merge automatically when checks pass)
+          gh pr merge "${{ steps.create-pr.outputs.pr-url }}" --auto --squash
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
 
@@ -154,8 +165,10 @@ jobs:
           echo "## Version Snapshot Summary" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.check-versions.outputs.has-versions }}" = "true" ]; then
             echo "✓ Pull request created with new version files" >> $GITHUB_STEP_SUMMARY
+            echo "✓ Auto-merge enabled - PR will merge automatically when checks pass" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Branch:** \`${{ env.branch }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "**PR:** ${{ steps.create-pr.outputs.pr-url }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Files created:**" >> $GITHUB_STEP_SUMMARY
             git diff origin/main --name-only | grep -E 'v/[0-9]+\.[0-9]+\.[0-9]+\.md$' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY || echo "- (checking...)" >> $GITHUB_STEP_SUMMARY
