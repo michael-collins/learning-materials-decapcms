@@ -66,29 +66,37 @@ for (const type of contentTypes) {
       const content = fs.readFileSync(indexPath, 'utf-8');
       const { data: frontmatter, content: markdown } = matter(content);
 
-      // Only create snapshot if version is set
-      if (!frontmatter.version) {
-        console.log(`   ⊘ ${folder}/index.md - No version field, skipping`);
-        return;
-      }
-
-      const version = frontmatter.version;
+      // Get current version and previous version from registry
+      const currentVersion = frontmatter.version;
       const slug = folder;
-      const versionDir = path.join(typeDir, folder, 'v');
-
-      // Check if we need to create a snapshot (version changed)
       const previousVersion = registry[slug]?.latest;
-      
-      // Only create snapshot if version has changed from what's in registry
-      if (previousVersion && previousVersion === version) {
-        console.log(`   − ${folder}/index.md v${version} (no version change detected)`);
+
+      // Check if version field is missing
+      if (!currentVersion) {
+        if (previousVersion) {
+          console.log(`   ⚠️  ${folder}/index.md - Version field removed (was ${previousVersion}), please restore it`);
+        } else {
+          console.log(`   ⊘ ${folder}/index.md - No version field, skipping`);
+        }
         return;
       }
 
-      // If there was a previous version, create a snapshot of it
-      if (previousVersion) {
-        const snapshotFileName = `${previousVersion}.md`;
+      // Check if version has changed from registry
+      if (previousVersion && previousVersion === currentVersion) {
+        console.log(`   − ${folder}/index.md v${currentVersion} (no version change detected)`);
+        return;
+      }
+
+      const versionDir = path.join(typeDir, folder, 'v');
+      
+      // Determine which version to snapshot (previous or default 0.0.1 for new content)
+      const versionToSnapshot = previousVersion || '0.0.1';
+
+      // If there's a version change (or new content with version), archive the previous version
+      if (!previousVersion || (previousVersion && previousVersion !== currentVersion)) {
+        const snapshotFileName = `${versionToSnapshot}.md`;
         const snapshotPath = path.join(versionDir, snapshotFileName);
+
 
         // Check if snapshot of previous version already exists
         if (!fs.existsSync(snapshotPath)) {
@@ -100,7 +108,7 @@ for (const type of contentTypes) {
           // Create snapshot with modified frontmatter (archiving the previous version)
           const snapshotFrontmatter = {
             ...frontmatter,
-            version: previousVersion,
+            version: versionToSnapshot,
             versionStatus: 'archived',
             publishEmbed: true,
             _snapshotCreatedAt: new Date().toISOString(),
@@ -110,18 +118,21 @@ for (const type of contentTypes) {
           const snapshotContent = matter.stringify(markdown, snapshotFrontmatter);
           fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
 
-          console.log(`   ✓ ${folder}/index.md v${previousVersion} → v/${snapshotFileName} (archived previous version)`);
+          const actionText = previousVersion 
+            ? `archived previous version` 
+            : `initialized with default version`;
+          console.log(`   ✓ ${folder}/index.md v${currentVersion} → v/${snapshotFileName} (${actionText})`);
           snapshotsCreated++;
 
           // Update registry with archived version
           if (!registry[slug]) {
             registry[slug] = {
-              latest: version,
+              latest: currentVersion,
               versions: {}
             };
           }
 
-          registry[slug].versions[previousVersion] = {
+          registry[slug].versions[versionToSnapshot] = {
             publishedAt: new Date().toISOString(),
             status: 'archived',
             changelog: frontmatter.changelog || '',
@@ -133,20 +144,20 @@ for (const type of contentTypes) {
       // Update registry with new latest version
       if (!registry[slug]) {
         registry[slug] = {
-          latest: version,
+          latest: currentVersion,
           versions: {}
         };
       }
 
-      registry[slug].latest = version;
-      registry[slug].versions[version] = {
+      registry[slug].latest = currentVersion;
+      registry[slug].versions[currentVersion] = {
         publishedAt: new Date().toISOString(),
         status: 'latest',
         changelog: frontmatter.changelog || '',
         breakingChanges: frontmatter.breakingChanges || []
       };
 
-      console.log(`   ✓ ${folder}/index.md v${version} (new latest)`);
+      console.log(`   ✓ ${folder}/index.md v${currentVersion} (new latest)`);
 
 
     } catch (error) {
