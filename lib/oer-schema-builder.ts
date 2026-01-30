@@ -739,22 +739,6 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
   // Duration (PT45M is a common default for lecture slides)
   schema.duration = 'PT45M';
   
-  // About/topics - extract from markdown body if available
-  if (doc.body) {
-    const topicsSection = doc.body.match(/## Topics Covered\n\n([\s\S]*?)(?=\n##|\Z)/);
-    if (topicsSection && topicsSection[1]) {
-      const topics = topicsSection[1]
-        .split('\n')
-        .filter((line: string) => line.trim().startsWith('-'))
-        .map((line: string) => line.trim().substring(1).trim())
-        .filter((line: string) => line.length > 0);
-      
-      if (topics.length > 0) {
-        schema.about = topics;
-      }
-    }
-  }
-  
   return schema;
 }
 /**
