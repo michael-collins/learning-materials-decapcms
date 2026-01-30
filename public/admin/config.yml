@@ -149,7 +149,6 @@ collections:
       - {label: "Version Status", name: "versionStatus", widget: "select", options: ["latest", "archived", "deprecated"], default: "latest", required: false}
       - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
       - {label: "Body", name: "body", widget: "markdown"}
-      - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
         widget: "list"
