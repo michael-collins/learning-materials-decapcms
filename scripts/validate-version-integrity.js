@@ -11,7 +11,7 @@ import { glob } from 'glob';
 import matter from 'gray-matter';
 import crypto from 'crypto';
 
-const contentTypes = ['exercises', 'tutorials', 'lectures', 'articles', 'projects'];
+const contentTypes = ['exercises', 'tutorials', 'lectures', 'articles', 'projects', 'lessons', 'pathways', 'specializations'];
 const errors = [];
 const warnings = [];
 
