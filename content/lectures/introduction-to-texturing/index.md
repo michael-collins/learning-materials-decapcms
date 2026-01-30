@@ -12,11 +12,7 @@ publishEmbed: true
 
 ## Presentation
 
-::google-slides-component
----
-id: 2PACX-1vTkzHEnQyXV6Fs5q3E_H1P0QwrWdhlFd6t-uePHf5mLug6Wr1A_54dHY2lYJgeZ6_oww2cFfpsmVm0v
-title: Introduction to Texturing
----
+::google-slides-component{id="2PACX-1vTkzHEnQyXV6Fs5q3E_H1P0QwrWdhlFd6t-uePHf5mLug6Wr1A_54dHY2lYJgeZ6_oww2cFfpsmVm0v" title="Introduction to Texturing"}
 ::
 
 
