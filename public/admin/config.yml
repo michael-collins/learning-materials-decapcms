@@ -310,8 +310,7 @@ collections:
       - {label: "Published", name: "published", widget: "boolean", default: true}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true, required: false}
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0)"}
-      - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
-      - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
+
       - label: "Attachments"
         name: "attachments"
         widget: "list"

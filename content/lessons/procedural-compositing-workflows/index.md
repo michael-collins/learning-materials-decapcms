@@ -11,10 +11,10 @@ learningObjectives:
   - 'Organize and document node graphs'
   - 'Create reusable compositing setups'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Learn procedural, node-based compositing workflows that provide flexibility and efficiency in post-production work.

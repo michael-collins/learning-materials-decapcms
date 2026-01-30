@@ -86,6 +86,13 @@ const oerSchema = computed(() => {
   const baseUrl = useRequestURL().origin
   return buildLearningComponentSchema(specialization.value, baseUrl)
 })
+
+// Embed section state
+const embedUrl = computed(() => {
+  if (typeof window === 'undefined') return ''
+  const baseUrl = window.location.origin
+  return `${baseUrl}/embed/specializations/${baseSlug}`
+})
 </script>
 
 <template>
@@ -96,6 +103,7 @@ const oerSchema = computed(() => {
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     </div>    <div v-if="specialization">
+      <!-- CollectionItem wrapper with title/edit menu/breadcrumbs -->
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="specialization.title"
@@ -104,6 +112,7 @@ const oerSchema = computed(() => {
         :imageAlt="specialization.imageAlt"
         :versionStatus="specialization.versionStatus"
         :version="displayVersion"
+        :allowEmbed="false"
       >
         <ContentRenderer :value="specialization" />
       </CollectionItem>
@@ -154,6 +163,11 @@ const oerSchema = computed(() => {
         <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
           <p class="text-muted-foreground">Lessons are being loaded...</p>
         </div>
+      </div>
+
+      <!-- Embed Section at Bottom -->
+      <div v-if="specialization.meta?.allowEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <EmbedSection :embed-url="embedUrl" :title="specialization.title" />
       </div>
     </div>
     <div v-else class="container py-8">

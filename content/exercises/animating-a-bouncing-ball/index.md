@@ -28,7 +28,6 @@ attachments:
     type: image/png
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, level 1 students will practice keyframe animation to animate a bouncing ball

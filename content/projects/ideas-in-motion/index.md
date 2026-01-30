@@ -38,7 +38,6 @@ attachments:
     type: application/pdf
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this project, you will apply creative 3D production workflows to develop a 30 second animation. You will pursue your own interests while balance solving for the project's theme.

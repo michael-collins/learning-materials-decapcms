@@ -95,7 +95,6 @@ content/exercises/
 title: "Animation Basics Exercise"
 version: "1.2.0"                    # Must match filename
 versionStatus: "archived"           # latest | archived | deprecated
-publishEmbed: true                  # If true, available for embedding
 changelog: "Fixed typo in step 3"   # What changed in this version
 breakingChanges: []                 # Array of breaking change descriptions
 ---
@@ -216,7 +215,7 @@ A: No. Once published, versions must remain available. You can mark them as `dep
 A: The integrity validation will fail in CI, and deployed sites may break user embeds. Don't do this.
 
 **Q: How do I deprecate a version?**
-A: Update the `versionStatus` to `deprecated` and optionally set `publishEmbed: false` to hide it from new embeds.
+A: Update the `versionStatus` to `deprecated`.
 
 ## Related Files
 

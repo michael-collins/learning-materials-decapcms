@@ -19,7 +19,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 changelog: Initial release with version control
 attachments:
   - title: Image Sequence Download

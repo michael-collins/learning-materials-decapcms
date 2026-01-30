@@ -11,10 +11,10 @@ learningObjectives:
   - 'Manage subdivision levels and detail'
   - 'Retopologize sculpts for animation'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Learn digital sculpting techniques for creating highly detailed organic models, characters, and illustrations with natural forms.

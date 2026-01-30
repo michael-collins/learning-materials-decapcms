@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will practice sculpting tools and workflows, as well as go through the process of retopology. You will end up with two models, a high resolution sculpt and a base mesh that will be ready for texturing.

@@ -36,7 +36,6 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 This foundational specialization introduces students to the core concepts and workflows of computer-generated imagery. Students will learn industry-standard terminology, basic 3D modeling techniques, and the principles of materials, lighting, and rendering that apply across all CGI disciplines.

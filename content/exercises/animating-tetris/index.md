@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, students will creatively interpret the game, Tetris created in 1984 by Alexey Pajitnov, into a 10 seconds or longer animation.

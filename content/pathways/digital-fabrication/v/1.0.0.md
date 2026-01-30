@@ -6,6 +6,7 @@ description: >-
   Utilizes 3D printing or CNC machining to create physical objects from digital
   designs.
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -24,7 +25,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 Utilizes 3D printing or CNC machining to create physical objects from digital designs.

@@ -62,7 +62,6 @@ async function updateVersionRegistry() {
 
       const version = frontmatter.version || '1.0.0'
       const versionStatus = frontmatter.versionStatus || 'latest'
-      const publishEmbed = frontmatter.publishEmbed !== undefined ? frontmatter.publishEmbed : true
 
       // Check if item already exists in registry
       if (!registry[item]) {

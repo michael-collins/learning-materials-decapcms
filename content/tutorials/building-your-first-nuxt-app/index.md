@@ -4,9 +4,9 @@ description: A step-by-step tutorial on creating a complete Nuxt application fro
 author: Learning Materials Team
 date: 2024-01-16
 difficulty: Beginner
+allowEmbed: true
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 # Building Your First Nuxt App

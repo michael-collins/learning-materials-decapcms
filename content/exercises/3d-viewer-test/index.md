@@ -1,7 +1,6 @@
 ---
 breakingChanges: []
 versionStatus: latest
-publishEmbed: true
 title: 3D Model Viewer Test
 difficulty: Beginner
 license: CC BY 4.0

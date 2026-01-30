@@ -11,10 +11,10 @@ learningObjectives:
   - 'Manage file sizes and quality'
   - 'Create delivery packages and documentation'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Learn proper export procedures and delivery workflows to ensure your composited work meets technical specifications and quality requirements.

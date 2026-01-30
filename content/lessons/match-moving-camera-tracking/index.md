@@ -11,10 +11,10 @@ learningObjectives:
   - 'Align CGI elements with footage'
   - 'Handle tracking challenges and errors'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Master camera tracking techniques to accurately match CGI cameras to live-action footage for seamless visual effects integration.

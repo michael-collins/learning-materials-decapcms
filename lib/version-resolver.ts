@@ -5,7 +5,6 @@ export interface VersionedContent extends ParsedContent {
   versionStatus?: 'latest' | 'archived' | 'deprecated'
   changelog?: string
   breakingChanges?: string[]
-  publishEmbed?: boolean
 }
 
 /**
@@ -29,7 +28,7 @@ export async function resolveContentVersion(
       const mainContent = await queryContent<VersionedContent>(`${type}/${slug}`)
         .findOne()
       
-      if (mainContent && mainContent.publishEmbed !== false) {
+      if (mainContent) {
         return mainContent
       }
     } catch (e) {
@@ -84,8 +83,7 @@ export async function getAvailableVersions(
   
   const versions = await queryContent<VersionedContent>(`${type}`)
     .where({ 
-      _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` },
-      publishEmbed: true 
+      _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` }
     })
     .sort({ version: -1 })
     .find()
@@ -118,8 +116,7 @@ export async function getLatestVersionNumber(
   // Check versioned files in v/ subdirectory
   const latestVersion = await queryContent<VersionedContent>(`${type}`)
     .where({ 
-      _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` },
-      publishEmbed: true 
+      _path: { $regex: `/${type}/${slug}/v/\\d+\\.\\d+\\.\\d+$` }
     })
     .sort({ version: -1 })
     .select(['version'])

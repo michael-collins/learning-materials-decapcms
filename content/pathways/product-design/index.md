@@ -4,6 +4,7 @@ slug: product-design
 type: 'oer:Course'
 description: Designs consumer products in 3D for manufacturing or visualization purposes.
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -20,7 +21,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 Designs consumer products in 3D for manufacturing or visualization purposes.

@@ -16,7 +16,6 @@ aiLicense:
   - AIUL-NA-3D
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will learn how to model 3 snowflakes

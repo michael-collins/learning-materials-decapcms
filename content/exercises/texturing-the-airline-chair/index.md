@@ -39,7 +39,6 @@ attachments:
     type: image/jpeg
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will practice unwrapping UVs, exporting a UV map, and creating textures in 2D image editing software like Photoshop. You will then apply your textures to a polygonal model of the KEM Weber Airline Chair.

@@ -11,6 +11,7 @@ lessons:
   - post-effects-color-grading
   - exporting-delivery
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': LearningComponent
@@ -36,7 +37,6 @@ prerequisites:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 ## Who It's For

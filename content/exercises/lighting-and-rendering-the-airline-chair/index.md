@@ -46,7 +46,6 @@ attachments:
     type: image/jpeg
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will create a final render of the KEM Weber Airline Chair. You will practice setting up 3-point lighting, adding cameras, creating a backdrop, optionally adding additional textures to the materials, configuring render settings, and doing some post-production cleanup in Photoshop.

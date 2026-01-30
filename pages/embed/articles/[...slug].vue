@@ -42,6 +42,7 @@ const { content: article, versionParam, currentVersion, latestVersion, isOutdate
         :tags="article.tags"
         :attachments="article.attachments"
         :versionStatus="article.versionStatus"
+        :hideMenu="true"
       >
         <ContentRenderer :value="article" />
       </CollectionItem>

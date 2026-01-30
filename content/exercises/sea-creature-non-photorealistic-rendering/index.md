@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will model an environment for your creature from the previous exercises. You will also set up NPR shaders, Freestyle lines, and use the compositor to achieve a comic visual style.

@@ -25,7 +25,6 @@ attachments:
     type: application/octet-stream
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, students will practice correcting a character model's edge-flow and set up an armature rig to pose the character in a sitting position.

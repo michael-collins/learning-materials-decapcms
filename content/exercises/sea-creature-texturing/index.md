@@ -18,7 +18,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you continue working on the sea creature. You will practice unwrapping UVs, exporting a UV map, and creating textures in 2D image editing software like Substance Painter and/or Photoshop.

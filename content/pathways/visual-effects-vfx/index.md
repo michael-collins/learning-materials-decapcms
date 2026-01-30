@@ -4,6 +4,7 @@ slug: visual-effects-vfx
 type: 'oer:Course'
 description: Integrates CGI elements into live-action footage and blends them seamlessly.
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -20,7 +21,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 Integrates CGI elements into live-action footage and blends them seamlessly.

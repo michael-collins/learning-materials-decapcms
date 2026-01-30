@@ -7,7 +7,6 @@ license: CC BY 4.0
 allowEmbed: true
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 Find your people!
 

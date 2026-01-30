@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will practice using PBR materials, modeling, lighting, and rendering. You will also use compositional theory from art and design to organize elements in a 3D scene to create an image.

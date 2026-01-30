@@ -69,7 +69,7 @@ for (const type of contentTypes) {
         });
       }
       
-      // Check 2: Version files should be marked as archived or have publishEmbed=true
+      // Check 2: Version file structure integrity
       if (frontmatter.versionStatus === 'latest') {
         warnings.push({
           file: filePath,

@@ -11,10 +11,10 @@ learningObjectives:
   - 'Create realistic shadows and reflections'
   - 'Finalize VFX shots for delivery'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Master the integration of VFX elements with live-action footage, creating seamless and believable final composites.

@@ -11,10 +11,10 @@ learningObjectives:
   - 'Create consistent visual style'
   - 'Apply final polish and finishing touches'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Learn to apply post-production effects and color grading to create polished, cohesive final images with professional visual quality.

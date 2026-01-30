@@ -10,10 +10,10 @@ learningObjectives:
   - 'Create effective camera angles and movements'
   - 'Use focal length and depth of field creatively'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Learn how to set up and control virtual cameras, applying cinematography and composition principles to create professional-quality renders.

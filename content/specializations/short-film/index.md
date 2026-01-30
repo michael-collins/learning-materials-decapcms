@@ -5,6 +5,7 @@ type: 'oer:LearningComponent'
 whoItsFor: null
 targetRole: null
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': LearningComponent
@@ -20,7 +21,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 ## Who It's For
