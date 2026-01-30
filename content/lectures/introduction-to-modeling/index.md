@@ -12,11 +12,7 @@ publishEmbed: true
 
 ## Presentation
 
-::google-slides-component
----
-id: 2PACX-1vQZHGphZzWL_7iw-faSX3DelelBxrRQg11TOINuDqnZxyLX3QDhGbVKMgm1wtDhuq9jNnroVi0JSiVp
-title: Introduction to Modeling
----
+::google-slides-component{id="2PACX-1vQZHGphZzWL_7iw-faSX3DelelBxrRQg11TOINuDqnZxyLX3QDhGbVKMgm1wtDhuq9jNnroVi0JSiVp" title="Introduction to Modeling"}
 ::
 
 

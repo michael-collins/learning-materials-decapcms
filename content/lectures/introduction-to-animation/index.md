@@ -12,11 +12,7 @@ publishEmbed: true
 
 ## Presentation
 
-::google-slides-component
----
-id: 2PACX-1vTKsgVUmLzY3WAx5o0e8ZipbwBfFSUzgYUBUccvInt9PjubvpIbqTR9QEJS6Yq6XfF5E7419MfNEAJn
-title: Introduction to Animation
----
+::google-slides-component{id="2PACX-1vTKsgVUmLzY3WAx5o0e8ZipbwBfFSUzgYUBUccvInt9PjubvpIbqTR9QEJS6Yq6XfF5E7419MfNEAJn" title="Introduction to Animation"}
 ::
 
 
