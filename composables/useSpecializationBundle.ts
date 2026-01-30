@@ -44,10 +44,14 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
         .first()
       specialization.value = spec
 
-      // Fetch lessons for specialization
-      const allLessons = await queryCollection('lessons').all()
-      const filtered = allLessons
-        .filter((lesson: any) => lesson.specialization === slug.value)
+      // Get lesson slugs from specialization and fetch those lessons
+      const lessonSlugs = Array.isArray(spec?.lessons) ? spec.lessons : []
+      const lessonPromises = lessonSlugs.map((lessonSlug: string) =>
+        queryCollection('lessons').path(`/lessons/${lessonSlug}`).first()
+      )
+      const fetchedLessons = await Promise.all(lessonPromises)
+      const filtered = fetchedLessons
+        .filter(Boolean)
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
 
       // Fetch linked content for each lesson
@@ -55,7 +59,7 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
       for (const lesson of filtered) {
         const items: LessonContent[] = []
 
-        const collect = async (field: string, type: string, basePath: string) => {
+        const collectLegacy = async (field: string, type: string, basePath: string) => {
           if (!lesson[field]) return
           const entries = await Promise.all(
             lesson[field].map((s: string) => queryCollection(type === 'articles' ? 'articles' : type).path(`${basePath}/${s}`).first())
@@ -71,12 +75,62 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
           })
         }
 
-        await collect('lectures', 'lectures', '/lectures')
-        await collect('tutorials', 'tutorials', '/tutorials')
-        await collect('exercises', 'exercises', '/exercises')
-        await collect('articles', 'articles', '/articles')
-        await collect('projects', 'projects', '/projects')
-        // resources is file list; skip for now or treat as resources without fetch
+        const resolveItemType = (item: any) => {
+          const rawType = item?.type || item?.__typename
+          if (!rawType) return null
+          if (rawType.endsWith('s')) return rawType
+          return `${rawType}s`
+        }
+
+        const resolveItemSlug = (item: any) => {
+          return (
+            item?.lecture ||
+            item?.tutorial ||
+            item?.exercise ||
+            item?.article ||
+            item?.project ||
+            item?.slug ||
+            null
+          )
+        }
+
+        const collectItems = async (lessonItems: any[]) => {
+          const entries = await Promise.all(
+            lessonItems.map(async (lessonItem: any) => {
+              const type = resolveItemType(lessonItem)
+              const slug = resolveItemSlug(lessonItem)
+              if (!type || !slug) return null
+              const basePath = type === 'articles' ? '/articles' : `/${type}`
+              const entry = await queryCollection(type === 'articles' ? 'articles' : type)
+                .path(`${basePath}/${slug}`)
+                .first()
+              return { entry, type, slug }
+            })
+          )
+
+          entries.filter(Boolean).forEach((result: any) => {
+            const { entry, type, slug } = result
+            if (!entry) return
+            items.push({
+              type,
+              slug,
+              title: entry.title,
+              description: entry.description,
+              estimatedDuration: entry.estimatedDuration
+            })
+          })
+        }
+
+        if (Array.isArray(lesson.items) && lesson.items.length) {
+          await collectItems(lesson.items)
+        } else {
+          await collectLegacy('lectures', 'lectures', '/lectures')
+          await collectLegacy('tutorials', 'tutorials', '/tutorials')
+          await collectLegacy('exercises', 'exercises', '/exercises')
+          await collectLegacy('articles', 'articles', '/articles')
+          await collectLegacy('projects', 'projects', '/projects')
+          // resources is file list; skip for now or treat as resources without fetch
+        }
 
         lessonBundles.push({
           title: lesson.title,
