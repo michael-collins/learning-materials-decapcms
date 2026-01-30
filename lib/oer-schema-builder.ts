@@ -95,24 +95,6 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
     schema.description = doc.description;
   }
   
-  // Parent lesson
-  if (doc.lesson) {
-    schema.isPartOf = {
-      '@type': 'oer:LearningComponent',
-      '@id': `${baseUrl}/lessons/${doc.lesson}`,
-      'name': doc.lesson
-    };
-  }
-  
-  // Parent specialization (if not already covered by lesson)
-  if (!schema.isPartOf && doc.specialization) {
-    schema.isPartOf = {
-      '@type': 'oer:InstructionalPattern',
-      '@id': `${baseUrl}/specializations/${doc.specialization}`,
-      'name': doc.specialization
-    };
-  }
-  
   // Educational level (difficulty)
   if (doc.difficulty) {
     schema.educationalLevel = doc.difficulty;
@@ -191,7 +173,7 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
       'oer': 'https://oerschema.org/',
       'schema': 'https://schema.org/'
     },
-    '@type': doc.type || 'oer:Assessment',
+    '@type': 'oer:Assessment',
     'name': doc.title,
     'url': `${baseUrl}${path}`,
     'assessmentType': 'Project',
@@ -201,24 +183,6 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   // Description
   if (doc.description) {
     schema.description = doc.description;
-  }
-  
-  // Parent lesson
-  if (doc.lesson) {
-    schema.isPartOf = {
-      '@type': 'oer:LearningComponent',
-      '@id': `${baseUrl}/lessons/${doc.lesson}`,
-      'name': doc.lesson
-    };
-  }
-  
-  // Parent specialization (if not already covered by lesson)
-  if (!schema.isPartOf && doc.specialization) {
-    schema.isPartOf = {
-      '@type': 'oer:InstructionalPattern',
-      '@id': `${baseUrl}/specializations/${doc.specialization}`,
-      'name': doc.specialization
-    };
   }
   
   // Educational level (difficulty)
@@ -720,21 +684,11 @@ function parseDurationToISO8601(duration: string): string | null {
 }
 /**
  * Build OER Schema for Supporting Material (Lectures)
- * Maintains backward compatibility with existing lectures page
+ * Maintains backward compatibility with existing lectures via oer frontmatter field
  */
 export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
   const path = doc._path || (doc.slug ? `/lectures/${doc.slug}` : '')
   const baseId = `${baseUrl}${path}`
-  
-  // Use existing oer object from frontmatter if available
-  if (doc.oer && typeof doc.oer === 'object') {
-    return {
-      ...doc.oer,
-      '@id': baseId,
-      'url': baseId,
-      'inLanguage': 'en-US'
-    };
-  }
   
   const schema: OERSchema = {
     '@context': {
@@ -753,47 +707,6 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
     schema.description = doc.description;
   }
   
-  // Parent lesson
-  if (doc.lesson) {
-    schema.isPartOf = {
-      '@type': 'oer:LearningComponent',
-      '@id': `${baseUrl}/lessons/${doc.lesson}`,
-      'name': doc.lesson
-    };
-  }
-  
-  // Parent specialization (if not already covered by lesson)
-  if (!schema.isPartOf && doc.specialization) {
-    schema.isPartOf = {
-      '@type': 'oer:InstructionalPattern',
-      '@id': `${baseUrl}/specializations/${doc.specialization}`,
-      'name': doc.specialization
-    };
-  }
-  
-  // Material type (e.g., "Slide Deck", "Video", "Article")
-  if (doc.materialType) {
-    schema.materialType = doc.materialType;
-  } else if (doc.googleSlidesID) {
-    schema.materialType = 'Slide Deck';
-  }
-  
-  // Encoding format
-  if (doc.googleSlidesID) {
-    schema.encodingFormat = 'application/vnd.google-apps.presentation';
-  } else if (doc.encodingFormat) {
-    schema.encodingFormat = doc.encodingFormat;
-  }
-  
-  // Topics/about
-  if (doc.topics) {
-    if (typeof doc.topics === 'string') {
-      schema.about = doc.topics.split('\n').filter((t: string) => t.trim());
-    } else if (Array.isArray(doc.topics)) {
-      schema.about = doc.topics;
-    }
-  }
-  
   // Author
   if (doc.author) {
     schema.author = {
@@ -810,6 +723,36 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
   // Tags as keywords
   if (doc.tags && doc.tags.length > 0) {
     schema.keywords = doc.tags;
+  }
+  
+  // Material type (default to "Slide Deck" for lectures since they typically contain Google Slides)
+  schema.materialType = 'Slide Deck';
+  
+  // Encoding format (Google Slides)
+  schema.encodingFormat = 'application/vnd.google-apps.presentation';
+  
+  // Course/context information
+  if (doc.course) {
+    schema.courseCode = doc.course;
+  }
+  
+  // Duration (PT45M is a common default for lecture slides)
+  schema.duration = 'PT45M';
+  
+  // About/topics - extract from markdown body if available
+  if (doc.body) {
+    const topicsSection = doc.body.match(/## Topics Covered\n\n([\s\S]*?)(?=\n##|\Z)/);
+    if (topicsSection && topicsSection[1]) {
+      const topics = topicsSection[1]
+        .split('\n')
+        .filter((line: string) => line.trim().startsWith('-'))
+        .map((line: string) => line.trim().substring(1).trim())
+        .filter((line: string) => line.length > 0);
+      
+      if (topics.length > 0) {
+        schema.about = topics;
+      }
+    }
   }
   
   return schema;

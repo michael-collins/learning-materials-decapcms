@@ -139,7 +139,10 @@ A work statement is a clear articulation about what you’ve made. This is not a
 5. You will engage in an online critique discussion of your work and that of your peers.
 
 
+## Tutorial
 
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrV1iw9_XUwArDOs5mwu6fAk" title="Project Tutorial"}
+::
 
 
 ## Grading Rubric

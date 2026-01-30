@@ -1,17 +1,13 @@
 ---
-recordId: recmjJ85mfZrRGRFu
 title: Animating a bouncing ball
 slug: animating-a-bouncing-ball
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrVJwkuJN1Ht3GcuzXpue29M
 image: /uploads/recmjJ85mfZrRGRFu_image_viewport-render.png
 imageAlt: viewport-render.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -30,7 +26,7 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: image/png
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

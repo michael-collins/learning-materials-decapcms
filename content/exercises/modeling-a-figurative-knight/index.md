@@ -1,13 +1,9 @@
 ---
-recordId: rec8Y2xjGTcAffTeB
 title: Modeling a Figurative Knight
 slug: modeling-a-figurative-knight
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QlEM8qkrx_rcHaAemZ3oHZH
 image: /uploads/rec8Y2xjGTcAffTeB_image_Smooth_Knight.png
 imageAlt: Smooth Knight.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -61,7 +57,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

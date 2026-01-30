@@ -1,17 +1,13 @@
 ---
-recordId: recc827jhaiZue5as
 title: 'Sea creature: Texturing'
 slug: sea-creature-texturing
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrUU3MSAv9EfORij5j2E3uVv
 image: /uploads/recc827jhaiZue5as_image_sculpting-retopo-header-v2.png
 imageAlt: sculpting-retopo-header-v2.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
   - Substance Painter
@@ -20,7 +16,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

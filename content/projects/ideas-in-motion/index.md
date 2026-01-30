@@ -139,8 +139,10 @@ Do not produce work that could be construed as ‘fan art’ for existing intell
 1. **Preliminary Submission Discussion thread**
     - Contribute feedback to peer work and engage with a discussion about your own work.
 
+## Tutorial
 
-
+::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrWRqmkePyLUhIndLHarj7H-" title="Project Tutorial"}
+::
 
 
 

@@ -1,17 +1,13 @@
 ---
-recordId: recksNEMV7vl5SFG4
 title: Modeling the Airline Chair
 slug: modeling-the-airline-chair
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrXnIBdsAhYlYODx8f45Jk9f
 image: /uploads/recksNEMV7vl5SFG4_image_airline-chair-header-compressed.jpg
 imageAlt: airline-chair-header-compressed.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
   - Modeling
@@ -41,7 +37,7 @@ attachments:
       2018-22-28 
     sourceUrl: 'http://cprhw.tt/o/BKmDR/'
     type: image/jpeg
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

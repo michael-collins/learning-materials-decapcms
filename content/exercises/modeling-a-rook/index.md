@@ -1,13 +1,9 @@
 ---
-recordId: recI5o36ru0BbxuCH
 title: Modeling a Rook
 slug: modeling-a-rook
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5Ql40pEsctlh1xNHLDS8F0cb
 image: /uploads/recI5o36ru0BbxuCH_image_rook_image.png
 imageAlt: rook image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -40,7 +36,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

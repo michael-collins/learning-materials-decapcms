@@ -1,17 +1,13 @@
 ---
-recordId: reczUhTIOSSFk77BH
 title: Texturing random objects
 slug: texturing-random-objects
-type: 'oer:Practice'
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrWipZPDR5ZYk4-EgwFzMahg
 image: /uploads/reczUhTIOSSFk77BH_image_texturing-objects-header-v2.jpg
 imageAlt: texturing-objects-header-v2.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

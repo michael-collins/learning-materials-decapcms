@@ -1,13 +1,9 @@
 ---
-recordId: rectzJhf833zBC9T3
 title: Modeling a Bishop
 slug: modeling-a-bishop
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5Qn9EwcL-Arvg3QWeQ_h-WVg
 image: /uploads/rectzJhf833zBC9T3_image_bishop_image.png
 imageAlt: bishop image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -47,7 +43,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

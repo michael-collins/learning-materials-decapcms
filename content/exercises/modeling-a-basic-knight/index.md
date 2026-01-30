@@ -1,13 +1,9 @@
 ---
-recordId: recPXvg0DlanTkyO2
 title: Modeling a Basic Knight
 slug: modeling-a-basic-knight
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QliQriwysglJwRIE6R8NP2f
 image: /uploads/recPXvg0DlanTkyO2_image_Simple_Knight.png
 imageAlt: Simple Knight.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -47,7 +43,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

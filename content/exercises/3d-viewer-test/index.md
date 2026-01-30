@@ -3,16 +3,17 @@ breakingChanges: []
 versionStatus: latest
 publishEmbed: true
 title: 3D Model Viewer Test
-slug: 3d-viewer-test
-type: oer:Practice
 difficulty: Beginner
-rubric: exercise
+license: CC BY 4.0
+aiLicense:
+  - AIUL-WA
+  - AIUL-NA-3D
 author: Michael Collins
 published: true
-date: 2026-01-28
+date: 2026-01-28T00:00:00.000Z
 allowEmbed: true
 changelog: Working version for future edits
-version: '1.0.0'
+version: 1.0.0
 ---
 # 3D Model Viewer Test Page
 

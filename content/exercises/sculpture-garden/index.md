@@ -1,17 +1,13 @@
 ---
-recordId: recHQtwVG79n7xiNK
 title: Sculpture Garden
 slug: sculpture-garden
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrXmwBV0kO-ErBLFnyWukKsD
 image: /uploads/recHQtwVG79n7xiNK_image_sculpture-garden.jpg
 imageAlt: sculpture-garden.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

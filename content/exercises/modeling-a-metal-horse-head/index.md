@@ -1,13 +1,9 @@
 ---
-recordId: recJa9PrmESgMr9Zw
 title: Modeling a Metal Horse Head
 slug: modeling-a-metal-horse-head
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5Qnmcpc_vs1RGJaQFm4EsuE9
 image: /uploads/recJa9PrmESgMr9Zw_image_METAL_KNIGHT_IMAGE.png
 imageAlt: METAL KNIGHT IMAGE.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -55,7 +51,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

@@ -1,18 +1,13 @@
 ---
-recordId: recEGCzExXCKxYoco
 title: 'Sea creature: Non-photorealistic rendering'
 slug: sea-creature-non-photorealistic-rendering
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrWh22nK2hfnGbeEaxMp3s_e
-image: >-
-  /uploads/recEGCzExXCKxYoco_image_sculpting-retopo-rendering-header-v1.jpg
+image: /uploads/recEGCzExXCKxYoco_image_sculpting-retopo-rendering-header-v1.jpg
 imageAlt: sculpting-retopo-rendering-header-v1.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -20,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

@@ -1,13 +1,9 @@
 ---
-recordId: recqV87QKaWerduJM
 title: Modeling a King
 slug: modeling-a-king
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QmZ7dFmd7KeeCH5h9b3ZlGu
 image: /uploads/recqV87QKaWerduJM_image_king_image.png
 imageAlt: king image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -40,7 +36,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

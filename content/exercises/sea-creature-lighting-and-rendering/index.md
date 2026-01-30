@@ -1,18 +1,13 @@
 ---
-recordId: recoSUxGzMnYSAxjn
 title: 'Sea creature: Lighting and rendering'
 slug: sea-creature-lighting-and-rendering
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrV3t6j1M7_93uLpJq-AXoHV
-image: >-
-  /uploads/recoSUxGzMnYSAxjn_image_sculpting-retopo-rendering-PBR-header-v1.jpg
+image: /uploads/recoSUxGzMnYSAxjn_image_sculpting-retopo-rendering-PBR-header-v1.jpg
 imageAlt: sculpting-retopo-rendering-PBR-header-v1.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -20,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

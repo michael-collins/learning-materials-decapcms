@@ -1,13 +1,9 @@
 ---
-recordId: rec2Od2fcMVgDSQyg
 title: Modeling a Diamond
 slug: modeling-a-diamond
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5Qnq4fsbvQw-IjrZd6EoMX1h
 image: /uploads/rec2Od2fcMVgDSQyg_image_diamond_image.png
 imageAlt: diamond image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -18,7 +14,7 @@ allowEmbed: true
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

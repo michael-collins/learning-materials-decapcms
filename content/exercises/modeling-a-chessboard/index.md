@@ -1,13 +1,9 @@
 ---
-recordId: recqqIknm5ebQaFmz
 title: Modeling a Chessboard
 slug: modeling-a-chessboard
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QksJy4ZnxgWrbVFklAoOFvU
 image: /uploads/recqqIknm5ebQaFmz_image_Chess_Board_Image.png
 imageAlt: Chess Board Image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -18,7 +14,7 @@ allowEmbed: true
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

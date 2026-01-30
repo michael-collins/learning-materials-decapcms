@@ -1,17 +1,13 @@
 ---
-recordId: recaLI7LYZgUjk4bg
 title: Rigging a human
 slug: rigging-a-human
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrWPKLLkM8oVibJ1aKHivoNl
 image: /uploads/recaLI7LYZgUjk4bg_image_human-rig-banner.png
 imageAlt: human-rig-banner.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

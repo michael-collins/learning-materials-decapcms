@@ -1,14 +1,10 @@
 ---
-recordId: recOJrvzE8GWdElPz
 title: Modeling a Chavet 121 series no 6 Knight
 slug: modeling-a-chavet-121-series-no-6-knight
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QlafOnfBirWwtx83ZQ-6K4t
 image: >-
   /uploads/recOJrvzE8GWdElPz_image_The_One_Called_Michael_Chavet_121_series_no_6_HORSE.png
 imageAlt: The One Called Michael Chavet 121 series no 6 HORSE.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -31,7 +27,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

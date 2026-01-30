@@ -1,17 +1,13 @@
 ---
-recordId: receipHXbIjwRD66T
 title: Rendering random objects
 slug: rendering-random-objects
-type: 'oer:Practice'
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrWaCwxTnu9yMGbqFudZtdls
 image: /uploads/receipHXbIjwRD66T_image_texturing-objects-header.jpg
 imageAlt: texturing-objects-header.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

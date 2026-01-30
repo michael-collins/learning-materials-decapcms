@@ -1,35 +1,33 @@
 ---
-recordId: recn4C0llk2Kq5tuH
 title: Animated textures
 slug: animated-textures
-type: oer:Practice
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrUWRugAsFhfYkUojjO1iZWH
 image: /uploads/recn4C0llk2Kq5tuH_image_ex-7-intro-banner-compressed.jpg
 imageAlt: ex-7-intro-banner-compressed.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
   - AfterEffects
   - Adobe Media Encoder
 author: Michael Collins
 course: DART 303
-authorUrl: https://michaelcollins.xyz
+authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
-changelog: "Initial release with version control"
+changelog: Initial release with version control
 attachments:
   - title: Image Sequence Download
-    description: This is a link to a Google Drive folder where you can download the
-      image sequence mentioned in the instructions.
-    url: https://drive.google.com/file/d/1b76RfhJXkYOcGn4wCPtNed6XFYwjR6nG/view?usp=sharing
+    description: >-
+      This is a link to a Google Drive folder where you can download the image
+      sequence mentioned in the instructions.
+    url: >-
+      https://drive.google.com/file/d/1b76RfhJXkYOcGn4wCPtNed6XFYwjR6nG/view?usp=sharing
 ---
 
 In this exercise, you will apply an image sequence as texture object in Blender, render a final Blender animation as an image sequence, and import it into after effects. You will create a compressed video in a web streaming format called H.264.

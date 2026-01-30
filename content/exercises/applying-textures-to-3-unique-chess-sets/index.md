@@ -1,13 +1,9 @@
 ---
-recordId: rec0apDu2F1wTfIoq
 title: Applying Textures to 3 Unique Chess Sets
 slug: applying-textures-to-3-unique-chess-sets
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QlIH4xCkx3q86mJu84QpGOJ
 image: /uploads/rec0apDu2F1wTfIoq_image_ianbrill_chess_set.png
 imageAlt: ianbrill chess set.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -27,7 +23,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---
