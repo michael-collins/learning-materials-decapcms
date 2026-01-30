@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 
 interface Props {
@@ -7,6 +7,28 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+type AiulApiResponse<T> = { data: T[] }
+
+type AiulLicenseApi = {
+  code: string
+  url: string
+  image: string
+  version?: string
+}
+
+type AiulCombinationApi = {
+  code: string
+  url: string
+  image: string
+  license?: { code: string }
+  modifier?: { code: string }
+}
+
+const apiLicenses = ref<AiulLicenseApi[] | null>(null)
+const apiCombinations = ref<AiulCombinationApi[] | null>(null)
+
+const apiError = ref('')
 
 // Track expanded state for each license by index
 const expandedStates = ref<Record<number, boolean>>({})
@@ -20,45 +42,67 @@ const toggleExpanded = (index: number) => {
   expandedStates.value[index] = !expandedStates.value[index]
 }
 
-// AIUL license definitions
+// AIUL license definitions with versioned URLs
+const AIUL_VERSION = '1.0.0'
+
 const aiulLicenses = {
   'AIUL-NA': {
     fullName: 'No AI',
     description: 'Use of AI is not allowed',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#na',
+    url: `https://dmd-program.github.io/aiul/licenses/na/${AIUL_VERSION}/`,
     color: 'text-red-700 dark:text-red-400'
   },
   'AIUL-WA': {
     fullName: 'With Approval',
     description: 'AI use requires explicit instructor approval',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#wa',
+    url: `https://dmd-program.github.io/aiul/licenses/wa/${AIUL_VERSION}/`,
     color: 'text-orange-700 dark:text-orange-400'
   },
   'AIUL-CD': {
     fullName: 'Conceptual Development',
     description: 'AI may be used for brainstorming and ideation, but not for final execution',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#cd',
+    url: `https://dmd-program.github.io/aiul/licenses/cd/${AIUL_VERSION}/`,
     color: 'text-yellow-700 dark:text-yellow-400'
   },
   'AIUL-TC': {
     fullName: 'Transparency & Citation',
     description: 'AI may be used if all usage is documented and properly cited',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#tc',
+    url: `https://dmd-program.github.io/aiul/licenses/tc/${AIUL_VERSION}/`,
     color: 'text-blue-700 dark:text-blue-400'
   },
   'AIUL-DP': {
     fullName: 'Draft & Prototyping',
     description: 'AI may be used for drafts and prototyping, but not for final submissions',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#dp',
+    url: `https://dmd-program.github.io/aiul/licenses/dp/${AIUL_VERSION}/`,
     color: 'text-cyan-700 dark:text-cyan-400'
   },
   'AIUL-IU': {
     fullName: 'Informed Use',
     description: 'AI may be used freely, but you must be able to explain and justify all AI-assisted work',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#iu',
+    url: `https://dmd-program.github.io/aiul/licenses/iu/${AIUL_VERSION}/`,
     color: 'text-green-700 dark:text-green-400'
   }
 }
+
+const fetchApiData = async () => {
+  if (apiLicenses.value && apiCombinations.value) return
+
+  try {
+    const [licensesResponse, combinationsResponse] = await Promise.all([
+      $fetch<AiulApiResponse<AiulLicenseApi>>('https://dmd-program.github.io/aiul/api/licenses.json'),
+      $fetch<AiulApiResponse<AiulCombinationApi>>('https://dmd-program.github.io/aiul/api/combinations.json')
+    ])
+
+    apiLicenses.value = licensesResponse?.data || []
+    apiCombinations.value = combinationsResponse?.data || []
+  } catch (error) {
+    apiError.value = error instanceof Error ? error.message : 'Failed to load AIUL API data'
+  }
+}
+
+onMounted(() => {
+  fetchApiData()
+})
 
 // Media suffix descriptions
 const mediaSuffixes: Record<string, string> = {
@@ -207,13 +251,39 @@ const licenseDetails = computed(() => {
     const tag = baseTag as keyof typeof aiulLicenses
     const baseInfo = aiulLicenses[tag]
     const media = mediaSuffix ? mediaSuffixes[mediaSuffix] : null
+
+    const baseCode = baseTag.replace('AIUL-', '').toLowerCase()
+    const modifierCode = mediaSuffix ? mediaSuffix.slice(1).toLowerCase() : null
+    const badgeCode = modifierCode ? `${baseCode}-${modifierCode}` : baseCode
+
+    const apiLicenseCode = baseTag.replace('AIUL-', '')
+    const apiModifierCode = mediaSuffix ? mediaSuffix.slice(1) : null
+
+    const apiLicense = apiLicenses.value?.find(l => l.code === apiLicenseCode)
+    const apiCombination = apiModifierCode
+      ? apiCombinations.value?.find(c => c.code === `${apiLicenseCode}-${apiModifierCode}`)
+      : undefined
+
+    // Generate badge image URL (API docs format) as fallback
+    const fallbackBadgeUrl = `https://dmd-program.github.io/aiul/assets/images/licenses/aiul-${badgeCode}.png`
+
+    const badgeUrl = apiCombination?.image || apiLicense?.image || fallbackBadgeUrl
+
+    // Link to license or combination URL (use API urls when available)
+    const detailUrl = apiCombination?.url || apiLicense?.url || baseInfo.url
     
     // Append media type to description if media suffix is present
     let info = baseInfo
     if (mediaSuffix && media) {
       info = {
         ...baseInfo,
+        url: detailUrl,
         description: `${baseInfo.description} for the following media: ${media}`
+      }
+    } else {
+      info = {
+        ...baseInfo,
+        url: detailUrl
       }
     }
     
@@ -255,6 +325,7 @@ const licenseDetails = computed(() => {
       mediaSuffix,
       info,
       mediaType: media,
+      badgeUrl,
       guidance
     }
   })
@@ -279,23 +350,26 @@ const licenseDetails = computed(() => {
       </svg>
       
       <div class="flex-1">
-        <div class="flex items-baseline gap-2 flex-wrap">
-          <span class="text-sm font-semibold text-foreground">AI Usage License:</span>
+        <!-- Badge Image -->
+        <div class="mb-3">
           <a 
             :href="detail.info.url" 
             target="_blank" 
-            rel="noopener noreferrer" 
-            class="text-sm font-bold hover:underline transition-colors"
-            :class="detail.info.color"
+            rel="noopener noreferrer"
+            class="inline-block hover:opacity-80 transition-opacity"
+            :aria-label="`View AI Usage License details for ${detail.original}`"
           >
-            {{ detail.original }}
+            <img 
+              :src="detail.badgeUrl" 
+              :alt="`${detail.original} Badge`"
+              :title="`AI Usage License badge for ${detail.original}`"
+              class="h-7 w-auto"
+              loading="lazy"
+            />
           </a>
-          <span v-if="detail.mediaType" class="text-xs text-muted-foreground">
-            ({{ detail.mediaType }})
-          </span>
         </div>
         
-        <p class="text-sm text-muted-foreground mt-1 leading-relaxed">
+        <p class="text-sm text-muted-foreground mt-3 leading-relaxed">
           <strong :class="detail.info.color">{{ detail.info.fullName }}:</strong> {{ detail.info.description }}
         </p>
         
