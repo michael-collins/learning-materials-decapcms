@@ -1,6 +1,6 @@
 {
   "3d-viewer-test": {
-    "latest": "3.3.0",
+    "latest": "1.0.0",
     "versions": {
       "3.2.0": {
         "publishedAt": "2026-01-29T06:25:17.134Z",
@@ -9,9 +9,9 @@
         "breakingChanges": []
       },
       "1.0.0": {
-        "publishedAt": "2026-01-29T06:18:05.599Z",
-        "status": "archived",
-        "changelog": "Initial version of 3D Model Viewer Test",
+        "publishedAt": "2026-01-30T04:15:36.413Z",
+        "status": "latest",
+        "changelog": "Working version for future edits",
         "breakingChanges": []
       },
       "2.6.0": {
@@ -45,8 +45,8 @@
         "breakingChanges": []
       },
       "3.3.0": {
-        "publishedAt": "2026-01-29T06:25:17.134Z",
-        "status": "latest",
+        "publishedAt": "2026-01-30T04:15:36.413Z",
+        "status": "archived",
         "changelog": "Working version for future edits",
         "breakingChanges": []
       }
