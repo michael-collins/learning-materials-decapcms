@@ -11,10 +11,10 @@ learningObjectives:
   - 'Set up render layers and passes'
   - 'Export renders in appropriate formats'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Master the rendering process from setup to final output, learning how to configure render engines and optimize settings for professional results.

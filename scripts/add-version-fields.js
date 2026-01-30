@@ -39,7 +39,6 @@ function addVersionFields(frontmatterStr) {
   const updated = []
   let versionAdded = false
   let versionStatusAdded = false
-  let publishEmbedAdded = false
   
   for (const line of lines) {
     if (line.startsWith('version:')) {
@@ -49,8 +48,8 @@ function addVersionFields(frontmatterStr) {
       versionStatusAdded = true
       updated.push("versionStatus: latest")
     } else if (line.startsWith('publishEmbed:')) {
-      publishEmbedAdded = true
-      updated.push("publishEmbed: true")
+      // Skip publishEmbed field when encountered
+      continue
     } else {
       updated.push(line)
     }
@@ -62,9 +61,6 @@ function addVersionFields(frontmatterStr) {
   }
   if (!versionStatusAdded) {
     updated.push("versionStatus: latest")
-  }
-  if (!publishEmbedAdded) {
-    updated.push("publishEmbed: true")
   }
   
   return updated.join('\n')
@@ -102,11 +98,10 @@ for (const contentType of contentTypes) {
     // Check if version fields are already present
     const hasVersion = frontmatter.includes('version:')
     const hasVersionStatus = frontmatter.includes('versionStatus:')
-    const hasPublishEmbed = frontmatter.includes('publishEmbed:')
     
-    console.log(`Checking ${contentType}/${item}: version=${hasVersion}, versionStatus=${hasVersionStatus}, publishEmbed=${hasPublishEmbed}`)
+    console.log(`Checking ${contentType}/${item}: version=${hasVersion}, versionStatus=${hasVersionStatus}`)
     
-    if (!hasVersion || !hasVersionStatus || !hasPublishEmbed) {
+    if (!hasVersion || !hasVersionStatus) {
       console.log(`  → Needs updating`)
       const updatedFrontmatter = addVersionFields(frontmatter)
       const updatedContent = `---\n${updatedFrontmatter}\n---\n${body}`

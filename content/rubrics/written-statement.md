@@ -24,6 +24,7 @@ criteria:
     name: On time
     description: >-
       This criterion checks to see if the assigned task was submitted on time.
+allowEmbed: true
       This indirectly assesses time management.
 ---
 # Written statement

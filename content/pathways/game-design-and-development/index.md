@@ -4,6 +4,7 @@ slug: game-design-and-development
 type: 'oer:Course'
 description: 'Designs gameplay mechanics, levels, and user experiences for video games.'
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -20,7 +21,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 Designs gameplay mechanics, levels, and user experiences for video games.

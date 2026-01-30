@@ -90,6 +90,13 @@ const oerSchema = computed(() => {
   return buildCourseSchema(pathway.value, specializations.value || [], baseUrl)
 })
 
+// Embed section state
+const embedUrl = computed(() => {
+  if (typeof window === 'undefined') return ''
+  const baseUrl = window.location.origin
+  return `${baseUrl}/embed/pathways/${baseSlug}`
+})
+
 // Use the shared specialization modal composable
 const { isModalOpen, currentModalSlug, openViewer, closeViewer } = useSpecializationModal()
 
@@ -109,6 +116,7 @@ const handleSelectSpec = (spec: any) => {
       </div>
     </div>
     <div v-else-if="pathway">
+      <!-- CollectionItem wrapper with title/edit menu/breadcrumbs -->
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="pathway.title"
@@ -117,10 +125,11 @@ const handleSelectSpec = (spec: any) => {
         :imageAlt="pathway.imageAlt"
         :versionStatus="pathway.versionStatus"
         :version="displayVersion"
+        :allowEmbed="false"
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>
-      
+
       <!-- Specializations Section -->
       <div v-if="!specializationsLoading && specializations && specializations.length > 0" class="border-t bg-muted/30">
         <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
@@ -134,12 +143,12 @@ const handleSelectSpec = (spec: any) => {
               :title="spec.title"
               :slug="spec.slug"
               :description="spec.description"
-              :difficulty="spec.difficulty"
-              :duration="spec.estimatedDuration"
+              :difficulty="spec.meta?.difficulty"
+              :duration="spec.meta?.estimatedDuration"
               :image="spec.image"
               :imageAlt="spec.imageAlt"
               :targetRole="spec.targetRole"
-              :skills="spec.skills"
+              :skills="spec.meta?.skills"
               :preview="true"
               @select="handleSelectSpec"
             />
@@ -150,6 +159,11 @@ const handleSelectSpec = (spec: any) => {
         <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
           <p class="text-muted-foreground">Specializations are being loaded...</p>
         </div>
+      </div>
+
+      <!-- Embed Section at Bottom -->
+      <div v-if="pathway.meta?.allowEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <EmbedSection :embed-url="embedUrl" :title="pathway.title" />
       </div>
       
       <ClientOnly>

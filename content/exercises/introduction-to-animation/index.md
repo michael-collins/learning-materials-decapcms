@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, level 1 students will practice keyframe animation, parenting, animating the camera with a target, and manipulating curves in the graph editor.

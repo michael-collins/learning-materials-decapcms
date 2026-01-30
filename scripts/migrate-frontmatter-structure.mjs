@@ -28,7 +28,7 @@ function getFrontmatterContent(data) {
     'title', 'slug', 'type', 'description', 'estimatedDuration', 'specialization',
     'order', 'learningObjectives', 'items', 'lectures', 'tutorials', 'exercises', 
     'articles', 'projects', 'resources', 'prerequisites', 'tags', 'author', 'published',
-    'allowEmbed', 'license', 'aiLicense', 'version', 'versionStatus', 'publishEmbed',
+    'allowEmbed', 'license', 'aiLicense', 'version', 'versionStatus',
     'changelog', 'whoItsFor', 'targetRole', 'skills', 'tools', 'difficulty',
     'pathway', 'lessons', 'image', 'imageAlt', 'date', 'oer', 'course'
   ]

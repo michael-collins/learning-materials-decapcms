@@ -6,6 +6,7 @@ description: >-
   Oversees the planning and execution of 3D projects, ensuring deadlines and
   budgets are met.
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -22,7 +23,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
  Oversees the planning and execution of 3D projects, ensuring deadlines and budgets are met.

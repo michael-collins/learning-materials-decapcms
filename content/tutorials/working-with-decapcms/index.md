@@ -4,9 +4,9 @@ description: "Learn how to integrate and use DecapCMS for content management in 
 author: "Learning Materials Team"
 date: 2024-01-17
 difficulty: "Intermediate"
+allowEmbed: true
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 # Working with DecapCMS

@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will continue working on your objects. Practice unwrapping UVs, exporting UV maps, and create textures in 2D image editing software like Photoshop.

@@ -17,10 +17,10 @@ items:
     __typename: lectures
     lecture: introduction-to-texturing
 published: true
+allowEmbed: true
 license: CC BY 4.0
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 Master the art of UV mapping and texturing, learning how to properly unwrap 3D models and apply high-quality textures and materials.

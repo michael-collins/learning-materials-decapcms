@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, students will practice modeling, rigging, and animating a hard-surface robot arm.

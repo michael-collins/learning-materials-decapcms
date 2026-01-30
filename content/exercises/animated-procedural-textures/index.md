@@ -19,7 +19,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 In this exercise, you will create a textured anime-style waterfall in Blender, render a final Blender animation as an image sequence, and import it into after effects. You will create a compressed video in a web streaming format called H.264.
 

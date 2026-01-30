@@ -11,10 +11,10 @@ learningObjectives:
   - 'Use AOVs for maximum flexibility'
   - 'Troubleshoot pass-related issues'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Master the use of render layers and passes to maintain maximum control and flexibility when compositing 3D renders.

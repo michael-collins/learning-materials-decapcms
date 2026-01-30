@@ -6,6 +6,7 @@ description: >-
   Creates animated graphics for multimedia projects, often involving typography
   and visual effects.
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -24,7 +25,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 Creates animated graphics for multimedia projects, often involving typography and visual effects.

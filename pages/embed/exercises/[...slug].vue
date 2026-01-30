@@ -106,6 +106,7 @@ const oerSchema = computed(() => {
         :imageAlt="exercise.imageAlt"
         :tags="exercise.tags"
         :attachments="exercise.attachments"
+        :hideMenu="true"
       >
         <ContentRenderer :value="exercise" />
       </CollectionItem>

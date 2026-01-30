@@ -36,11 +36,12 @@ interface Props {
   tags?: string[]
   versionStatus?: string
   version?: string
+  hideMenu?: boolean
 }
 
 const props = defineProps<Props>()
 
-console.log('[CollectionItem] Props received:', { title: props.title, versionStatus: props.versionStatus })
+console.log('[CollectionItem] Props received:', { title: props.title, versionStatus: props.versionStatus, allowEmbed: props.allowEmbed })
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -264,7 +265,7 @@ const copyCitation = async () => {
     <article>
       <header class="mb-8 pb-8" :class="{ 'border-b': breadcrumbs.length > 0 }">
         <!-- More menu dropdown -->
-        <div v-if="!isEmbed" class="flex justify-end mb-4">
+        <div v-if="!isEmbed && !hideMenu" class="flex justify-end mb-4">
           <div class="relative group">
             <Button
               size="icon"

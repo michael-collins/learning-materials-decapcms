@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will practice polygonal modeling fundamentals and will use 3D software to build a polygonal model of three random objects.

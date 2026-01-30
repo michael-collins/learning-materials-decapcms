@@ -41,7 +41,6 @@ attachments:
     type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 For this project, you will produce 3D rendered images of products and other objects you experience every day, but with one slight difference. You will augment the object in such a way to inhibit its utility, material qualities, or its system or environmental context.

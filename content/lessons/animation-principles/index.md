@@ -11,10 +11,10 @@ learningObjectives:
   - 'Create anticipation and follow-through in animations'
   - 'Develop strong poses and silhouettes'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 Master the fundamental principles of animation that bring characters and objects to life through believable movement and performance.

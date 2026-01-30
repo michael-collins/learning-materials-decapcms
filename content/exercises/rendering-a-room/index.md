@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you will continue working on your objects and create a lighting and background setup for final rendering.

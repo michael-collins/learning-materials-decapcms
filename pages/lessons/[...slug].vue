@@ -141,6 +141,7 @@ const oerSchema = computed(() => {
         :imageAlt="lesson.imageAlt"
         :tags="lesson.tags"
         :versionStatus="lesson.versionStatus"
+        :allowEmbed="lesson.allowEmbed"
       >
         <template #metadata>
           <div class="flex flex-wrap gap-4 text-sm">

@@ -61,17 +61,7 @@ changedFiles.forEach(filePath => {
         console.log(`   ℹ️  Status: DEPRECATED`);
       }
       
-      // Check if embed publishing is enabled
-      if (frontmatter.publishEmbed === true) {
-        hasCriticalEdits = true;
-        warnings.push({
-          file: filePath,
-          severity: 'critical',
-          message: 'This version is PUBLISHED for embedding. Changes will affect external users!'
-        });
-        console.log(`   🔴 CRITICAL: Published for embedding`);
-      }
-      
+
       // Show version info
       if (frontmatter.version) {
         console.log(`   📌 Version: ${frontmatter.version}`);

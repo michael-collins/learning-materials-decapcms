@@ -17,7 +17,6 @@ allowEmbed: true
 course: DART 303
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 In this exercise, you will practice animation techniques by recreating creatures from Evolved Virtual Creatures by Karl Sims.
 

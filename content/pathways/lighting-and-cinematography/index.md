@@ -4,6 +4,7 @@ slug: lighting-and-cinematography
 type: 'oer:Course'
 description: Sets up lighting and camera angles to create visually compelling 3D scenes.
 published: true
+allowEmbed: true
 oer:
   '@context': 'https://oerschema.org/'
   '@type': Course
@@ -20,7 +21,6 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 Sets up lighting and camera angles to create visually compelling 3D scenes.

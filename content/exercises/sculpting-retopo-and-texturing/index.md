@@ -17,7 +17,6 @@ published: true
 allowEmbed: true
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 In this exercise, you continue working on your creature sculpt. You will practice unwrapping UVs, exporting a UV map, and creating textures in 2D image editing software like Photoshop.

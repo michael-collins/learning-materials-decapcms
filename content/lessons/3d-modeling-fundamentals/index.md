@@ -25,10 +25,10 @@ items:
     __typename: projects
     project: you-dont-see-that-everyday-objects
 published: true
+allowEmbed: true
 license: CC BY 4.0
 version: 1.0.0
 versionStatus: latest
-publishEmbed: true
 ---
 
 Learn the core principles and techniques of 3D modeling, focusing on polygon modeling methods that form the foundation for all 3D content creation.

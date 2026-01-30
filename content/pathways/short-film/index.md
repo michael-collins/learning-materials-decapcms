@@ -29,7 +29,6 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 This pathway is designed for aspiring animators who want to create narrative-driven short films using 3D animation. Students will progress from foundational CGI skills through character animation and compositing, developing the complete skillset needed to produce professional-quality animated shorts.

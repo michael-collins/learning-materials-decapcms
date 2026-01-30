@@ -8,7 +8,6 @@ license: CC BY 4.0
 published: true
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 ## Presentation

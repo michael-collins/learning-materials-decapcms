@@ -38,7 +38,6 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 This specialization explores the technical and artistic aspects of creating visual effects through simulation. Students will learn to harness physics-based systems to create believable dynamic effects for film, television, and other media.

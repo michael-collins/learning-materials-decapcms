@@ -228,7 +228,6 @@ export default defineContentConfig({
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
         changelog: z.string().optional(),
         breakingChanges: z.array(z.string()).optional(),
-        publishEmbed: z.boolean().optional(),
       })
     }),
     docs: defineCollection({

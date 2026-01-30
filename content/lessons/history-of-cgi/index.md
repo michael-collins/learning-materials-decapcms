@@ -10,10 +10,10 @@ learningObjectives:
   - 'Understand how CGI transformed various industries'
   - 'Recognize pioneering artists and studios in CGI development'
 published: true
+allowEmbed: true
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'
-publishEmbed: true
 ---
 
 An introduction to the history and evolution of computer-generated imagery, exploring how CGI has transformed visual storytelling and design across multiple industries.

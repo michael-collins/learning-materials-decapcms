@@ -109,7 +109,6 @@ for (const type of contentTypes) {
             ...frontmatter,
             version: versionToSnapshot,
             versionStatus: 'archived',
-            publishEmbed: true,
             _snapshotCreatedAt: new Date().toISOString(),
             _snapshotFrom: 'index.md'
           };

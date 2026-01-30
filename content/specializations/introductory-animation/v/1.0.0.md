@@ -36,7 +36,6 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
-publishEmbed: true
 ---
 
 This specialization introduces students to the art and technique of 3D animation. Building on traditional animation principles, students will learn to create believable movement through careful observation, planning, and execution of animated sequences.

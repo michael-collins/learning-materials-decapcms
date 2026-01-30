@@ -31,6 +31,7 @@ criteria:
     name: Steps completed
     description: >-
       This criteria assess whether you completed all parts of a given set of
+allowEmbed: true
       instructions.
 ---
 # Project
