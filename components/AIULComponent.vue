@@ -20,42 +20,44 @@ const toggleExpanded = (index: number) => {
   expandedStates.value[index] = !expandedStates.value[index]
 }
 
-// AIUL license definitions
+// AIUL license definitions with versioned URLs
+const AIUL_VERSION = '1.0.0'
+
 const aiulLicenses = {
   'AIUL-NA': {
     fullName: 'No AI',
     description: 'Use of AI is not allowed',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#na',
+    url: `https://dmd-program.github.io/aiul/licenses/na/${AIUL_VERSION}/`,
     color: 'text-red-700 dark:text-red-400'
   },
   'AIUL-WA': {
     fullName: 'With Approval',
     description: 'AI use requires explicit instructor approval',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#wa',
+    url: `https://dmd-program.github.io/aiul/licenses/wa/${AIUL_VERSION}/`,
     color: 'text-orange-700 dark:text-orange-400'
   },
   'AIUL-CD': {
     fullName: 'Conceptual Development',
     description: 'AI may be used for brainstorming and ideation, but not for final execution',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#cd',
+    url: `https://dmd-program.github.io/aiul/licenses/cd/${AIUL_VERSION}/`,
     color: 'text-yellow-700 dark:text-yellow-400'
   },
   'AIUL-TC': {
     fullName: 'Transparency & Citation',
     description: 'AI may be used if all usage is documented and properly cited',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#tc',
+    url: `https://dmd-program.github.io/aiul/licenses/tc/${AIUL_VERSION}/`,
     color: 'text-blue-700 dark:text-blue-400'
   },
   'AIUL-DP': {
     fullName: 'Draft & Prototyping',
     description: 'AI may be used for drafts and prototyping, but not for final submissions',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#dp',
+    url: `https://dmd-program.github.io/aiul/licenses/dp/${AIUL_VERSION}/`,
     color: 'text-cyan-700 dark:text-cyan-400'
   },
   'AIUL-IU': {
     fullName: 'Informed Use',
     description: 'AI may be used freely, but you must be able to explain and justify all AI-assisted work',
-    url: 'https://dmd-program.github.io/aiul/licenses.html#iu',
+    url: `https://dmd-program.github.io/aiul/licenses/iu/${AIUL_VERSION}/`,
     color: 'text-green-700 dark:text-green-400'
   }
 }
@@ -208,6 +210,9 @@ const licenseDetails = computed(() => {
     const baseInfo = aiulLicenses[tag]
     const media = mediaSuffix ? mediaSuffixes[mediaSuffix] : null
     
+    // Generate badge image URL: https://dmd-program.github.io/aiul/assets/images/licenses/aiul-cd-3d.png
+    const badgeUrl = `https://dmd-program.github.io/aiul/assets/images/licenses/${lic.toLowerCase()}.png`
+    
     // Append media type to description if media suffix is present
     let info = baseInfo
     if (mediaSuffix && media) {
@@ -255,6 +260,7 @@ const licenseDetails = computed(() => {
       mediaSuffix,
       info,
       mediaType: media,
+      badgeUrl,
       guidance
     }
   })
@@ -279,6 +285,23 @@ const licenseDetails = computed(() => {
       </svg>
       
       <div class="flex-1">
+        <!-- Badge Image -->
+        <div class="mb-3">
+          <a 
+            :href="detail.info.url" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="inline-block hover:opacity-80 transition-opacity"
+          >
+            <img 
+              :src="detail.badgeUrl" 
+              :alt="`${detail.original} Badge`"
+              class="h-16 w-auto"
+              loading="lazy"
+            />
+          </a>
+        </div>
+        
         <div class="flex items-baseline gap-2 flex-wrap">
           <span class="text-sm font-semibold text-foreground">AI Usage License:</span>
           <a 
