@@ -102,6 +102,7 @@ collections:
       - {label: "Published", name: "published", widget: "boolean", default: true}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true, hint: "Enable iframe embedding for this content"}
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0). Bump this to auto-create a version snapshot."}
+      - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
@@ -146,7 +147,7 @@ collections:
       - {label: "Published", name: "published", widget: "boolean", default: true}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true, hint: "Enable iframe embedding for this content"}
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0)"}
-      - {label: "Version Status", name: "versionStatus", widget: "select", options: ["latest", "archived", "deprecated"], default: "latest", required: false}
+      - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
       - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
@@ -309,7 +310,7 @@ collections:
       - {label: "Published", name: "published", widget: "boolean", default: true}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true, required: false}
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0)"}
-      - {label: "Version Status", name: "versionStatus", widget: "select", options: ["latest", "archived", "deprecated"], default: "latest", required: false}
+      - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
       - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
       - label: "Attachments"
         name: "attachments"
@@ -399,7 +400,7 @@ collections:
       - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "AI Usage Licenses", name: "aiLicense", widget: "select", required: false, multiple: true, options: ["AIUL-NA", "AIUL-NA-WR", "AIUL-NA-IM", "AIUL-NA-VD", "AIUL-NA-AU", "AIUL-NA-3D", "AIUL-NA-TR", "AIUL-NA-MX", "AIUL-NA-CO", "AIUL-WA", "AIUL-WA-WR", "AIUL-WA-IM", "AIUL-WA-VD", "AIUL-WA-AU", "AIUL-WA-3D", "AIUL-WA-TR", "AIUL-WA-MX", "AIUL-WA-CO", "AIUL-CD", "AIUL-CD-WR", "AIUL-CD-IM", "AIUL-CD-VD", "AIUL-CD-AU", "AIUL-CD-3D", "AIUL-CD-TR", "AIUL-CD-MX", "AIUL-CD-CO", "AIUL-TC", "AIUL-TC-WR", "AIUL-TC-IM", "AIUL-TC-VD", "AIUL-TC-AU", "AIUL-TC-3D", "AIUL-TC-TR", "AIUL-TC-MX", "AIUL-TC-CO", "AIUL-DP", "AIUL-DP-WR", "AIUL-DP-IM", "AIUL-DP-VD", "AIUL-DP-AU", "AIUL-DP-3D", "AIUL-DP-TR", "AIUL-DP-MX", "AIUL-DP-CO", "AIUL-IU", "AIUL-IU-WR", "AIUL-IU-IM", "AIUL-IU-VD", "AIUL-IU-AU", "AIUL-IU-3D", "AIUL-IU-TR", "AIUL-IU-MX", "AIUL-IU-CO"], hint: "Select one or more AI usage policies"}
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0)"}
-      - {label: "Version Status", name: "versionStatus", widget: "select", options: ["latest", "archived", "deprecated"], default: "latest", required: false}
+      - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
       - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
       - {label: "Changelog", name: "changelog", widget: "text", required: false, hint: "What changed in this version?"}
       - label: "Breaking Changes"
