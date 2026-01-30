@@ -319,20 +319,13 @@ collections:
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0)"}
       - {label: "Version Status", name: "versionStatus", widget: "select", options: ["latest", "archived", "deprecated"], default: "latest", required: false}
       - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
-      - {label: "Changelog", name: "changelog", widget: "text", required: false, hint: "What changed in this version?"}
-      - label: "Breaking Changes"
-        name: "breakingChanges"
-        widget: "list"
-        required: false
-        hint: "List any breaking changes"
-        field: {label: "Change", name: "change", widget: "string"}
       - label: "Attachments"
         name: "attachments"
         widget: "list"
         required: false
         hint: "Add downloadable files or external links"
         fields:
-          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Attachment Title", name: "name", widget: "string"}
           - {label: "Description", name: "description", widget: "text", required: false}
           - {label: "File", name: "file", widget: "file", required: false, hint: "Upload a file for download"}
           - {label: "External URL", name: "url", widget: "string", required: false, hint: "Or provide an external link"}

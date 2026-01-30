@@ -15,8 +15,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -39,8 +37,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -68,8 +64,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -108,8 +102,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -188,13 +180,11 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
           url: z.string().optional(),
-          title: z.string(),
+          name: z.string(),
           description: z.string().optional(),
         })).optional(),
         // Legacy/override fields (optional, auto-generated if not provided)
