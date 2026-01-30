@@ -13,7 +13,7 @@ import matter from 'gray-matter';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const contentTypes = ['exercises', 'tutorials', 'lectures', 'articles', 'projects'];
+const contentTypes = ['exercises', 'tutorials', 'lectures', 'articles', 'projects', 'lessons', 'pathways', 'specializations'];
 const rootDir = path.join(__dirname, '..');
 const registryPath = path.join(rootDir, 'content/data/version-registry.json');
 
