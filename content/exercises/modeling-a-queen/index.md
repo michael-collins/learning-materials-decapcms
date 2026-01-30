@@ -1,13 +1,9 @@
 ---
-recordId: rec9QA33OJOpWtn9W
 title: Modeling a Queen
 slug: modeling-a-queen
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QkznWA0SSvO8i2iMil7btof
 image: /uploads/rec9QA33OJOpWtn9W_image_queen_image.png
 imageAlt: queen image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -33,7 +29,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

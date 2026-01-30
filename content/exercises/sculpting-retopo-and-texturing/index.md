@@ -1,17 +1,13 @@
 ---
-recordId: rec9LnLexVEqnrZNs
 title: 'Sculpting, retopo, and texturing'
 slug: sculpting-retopo-and-texturing
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrU8K-0aHxzKVRQWLcJt7YAW
 image: /uploads/rec9LnLexVEqnrZNs_image_sculpting-retopo-header-v2.png
 imageAlt: sculpting-retopo-header-v2.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

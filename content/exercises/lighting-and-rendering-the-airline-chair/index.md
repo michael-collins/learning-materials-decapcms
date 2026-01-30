@@ -1,17 +1,13 @@
 ---
-recordId: recbAgArvnM20cFKL
 title: Lighting and Rendering the Airline Chair
 slug: lighting-and-rendering-the-airline-chair
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrVabQ0miYe-Oy-PZe6Jab7Q
 image: /uploads/recbAgArvnM20cFKL_image_rendering-banner.jpg
 imageAlt: rendering-banner.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
   - Lighting
@@ -48,7 +44,7 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: image/jpeg
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

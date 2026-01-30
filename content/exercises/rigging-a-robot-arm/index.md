@@ -1,17 +1,13 @@
 ---
-recordId: recdQolQv78RHunPj
 title: Rigging a robot arm
 slug: rigging-a-robot-arm
-type: 'oer:Practice'
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrX1grpUd5zHMGYJovRjPN69
 image: /uploads/recdQolQv78RHunPj_image_ex-6-adv-banner-compressed.jpg
 imageAlt: ex-6-adv-banner-compressed.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

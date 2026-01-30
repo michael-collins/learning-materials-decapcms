@@ -1,13 +1,9 @@
 ---
-recordId: recvUlgEohhluSnhU
 title: Modeling a Low Poly Animal and Introduction to Particles
 slug: modeling-a-low-poly-animal-and-introduction-to-particles
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QkTtYtaAa7RjiQgixIJX0kH
 image: /uploads/recvUlgEohhluSnhU_image_OSTRICH.png
 imageAlt: OSTRICH.png
-rubric: exercise-low-poly
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -18,7 +14,7 @@ allowEmbed: true
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

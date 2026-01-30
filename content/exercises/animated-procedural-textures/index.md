@@ -1,27 +1,23 @@
 ---
-recordId: recHfTCKlxhMVb30g
 title: Animated procedural textures
 slug: animated-procedural-textures
-type: oer:Practice
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrXtsipLP7DiUgZxSrwUp8uh
 image: /uploads/recHfTCKlxhMVb30g_image_waterfall.png
 imageAlt: waterfall.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
   - AfterEffects
   - Adobe Media Encoder
 author: Michael Collins
 course: DART 303
-authorUrl: https://michaelcollins.xyz
+authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

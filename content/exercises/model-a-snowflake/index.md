@@ -1,13 +1,9 @@
 ---
-recordId: recorR58sjS22oVbk
 title: Model a Snowflake
 slug: model-a-snowflake
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QlA1AFMxpkvj6JQwOxNygMy
 image: /uploads/recorR58sjS22oVbk_image_snowflake_image.png
 imageAlt: snowflake image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -18,7 +14,7 @@ allowEmbed: true
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

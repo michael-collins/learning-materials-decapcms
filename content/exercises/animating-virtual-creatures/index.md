@@ -1,25 +1,21 @@
 ---
-recordId: rechgHKhLdlHzKX81
 title: Animating virtual creatures
 slug: animating-virtual-creatures
-type: oer:Practice
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrVL5OApws44r45Oz65NJyEi
 image: /uploads/rechgHKhLdlHzKX81_image_banner-creatures-compressed.jpg
 imageAlt: banner-creatures-compressed.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
-authorUrl: https://michaelcollins.xyz
+authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
 course: DART 303
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

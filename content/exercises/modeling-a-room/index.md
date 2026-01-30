@@ -1,17 +1,13 @@
 ---
-recordId: rec6ebYsG1Dnf08qb
 title: Modeling a room
 slug: modeling-a-room
-type: 'oer:Practice'
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrVP_vzYSEfaSkkPDhMdPfrK
 image: /uploads/rec6ebYsG1Dnf08qb_image_room-model.png
 imageAlt: room-model.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

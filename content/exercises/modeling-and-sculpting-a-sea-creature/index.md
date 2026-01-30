@@ -1,17 +1,13 @@
 ---
-recordId: reckkzm19AZnEIkJE
 title: Modeling and sculpting a sea creature
 slug: modeling-and-sculpting-a-sea-creature
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrW9SylyEr8DprET38xynl_5
 image: /uploads/reckkzm19AZnEIkJE_image_sculpting-retopo-header-v1.jpg
 imageAlt: sculpting-retopo-header-v1.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

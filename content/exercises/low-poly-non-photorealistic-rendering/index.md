@@ -1,17 +1,13 @@
 ---
-recordId: recc8Zz9a0zTOaRyE
 title: Low poly non-photorealistic rendering
 slug: low-poly-non-photorealistic-rendering
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrX6h44IeMo7hTkjg9HtJgvb
 image: /uploads/recc8Zz9a0zTOaRyE_image_t-pose-banner.jpg
 imageAlt: t-pose-banner.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

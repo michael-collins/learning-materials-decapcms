@@ -1,17 +1,13 @@
 ---
-recordId: rechLzLJpVGI50gnn
 title: Rendering a room
 slug: rendering-a-room
-type: 'oer:Practice'
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrU-XvcElSlBW7dQn4n1yj54
 image: /uploads/rechLzLJpVGI50gnn_image_room-banner2.png
 imageAlt: room-banner2.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

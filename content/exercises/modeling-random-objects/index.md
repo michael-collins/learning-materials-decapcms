@@ -1,17 +1,13 @@
 ---
-recordId: recLtYP0nJUL7RK8O
 title: Modeling random objects
 slug: modeling-random-objects
-type: 'oer:Practice'
 difficulty: Intermediate
-youtubePlaylistID: PL-V2nChTadrUtPySfHyf4j_w6PGi6AES9
 image: /uploads/recLtYP0nJUL7RK8O_image_modeling-objects-header.jpg
 imageAlt: modeling-objects-header.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

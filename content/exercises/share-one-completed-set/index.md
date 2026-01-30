@@ -1,12 +1,9 @@
 ---
-recordId: rec3owIe1VzR0OffF
 title: Share One Completed Set
 slug: share-one-completed-set
-type: 'oer:Practice'
 difficulty: Beginner
 image: /uploads/rec3owIe1VzR0OffF_image_ian_brill_icon_chess_set_2.jpg
 imageAlt: ian brill icon chess set 2.jpg
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -17,7 +14,7 @@ allowEmbed: true
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

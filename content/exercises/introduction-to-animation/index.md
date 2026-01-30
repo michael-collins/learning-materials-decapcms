@@ -1,17 +1,13 @@
 ---
-recordId: recDaZ0H0qFz4iYlR
 title: Introduction to animation
 slug: introduction-to-animation
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrUCq3o-AvWZ3A6mQTd8O9uJ
 image: /uploads/recDaZ0H0qFz4iYlR_image_animation.png
 imageAlt: animation.png
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -19,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

@@ -1,13 +1,9 @@
 ---
-recordId: rec14hI66d4Hl61SA
 title: Model a Gem
 slug: model-a-gem
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5Qn9XcneFk2URkb8MW1B4lQB
 image: /uploads/rec14hI66d4Hl61SA_image_gem_image.png
 imageAlt: gem image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -18,7 +14,7 @@ allowEmbed: true
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

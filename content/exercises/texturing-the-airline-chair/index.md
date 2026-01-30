@@ -1,17 +1,13 @@
 ---
-recordId: recF0xzVxfkZoJ63J
 title: Texturing the Airline Chair
 slug: texturing-the-airline-chair
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrUGw6OioaTkVBSCP12C9mjq
 image: /uploads/recF0xzVxfkZoJ63J_image_airline-chair-texturing-header.jpg
 imageAlt: airline-chair-texturing-header.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
   - Texturing
@@ -41,7 +37,7 @@ attachments:
       2018-22-28 
     sourceUrl: 'http://cprhw.tt/o/BKmDR/'
     type: image/jpeg
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

@@ -1,13 +1,9 @@
 ---
-recordId: recsOUAg8kJfB2Czp
 title: Modeling a Pawn
 slug: modeling-a-pawn
-type: 'oer:Practice'
 difficulty: Beginner
-youtubePlaylistID: PLcAjW37cz5QkyyjlPgk2ZmvzQih_Yk8Dx
 image: /uploads/recsOUAg8kJfB2Czp_image_pawn_image.png
 imageAlt: pawn image.png
-rubric: exercise
 tags:
   - Blender
 author: Kenneth Ian Brill
@@ -33,7 +29,7 @@ attachments:
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

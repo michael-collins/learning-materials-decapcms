@@ -1,18 +1,13 @@
 ---
-recordId: recF6aLZmbNHI355u
 title: Rigging a quadruped
 slug: rigging-a-quadruped
-type: 'oer:Practice'
 difficulty: Advanced
-youtubePlaylistID: PL-V2nChTadrV1SRFV9WFkj605z0HzQLXS
-image: >-
-  /uploads/recF6aLZmbNHI355u_image_ex-6-intermediate-banner-compressed.jpg
+image: /uploads/recF6aLZmbNHI355u_image_ex-6-intermediate-banner-compressed.jpg
 imageAlt: ex-6-intermediate-banner-compressed.jpg
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
-rubric: exercise
 tags:
   - Blender
 author: Michael Collins
@@ -20,7 +15,7 @@ course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
 publishEmbed: true
 ---

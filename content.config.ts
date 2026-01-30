@@ -15,8 +15,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -39,8 +37,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -54,17 +50,12 @@ export default defineContentConfig({
       type: 'page',
       source: 'exercises/**/*.md',
       schema: z.object({
-        recordId: z.string().optional(),
         title: z.string(),
-        slug: z.string().optional(),
-        type: z.string().optional(),
         difficulty: z.string().optional(),
-        youtubePlaylistID: z.string().optional(),
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         license: z.string().optional(),
         aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
-        rubric: z.string().optional(),
         tags: z.array(z.string()).optional(),
         author: z.string().optional(),
         authorUrl: z.string().optional(),
@@ -73,8 +64,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -86,23 +75,25 @@ export default defineContentConfig({
           sourceUrl: z.string().optional(),
           type: z.string().optional(),
         })).optional(),
+        // Legacy/override fields (optional, auto-generated if not provided)
+        slug: z.string().optional(),
+        recordId: z.string().optional(),
+        type: z.string().optional(),
+        rubric: z.string().optional(),
+        lesson: z.string().optional(),
+        specialization: z.string().optional(),
       })
     }),
     projects: defineCollection({
       type: 'page',
       source: 'projects/**/*.md',
       schema: z.object({
-        recordId: z.string().optional(),
         title: z.string(),
-        slug: z.string().optional(),
-        type: z.string().optional(),
         difficulty: z.string().optional(),
-        youtubePlaylistID: z.string().optional(),
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         license: z.string().optional(),
         aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
-        rubric: z.string().optional(),
         tags: z.array(z.string()).optional(),
         author: z.string().optional(),
         authorUrl: z.string().optional(),
@@ -111,8 +102,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
@@ -124,6 +113,14 @@ export default defineContentConfig({
           sourceUrl: z.string().optional(),
           type: z.string().optional(),
         })).optional(),
+        // Legacy/override fields (optional, auto-generated if not provided)
+        slug: z.string().optional(),
+        recordId: z.string().optional(),
+        type: z.string().optional(),
+        rubric: z.string().optional(),
+        lesson: z.string().optional(),
+        specialization: z.string().optional(),
+        youtubePlaylistID: z.string().optional(),
       })
     }),
     specializations: defineCollection({
@@ -170,12 +167,8 @@ export default defineContentConfig({
       type: 'page',
       source: 'lectures/*/index.md',
       schema: z.object({
-        recordId: z.string().optional(),
         title: z.string(),
-        slug: z.string().optional(),
-        type: z.string().optional(),
-        googleSlidesID: z.string().optional(),
-        topics: z.string().optional(),
+        course: z.string().optional(),
         author: z.string().optional(),
         license: z.string().optional(),
         aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
@@ -187,16 +180,21 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
         publishEmbed: z.boolean().optional(),
         attachments: z.array(z.object({
           file: z.string().optional(),
           url: z.string().optional(),
-          title: z.string(),
+          name: z.string(),
           description: z.string().optional(),
         })).optional(),
-        oer: z.any().optional(),
+        // Legacy/override fields (optional, auto-generated if not provided)
+        slug: z.string().optional(),
+        recordId: z.string().optional(),
+        type: z.string().optional(),
+        googleSlidesID: z.string().optional(),
+        topics: z.union([z.string(), z.array(z.string())]).optional(),
+        lesson: z.string().optional(),
+        specialization: z.string().optional(),
       })
     }),
     lessons: defineCollection({
