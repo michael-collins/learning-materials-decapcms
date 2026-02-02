@@ -536,6 +536,9 @@ const copyCitation = async () => {
           <span v-else class="font-medium text-foreground">{{ license }}</span>
         </p>
       </div>
+
+      <!-- OER Schema Curriculum Graph -->
+      <OERSchemaGraphWrapper v-if="!isEmbed" />
     </article>
     
     <!-- Citation copied toast -->
