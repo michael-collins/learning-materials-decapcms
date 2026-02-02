@@ -1,28 +1,25 @@
 <template>
   <div class="oer-schema-badge">
-    <div class="flex items-center gap-3">
+    <button
+      @click="openObjects"
+      @keydown.enter="openObjects"
+      @keydown.space.prevent="openObjects"
+      class="flex items-center gap-2 p-2 -m-2 rounded-md hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors cursor-pointer"
+      aria-label="View OER Schema structured data for this page"
+      type="button"
+    >
       <img 
         :src="logoUrl"
         alt="OER Schema"
         class="h-6 w-auto"
         @error="handleImageError"
       />
-      <Button
-        variant="outline"
-        size="sm"
-        @click="openObjects"
-        class="flex items-center gap-2"
-      >
-        <Icon name="lucide:file-code" class="w-4 h-4" />
-        <span>OER Objects</span>
-      </Button>
-    </div>
+      <span class="sr-only">Open OER Schema data modal</span>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import Button from '~/components/ui/button/Button.vue';
-
 const { isDark } = useTheme();
 
 const logoUrl = computed(() => {
