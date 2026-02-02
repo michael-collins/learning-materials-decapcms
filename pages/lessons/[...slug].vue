@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { buildLessonSchema } from '~/lib/oer-schema-builder'
+import { Card, CardContent } from '~/components/ui/card'
 
 const route = useRoute()
 const isEmbed = computed(() => route.query.embed === 'true')
@@ -44,44 +45,103 @@ const { data: relatedContent } = await useAsyncData(
   async () => {
     if (!lesson.value) return { lectures: [], tutorials: [], exercises: [], articles: [], projects: [] }
     
-    const lectures = lesson.value.lectures 
+    console.log('[Lesson Page] Full lesson data:', lesson.value)
+    console.log('[Lesson Page] Items array:', lesson.value.items)
+    
+    // Parse items array (new format) or fallback to old format
+    let lectureSlugs: string[] = []
+    let tutorialSlugs: string[] = []
+    let exerciseSlugs: string[] = []
+    let articleSlugs: string[] = []
+    let projectSlugs: string[] = []
+    
+    if (lesson.value.items && Array.isArray(lesson.value.items)) {
+      console.log('[Lesson Page] Using new items format')
+      // New format: items array with type-specific keys
+      lesson.value.items.forEach((item: any) => {
+        console.log('[Lesson Page] Processing item:', item)
+        if (item.type === 'lectures' && item.lecture) {
+          lectureSlugs.push(item.lecture)
+        } else if (item.type === 'tutorials' && item.tutorial) {
+          tutorialSlugs.push(item.tutorial)
+        } else if (item.type === 'exercises' && item.exercise) {
+          exerciseSlugs.push(item.exercise)
+        } else if (item.type === 'articles' && item.article) {
+          articleSlugs.push(item.article)
+        } else if (item.type === 'projects' && item.project) {
+          projectSlugs.push(item.project)
+        }
+      })
+    } else {
+      console.log('[Lesson Page] Using old format')
+      // Old format: separate arrays
+      lectureSlugs = lesson.value.lectures || []
+      tutorialSlugs = lesson.value.tutorials || []
+      exerciseSlugs = lesson.value.exercises || []
+      articleSlugs = lesson.value.articles || []
+      projectSlugs = lesson.value.projects || []
+    }
+    
+    console.log('[Lesson Page] Parsed slugs:', { lectureSlugs, tutorialSlugs, exerciseSlugs, articleSlugs, projectSlugs })
+    
+    const lectures = lectureSlugs.length > 0
       ? await Promise.all(
-          lesson.value.lectures.map((slug: string) =>
+          lectureSlugs.map((slug: string) =>
             queryCollection('lectures').path(`/lectures/${slug}`).first()
           )
-        ).then(results => results.filter(Boolean))
+        ).then(results => {
+          const filtered = results.filter(Boolean)
+          console.log('Fetched lectures:', filtered)
+          return filtered
+        })
       : []
     
-    const tutorials = lesson.value.tutorials
+    const tutorials = tutorialSlugs.length > 0
       ? await Promise.all(
-          lesson.value.tutorials.map((slug: string) =>
+          tutorialSlugs.map((slug: string) =>
             queryCollection('tutorials').path(`/tutorials/${slug}`).first()
           )
-        ).then(results => results.filter(Boolean))
+        ).then(results => {
+          const filtered = results.filter(Boolean)
+          console.log('Fetched tutorials:', filtered)
+          return filtered
+        })
       : []
     
-    const exercises = lesson.value.exercises
+    const exercises = exerciseSlugs.length > 0
       ? await Promise.all(
-          lesson.value.exercises.map((slug: string) =>
+          exerciseSlugs.map((slug: string) =>
             queryCollection('exercises').path(`/exercises/${slug}`).first()
           )
-        ).then(results => results.filter(Boolean))
+        ).then(results => {
+          const filtered = results.filter(Boolean)
+          console.log('Fetched exercises:', filtered)
+          return filtered
+        })
       : []
     
-    const articles = lesson.value.articles
+    const articles = articleSlugs.length > 0
       ? await Promise.all(
-          lesson.value.articles.map((slug: string) =>
+          articleSlugs.map((slug: string) =>
             queryCollection('articles').path(`/articles/${slug}`).first()
           )
-        ).then(results => results.filter(Boolean))
+        ).then(results => {
+          const filtered = results.filter(Boolean)
+          console.log('Fetched articles:', filtered)
+          return filtered
+        })
       : []
     
-    const projects = lesson.value.projects
+    const projects = projectSlugs.length > 0
       ? await Promise.all(
-          lesson.value.projects.map((slug: string) =>
+          projectSlugs.map((slug: string) =>
             queryCollection('projects').path(`/projects/${slug}`).first()
           )
-        ).then(results => results.filter(Boolean))
+        ).then(results => {
+          const filtered = results.filter(Boolean)
+          console.log('Fetched projects:', filtered)
+          return filtered
+        })
       : []
     
     return { lectures, tutorials, exercises, articles, projects }
@@ -108,6 +168,15 @@ const breadcrumbs = computed(() => {
   
   return crumbs
 })
+
+// Helper to get link path from content item
+const getItemPath = (item: any, type: string) => {
+  if (!item) return '#'
+  if (item.path) return item.path
+  if (item._path) return item._path
+  if (item.slug) return `/${type}/${item.slug}`
+  return '#'
+}
 
 // Build OER Schema for SEO and discoverability
 const oerSchema = computed(() => {
@@ -182,87 +251,162 @@ const oerSchema = computed(() => {
           <h2 class="text-2xl font-bold">Related Content</h2>
           
           <div v-if="relatedContent.lectures.length > 0" class="space-y-4">
-            <h3 class="text-xl font-semibold">Lectures</h3>
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <NuxtLink
+            <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Lectures</h3>
+            <div class="space-y-2">
+              <Card
                 v-for="lecture in relatedContent.lectures"
-                :key="lecture.slug"
-                :to="`/lectures/${lecture.slug}`"
-                class="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+                :key="lecture._id || lecture.slug"
+                class="overflow-hidden hover:bg-accent transition-colors group cursor-pointer"
               >
-                <h4 class="font-semibold">{{ lecture.title }}</h4>
-                <p v-if="lecture.description" class="text-sm text-muted-foreground mt-1">
-                  {{ lecture.description }}
-                </p>
-              </NuxtLink>
+                <NuxtLink :to="getItemPath(lecture, 'lectures')">
+                  <CardContent class="p-4">
+                    <div class="flex items-center gap-4">
+                      <div 
+                        v-if="lecture.image" 
+                        class="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted"
+                      >
+                        <img 
+                          :src="lecture.image" 
+                          :alt="lecture.imageAlt || lecture.title"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-medium group-hover:text-primary transition-colors">{{ lecture.title }}</h4>
+                      </div>
+                      <Icon name="lucide:arrow-right" class="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </div>
+                  </CardContent>
+                </NuxtLink>
+              </Card>
             </div>
           </div>
 
           <div v-if="relatedContent.tutorials.length > 0" class="space-y-4">
-            <h3 class="text-xl font-semibold">Tutorials</h3>
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <NuxtLink
+            <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Tutorials</h3>
+            <div class="space-y-2">
+              <Card
                 v-for="tutorial in relatedContent.tutorials"
-                :key="tutorial.slug"
-                :to="`/tutorials/${tutorial.slug}`"
-                class="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+                :key="tutorial._id || tutorial.slug"
+                class="overflow-hidden hover:bg-accent transition-colors group cursor-pointer"
               >
-                <h4 class="font-semibold">{{ tutorial.title }}</h4>
-                <p v-if="tutorial.description" class="text-sm text-muted-foreground mt-1">
-                  {{ tutorial.description }}
-                </p>
-              </NuxtLink>
+                <NuxtLink :to="getItemPath(tutorial, 'tutorials')">
+                  <CardContent class="p-4">
+                    <div class="flex items-center gap-4">
+                      <div 
+                        v-if="tutorial.image" 
+                        class="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted"
+                      >
+                        <img 
+                          :src="tutorial.image" 
+                          :alt="tutorial.imageAlt || tutorial.title"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-medium group-hover:text-primary transition-colors">{{ tutorial.title }}</h4>
+                      </div>
+                      <Icon name="lucide:arrow-right" class="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </div>
+                  </CardContent>
+                </NuxtLink>
+              </Card>
             </div>
           </div>
 
           <div v-if="relatedContent.exercises.length > 0" class="space-y-4">
-            <h3 class="text-xl font-semibold">Exercises</h3>
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <NuxtLink
+            <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Exercises</h3>
+            <div class="space-y-2">
+              <Card
                 v-for="exercise in relatedContent.exercises"
-                :key="exercise.slug"
-                :to="`/exercises/${exercise.slug}`"
-                class="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+                :key="exercise._id || exercise.slug"
+                class="overflow-hidden hover:bg-accent transition-colors group cursor-pointer"
               >
-                <h4 class="font-semibold">{{ exercise.title }}</h4>
-                <p v-if="exercise.description" class="text-sm text-muted-foreground mt-1">
-                  {{ exercise.description }}
-                </p>
-              </NuxtLink>
+                <NuxtLink :to="getItemPath(exercise, 'exercises')">
+                  <CardContent class="p-4">
+                    <div class="flex items-center gap-4">
+                      <div 
+                        v-if="exercise.image" 
+                        class="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted"
+                      >
+                        <img 
+                          :src="exercise.image" 
+                          :alt="exercise.imageAlt || exercise.title"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-medium group-hover:text-primary transition-colors">{{ exercise.title }}</h4>
+                      </div>
+                      <Icon name="lucide:arrow-right" class="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </div>
+                  </CardContent>
+                </NuxtLink>
+              </Card>
             </div>
           </div>
 
           <div v-if="relatedContent.articles.length > 0" class="space-y-4">
-            <h3 class="text-xl font-semibold">Articles</h3>
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <NuxtLink
+            <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Articles</h3>
+            <div class="space-y-2">
+              <Card
                 v-for="article in relatedContent.articles"
-                :key="article.slug"
-                :to="`/articles/${article.slug}`"
-                class="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+                :key="article._id || article.slug"
+                class="overflow-hidden hover:bg-accent transition-colors group cursor-pointer"
               >
-                <h4 class="font-semibold">{{ article.title }}</h4>
-                <p v-if="article.description" class="text-sm text-muted-foreground mt-1">
-                  {{ article.description }}
-                </p>
-              </NuxtLink>
+                <NuxtLink :to="getItemPath(article, 'articles')">
+                  <CardContent class="p-4">
+                    <div class="flex items-center gap-4">
+                      <div 
+                        v-if="article.image" 
+                        class="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted"
+                      >
+                        <img 
+                          :src="article.image" 
+                          :alt="article.imageAlt || article.title"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-medium group-hover:text-primary transition-colors">{{ article.title }}</h4>
+                      </div>
+                      <Icon name="lucide:arrow-right" class="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </div>
+                  </CardContent>
+                </NuxtLink>
+              </Card>
             </div>
           </div>
 
           <div v-if="relatedContent.projects.length > 0" class="space-y-4">
-            <h3 class="text-xl font-semibold">Projects</h3>
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <NuxtLink
+            <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Projects</h3>
+            <div class="space-y-2">
+              <Card
                 v-for="project in relatedContent.projects"
-                :key="project.slug"
-                :to="`/projects/${project.slug}`"
-                class="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+                :key="project._id || project.slug"
+                class="overflow-hidden hover:bg-accent transition-colors group cursor-pointer"
               >
-                <h4 class="font-semibold">{{ project.title }}</h4>
-                <p v-if="project.description" class="text-sm text-muted-foreground mt-1">
-                  {{ project.description }}
-                </p>
-              </NuxtLink>
+                <NuxtLink :to="getItemPath(project, 'projects')">
+                  <CardContent class="p-4">
+                    <div class="flex items-center gap-4">
+                      <div 
+                        v-if="project.image" 
+                        class="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted"
+                      >
+                        <img 
+                          :src="project.image" 
+                          :alt="project.imageAlt || project.title"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-medium group-hover:text-primary transition-colors">{{ project.title }}</h4>
+                      </div>
+                      <Icon name="lucide:arrow-right" class="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </div>
+                  </CardContent>
+                </NuxtLink>
+              </Card>
             </div>
           </div>
         </div>
