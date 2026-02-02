@@ -528,12 +528,11 @@ export function buildLessonSchema(doc: ParsedContent, parentSpecialization?: Par
       'oer': 'https://oerschema.org/',
       'schema': 'https://schema.org/'
     },
-    '@type': 'oer:LearningComponent',
+    '@type': 'oer:InstructionalPattern',
     '@id': baseId,
     'name': doc.title,
     'url': baseId,
     'inLanguage': 'en-US',
-    'componentType': 'Lesson',
   };
   
   // Description
@@ -564,9 +563,9 @@ export function buildLessonSchema(doc: ParsedContent, parentSpecialization?: Par
     }
   }
   
-  // Learning objectives
+  // Learning objectives with @id references
   if (doc.learningObjectives && doc.learningObjectives.length > 0) {
-    schema.teaches = doc.learningObjectives.map((obj: string, idx: number) => ({
+    schema.hasLearningObjective = doc.learningObjectives.map((obj: string, idx: number) => ({
       '@type': 'oer:LearningObjective',
       '@id': `${baseId}#objective-${idx + 1}`,
       'description': obj
@@ -580,42 +579,48 @@ export function buildLessonSchema(doc: ParsedContent, parentSpecialization?: Par
     // Add lectures
     if (content.lectures && content.lectures.length > 0) {
       content.lectures.forEach(lecture => {
-        components.push({
-          '@type': 'oer:SupportingMaterial',
-          '@id': `${baseUrl}/lectures/${lecture.slug}`,
-          'name': lecture.title,
-          'materialType': 'Lecture'
-        });
+        if (lecture && lecture.slug && lecture.title) {
+          components.push({
+            '@type': 'oer:SupportingMaterial',
+            '@id': `${baseUrl}/lectures/${lecture.slug}`,
+            'name': lecture.title,
+            'materialType': 'Lecture'
+          });
+        }
       });
     }
     
     // Add exercises
     if (content.exercises && content.exercises.length > 0) {
       content.exercises.forEach(exercise => {
-        components.push({
-          '@type': 'oer:Practice',
-          '@id': `${baseUrl}/exercises/${exercise.slug}`,
-          'name': exercise.title,
-          'educationalLevel': exercise.difficulty
-        });
+        if (exercise && exercise.slug && exercise.title) {
+          components.push({
+            '@type': 'oer:Practice',
+            '@id': `${baseUrl}/exercises/${exercise.slug}`,
+            'name': exercise.title,
+            ...(exercise.difficulty && { 'educationalLevel': exercise.difficulty })
+          });
+        }
       });
     }
     
     // Add projects
     if (content.projects && content.projects.length > 0) {
       content.projects.forEach(project => {
-        components.push({
-          '@type': 'oer:Assessment',
-          '@id': `${baseUrl}/projects/${project.slug}`,
-          'name': project.title,
-          'assessmentType': 'Project',
-          'educationalLevel': project.difficulty
-        });
+        if (project && project.slug && project.title) {
+          components.push({
+            '@type': 'oer:Assessment',
+            '@id': `${baseUrl}/projects/${project.slug}`,
+            'name': project.title,
+            'assessmentType': 'Project',
+            ...(project.difficulty && { 'educationalLevel': project.difficulty })
+          });
+        }
       });
     }
     
     if (components.length > 0) {
-      schema.hasPart = components;
+      schema.hasComponent = components;
     }
   }
   
