@@ -26,6 +26,15 @@ export default defineNuxtConfig({
     },
   },
 
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        ignore: ['**/index.ts'] // Exclude index.ts files to avoid conflicts with auto-imported components
+      }
+    ]
+  },
+
   content: {
     // Nuxt Content configuration
     highlight: {

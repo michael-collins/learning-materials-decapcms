@@ -43,6 +43,7 @@ interface Props {
   versionStatus?: string
   version?: string
   hideMenu?: boolean
+  hideOerSchemaBadge?: boolean
 }
 
 const props = defineProps<Props>()
@@ -486,13 +487,10 @@ const copyCitation = async () => {
           />
         </div>
       </div>
-
-      <!-- OER Schema Curriculum Graph -->
-      <OERSchemaGraphWrapper v-if="!isEmbed" />
     </article>
 
     <!-- OER Schema Curriculum Graph -->
-    <OERSchemaGraphWrapper v-if="!isEmbed" />
+    <OERSchemaGraphWrapper v-if="!isEmbed && !hideOerSchemaBadge" />
     
     <!-- Embed Modal -->
     <Teleport to="body">
@@ -622,10 +620,6 @@ const copyCitation = async () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
           </div>
         </div>
       </Transition>

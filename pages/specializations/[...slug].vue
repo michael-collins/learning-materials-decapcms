@@ -84,14 +84,11 @@ const breadcrumbs = computed(() => [
 const oerSchema = computed(() => {
   if (!specialization.value) return null
   const baseUrl = useRequestURL().origin
-  return buildLearningComponentSchema(specialization.value, baseUrl)
-})
-
-// Embed section state
-const embedUrl = computed(() => {
-  if (typeof window === 'undefined') return ''
-  const baseUrl = window.location.origin
-  return `${baseUrl}/embed/specializations/${baseSlug}`
+  const specializationWithPath = {
+    ...specialization.value,
+    _path: `/specializations/${baseSlug}`
+  }
+  return buildLearningComponentSchema(specializationWithPath, baseUrl)
 })
 </script>
 
@@ -113,6 +110,7 @@ const embedUrl = computed(() => {
         :versionStatus="specialization.versionStatus"
         :version="displayVersion"
         :allowEmbed="specialization.meta?.allowEmbed"
+        :hideOerSchemaBadge="true"
       >
         <ContentRenderer :value="specialization" />
       </CollectionItem>
@@ -165,9 +163,9 @@ const embedUrl = computed(() => {
         </div>
       </div>
 
-      <!-- Embed Section at Bottom -->
-      <div v-if="specialization.meta?.allowEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <EmbedSection :embed-url="embedUrl" :title="specialization.title" />
+      <!-- OER Schema Curriculum Graph -->
+      <div v-if="!isEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+        <OERSchemaGraphWrapper />
       </div>
     </div>
     <div v-else class="container py-8">
