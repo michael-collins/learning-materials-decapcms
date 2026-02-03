@@ -6,6 +6,7 @@ import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
 import BreadcrumbSeparator from '~/components/ui/breadcrumb/BreadcrumbSeparator.vue'
 import { Download, ExternalLink, FileText, FileArchive, File, Copy, Check, ChevronDown, Pencil } from 'lucide-vue-next'
 import Button from '~/components/ui/button/Button.vue'
+import CitationDropdown from '~/components/CitationDropdown.vue'
 
 interface BreadcrumbSegment {
   label: string
@@ -299,14 +300,6 @@ const copyCitation = async () => {
               <div class="h-px bg-border" />
               
               <button
-                @click.stop="copyCitation"
-                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
-              >
-                <Copy class="w-4 h-4" />
-                Copy page citation
-              </button>
-              <div class="h-px bg-border" />
-              <button
                 @click.stop="exportCommonCartridge"
                 class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"
               >
@@ -524,17 +517,28 @@ const copyCitation = async () => {
 
       <!-- Creative Commons License -->
       <div v-if="license" class="mt-12 pt-8 border-t">
-        <p class="text-sm text-muted-foreground leading-relaxed">
-          <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
-          <span v-if="author">
-            by 
-            <a v-if="authorUrl" :href="authorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-foreground hover:text-primary transition-colors">{{ author }}</a>
-            <span v-else>{{ author }}</span>
-          </span>
-          is licensed under
-          <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
-          <span v-else class="font-medium text-foreground">{{ license }}</span>
-        </p>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <p class="text-sm text-muted-foreground leading-relaxed">
+            <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
+            <span v-if="author">
+              by 
+              <a v-if="authorUrl" :href="authorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-foreground hover:text-primary transition-colors">{{ author }}</a>
+              <span v-else>{{ author }}</span>
+            </span>
+            is licensed under
+            <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
+            <span v-else class="font-medium text-foreground">{{ license }}</span>
+          </p>
+          <CitationDropdown 
+            :title="title"
+            :author="author"
+            :author-url="authorUrl"
+            :date="date"
+            :license="license"
+            :version="version"
+            :version-status="versionStatus"
+          />
+        </div>
       </div>
 
       <!-- OER Schema Curriculum Graph -->
