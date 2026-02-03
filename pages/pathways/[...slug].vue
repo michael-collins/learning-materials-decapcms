@@ -24,11 +24,6 @@ const { data: pathway, pending } = await useAsyncData(`pathway-${baseSlug}-${ver
   
   // Fallback to latest (index)
   const result = await queryCollection('pathways').path(`/pathways/${baseSlug}`).first()
-  console.log('[Pathway Page] Title:', result?.title)
-  console.log('[Pathway Page] meta.license:', result?.meta?.license)
-  console.log('[Pathway Page] meta.author:', result?.meta?.author)
-  console.log('[Pathway Page] meta keys:', Object.keys(result?.meta || {}))
-  console.log('[Pathway Page] Full result keys:', Object.keys(result || {}))
   return result
 })
 
@@ -38,36 +33,24 @@ const specializationsLoading = ref(false)
 
 const fetchSpecializations = async () => {
   if (!pathway.value?.specializations || pathway.value.specializations.length === 0) {
-    console.log('No specializations found in pathway')
     specializations.value = []
     return
   }
 
   specializationsLoading.value = true
-  console.log('Pathway specializations array:', pathway.value.specializations)
 
   try {
     const specs = await Promise.all(
       pathway.value.specializations.map((spec: any) => {
         const specSlug = typeof spec === 'string' ? spec : spec.slug
         const specPath = `/specializations/${specSlug}`
-        console.log('Querying specialization:', specPath)
         return queryCollection('specializations').path(specPath).first()
-          .then((result: any) => {
-            console.log(`Result for ${specPath}:`, result ? `Found (${result.title})` : 'Not found')
-            return result
-          })
-          .catch((err: any) => {
-            console.error(`Error fetching ${specPath}:`, err)
-            return null
-          })
+          .catch(() => null)
       })
     )
     const filtered = specs.filter(Boolean)
-    console.log('Final filtered specializations:', filtered.length, filtered)
     specializations.value = filtered
   } catch (err) {
-    console.error('Error fetching specializations:', err)
     specializations.value = []
   } finally {
     specializationsLoading.value = false
@@ -77,8 +60,6 @@ const fetchSpecializations = async () => {
 // Watch pathway and fetch specializations when it loads
 watch(() => pathway.value, (newVal) => {
   if (newVal) {
-    console.log('Pathway loaded:', newVal.title)
-    console.log('Raw specializations field:', newVal.specializations)
     fetchSpecializations()
   }
 }, { immediate: true })

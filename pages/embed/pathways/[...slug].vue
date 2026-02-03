@@ -38,7 +38,6 @@ const fetchSpecializations = async () => {
     )
     specializations.value = specs.filter(Boolean)
   } catch (err) {
-    console.error('Error fetching specializations:', err)
     specializations.value = []
   } finally {
     specializationsLoading.value = false

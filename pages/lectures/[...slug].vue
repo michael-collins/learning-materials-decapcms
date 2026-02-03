@@ -26,18 +26,6 @@ const { data: lecture, pending } = await useAsyncData(`lecture-${baseSlug}-${ver
   return queryCollection('lectures').path(`/lectures/${baseSlug}`).first()
 })
 
-// Debug log
-watch(lecture, (newValue) => {
-  if (newValue) {
-    console.log('[Lectures Page] Lecture data:', {
-      title: newValue.title,
-      allowEmbed: newValue.allowEmbed,
-      hasLicense: !!newValue.license,
-      hasAiLicense: !!newValue.aiLicense
-    })
-  }
-}, { immediate: true })
-
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },
   { label: 'Lectures', path: '/lectures' },

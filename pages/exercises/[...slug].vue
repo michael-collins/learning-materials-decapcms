@@ -23,34 +23,23 @@ const versionParam = route.query.version;
 // Extract version string without 'v' prefix for display
 const displayVersion = versionParam && typeof versionParam === 'string' ? versionParam : undefined
 
-console.log('[Exercise Page] Loading exercise:', baseSlug, 'version:', versionParam)
-
 const { data: exercise, pending } = await useAsyncData(
   `exercise-${baseSlug}-${versionParam || 'latest'}`,
   async () => {
     // If version param is provided, try the versioned path first
     if (versionParam) {
       const versionedPath = `/exercises/${baseSlug}/v/${versionParam}`
-      console.log('[Exercise Page] Trying versioned path:', versionedPath)
       const versioned = await queryCollection('exercises').path(versionedPath).first()
       if (versioned) {
-        console.log('[Exercise Page] Found versioned:', versioned.title, versioned.version)
         return versioned
       }
-      console.log('[Exercise Page] Versioned path not found, trying fallback')
     }
     
     // Fallback to latest (index)
     const latest = await queryCollection('exercises').path(`/exercises/${baseSlug}`).first()
-    console.log('[Exercise Page] Fallback result:', latest?.title)
     return latest
   }
 )
-
-console.log('[Exercise Page] Exercise data loaded:', {
-  hasExercise: !!exercise.value,
-  title: exercise.value?.title
-})
 
 const breadcrumbs = computed(() => [
   { label: 'Home', path: '/' },

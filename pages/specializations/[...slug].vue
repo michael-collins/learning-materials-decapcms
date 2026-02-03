@@ -24,10 +24,6 @@ const { data: specialization, pending } = await useAsyncData(`specialization-${b
   
   // Fallback to latest (index)
   const result = await queryCollection('specializations').path(`/specializations/${baseSlug}`).first()
-  console.log('[Specialization Page] Title:', result?.title)
-  console.log('[Specialization Page] meta.license:', result?.meta?.license)
-  console.log('[Specialization Page] meta.author:', result?.meta?.author)
-  console.log('[Specialization Page] meta keys:', Object.keys(result?.meta || {}))
   return result
 })
 
@@ -37,13 +33,11 @@ const lessonsLoading = ref(false)
 
 const fetchLessons = async () => {
   if (!specialization.value?.lessons || specialization.value.lessons.length === 0) {
-    console.log('No lessons in specialization')
     lessons.value = []
     return
   }
 
   lessonsLoading.value = true
-  console.log('Fetching lessons for specialization:', specialization.value.slug)
 
   try {
     // Get lesson slugs from specialization frontmatter
@@ -61,10 +55,8 @@ const fetchLessons = async () => {
     // Filter out any missing lessons
     const filtered = lessonData.filter(Boolean)
     
-    console.log('Found lessons:', filtered.length)
     lessons.value = filtered
   } catch (err) {
-    console.error('Error fetching lessons:', err)
     lessons.value = []
   } finally {
     lessonsLoading.value = false
@@ -74,7 +66,6 @@ const fetchLessons = async () => {
 // Watch specialization and fetch lessons when it loads
 watch(() => specialization.value, (newVal) => {
   if (newVal) {
-    console.log('Specialization loaded:', newVal.title)
     fetchLessons()
   }
 }, { immediate: true })

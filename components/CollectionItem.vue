@@ -58,11 +58,6 @@ interface Props {
 
 const props = defineProps<Props>()
 
-console.log('[CollectionItem] Title:', props.title)
-console.log('[CollectionItem] License prop:', props.license)
-console.log('[CollectionItem] Author prop:', props.author)
-console.log('[CollectionItem] Prerequisites prop:', props.prerequisites)
-
 const { toggle: toggleBodyOverflow } = useBodyOverflow()
 
 const formatDate = (dateString: string) => {
@@ -198,12 +193,6 @@ const embedUrl = computed(() => {
   const fullPath = queryString ? `${embedPath}?${queryString}` : embedPath
   
   const finalUrl = `${window.location.origin}${fullPath}`
-  console.log('[CollectionItem] embedUrl computed:', { 
-    routePath: route.path, 
-    embedPath, 
-    versionParam, 
-    finalUrl 
-  })
   
   return finalUrl
 })
@@ -220,7 +209,7 @@ const copyEmbedCode = async () => {
       isCopied.value = false
     }, 2000)
   } catch (err) {
-    console.error('Failed to copy:', err)
+    // Silently fail
   }
 }
 
@@ -244,7 +233,7 @@ const exportCommonCartridge = async () => {
     window.URL.revokeObjectURL(url)
     document.body.removeChild(a)
   } catch (error) {
-    console.error('Failed to export Common Cartridge:', error)
+    // Silently fail
   }
 }
 
@@ -304,7 +293,7 @@ const copyCitation = async () => {
       isCitationCopied.value = false
     }, 2000)
   } catch (err) {
-    console.error('Failed to copy citation:', err)
+    // Silently fail
   }
 }
 </script>
@@ -373,7 +362,7 @@ const copyCitation = async () => {
           :src="image"
           :alt="imageAlt || title"
           class="w-full object-cover rounded-lg mb-6"
-          loading="eager"
+          :loading="isEmbed ? 'lazy' : 'eager'"
         />
         
         <h1 class="text-4xl font-bold tracking-tight mb-4 flex items-center gap-3">

@@ -9,10 +9,8 @@ definePageMeta({
 const { data: rawResources, pending } = await useAsyncData('resources', async () => {
   try {
     const response = await $fetch('/api/resources')
-    console.log('[Resources] Loaded:', response?.length, 'resources')
     return response || []
   } catch (error) {
-    console.error('[Resources] Error loading:', error)
     return []
   }
 })
@@ -88,7 +86,6 @@ const getResourceImage = async (resource: any) => {
     imageCache.value[resource.url] = response || null
     return response || null
   } catch (error) {
-    console.error('Error fetching resource image:', error)
     imageCache.value[resource.url] = null
     return null
   }

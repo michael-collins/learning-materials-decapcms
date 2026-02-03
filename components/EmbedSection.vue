@@ -39,7 +39,7 @@ const copyEmbedCode = async () => {
       isCopied.value = false
     }, 2000)
   } catch (err) {
-    console.error('Failed to copy:', err)
+    // Silently fail
   }
 }
 </script>

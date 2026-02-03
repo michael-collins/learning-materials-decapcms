@@ -25,7 +25,6 @@ const { data: lesson, pending } = await useAsyncData(`lesson-${baseSlug}-${versi
   
   // Fallback to latest (index)
   const result = await queryCollection('lessons').path(`/lessons/${baseSlug}`).first()
-  console.log('[Lessons Page] Fetched lesson:', result?.title, 'Prerequisites:', result?.prerequisites)
   return result
 })
 
@@ -47,9 +46,6 @@ const { data: relatedContent } = await useAsyncData(
   async () => {
     if (!lesson.value) return { lectures: [], tutorials: [], exercises: [], articles: [], projects: [] }
     
-    console.log('[Lesson Page] Full lesson data:', lesson.value)
-    console.log('[Lesson Page] Items array:', lesson.value.items)
-    
     // Parse items array (new format) or fallback to old format
     let lectureSlugs: string[] = []
     let tutorialSlugs: string[] = []
@@ -58,10 +54,8 @@ const { data: relatedContent } = await useAsyncData(
     let projectSlugs: string[] = []
     
     if (lesson.value.items && Array.isArray(lesson.value.items)) {
-      console.log('[Lesson Page] Using new items format')
       // New format: items array with type-specific keys
       lesson.value.items.forEach((item: any) => {
-        console.log('[Lesson Page] Processing item:', item)
         // Check both __typename (from DecapCMS) and type fields
         const itemType = item.__typename || item.type
         if ((itemType === 'lectures' || item.lecture) && item.lecture) {
@@ -77,7 +71,6 @@ const { data: relatedContent } = await useAsyncData(
         }
       })
     } else {
-      console.log('[Lesson Page] Using old format')
       // Old format: separate arrays
       lectureSlugs = lesson.value.lectures || []
       tutorialSlugs = lesson.value.tutorials || []
@@ -86,18 +79,12 @@ const { data: relatedContent } = await useAsyncData(
       projectSlugs = lesson.value.projects || []
     }
     
-    console.log('[Lesson Page] Parsed slugs:', { lectureSlugs, tutorialSlugs, exerciseSlugs, articleSlugs, projectSlugs })
-    
     const lectures = lectureSlugs.length > 0
       ? await Promise.all(
           lectureSlugs.map((slug: string) =>
             queryCollection('lectures').path(`/lectures/${slug}`).first()
           )
-        ).then(results => {
-          const filtered = results.filter(Boolean)
-          console.log('Fetched lectures:', filtered)
-          return filtered
-        })
+        ).then(results => results.filter(Boolean))
       : []
     
     const tutorials = tutorialSlugs.length > 0
@@ -105,11 +92,7 @@ const { data: relatedContent } = await useAsyncData(
           tutorialSlugs.map((slug: string) =>
             queryCollection('tutorials').path(`/tutorials/${slug}`).first()
           )
-        ).then(results => {
-          const filtered = results.filter(Boolean)
-          console.log('Fetched tutorials:', filtered)
-          return filtered
-        })
+        ).then(results => results.filter(Boolean))
       : []
     
     const exercises = exerciseSlugs.length > 0
@@ -117,11 +100,7 @@ const { data: relatedContent } = await useAsyncData(
           exerciseSlugs.map((slug: string) =>
             queryCollection('exercises').path(`/exercises/${slug}`).first()
           )
-        ).then(results => {
-          const filtered = results.filter(Boolean)
-          console.log('Fetched exercises:', filtered)
-          return filtered
-        })
+        ).then(results => results.filter(Boolean))
       : []
     
     const articles = articleSlugs.length > 0
@@ -129,11 +108,7 @@ const { data: relatedContent } = await useAsyncData(
           articleSlugs.map((slug: string) =>
             queryCollection('articles').path(`/articles/${slug}`).first()
           )
-        ).then(results => {
-          const filtered = results.filter(Boolean)
-          console.log('Fetched articles:', filtered)
-          return filtered
-        })
+        ).then(results => results.filter(Boolean))
       : []
     
     const projects = projectSlugs.length > 0
@@ -141,11 +116,7 @@ const { data: relatedContent } = await useAsyncData(
           projectSlugs.map((slug: string) =>
             queryCollection('projects').path(`/projects/${slug}`).first()
           )
-        ).then(results => {
-          const filtered = results.filter(Boolean)
-          console.log('Fetched projects:', filtered)
-          return filtered
-        })
+        ).then(results => results.filter(Boolean))
       : []
     
     return { lectures, tutorials, exercises, articles, projects }

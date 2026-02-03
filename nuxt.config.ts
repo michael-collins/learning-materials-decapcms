@@ -12,6 +12,30 @@ export default defineNuxtConfig({
     '@nuxt/icon'
   ],
 
+  // Performance optimizations
+  experimental: {
+    payloadExtraction: true,
+    componentIslands: true,
+  },
+
+  // Build optimizations
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            // Split vendor chunks for better caching
+            if (id.includes('node_modules')) {
+              if (id.includes('lucide')) return 'icons'
+              if (id.includes('vue')) return 'vue'
+              return 'vendor'
+            }
+          }
+        }
+      }
+    }
+  },
+
   vue: {
     compilerOptions: {
       isCustomElement: (tag) => tag === 'model-viewer'

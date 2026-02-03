@@ -19,30 +19,19 @@ export const useContentVersions = async (
   try {
     // Extract base slug (remove any /v*.*.* version path)
     const baseSlug = slug.split('/')[0]
-    console.log(`[useContentVersions] Fetching versions for ${contentType}/${slug} (baseSlug: ${baseSlug})`)
     
     // Fetch the latest version - try both versioned folder (index.md) and flat file structures
     let latestContent = null
     
     // First try the versioned folder structure: /exercises/3d-viewer-test/index
     let contentPath = `/${contentType}/${baseSlug}/index`
-    console.log(`[useContentVersions] Querying versioned content at path: ${contentPath}`)
     latestContent = await queryCollection(contentType).path(contentPath).first()
     
     // If not found, try flat file: /exercises/3d-viewer-test
     if (!latestContent) {
       contentPath = `/${contentType}/${baseSlug}`
-      console.log(`[useContentVersions] Versioned path not found, trying flat file at: ${contentPath}`)
       latestContent = await queryCollection(contentType).path(contentPath).first()
     }
-    
-    console.log(`[useContentVersions] Latest content result:`, {
-      found: !!latestContent,
-      hasVersion: latestContent?.version || latestContent?.meta?.version,
-      version: latestContent?.version || latestContent?.meta?.version,
-      hasPublishEmbed: latestContent?.publishEmbed || latestContent?.meta?.publishEmbed,
-      _path: latestContent?._path
-    })
     
     if (latestContent) {
       const latestVersion: ContentVersion = {
@@ -51,20 +40,12 @@ export const useContentVersions = async (
         publishedAt: latestContent.date
       }
       versions.value.push(latestVersion)
-      console.log(`[useContentVersions] Added latest version: ${latestVersion.version}`)
     }
 
     // Fetch all archived versions from the same slug folder
     try {
-      console.log(`[useContentVersions] Searching for archived versions in ${contentType}/${baseSlug}`)
-      
       // Query all items in the collection
       const allContent = await queryCollection(contentType).all()
-      
-      console.log(`[useContentVersions] Found ${allContent?.length || 0} total items in collection`)
-      if (allContent?.length > 0) {
-        console.log(`[useContentVersions] Sample item:`, allContent[0])
-      }
       
       if (allContent && Array.isArray(allContent)) {
         // Get the latest version number to avoid duplicates
@@ -92,7 +73,6 @@ export const useContentVersions = async (
             }
             
             if (itemVersion && itemPublishEmbed && itemVersionStatus === 'archived') {
-              console.log(`[useContentVersions] ✓ Adding archived version: ${itemVersion}`)
               versions.value.push({
                 version: itemVersion,
                 versionStatus: itemVersionStatus || 'archived',
@@ -103,7 +83,7 @@ export const useContentVersions = async (
         })
       }
     } catch (e) {
-      console.warn('[useContentVersions] Could not fetch archived versions:', e)
+
       // Don't fail completely if archived versions can't be fetched
     }
 
@@ -125,10 +105,7 @@ export const useContentVersions = async (
       if (aV.minor !== bV.minor) return bV.minor - aV.minor
       return bV.patch - aV.patch
     })
-    
-    console.log(`[useContentVersions] Final versions:`, versions.value)
   } catch (e) {
-    console.error('[useContentVersions] Error fetching versions:', e)
     error.value = 'Failed to load versions'
   } finally {
     loading.value = false

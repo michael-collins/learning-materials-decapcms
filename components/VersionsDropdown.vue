@@ -89,13 +89,6 @@ const emit = defineEmits<{
 // Fetch versions
 const { versions, loading, error } = await useContentVersions(props.contentType, props.slug)
 
-console.log(`[VersionsDropdown] Loaded versions for ${props.contentType}/${props.slug}:`, {
-  count: versions.value?.length,
-  versions: versions.value,
-  loading: loading.value,
-  error: error.value
-})
-
 const isCurrentVersion = (version: string) => {
   if (!props.currentVersion) return version === 'latest'
   return version === props.currentVersion

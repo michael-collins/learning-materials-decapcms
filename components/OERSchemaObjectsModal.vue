@@ -207,7 +207,7 @@ const copySchema = async (index: number) => {
       copiedIndex.value = null;
     }, 2000);
   } catch (err) {
-    console.error('Failed to copy schema:', err);
+    // Silently fail
   }
 };
 
@@ -222,7 +222,7 @@ const loadSchemaObjects = () => {
         objects.push(schema);
       }
     } catch (error) {
-      console.error('Error parsing OER Schema:', error);
+      // Silently fail - invalid JSON
     }
   });
   

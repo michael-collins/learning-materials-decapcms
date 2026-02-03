@@ -42,7 +42,6 @@ const fetchLessons = async () => {
 
     lessons.value = lessonData.filter(Boolean)
   } catch (err) {
-    console.error('Error fetching lessons:', err)
     lessons.value = []
   } finally {
     lessonsLoading.value = false

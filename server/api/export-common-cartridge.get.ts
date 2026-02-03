@@ -76,7 +76,6 @@ export default defineEventHandler(async (event) => {
 
     return Buffer.from(zipBuffer)
   } catch (error) {
-    console.error('Export error:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to generate Common Cartridge export',

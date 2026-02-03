@@ -16,8 +16,6 @@ const exercisePath = `/exercises/${slugString}`
 // Get version parameter from query
 const versionParam = route.query.version as string | undefined
 
-console.log('[Embed Exercise Page] Loading exercise:', exercisePath, 'version:', versionParam || 'latest')
-
 // Resolve version
 const { data: exercise } = await useAsyncData(
   `exercise-${exercisePath}-${versionParam || 'latest'}`,
@@ -49,14 +47,6 @@ const currentVersion = computed(() => exercise.value?.version)
 const isOutdated = computed(() => {
   if (!currentVersion.value || !latestVersion.value) return false
   return currentVersion.value !== latestVersion.value
-})
-
-console.log('[Embed Exercise Page] Exercise data loaded:', {
-  hasExercise: !!exercise.value,
-  title: exercise.value?.title,
-  currentVersion: currentVersion.value,
-  latestVersion: latestVersion.value,
-  isOutdated: isOutdated.value
 })
 
 // Generate OER Schema

@@ -11,35 +11,16 @@ const getContentHeight = () => {
   // html.scrollHeight includes the iframe height set by Canvas, creating a feedback loop
   const body = document.body
   
-  // Find the actual content - look for the deepest/largest content containers
-  let actualContentHeight = 0
-  
-  // Check all elements and find the one with the largest bottom position
-  const allElements = document.querySelectorAll('*')
-  allElements.forEach((element) => {
-    const rect = element.getBoundingClientRect()
-    const bottom = rect.bottom + window.scrollY
-    actualContentHeight = Math.max(actualContentHeight, bottom)
-  })
-  
-  // Also specifically check main content containers
+  // Use the most reliable measurements without iterating through all elements
+  // This is much faster than checking every single element
   const mainContent = document.querySelector('#__nuxt') as HTMLElement
-  const contentDivs = document.querySelectorAll('div, article, section, main')
   
-  let maxContentDivHeight = 0
-  contentDivs.forEach((div) => {
-    const el = div as HTMLElement
-    const bottom = el.offsetTop + el.offsetHeight
-    maxContentDivHeight = Math.max(maxContentDivHeight, bottom, el.scrollHeight)
-  })
-  
-  // ONLY use body measurements and actual content, NOT html which reflects iframe size
+  // Get the maximum height from the most reliable sources
   const height = Math.max(
     body.scrollHeight,
     body.offsetHeight,
-    actualContentHeight,
-    maxContentDivHeight,
-    mainContent?.scrollHeight || 0
+    mainContent?.scrollHeight || 0,
+    mainContent?.offsetHeight || 0
   )
   
   return height
@@ -55,7 +36,6 @@ const sendCanvasResize = () => {
     
     // Only send if height actually changed (prevent infinite loop)
     if (Math.abs(heightWithPadding - lastSentHeight) < 5) {
-      console.log('[LTI Embed] Height unchanged, skipping resize')
       return
     }
     
@@ -69,113 +49,81 @@ const sendCanvasResize = () => {
       subject: "lti.frameResize", 
       height: heightWithPadding
     }), "*")
-    
-    console.log('[LTI Embed] Sent resize message:', heightWithPadding)
   } catch (err) {
-    console.error('Failed to send Canvas LMS resize message:', err)
+    // Silently fail
   }
 }
 
 const debouncedResize = () => {
   if (!observerActive) {
-    console.log('[LTI Embed] Observer inactive, skipping resize')
     return
   }
   
-  console.log('[LTI Embed] debouncedResize called')
   if (resizeTimeout) {
     clearTimeout(resizeTimeout)
   }
   resizeTimeout = setTimeout(() => {
-    console.log('[LTI Embed] Executing debounced resize')
     sendCanvasResize()
   }, 100)
 }
 
 const waitForImages = async () => {
-  // Wait multiple times to catch images added during hydration
-  for (let i = 0; i < 3; i++) {
-    await new Promise(resolve => setTimeout(resolve, 200))
-    const images = Array.from(document.images)
-    
-    if (images.length > 0) {
-      await Promise.all(
-        images.map(img => {
-          if (img.complete) return Promise.resolve()
-          return new Promise((resolve) => {
-            img.addEventListener('load', () => resolve(true))
-            img.addEventListener('error', () => resolve(true))
-            // Timeout after 5 seconds per image
-            setTimeout(() => resolve(true), 5000)
-          })
+  const images = Array.from(document.images)
+  
+  if (images.length === 0) return
+  
+  // Wait for all images with a timeout
+  await Promise.race([
+    Promise.all(
+      images.map(img => {
+        if (img.complete) return Promise.resolve()
+        return new Promise((resolve) => {
+          img.addEventListener('load', () => resolve(true), { once: true })
+          img.addEventListener('error', () => resolve(true), { once: true })
         })
-      )
-    }
-  }
+      })
+    ),
+    // Timeout after 3 seconds total (instead of per image)
+    new Promise(resolve => setTimeout(resolve, 3000))
+  ])
 }
 
 onMounted(async () => {
-  console.log('[LTI Embed] Layout mounted - starting resize process')
-  
   // Critical: Wait for Vue hydration to complete in SSG
   await nextTick()
   
-  // Wait a bit for hydration to settle
-  await new Promise(resolve => setTimeout(resolve, 100))
-  
   // Initial resize
-  console.log('[LTI Embed] Sending initial resize')
   sendCanvasResize()
   
   // Wait for images to load
-  console.log('[LTI Embed] Waiting for images to load')
   await waitForImages()
   sendCanvasResize()
   
   // Wait for fonts to load
   if (document.fonts && document.fonts.ready) {
-    console.log('[LTI Embed] Waiting for fonts')
     await document.fonts.ready
     sendCanvasResize()
   }
   
-  // Additional resize attempts to catch any delayed content/CSS
-  console.log('[LTI Embed] Setting up delayed resize attempts')
+  // Optimized resize attempts - reduced from 5 to 3 attempts
+  setTimeout(() => sendCanvasResize(), 300)
+  setTimeout(() => sendCanvasResize(), 1000)
   setTimeout(() => {
-    console.log('[LTI Embed] Resize at 500ms')
-    sendCanvasResize()
-  }, 500)
-  setTimeout(() => {
-    console.log('[LTI Embed] Resize at 1000ms')
-    sendCanvasResize()
-  }, 1000)
-  setTimeout(() => {
-    console.log('[LTI Embed] Resize at 2000ms')
-    sendCanvasResize()
-  }, 2000)
-  setTimeout(() => {
-    console.log('[LTI Embed] Resize at 3000ms')
-    sendCanvasResize()
-  }, 3000)
-  setTimeout(() => {
-    console.log('[LTI Embed] Final resize at 5000ms')
     sendCanvasResize()
     
     // Stop observing after final resize to prevent infinite loops
-    console.log('[LTI Embed] Disabling ResizeObserver after final resize')
     observerActive = false
     if (resizeObserver) {
       resizeObserver.disconnect()
       resizeObserver = null
     }
-  }, 5000)
+  }, 2500) // Reduced from 5000ms to 2500ms
   
-  // Watch for content changes and resize accordingly (only for first 5 seconds)
+  // Watch for content changes and resize accordingly (only for first 2.5 seconds)
   resizeObserver = new ResizeObserver(debouncedResize)
 
   if (document.body) {
     resizeObserver.observe(document.body)
-    console.log('[LTI Embed] ResizeObserver attached to body')
   }
 
   // Listen for window resize events
@@ -183,8 +131,6 @@ onMounted(async () => {
   
   // Listen for image load events on dynamically added images
   window.addEventListener('load', sendCanvasResize)
-  
-  console.log('[LTI Embed] All listeners attached')
 })
 
 onUnmounted(() => {
