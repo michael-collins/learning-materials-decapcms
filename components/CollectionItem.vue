@@ -504,7 +504,7 @@ const copyCitation = async () => {
       </div>
 
     <!-- OER Schema Curriculum Graph -->
-    <OERSchemaGraphWrapper v-if="!isEmbed" />
+    <OERSchemaGraphWrapper v-if="!isEmbed && !hideOerSchemaBadge" />
     
     <!-- Embed Modal -->
     <Teleport to="body">
