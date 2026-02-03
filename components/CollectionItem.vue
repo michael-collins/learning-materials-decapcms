@@ -486,10 +486,10 @@ const copyCitation = async () => {
           />
         </div>
       </div>
-
-      <!-- OER Schema Curriculum Graph -->
-      <OERSchemaGraphWrapper v-if="!isEmbed" />
     </article>
+
+    <!-- OER Schema Curriculum Graph -->
+    <OERSchemaGraphWrapper v-if="!isEmbed" />
     
     <!-- Embed Modal -->
     <Teleport to="body">
