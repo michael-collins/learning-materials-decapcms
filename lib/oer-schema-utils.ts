@@ -141,22 +141,76 @@ export function getLicenseUrl(license: string): string {
 
 /**
  * Get AIUL (AI Usage License) URL from license tag
+ * Supports both base licenses (AIUL-NA) and combinations (AIUL-NA-WR)
  */
 export function getAIULUrl(license: string): string {
-  // Handle full license tags like "AIUL-NA-WR" by extracting base tag
-  const baseMatch = license.match(/^(AIUL-[A-Z]{2})/);
-  const baseTag = baseMatch ? baseMatch[1] : license;
+  const AIUL_VERSION = '1.0.0';
   
-  const map: Record<string, string> = {
-    'AIUL-NA': 'https://dmd-program.github.io/aiul/licenses/na/1.0.0/',
-    'AIUL-WA': 'https://dmd-program.github.io/aiul/licenses/wa/1.0.0/',
-    'AIUL-CD': 'https://dmd-program.github.io/aiul/licenses/cd/1.0.0/',
-    'AIUL-TC': 'https://dmd-program.github.io/aiul/licenses/tc/1.0.0/',
-    'AIUL-DP': 'https://dmd-program.github.io/aiul/licenses/dp/1.0.0/',
-    'AIUL-IU': 'https://dmd-program.github.io/aiul/licenses/iu/1.0.0/',
+  // Parse base license and optional modifier
+  const match = license.match(/^AIUL-([A-Z]{2})(?:-([A-Z0-9]{2,3}))?$/);
+  if (!match) {
+    return 'https://dmd-program.github.io/aiul/licenses.html';
+  }
+  
+  const baseCode = match[1].toLowerCase(); // e.g., "na", "wa"
+  const modifierCode = match[2]?.toLowerCase(); // e.g., "wr", "3d"
+  
+  // If there's a modifier, construct combination URL
+  if (modifierCode) {
+    return `https://dmd-program.github.io/aiul/licenses/${baseCode}-${modifierCode}/${AIUL_VERSION}/`;
+  }
+  
+  // Otherwise return base license URL
+  return `https://dmd-program.github.io/aiul/licenses/${baseCode}/${AIUL_VERSION}/`;
+}
+
+/**
+ * Get AIUL license description for OER schema
+ * Returns a human-readable description like "AI usage is AIUL-WA-3D: With Approval for 3D Production"
+ */
+export function getAIULDescription(license: string): string {
+  // License name mappings
+  const licenseNames: Record<string, string> = {
+    'NA': 'No AI',
+    'WA': 'With Approval',
+    'CD': 'Conceptual Development',
+    'TC': 'Transparency & Citation',
+    'DP': 'Draft & Prototyping',
+    'IU': 'Informed Use'
   };
   
-  return map[baseTag] || `https://dmd-program.github.io/aiul/licenses.html`;
+  // Media modifier mappings
+  const modifierNames: Record<string, string> = {
+    'WR': 'Writing',
+    'IM': 'Image',
+    'VD': 'Video',
+    'AU': 'Audio',
+    '3D': '3D Production',
+    'TR': 'Translation',
+    'MX': 'Mixed Media',
+    'CO': 'Code'
+  };
+  
+  // Parse license code
+  const match = license.match(/^AIUL-([A-Z]{2})(?:-([A-Z0-9]{2,3}))?$/);
+  if (!match) {
+    return `AI usage is ${license}`;
+  }
+  
+  const baseCode = match[1];
+  const modifierCode = match[2];
+  
+  const baseName = licenseNames[baseCode] || baseCode;
+  
+  // Build description
+  let description = `AI usage is ${license}: ${baseName}`;
+  
+  if (modifierCode) {
+    const modifierName = modifierNames[modifierCode] || modifierCode;
+    description += ` for ${modifierName}`;
+  }
+  
+  return description;
 }
 
 /**

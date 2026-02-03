@@ -25,6 +25,9 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
+license: CC BY 4.0
 ---
 
 Utilizes 3D printing or CNC machining to create physical objects from digital designs.

@@ -12,6 +12,8 @@ import {
   parseTaskSections,
   inferActionTypes,
   getLicenseUrl,
+  getAIULUrl,
+  getAIULDescription,
   parseDuration
 } from './oer-schema-utils';
 
@@ -114,6 +116,16 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
     schema.license = getLicenseUrl(doc.license);
   }
   
+  // AI Usage Constraint (AIUL)
+  if (doc.aiLicense) {
+    const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
+    schema.aiUsageConstraint = licenses.map((license: string) => ({
+      '@type': 'AIUsageConstraint',
+      'constraintType': getAIULUrl(license),
+      'description': getAIULDescription(license)
+    }));
+  }
+  
   // Link to learning objectives
   if (objectives.length > 0) {
     schema.hasLearningObjective = objectives.map((obj, idx) => ({
@@ -202,6 +214,16 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   // License
   if (doc.license) {
     schema.license = getLicenseUrl(doc.license);
+  }
+  
+  // AI Usage Constraint (AIUL)
+  if (doc.aiLicense) {
+    const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
+    schema.aiUsageConstraint = licenses.map((license: string) => ({
+      '@type': 'AIUsageConstraint',
+      'constraintType': getAIULUrl(license),
+      'description': getAIULDescription(license)
+    }));
   }
   
   // Learning Objectives

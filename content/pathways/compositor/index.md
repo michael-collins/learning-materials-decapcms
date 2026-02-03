@@ -30,6 +30,8 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 ---
 
 This streamlined pathway focuses specifically on digital compositing skills, providing students with the technical and artistic abilities needed to work in post-production facilities. Students will learn to combine multiple elements into final, polished images for film, television, and digital media.

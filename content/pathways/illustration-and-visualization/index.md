@@ -25,6 +25,9 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
+license: CC BY 4.0
 ---
 
 Creates realistic architectural visualizations for design, marketing, or presentations.

@@ -37,6 +37,9 @@ prerequisites:
 course:
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
+license: CC BY 4.0
 ---
 
 ## Who It's For

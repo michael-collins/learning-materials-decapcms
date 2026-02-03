@@ -21,6 +21,9 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
+license: CC BY 4.0
 ---
 
 Designs gameplay mechanics, levels, and user experiences for video games.

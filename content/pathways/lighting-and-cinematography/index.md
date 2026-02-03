@@ -21,6 +21,9 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
+license: CC BY 4.0
 ---
 
 Sets up lighting and camera angles to create visually compelling 3D scenes.

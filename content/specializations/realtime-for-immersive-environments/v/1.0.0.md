@@ -38,6 +38,8 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 ---
 
 This advanced specialization prepares students to create content for real-time applications, with emphasis on virtual reality, augmented reality, and game engine workflows. Students will learn to balance visual quality with performance requirements while creating immersive interactive experiences.

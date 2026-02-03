@@ -119,46 +119,45 @@ const handleSelectSpec = (spec: any) => {
         :versionStatus="pathway.versionStatus"
         :version="displayVersion"
         :allowEmbed="pathway.meta?.allowEmbed"
-        :hideOerSchemaBadge="true"
+        :license="pathway.license"
+        :aiLicense="pathway.aiLicense"
+        :author="pathway.author"
+        :authorUrl="pathway.authorUrl"
+        :date="pathway.date"
       >
         <ContentRenderer :value="pathway" />
-      </CollectionItem>
-
-      <!-- Specializations Section -->
-      <div v-if="!specializationsLoading && specializations && specializations.length > 0" class="border-t bg-muted/30">
-        <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-          <h2 class="text-3xl font-bold mb-2">Specializations in This Pathway</h2>
-          <p class="text-muted-foreground mb-8">Choose a specialization to dive deeper into a specific area of focus.</p>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SpecializationCard
-              v-for="spec in specializations"
-              :key="spec.slug"
-              :title="spec.title"
-              :slug="spec.slug"
-              :description="spec.description"
-              :difficulty="spec.meta?.difficulty"
-              :duration="spec.meta?.estimatedDuration"
-              :image="spec.image"
-              :imageAlt="spec.imageAlt"
-              :targetRole="spec.targetRole"
-              :skills="spec.meta?.skills"
-              :preview="true"
-              @select="handleSelectSpec"
-            />
+        
+        <!-- Specializations Section -->
+        <div v-if="!specializationsLoading && specializations && specializations.length > 0" class="border-t bg-muted/30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+          <div class="py-10">
+            <h2 class="text-3xl font-bold mb-2">Specializations in This Pathway</h2>
+            <p class="text-muted-foreground mb-8">Choose a specialization to dive deeper into a specific area of focus.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <SpecializationCard
+                v-for="spec in specializations"
+                :key="spec.slug"
+                :title="spec.title"
+                :slug="spec.slug"
+                :description="spec.description"
+                :difficulty="spec.meta?.difficulty"
+                :duration="spec.meta?.estimatedDuration"
+                :image="spec.image"
+                :imageAlt="spec.imageAlt"
+                :targetRole="spec.targetRole"
+                :skills="spec.meta?.skills"
+                :preview="true"
+                @select="handleSelectSpec"
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div v-else-if="specializationsLoading" class="border-t bg-muted/30">
-        <div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-          <p class="text-muted-foreground">Specializations are being loaded...</p>
+        <div v-else-if="specializationsLoading" class="border-t bg-muted/30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+          <div class="py-10">
+            <p class="text-muted-foreground">Specializations are being loaded...</p>
+          </div>
         </div>
-      </div>
-
-      <!-- OER Schema Curriculum Graph -->
-      <div v-if="!isEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-        <OERSchemaGraphWrapper />
-      </div>
+      </CollectionItem>
       
       <ClientOnly>
         <SpecializationViewerModal

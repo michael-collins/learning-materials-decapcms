@@ -23,6 +23,9 @@ oer:
 course:
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
+license: CC BY 4.0
 ---
 
  Oversees the planning and execution of 3D projects, ensuring deadlines and budgets are met.
