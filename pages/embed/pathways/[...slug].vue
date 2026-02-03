@@ -69,6 +69,7 @@ const oerSchema = computed(() => {
         :breadcrumbs="[]"
         :title="pathway.title"
         :description="pathway.description"
+        :date="pathway.date"
         :image="pathway.image"
         :imageAlt="pathway.imageAlt"
         :allowEmbed="false"

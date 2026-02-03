@@ -1,5 +1,6 @@
 ---
 title: Introductory Animation
+date: 2026-01-12T12:00:00.000Z
 slug: introductory-animation
 type: oer:InstructionalPattern
 description: Learn the principles of animation and how to bring 3D characters and objects to life. This specialization covers keyframe animation, timing, spacing, and the twelve principles of animation.

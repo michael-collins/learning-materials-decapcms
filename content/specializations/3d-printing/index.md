@@ -1,5 +1,6 @@
 ---
 title: 3D printing
+date: 2026-01-12T12:00:00.000Z
 slug: 3d-printing
 type: 'oer:LearningComponent'
 whoItsFor: null

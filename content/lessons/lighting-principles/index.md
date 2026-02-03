@@ -1,5 +1,6 @@
 ---
 title: 'Lighting Principles'
+date: 2026-01-12T12:00:00.000Z
 slug: 'lighting-principles'
 type: 'oer:LearningComponent'
 description: 'Explore fundamental lighting principles and techniques for creating mood, atmosphere, and visual interest in 3D scenes.'

@@ -1,6 +1,7 @@
 ---
 recordId: rec67LSQtsxBgHxxE
 title: You don't see that everyday objects
+date: 2026-01-12T12:00:00.000Z
 slug: you-dont-see-that-everyday-objects
 type: 'oer:Assessment'
 difficulty: Beginner

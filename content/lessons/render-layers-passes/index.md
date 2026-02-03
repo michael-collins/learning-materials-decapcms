@@ -1,5 +1,6 @@
 ---
 title: 'Render Layers and Passes'
+date: 2026-01-12T12:00:00.000Z
 slug: 'render-layers-passes'
 type: 'oer:LearningComponent'
 description: 'Learn to work with render layers and passes to maintain flexibility and control in the compositing process.'

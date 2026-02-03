@@ -1,5 +1,6 @@
 ---
 title: 'Environment Design for Real-time'
+date: 2026-01-12T12:00:00.000Z
 slug: 'environment-design-realtime'
 type: 'oer:LearningComponent'
 description: 'Learn to design and build optimized 3D environments for real-time applications, games, and interactive experiences.'

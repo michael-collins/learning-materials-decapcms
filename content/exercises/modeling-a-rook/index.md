@@ -1,5 +1,6 @@
 ---
 title: Modeling a Rook
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-rook
 difficulty: Beginner
 image: /uploads/recI5o36ru0BbxuCH_image_rook_image.png

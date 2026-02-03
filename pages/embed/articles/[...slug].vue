@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { buildAssociatedMaterialSchema } from '~/lib/oer-schema-builder'
+
 const route = useRoute()
 
 definePageMeta({
@@ -11,10 +13,23 @@ const slugString = slug.join('/')
 
 // Use versioned embed composable
 const { content: article, versionParam, currentVersion, latestVersion, isOutdated, pending } = useVersionedEmbed('articles', slugString)
+
+// Generate OER Schema
+const oerSchema = computed(() => {
+  if (!article.value) return null
+  const baseUrl = useRequestURL().origin
+  const articleWithPath = {
+    ...article.value,
+    _path: `/articles/${slugString}`
+  }
+  return buildAssociatedMaterialSchema(articleWithPath, baseUrl)
+})
 </script>
 
 <template>
   <div>
+    <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
+    
     <!-- Version notice banner -->
     <div v-if="isOutdated && currentVersion && latestVersion" 
          class="bg-amber-50 border-b border-amber-200 px-4 py-3 text-sm">

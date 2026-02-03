@@ -1,5 +1,6 @@
 ---
 title: Animating Tetris
+date: 2026-01-12T12:00:00.000Z
 slug: animating-tetris
 difficulty: Intermediate
 image: /uploads/recxOxvwqqUAVs2TK_image_banner-tetris-compressed.jpg

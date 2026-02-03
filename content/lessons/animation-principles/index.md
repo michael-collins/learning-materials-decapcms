@@ -1,5 +1,6 @@
 ---
 title: 'Animation Principles'
+date: 2026-01-12T12:00:00.000Z
 slug: 'animation-principles'
 type: 'oer:LearningComponent'
 description: 'Learn the twelve principles of animation and how to apply them to create believable movement in 3D animation.'

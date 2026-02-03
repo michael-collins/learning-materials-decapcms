@@ -1,5 +1,6 @@
 ---
 title: 'Camera and Composition'
+date: 2026-01-12T12:00:00.000Z
 slug: 'camera-composition'
 type: 'oer:LearningComponent'
 description: 'Master camera settings, placement, and composition principles to create visually compelling rendered images and animations.'

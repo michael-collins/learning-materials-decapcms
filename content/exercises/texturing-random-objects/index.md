@@ -1,5 +1,6 @@
 ---
 title: Texturing random objects
+date: 2026-01-12T12:00:00.000Z
 slug: texturing-random-objects
 difficulty: Intermediate
 image: /uploads/reczUhTIOSSFk77BH_image_texturing-objects-header-v2.jpg

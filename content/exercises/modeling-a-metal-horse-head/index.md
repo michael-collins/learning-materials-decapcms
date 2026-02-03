@@ -1,5 +1,6 @@
 ---
 title: Modeling a Metal Horse Head
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-metal-horse-head
 difficulty: Beginner
 image: /uploads/recJa9PrmESgMr9Zw_image_METAL_KNIGHT_IMAGE.png

@@ -1,4 +1,6 @@
 <script setup>
+import { buildAssociatedMaterialSchema } from '~/lib/oer-schema-builder'
+
 const route = useRoute()
 const isEmbed = computed(() => route.query.embed === 'true')
 const versionParam = route.query.version
@@ -27,10 +29,23 @@ const breadcrumbs = computed(() => [
   { label: 'Articles', path: '/articles' },
   { label: article.value?.title || 'Loading...' }
 ])
+
+// Build OER Schema for SEO and discoverability
+const oerSchema = computed(() => {
+  if (!article.value) return null
+  const baseUrl = useRequestURL().origin
+  const articleWithPath = {
+    ...article.value,
+    _path: `/articles/${baseSlug}`
+  }
+  return buildAssociatedMaterialSchema(articleWithPath, baseUrl)
+})
 </script>
 
 <template>
   <NuxtLayout :name="isEmbed ? 'embed' : 'docs'">
+    <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
+    
     <div v-if="pending" class="container py-8">
       <div class="flex justify-center items-center min-h-[400px]">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

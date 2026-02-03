@@ -1,5 +1,6 @@
 ---
 title: Modeling a Chessboard
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-chessboard
 difficulty: Beginner
 image: /uploads/recqqIknm5ebQaFmz_image_Chess_Board_Image.png

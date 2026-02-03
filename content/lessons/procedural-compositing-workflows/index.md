@@ -1,5 +1,6 @@
 ---
 title: 'Procedural Compositing Workflows'
+date: 2026-01-12T12:00:00.000Z
 slug: 'procedural-compositing-workflows'
 type: 'oer:LearningComponent'
 description: 'Master node-based compositing workflows using software like Nuke, learning to build flexible and efficient compositing networks.'

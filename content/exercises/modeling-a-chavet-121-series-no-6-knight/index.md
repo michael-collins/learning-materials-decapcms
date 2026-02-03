@@ -1,5 +1,6 @@
 ---
 title: Modeling a Chavet 121 series no 6 Knight
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-chavet-121-series-no-6-knight
 difficulty: Beginner
 image: >-

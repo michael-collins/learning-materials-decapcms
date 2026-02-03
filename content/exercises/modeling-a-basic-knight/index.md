@@ -1,5 +1,6 @@
 ---
 title: Modeling a Basic Knight
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-basic-knight
 difficulty: Beginner
 image: /uploads/recPXvg0DlanTkyO2_image_Simple_Knight.png

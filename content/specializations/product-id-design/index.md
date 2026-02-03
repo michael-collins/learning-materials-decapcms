@@ -1,5 +1,6 @@
 ---
 title: Product (ID) design
+date: 2026-01-12T12:00:00.000Z
 slug: product-id-design
 type: 'oer:LearningComponent'
 whoItsFor: null

@@ -1,5 +1,6 @@
 ---
 title: Introduction to Modeling
+date: 2026-01-12T12:00:00.000Z
 author: Michael Collins
 authorUrl: https://michaelcollins.xyz
 course: DART 303

@@ -1,5 +1,6 @@
 ---
 title: Modeling a Low Poly Animal and Introduction to Particles
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-low-poly-animal-and-introduction-to-particles
 difficulty: Beginner
 image: /uploads/recvUlgEohhluSnhU_image_OSTRICH.png

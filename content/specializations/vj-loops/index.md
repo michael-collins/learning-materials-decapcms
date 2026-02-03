@@ -1,5 +1,6 @@
 ---
 title: VJ Loops
+date: 2026-01-12T12:00:00.000Z
 slug: vj-loops
 type: 'oer:LearningComponent'
 whoItsFor: null

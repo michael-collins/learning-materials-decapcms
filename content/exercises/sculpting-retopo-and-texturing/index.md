@@ -1,5 +1,6 @@
 ---
 title: 'Sculpting, retopo, and texturing'
+date: 2026-01-12T12:00:00.000Z
 slug: sculpting-retopo-and-texturing
 difficulty: Advanced
 image: /uploads/rec9LnLexVEqnrZNs_image_sculpting-retopo-header-v2.png

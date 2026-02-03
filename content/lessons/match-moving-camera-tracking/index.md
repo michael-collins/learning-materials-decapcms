@@ -1,5 +1,6 @@
 ---
 title: 'Match Moving and Camera Tracking'
+date: 2026-01-12T12:00:00.000Z
 slug: 'match-moving-camera-tracking'
 type: 'oer:LearningComponent'
 description: 'Learn camera tracking and match moving techniques to integrate CGI elements seamlessly with live-action footage.'

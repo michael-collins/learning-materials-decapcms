@@ -9,6 +9,7 @@ export default defineContentConfig({
         title: z.string(),
         description: z.string(),
         author: z.string().optional(),
+        authorUrl: z.string().optional(),
         date: z.string().optional(),
         license: z.string().optional(),
         allowEmbed: z.boolean().optional(),
@@ -32,6 +33,7 @@ export default defineContentConfig({
         title: z.string(),
         description: z.string(),
         author: z.string().optional(),
+        authorUrl: z.string().optional(),
         date: z.string().optional(),
         license: z.string().optional(),
         allowEmbed: z.boolean().optional(),        prerequisites: z.array(z.any()).optional(),        prerequisites: z.array(z.any()).optional(),
@@ -52,6 +54,7 @@ export default defineContentConfig({
       source: 'exercises/**/*.md',
       schema: z.object({
         title: z.string(),
+        date: z.string().optional(),
         difficulty: z.string().optional(),
         image: z.string().optional(),
         imageAlt: z.string().optional(),
@@ -90,6 +93,7 @@ export default defineContentConfig({
       source: 'projects/**/*.md',
       schema: z.object({
         title: z.string(),
+        date: z.string().optional(),
         difficulty: z.string().optional(),
         image: z.string().optional(),
         imageAlt: z.string().optional(),
@@ -131,6 +135,7 @@ export default defineContentConfig({
       schema: z.object({
         recordId: z.string().optional(),
         title: z.string(),
+        date: z.string().optional(),
         slug: z.string().optional(),
         type: z.string().optional(),
         whoItsFor: z.string().optional(),
@@ -152,6 +157,7 @@ export default defineContentConfig({
       schema: z.object({
         recordId: z.string().optional(),
         title: z.string(),
+        date: z.string().optional(),
         slug: z.string().optional(),
         type: z.string().optional(),
         description: z.string().optional(),
@@ -176,6 +182,7 @@ export default defineContentConfig({
       source: 'lectures/*/index.md',
       schema: z.object({
         title: z.string(),
+        date: z.string().optional(),
         course: z.string().optional(),
         author: z.string().optional(),
         authorUrl: z.string().optional(),
@@ -212,6 +219,7 @@ export default defineContentConfig({
       source: 'lessons/*/index.md',
       schema: z.object({
         title: z.string(),
+        date: z.string().optional(),
         slug: z.string().optional(),
         type: z.string().optional(),
         description: z.string().optional(),

@@ -1,5 +1,6 @@
 ---
 title: Modeling random objects
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-random-objects
 difficulty: Intermediate
 image: /uploads/recLtYP0nJUL7RK8O_image_modeling-objects-header.jpg

@@ -1,5 +1,6 @@
 ---
 title: Realtime for Immersive Environments
+date: 2026-01-12T12:00:00.000Z
 slug: realtime-for-immersive-environments
 type: oer:InstructionalPattern
 description: Create optimized content for real-time rendering in game engines and virtual reality. This specialization covers performance optimization, shader development, lighting for real-time, and interactive environment design.

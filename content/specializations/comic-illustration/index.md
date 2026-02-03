@@ -1,5 +1,6 @@
 ---
 title: Comic illustration
+date: 2026-01-12T12:00:00.000Z
 slug: comic-illustration
 type: 'oer:LearningComponent'
 whoItsFor: null

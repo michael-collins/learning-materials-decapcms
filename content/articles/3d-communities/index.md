@@ -2,6 +2,7 @@
 title: 3D Communities
 description: Get involved with communities of practice for 3D fields.
 author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 date: 2026-01-21T16:30:00.000-05:00
 license: CC BY 4.0
 allowEmbed: true

@@ -1,5 +1,6 @@
 ---
 title: 'Drawing for 3D Design'
+date: 2026-01-12T12:00:00.000Z
 slug: 'drawing-for-3d-design'
 type: 'oer:LearningComponent'
 description: 'Develop drawing and sketching skills to support 3D design work, including concept development and reference creation.'

@@ -1,5 +1,6 @@
 ---
 title: 'Digital Sculpting'
+date: 2026-01-12T12:00:00.000Z
 slug: 'digital-sculpting'
 type: 'oer:LearningComponent'
 description: 'Master organic modeling through digital sculpting techniques, creating detailed characters and organic forms.'

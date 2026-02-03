@@ -1,5 +1,6 @@
 ---
 title: Modeling a King
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-king
 difficulty: Beginner
 image: /uploads/recqV87QKaWerduJM_image_king_image.png

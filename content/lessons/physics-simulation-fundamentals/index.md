@@ -1,5 +1,6 @@
 ---
 title: 'Physics Simulation Fundamentals'
+date: 2026-01-12T12:00:00.000Z
 slug: 'physics-simulation-fundamentals'
 type: 'oer:LearningComponent'
 description: 'Learn the fundamentals of physics simulation including rigid body dynamics, collisions, and force interactions.'

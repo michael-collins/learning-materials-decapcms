@@ -1,5 +1,6 @@
 ---
 title: VFX and Simulation
+date: 2026-01-12T12:00:00.000Z
 slug: vfx-and-simulation
 type: oer:InstructionalPattern
 description: Create realistic visual effects using simulation systems. This specialization covers particle systems, fluid dynamics, rigid body physics, cloth simulation, and dynamic effects for film and video.

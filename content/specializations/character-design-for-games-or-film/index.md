@@ -1,5 +1,6 @@
 ---
 title: Character design for games or film
+date: 2026-01-12T12:00:00.000Z
 slug: character-design-for-games-or-film
 type: 'oer:LearningComponent'
 whoItsFor: null

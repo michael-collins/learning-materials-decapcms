@@ -1,5 +1,6 @@
 ---
 title: Rigging a robot arm
+date: 2026-01-12T12:00:00.000Z
 slug: rigging-a-robot-arm
 difficulty: Intermediate
 image: /uploads/recdQolQv78RHunPj_image_ex-6-adv-banner-compressed.jpg

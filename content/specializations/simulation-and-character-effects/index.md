@@ -1,5 +1,6 @@
 ---
 title: Simulation and character effects
+date: 2026-01-12T12:00:00.000Z
 slug: simulation-and-character-effects
 type: 'oer:LearningComponent'
 whoItsFor: null

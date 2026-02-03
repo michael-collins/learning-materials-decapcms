@@ -1,5 +1,6 @@
 ---
 title: Scientific visualization
+date: 2026-01-12T12:00:00.000Z
 slug: scientific-visualization
 type: 'oer:LearningComponent'
 whoItsFor: null

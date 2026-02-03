@@ -1,5 +1,6 @@
 ---
 title: Motion graphics
+date: 2026-01-12T12:00:00.000Z
 slug: motion-graphics
 type: 'oer:Course'
 description: >-

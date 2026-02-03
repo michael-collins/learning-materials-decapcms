@@ -1,5 +1,6 @@
 ---
 title: Introduction to animation
+date: 2026-01-12T12:00:00.000Z
 slug: introduction-to-animation
 difficulty: Beginner
 image: /uploads/recDaZ0H0qFz4iYlR_image_animation.png

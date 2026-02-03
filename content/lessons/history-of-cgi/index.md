@@ -1,5 +1,6 @@
 ---
 title: 'History of CGI'
+date: 2026-01-12T12:00:00.000Z
 slug: 'history-of-cgi'
 type: 'oer:LearningComponent'
 description: 'Explore the evolution and development of computer-generated imagery from its early beginnings to modern applications across film, gaming, and advertising industries.'

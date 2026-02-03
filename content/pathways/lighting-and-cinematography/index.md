@@ -1,5 +1,6 @@
 ---
 title: Lighting and cinematography
+date: 2026-01-12T12:00:00.000Z
 slug: lighting-and-cinematography
 type: 'oer:Course'
 description: Sets up lighting and camera angles to create visually compelling 3D scenes.

@@ -1,5 +1,6 @@
 ---
 title: 'Sea creature: Texturing'
+date: 2026-01-12T12:00:00.000Z
 slug: sea-creature-texturing
 difficulty: Advanced
 image: /uploads/recc827jhaiZue5as_image_sculpting-retopo-header-v2.png

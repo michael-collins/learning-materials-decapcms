@@ -1,5 +1,6 @@
 ---
 title: 'Introduction to Cameras, Lighting, and Rendering'
+date: 2026-01-12T12:00:00.000Z
 type: 'oer:SupportingMaterial'
 author: Michael Collins
 authorUrl: https://michaelcollins.xyz

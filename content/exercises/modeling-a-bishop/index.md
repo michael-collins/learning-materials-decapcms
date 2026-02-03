@@ -1,5 +1,6 @@
 ---
 title: Modeling a Bishop
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-bishop
 difficulty: Beginner
 image: /uploads/rectzJhf833zBC9T3_image_bishop_image.png

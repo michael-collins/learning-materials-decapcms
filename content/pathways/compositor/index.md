@@ -1,5 +1,6 @@
 ---
 title: Compositor Pathway
+date: 2026-01-12T12:00:00.000Z
 slug: compositor
 type: oer:Course
 description: Master the art and technique of digital compositing for film and video. This focused pathway provides the essential skills needed to combine CGI elements with live-action footage and create seamless final images for professional productions.

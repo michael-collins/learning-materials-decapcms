@@ -73,6 +73,7 @@ const oerSchema = computed(() => {
         :breadcrumbs="[]"
         :title="specialization.title"
         :description="specialization.whoItsFor"
+        :date="specialization.date"
         :image="specialization.image"
         :imageAlt="specialization.imageAlt"
         :allowEmbed="false"
