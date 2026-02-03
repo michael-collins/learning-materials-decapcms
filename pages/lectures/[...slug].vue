@@ -82,6 +82,7 @@ const oerSchema = computed(() => {
         :attachments="lecture.attachments"
         :versionStatus="lecture.versionStatus"
         :version="displayVersion"
+        :prerequisites="lecture.prerequisites"
       >
         <ContentRenderer :value="lecture" />
       </CollectionItem>

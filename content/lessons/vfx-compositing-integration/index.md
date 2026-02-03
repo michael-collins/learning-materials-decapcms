@@ -12,6 +12,8 @@ learningObjectives:
   - 'Finalize VFX shots for delivery'
 published: true
 allowEmbed: true
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'

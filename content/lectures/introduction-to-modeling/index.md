@@ -1,6 +1,7 @@
 ---
 title: Introduction to Modeling
 author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 course: DART 303
 allowEmbed: true
 license: CC BY 4.0

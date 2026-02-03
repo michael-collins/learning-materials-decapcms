@@ -23,7 +23,12 @@ const { data: specialization, pending } = await useAsyncData(`specialization-${b
   }
   
   // Fallback to latest (index)
-  return queryCollection('specializations').path(`/specializations/${baseSlug}`).first()
+  const result = await queryCollection('specializations').path(`/specializations/${baseSlug}`).first()
+  console.log('[Specialization Page] Title:', result?.title)
+  console.log('[Specialization Page] meta.license:', result?.meta?.license)
+  console.log('[Specialization Page] meta.author:', result?.meta?.author)
+  console.log('[Specialization Page] meta keys:', Object.keys(result?.meta || {}))
+  return result
 })
 
 // Fetch related lessons from specialization.lessons array

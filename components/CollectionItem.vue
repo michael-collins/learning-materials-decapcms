@@ -43,11 +43,25 @@ interface Props {
   versionStatus?: string
   version?: string
   hideMenu?: boolean
+  prerequisites?: Array<{
+    __typename: string
+    lesson?: string
+    lecture?: string
+    tutorial?: string
+    exercise?: string
+    article?: string
+    project?: string
+    specialization?: string
+    pathway?: string
+  }>
 }
 
 const props = defineProps<Props>()
 
-console.log('[CollectionItem] Props received:', { title: props.title, versionStatus: props.versionStatus, allowEmbed: props.allowEmbed })
+console.log('[CollectionItem] Title:', props.title)
+console.log('[CollectionItem] License prop:', props.license)
+console.log('[CollectionItem] Author prop:', props.author)
+console.log('[CollectionItem] Prerequisites prop:', props.prerequisites)
 
 const { toggle: toggleBodyOverflow } = useBodyOverflow()
 
@@ -452,6 +466,9 @@ const copyCitation = async () => {
         </p>
       </header>
 
+      <!-- Prerequisites Section -->
+      <PrerequisiteSection v-if="prerequisites && prerequisites.length > 0" :prerequisites="prerequisites" />
+
       <div class="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-foreground prose-p:text-base prose-p:leading-7 prose-li:text-foreground prose-li:text-base prose-code:text-foreground prose-code:text-sm prose-code:bg-muted/50 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-border/50 prose-pre:bg-muted dark:prose-pre:bg-[#0a0a0a] prose-pre:text-foreground prose-pre:border prose-pre:border-border/50 prose-a:text-primary prose-a:font-medium prose-a:no-underline prose-strong:text-foreground prose-blockquote:text-foreground prose-blockquote:border-l-primary">
         <slot />
       </div>
@@ -461,7 +478,7 @@ const copyCitation = async () => {
     <AIULComponent v-if="aiLicense && shouldShowAILicense" :license="aiLicense" />
 
     <!-- Creative Commons License -->
-    <div v-if="license" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-4 border-t">
+    <div v-if="license" class="container max-w-4xl mx-auto mt-12 pt-4 border-t">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p class="text-sm text-muted-foreground leading-relaxed">
             <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>

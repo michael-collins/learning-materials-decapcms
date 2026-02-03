@@ -50,6 +50,7 @@ const breadcrumbs = computed(() => [
         :attachments="tutorial.attachments"
         :versionStatus="tutorial.versionStatus"
         :version="displayVersion"
+        :prerequisites="tutorial.prerequisites"
       >
         <ContentRenderer :value="tutorial" />
       </CollectionItem>

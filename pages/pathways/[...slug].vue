@@ -23,7 +23,13 @@ const { data: pathway, pending } = await useAsyncData(`pathway-${baseSlug}-${ver
   }
   
   // Fallback to latest (index)
-  return queryCollection('pathways').path(`/pathways/${baseSlug}`).first()
+  const result = await queryCollection('pathways').path(`/pathways/${baseSlug}`).first()
+  console.log('[Pathway Page] Title:', result?.title)
+  console.log('[Pathway Page] meta.license:', result?.meta?.license)
+  console.log('[Pathway Page] meta.author:', result?.meta?.author)
+  console.log('[Pathway Page] meta keys:', Object.keys(result?.meta || {}))
+  console.log('[Pathway Page] Full result keys:', Object.keys(result || {}))
+  return result
 })
 
 // Fetch related specializations - separate async call
