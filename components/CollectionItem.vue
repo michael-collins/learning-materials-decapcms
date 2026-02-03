@@ -162,13 +162,13 @@ const isCitationCopied = ref(false)
 const isEmbedConfigOpen = ref(false)
 const isEmbedPreviewOpen = ref(false)
 const isEmbedModalOpen = ref(false)
+const embedShowRubric = ref(true)
+const embedShowAILicense = ref(true)
 
 // Watch embed modal state and toggle body overflow
 watch(() => isEmbedModalOpen.value, (isOpen) => {
   toggleBodyOverflow(isOpen)
 })
-const embedShowRubric = ref(true)
-const embedShowAILicense = ref(true)
 
 const embedUrl = computed(() => {
   if (typeof window === 'undefined') return ''
