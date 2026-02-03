@@ -30,6 +30,60 @@ collections:
       - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: false, required: false}
       - {label: "Body", name: "body", widget: "markdown"}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - label: "Attachments"
         name: "attachments"
         widget: "list"
@@ -58,6 +112,60 @@ collections:
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "License", name: "license", widget: "select", required: false, options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: false, required: false}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
@@ -103,6 +211,60 @@ collections:
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: true, hint: "Enable iframe embedding for this content"}
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0). Bump this to auto-create a version snapshot."}
       - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
@@ -149,6 +311,60 @@ collections:
       - {label: "Version", name: "version", widget: "string", pattern: ["\\d+\\.\\d+\\.\\d+", "Must be semantic version: X.Y.Z"], required: false, hint: "Semantic version (e.g., 1.0.0)"}
       - {label: "Version Status", name: "versionStatus", widget: "hidden", default: "latest"}
       - {label: "Publish for Embed", name: "publishEmbed", widget: "boolean", default: false, required: false, hint: "Make this version available for embedding"}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Body", name: "body", widget: "markdown"}
       - label: "Attachments"
         name: "attachments"
@@ -216,7 +432,60 @@ collections:
         widget: "list"
         required: false
         field: {label: "Objective", name: "objective", widget: "text"}
-      - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
@@ -268,7 +537,60 @@ collections:
         widget: "list"
         required: false
         field: {label: "Objective", name: "objective", widget: "text"}
-      - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
@@ -322,6 +644,60 @@ collections:
           - {label: "Description", name: "description", widget: "text", required: false}
           - {label: "File", name: "file", widget: "file", required: false, hint: "Upload a file for download"}
           - {label: "External URL", name: "url", widget: "string", required: false, hint: "Or provide an external link"}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Body", name: "body", widget: "markdown"}
 
   - name: "lessons"
@@ -392,7 +768,60 @@ collections:
             fields:
               - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
               - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
-      - {label: "Prerequisites", name: "prerequisites", widget: "list", required: false}
+      - label: "Prerequisites"
+        name: "prerequisites"
+        widget: "list"
+        required: false
+        hint: "Add prerequisite content that should be completed first"
+        types:
+          - label: "Lesson"
+            name: "lessons"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lessons"}
+              - {label: "Lesson", name: "lesson", widget: "relation", required: true, collection: "lessons", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Lecture"
+            name: "lectures"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "lectures"}
+              - {label: "Lecture", name: "lecture", widget: "relation", required: true, collection: "lectures", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Tutorial"
+            name: "tutorials"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "tutorials"}
+              - {label: "Tutorial", name: "tutorial", widget: "relation", required: true, collection: "tutorials", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Exercise"
+            name: "exercises"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "exercises"}
+              - {label: "Exercise", name: "exercise", widget: "relation", required: true, collection: "exercises", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Article"
+            name: "articles"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "articles"}
+              - {label: "Article", name: "article", widget: "relation", required: true, collection: "articles", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Project"
+            name: "projects"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
+              - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Specialization"
+            name: "specializations"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "specializations"}
+              - {label: "Specialization", name: "specialization", widget: "relation", required: true, collection: "specializations", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
+          - label: "Pathway"
+            name: "pathways"
+            widget: "object"
+            fields:
+              - {label: "Type", name: "__typename", widget: "hidden", default: "pathways"}
+              - {label: "Pathway", name: "pathway", widget: "relation", required: true, collection: "pathways", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
       - {label: "Tags", name: "tags", widget: "list", required: false}
       - {label: "Author", name: "author", widget: "string", required: false}
       - {label: "Published", name: "published", widget: "boolean", default: true}

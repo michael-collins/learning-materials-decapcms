@@ -39,6 +39,8 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 ---
 
 This specialization focuses on creating high-quality 3D artwork for illustration, character design, and product visualization. Students will learn to balance artistic vision with technical execution, creating compelling 3D designs that tell stories and communicate ideas.

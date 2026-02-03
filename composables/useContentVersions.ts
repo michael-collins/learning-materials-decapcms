@@ -79,12 +79,8 @@ export const useContentVersions = async (
           const fileNameWithoutExt = fileName.replace('.md', '')
           const parentFolder = idParts[idParts.length - 1] || ''
           
-          console.log(`[useContentVersions] Checking item: slug=${itemSlug}, fileName=${fileName}, parentFolder=${parentFolder}, baseSlug=${baseSlug}`)
-          
           // Only process items that are in the same slug folder, in v/ subdirectory, and are version files
           if (itemSlug === baseSlug && parentFolder === 'v' && fileNameWithoutExt.match(/^\d+\.\d+\.\d+$/)) {
-            console.log(`[useContentVersions] ✓ Found version file: ${fileNameWithoutExt}, versionStatus=${item.versionStatus}`)
-            
             // Get version from item.version or item.meta.version
             const itemVersion = item.version || item.meta?.version
             const itemPublishEmbed = item.publishEmbed || item.meta?.publishEmbed
@@ -92,7 +88,6 @@ export const useContentVersions = async (
             
             // Skip if this archived version has the same version number as the latest
             if (itemVersion === latestVersionNumber) {
-              console.log(`[useContentVersions] ✗ Skipping archived version ${itemVersion} - duplicate of latest`)
               return
             }
             
@@ -103,15 +98,6 @@ export const useContentVersions = async (
                 versionStatus: itemVersionStatus || 'archived',
                 publishedAt: item.date
               })
-            } else {
-              console.log(`[useContentVersions] ✗ Skipping - version=${!!itemVersion}, publishEmbed=${!!itemPublishEmbed}, versionStatus=${itemVersionStatus}`)
-            }
-          } else {
-            if (itemSlug !== baseSlug) {
-              console.log(`[useContentVersions] ✗ Slug mismatch: ${itemSlug} !== ${baseSlug}`)
-            }
-            if (!fileNameWithoutExt.match(/^v\d+\.\d+\.\d+$/)) {
-              console.log(`[useContentVersions] ✗ Not a version file: ${fileNameWithoutExt}`)
             }
           }
         })

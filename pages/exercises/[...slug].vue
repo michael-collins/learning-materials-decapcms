@@ -88,6 +88,7 @@ const oerSchema = computed(() => {
         :allowEmbed="exercise.allowEmbed"
         :image="exercise.image"
         :imageAlt="exercise.imageAlt"
+        :prerequisites="exercise.prerequisites"
         :tags="exercise.tags"
         :attachments="exercise.attachments"
         :versionStatus="exercise.versionStatus"

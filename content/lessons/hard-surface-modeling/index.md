@@ -10,8 +10,13 @@ learningObjectives:
   - 'Use modifiers for non-destructive workflows'
   - 'Model mechanical and manufactured objects'
   - 'Maintain precision and accuracy in models'
+prerequisites:
+  - __typename: lessons
+    lesson: 3d-modeling-fundamentals
 published: true
 allowEmbed: true
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 license: 'CC BY 4.0'
 version: '1.0.0'
 versionStatus: 'latest'

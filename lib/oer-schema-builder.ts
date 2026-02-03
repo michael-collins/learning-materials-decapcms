@@ -12,6 +12,8 @@ import {
   parseTaskSections,
   inferActionTypes,
   getLicenseUrl,
+  getAIULUrl,
+  getAIULDescription,
   parseDuration
 } from './oer-schema-utils';
 
@@ -114,6 +116,16 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
     schema.license = getLicenseUrl(doc.license);
   }
   
+  // AI Usage Constraint (AIUL)
+  if (doc.aiLicense) {
+    const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
+    schema.aiUsageConstraint = licenses.map((license: string) => ({
+      '@type': 'AIUsageConstraint',
+      'constraintType': getAIULUrl(license),
+      'description': getAIULDescription(license)
+    }));
+  }
+  
   // Link to learning objectives
   if (objectives.length > 0) {
     schema.hasLearningObjective = objectives.map((obj, idx) => ({
@@ -202,6 +214,16 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   // License
   if (doc.license) {
     schema.license = getLicenseUrl(doc.license);
+  }
+  
+  // AI Usage Constraint (AIUL)
+  if (doc.aiLicense) {
+    const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
+    schema.aiUsageConstraint = licenses.map((license: string) => ({
+      '@type': 'AIUsageConstraint',
+      'constraintType': getAIULUrl(license),
+      'description': getAIULDescription(license)
+    }));
   }
   
   // Learning Objectives
@@ -628,8 +650,53 @@ export function buildLessonSchema(doc: ParsedContent, parentSpecialization?: Par
   if (doc.author) {
     schema.author = {
       '@type': 'Person',
-      'name': doc.author
+      'name': doc.author,
+      ...(doc.authorUrl && { 'url': doc.authorUrl })
     };
+  }
+  
+  // Prerequisites (coursePrerequisites per Schema.org/OER Schema)
+  if (doc.prerequisites && doc.prerequisites.length > 0) {
+    schema.coursePrerequisites = doc.prerequisites.map((prereq: any) => {
+      const typename = prereq.__typename;
+      const typeMap: Record<string, string> = {
+        lessons: 'lessons',
+        lectures: 'lectures',
+        tutorials: 'tutorials',
+        exercises: 'exercises',
+        articles: 'articles',
+        projects: 'projects',
+        specializations: 'specializations',
+        pathways: 'pathways'
+      };
+      
+      const collection = typeMap[typename];
+      if (!collection) return null;
+      
+      // Get the slug from the appropriate field
+      const fieldMap: Record<string, string> = {
+        lessons: 'lesson',
+        lectures: 'lecture',
+        tutorials: 'tutorial',
+        exercises: 'exercise',
+        articles: 'article',
+        projects: 'project',
+        specializations: 'specialization',
+        pathways: 'pathway'
+      };
+      
+      const field = fieldMap[typename];
+      const slug = prereq[field];
+      
+      if (!slug) return null;
+      
+      // Return as AlignmentObject with URL reference
+      return {
+        '@type': 'AlignmentObject',
+        'alignmentType': 'prerequisite',
+        'targetUrl': `${baseUrl}/${collection}/${slug}`
+      };
+    }).filter(Boolean);
   }
   
   // License

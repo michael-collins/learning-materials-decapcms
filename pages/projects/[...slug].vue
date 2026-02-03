@@ -64,7 +64,9 @@ const oerSchema = computed(() => {
         :imageAlt="project.imageAlt"
         :tags="project.tags"
         :attachments="project.attachments"
-        :versionStatus="project.versionStatus"        :version="displayVersion"      >
+        :versionStatus="project.versionStatus"        :version="displayVersion"
+        :prerequisites="project.prerequisites"
+      >
         <ContentRenderer :value="project" />
       </CollectionItem>
     </div>

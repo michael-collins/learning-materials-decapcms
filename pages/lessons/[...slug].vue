@@ -24,7 +24,9 @@ const { data: lesson, pending } = await useAsyncData(`lesson-${baseSlug}-${versi
   }
   
   // Fallback to latest (index)
-  return queryCollection('lessons').path(`/lessons/${baseSlug}`).first()
+  const result = await queryCollection('lessons').path(`/lessons/${baseSlug}`).first()
+  console.log('[Lessons Page] Fetched lesson:', result?.title, 'Prerequisites:', result?.prerequisites)
+  return result
 })
 
 // Fetch related specialization if available
@@ -213,6 +215,7 @@ const oerSchema = computed(() => {
         :tags="lesson.tags"
         :versionStatus="lesson.versionStatus"
         :allowEmbed="lesson.allowEmbed"
+        :prerequisites="lesson.prerequisites"
       >
         <template #metadata>
           <div class="flex flex-wrap gap-4 text-sm">

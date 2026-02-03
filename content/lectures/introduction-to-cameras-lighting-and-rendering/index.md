@@ -2,6 +2,7 @@
 title: 'Introduction to Cameras, Lighting, and Rendering'
 type: 'oer:SupportingMaterial'
 author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 course: DART 303
 allowEmbed: true
 license: CC BY 4.0

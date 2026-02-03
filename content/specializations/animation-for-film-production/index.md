@@ -34,6 +34,8 @@ allowEmbed: true
 license: CC BY 4.0
 version: '1.0.0'
 versionStatus: latest
+author: Michael Collins
+authorUrl: https://michaelcollins.xyz
 ---
 
 This advanced specialization focuses on the art of character animation for film and cinematic projects. Students will learn to create believable, emotionally resonant performances while working within professional production pipelines and collaborative workflows.
