@@ -90,13 +90,6 @@ const oerSchema = computed(() => {
   return buildCourseSchema(pathway.value, specializations.value || [], baseUrl)
 })
 
-// Embed section state
-const embedUrl = computed(() => {
-  if (typeof window === 'undefined') return ''
-  const baseUrl = window.location.origin
-  return `${baseUrl}/embed/pathways/${baseSlug}`
-})
-
 // Use the shared specialization modal composable
 const { isModalOpen, currentModalSlug, openViewer, closeViewer } = useSpecializationModal()
 
@@ -126,6 +119,7 @@ const handleSelectSpec = (spec: any) => {
         :versionStatus="pathway.versionStatus"
         :version="displayVersion"
         :allowEmbed="pathway.meta?.allowEmbed"
+        :hideOerSchemaBadge="true"
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>
@@ -161,9 +155,9 @@ const handleSelectSpec = (spec: any) => {
         </div>
       </div>
 
-      <!-- Embed Section at Bottom -->
-      <div v-if="pathway.meta?.allowEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <EmbedSection :embed-url="embedUrl" :title="pathway.title" />
+      <!-- OER Schema Curriculum Graph -->
+      <div v-if="!isEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+        <OERSchemaGraphWrapper />
       </div>
       
       <ClientOnly>
