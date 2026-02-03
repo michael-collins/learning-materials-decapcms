@@ -486,6 +486,9 @@ const copyCitation = async () => {
           />
         </div>
       </div>
+
+      <!-- OER Schema Curriculum Graph -->
+      <OERSchemaGraphWrapper v-if="!isEmbed" />
     </article>
 
     <!-- OER Schema Curriculum Graph -->
@@ -619,6 +622,10 @@ const copyCitation = async () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
           </div>
         </div>
       </Transition>

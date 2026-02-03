@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4 pt-6 border-t border-border">
+  <div class="mt-4 pt-4 border-t border-border">
     <button
       @click="openObjects"
       @keydown.enter="openObjects"

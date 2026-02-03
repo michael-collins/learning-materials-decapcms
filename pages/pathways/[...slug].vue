@@ -160,6 +160,11 @@ const handleSelectSpec = (spec: any) => {
           <p class="text-muted-foreground">Specializations are being loaded...</p>
         </div>
       </div>
+
+      <!-- Embed Section at Bottom -->
+      <div v-if="pathway.meta?.allowEmbed" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <EmbedSection :embed-url="embedUrl" :title="pathway.title" />
+      </div>
       
       <ClientOnly>
         <SpecializationViewerModal
