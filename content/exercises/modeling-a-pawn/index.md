@@ -1,5 +1,6 @@
 ---
 title: Modeling a Pawn
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-pawn
 difficulty: Beginner
 image: /uploads/recsOUAg8kJfB2Czp_image_pawn_image.png

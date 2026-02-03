@@ -1,5 +1,6 @@
 ---
 title: Game Artist Pathway
+date: 2026-01-12T12:00:00.000Z
 slug: game-artist
 type: oer:Course
 description: Become a skilled game artist capable of creating optimized 3D assets for real-time environments. This pathway covers the complete skillset needed for game development, from foundational CGI to advanced real-time optimization and interactive design.

@@ -1,5 +1,6 @@
 ---
 title: Product design
+date: 2026-01-12T12:00:00.000Z
 slug: product-design
 type: 'oer:Course'
 description: Designs consumer products in 3D for manufacturing or visualization purposes.

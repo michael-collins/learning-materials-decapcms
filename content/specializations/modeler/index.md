@@ -1,5 +1,6 @@
 ---
 title: Modeler
+date: 2026-01-12T12:00:00.000Z
 slug: modeler
 type: 'oer:LearningComponent'
 whoItsFor: null

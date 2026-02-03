@@ -1,5 +1,6 @@
 ---
 title: Digital fabrication
+date: 2026-01-12T12:00:00.000Z
 slug: digital-fabrication
 type: 'oer:Course'
 description: >-

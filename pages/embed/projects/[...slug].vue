@@ -43,6 +43,7 @@ const oerSchema = computed(() => {
       <CollectionItem
         :breadcrumbs="[]"
         :title="project.title"
+        :date="project.date"
         :author="project.author"
         :authorUrl="project.authorUrl"
         :difficulty="project.difficulty"

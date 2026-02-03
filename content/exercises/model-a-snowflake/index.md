@@ -1,5 +1,6 @@
 ---
 title: Model a Snowflake
+date: 2026-01-12T12:00:00.000Z
 slug: model-a-snowflake
 difficulty: Beginner
 image: /uploads/recorR58sjS22oVbk_image_snowflake_image.png

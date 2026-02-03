@@ -1,5 +1,6 @@
 ---
 title: Rendering random objects
+date: 2026-01-12T12:00:00.000Z
 slug: rendering-random-objects
 difficulty: Intermediate
 image: /uploads/receipHXbIjwRD66T_image_texturing-objects-header.jpg

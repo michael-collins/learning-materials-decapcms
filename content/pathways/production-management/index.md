@@ -1,5 +1,6 @@
 ---
 title: Production management
+date: 2026-01-12T12:00:00.000Z
 slug: production-management
 type: 'oer:Course'
 description: >-

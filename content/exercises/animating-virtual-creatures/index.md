@@ -1,5 +1,6 @@
 ---
 title: Animating virtual creatures
+date: 2026-01-12T12:00:00.000Z
 slug: animating-virtual-creatures
 difficulty: Advanced
 image: /uploads/rechgHKhLdlHzKX81_image_banner-creatures-compressed.jpg

@@ -1,5 +1,6 @@
 ---
 title: Modeling a Diamond
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-diamond
 difficulty: Beginner
 image: /uploads/rec2Od2fcMVgDSQyg_image_diamond_image.png

@@ -1,5 +1,6 @@
 ---
 title: 'Hard Surface Modeling'
+date: 2026-01-12T12:00:00.000Z
 slug: 'hard-surface-modeling'
 type: 'oer:LearningComponent'
 description: 'Master hard surface modeling techniques for creating mechanical objects, products, and architectural elements with clean geometry.'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { buildCourseSchema } from '~/lib/oer-schema-builder'
+import { buildAssociatedMaterialSchema } from '~/lib/oer-schema-builder'
 
 const route = useRoute()
 
@@ -18,7 +18,11 @@ const { content: tutorial, versionParam, currentVersion, latestVersion, isOutdat
 const oerSchema = computed(() => {
   if (!tutorial.value) return null
   const baseUrl = useRequestURL().origin
-  return buildCourseSchema(tutorial.value, baseUrl)
+  const tutorialWithPath = {
+    ...tutorial.value,
+    _path: `/tutorials/${slugString}`
+  }
+  return buildAssociatedMaterialSchema(tutorialWithPath, baseUrl)
 })
 </script>
 

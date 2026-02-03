@@ -1,5 +1,6 @@
 ---
 title: Modeling the Airline Chair
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-the-airline-chair
 difficulty: Beginner
 image: /uploads/recksNEMV7vl5SFG4_image_airline-chair-header-compressed.jpg

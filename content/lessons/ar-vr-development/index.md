@@ -1,5 +1,6 @@
 ---
 title: 'AR/VR Development'
+date: 2026-01-12T12:00:00.000Z
 slug: 'ar-vr-development'
 type: 'oer:LearningComponent'
 description: 'Explore augmented and virtual reality development, creating immersive experiences with proper UX considerations.'

@@ -1,5 +1,6 @@
 ---
 title: 'Constraints and Animation Controls'
+date: 2026-01-12T12:00:00.000Z
 slug: 'constraints-animation-controls'
 type: 'oer:LearningComponent'
 description: 'Master the use of constraints and control systems to create complex animations with efficient workflows.'

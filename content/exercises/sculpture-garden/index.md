@@ -1,5 +1,6 @@
 ---
 title: Sculpture Garden
+date: 2026-01-12T12:00:00.000Z
 slug: sculpture-garden
 difficulty: Beginner
 image: /uploads/recHQtwVG79n7xiNK_image_sculpture-garden.jpg

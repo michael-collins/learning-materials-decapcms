@@ -1,5 +1,6 @@
 ---
 title: Texturing a room
+date: 2026-01-12T12:00:00.000Z
 slug: texturing-a-room
 difficulty: Intermediate
 image: /uploads/recJabaqMEyrxdB23_image_interior-texture-banner.png

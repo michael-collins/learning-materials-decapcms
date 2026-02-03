@@ -1,5 +1,6 @@
 ---
 title: Low poly non-photorealistic rendering
+date: 2026-01-12T12:00:00.000Z
 slug: low-poly-non-photorealistic-rendering
 difficulty: Beginner
 image: /uploads/recc8Zz9a0zTOaRyE_image_t-pose-banner.jpg

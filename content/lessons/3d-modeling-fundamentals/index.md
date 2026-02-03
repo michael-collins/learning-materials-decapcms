@@ -1,5 +1,6 @@
 ---
 title: 3D Modeling Fundamentals
+date: 2026-01-12T12:00:00.000Z
 slug: 3d-modeling-fundamentals
 type: oer:LearningComponent
 description: Master the fundamentals of 3D modeling including polygon modeling

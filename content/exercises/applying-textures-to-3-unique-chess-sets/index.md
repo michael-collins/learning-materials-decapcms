@@ -1,5 +1,6 @@
 ---
 title: Applying Textures to 3 Unique Chess Sets
+date: 2026-01-12T12:00:00.000Z
 slug: applying-textures-to-3-unique-chess-sets
 difficulty: Beginner
 image: /uploads/rec0apDu2F1wTfIoq_image_ianbrill_chess_set.png

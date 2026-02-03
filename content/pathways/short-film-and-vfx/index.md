@@ -1,5 +1,6 @@
 ---
 title: Short Film and VFX Pathway
+date: 2026-01-12T12:00:00.000Z
 slug: short-film-and-vfx
 type: oer:Course
 description: A comprehensive pathway for creating animated short films with visual effects. This pathway combines traditional animation techniques with advanced simulation and compositing skills to produce cinematic CGI content with professional VFX elements.

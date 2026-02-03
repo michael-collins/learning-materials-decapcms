@@ -1,5 +1,6 @@
 ---
 title: Animated textures
+date: 2026-01-12T12:00:00.000Z
 slug: animated-textures
 difficulty: Beginner
 image: /uploads/recn4C0llk2Kq5tuH_image_ex-7-intro-banner-compressed.jpg

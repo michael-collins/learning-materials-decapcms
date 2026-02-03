@@ -1,5 +1,6 @@
 ---
 title: 'Rendering Techniques'
+date: 2026-01-12T12:00:00.000Z
 slug: 'rendering-techniques'
 type: 'oer:LearningComponent'
 description: 'Learn rendering workflows, engine settings, and optimization techniques to produce high-quality final images.'

@@ -1,5 +1,6 @@
 ---
 title: Texturing and UV Mapping
+date: 2026-01-12T12:00:00.000Z
 slug: texturing-uv-mapping
 type: 'oer:LearningComponent'
 description: >-

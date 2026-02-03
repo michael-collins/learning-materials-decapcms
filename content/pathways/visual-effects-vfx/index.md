@@ -1,5 +1,6 @@
 ---
 title: Visual Effects (VFX)
+date: 2026-01-12T12:00:00.000Z
 slug: visual-effects-vfx
 type: 'oer:Course'
 description: Integrates CGI elements into live-action footage and blends them seamlessly.

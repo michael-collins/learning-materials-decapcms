@@ -1,5 +1,6 @@
 ---
 title: 'Real-time Engines'
+date: 2026-01-12T12:00:00.000Z
 slug: 'realtime-engines'
 type: 'oer:LearningComponent'
 description: 'Learn to work with game engines like Unity and Unreal Engine, implementing 3D assets and creating interactive experiences.'

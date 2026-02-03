@@ -1,5 +1,6 @@
 ---
 title: Modeling a Queen
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-queen
 difficulty: Beginner
 image: /uploads/rec9QA33OJOpWtn9W_image_queen_image.png

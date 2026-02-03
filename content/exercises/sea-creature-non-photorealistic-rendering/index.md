@@ -1,5 +1,6 @@
 ---
 title: 'Sea creature: Non-photorealistic rendering'
+date: 2026-01-12T12:00:00.000Z
 slug: sea-creature-non-photorealistic-rendering
 difficulty: Advanced
 image: /uploads/recEGCzExXCKxYoco_image_sculpting-retopo-rendering-header-v1.jpg

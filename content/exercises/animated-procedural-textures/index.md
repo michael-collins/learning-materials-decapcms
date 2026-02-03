@@ -1,5 +1,6 @@
 ---
 title: Animated procedural textures
+date: 2026-01-12T12:00:00.000Z
 slug: animated-procedural-textures
 difficulty: Intermediate
 image: /uploads/recHfTCKlxhMVb30g_image_waterfall.png

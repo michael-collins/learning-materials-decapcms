@@ -1,5 +1,6 @@
 ---
 title: Texturing the Airline Chair
+date: 2026-01-12T12:00:00.000Z
 slug: texturing-the-airline-chair
 difficulty: Beginner
 image: /uploads/recF0xzVxfkZoJ63J_image_airline-chair-texturing-header.jpg

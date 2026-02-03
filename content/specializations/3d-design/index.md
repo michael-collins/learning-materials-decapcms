@@ -1,5 +1,6 @@
 ---
 title: 3D Design
+date: 2026-01-12T12:00:00.000Z
 slug: 3d-design
 type: oer:InstructionalPattern
 description: Advanced 3D modeling and design techniques for creating compelling illustrations, character sculpts, and product designs. This specialization emphasizes artistic principles, rendering techniques, and story-driven 3D artwork.

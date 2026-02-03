@@ -1,5 +1,6 @@
 ---
 title: Rigging a quadruped
+date: 2026-01-12T12:00:00.000Z
 slug: rigging-a-quadruped
 difficulty: Advanced
 image: /uploads/recF6aLZmbNHI355u_image_ex-6-intermediate-banner-compressed.jpg

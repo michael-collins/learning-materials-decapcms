@@ -1,5 +1,6 @@
 ---
 title: Rendering a room
+date: 2026-01-12T12:00:00.000Z
 slug: rendering-a-room
 difficulty: Intermediate
 image: /uploads/rechLzLJpVGI50gnn_image_room-banner2.png

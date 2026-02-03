@@ -1,5 +1,6 @@
 ---
 title: Modeling a room
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-a-room
 difficulty: Intermediate
 image: /uploads/rec6ebYsG1Dnf08qb_image_room-model.png

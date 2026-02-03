@@ -71,6 +71,7 @@ const oerSchema = computed(() => {
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="lecture.title"
+        :date="lecture.date"
         :author="lecture.author"
         :authorUrl="lecture.authorUrl"
         :license="lecture.license"

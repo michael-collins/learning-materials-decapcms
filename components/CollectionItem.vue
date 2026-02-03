@@ -120,6 +120,12 @@ const currentUrl = computed(() => {
 
 const isEmbed = computed(() => route.query.embed === 'true')
 
+// Hide OER Schema badge in embed/preview contexts
+const hideOerSchemaBadge = computed(() => {
+  // Check if we're in embed mode via query param or in the /embed/ route
+  return route.query.embed === 'true' || route.path.startsWith('/embed/')
+})
+
 const shouldShowRubric = computed(() => {
   // Show rubric unless hideRubric query param is set
   return route.query.hideRubric !== 'true'
@@ -477,19 +483,21 @@ const copyCitation = async () => {
     <!-- AI Usage License (AIUL) -->
     <AIULComponent v-if="aiLicense && shouldShowAILicense" :license="aiLicense" />
 
-    <!-- Creative Commons License -->
-    <div v-if="license" class="container max-w-4xl mx-auto mt-12 pt-4 border-t">
+    <!-- License or Copyright -->
+    <div v-if="license || author" class="container max-w-4xl mx-auto mt-12 pt-4 border-t">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p class="text-sm text-muted-foreground leading-relaxed">
             <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
             <span v-if="author">
               by 
-              <a v-if="authorUrl" :href="authorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-foreground hover:text-primary transition-colors">{{ author }}</a>
-              <span v-else>{{ author }}</span>
+              <a v-if="authorUrl" :href="authorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline transition-colors">{{ author }}</a>
+              <span v-else class="font-medium text-foreground">{{ author }}</span>
             </span>
-            is licensed under
-            <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
-            <span v-else class="font-medium text-foreground">{{ license }}</span>
+            <span v-if="license">
+              is licensed under
+              <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
+              <span v-else class="font-medium text-foreground">{{ license }}</span>
+            </span>
           </p>
           <CitationDropdown 
             :title="title"

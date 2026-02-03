@@ -1,5 +1,6 @@
 ---
 title: Rigging a human
+date: 2026-01-12T12:00:00.000Z
 slug: rigging-a-human
 difficulty: Advanced
 image: /uploads/recaLI7LYZgUjk4bg_image_human-rig-banner.png

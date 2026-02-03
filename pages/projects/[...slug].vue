@@ -54,6 +54,7 @@ const oerSchema = computed(() => {
       <CollectionItem
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="project.title"
+        :date="project.date"
         :author="project.author"
         :authorUrl="project.authorUrl"
         :difficulty="project.difficulty"

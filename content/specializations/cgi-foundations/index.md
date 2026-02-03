@@ -1,5 +1,6 @@
 ---
 title: CGI Foundations
+date: 2026-01-12T12:00:00.000Z
 slug: cgi-foundations
 type: oer:InstructionalPattern
 description: Master the fundamental concepts and techniques of computer-generated imagery. This specialization covers essential 3D modeling, texturing, lighting, and rendering principles that form the foundation for all CGI work.

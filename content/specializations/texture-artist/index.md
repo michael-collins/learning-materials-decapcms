@@ -1,5 +1,6 @@
 ---
 title: Texture artist
+date: 2026-01-12T12:00:00.000Z
 slug: texture-artist
 type: 'oer:LearningComponent'
 whoItsFor: null

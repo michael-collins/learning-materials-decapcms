@@ -1,5 +1,6 @@
 ---
 title: Animation for Film Production
+date: 2026-01-12T12:00:00.000Z
 slug: animation-for-film-production
 type: oer:InstructionalPattern
 description: Advanced animation techniques for cinematic storytelling. This specialization covers character performance, acting for animation, camera work, and production pipelines for animated film projects.

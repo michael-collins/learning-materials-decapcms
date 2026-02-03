@@ -1,5 +1,6 @@
 ---
 title: Share One Completed Set
+date: 2026-01-12T12:00:00.000Z
 slug: share-one-completed-set
 difficulty: Beginner
 image: /uploads/rec3owIe1VzR0OffF_image_ian_brill_icon_chess_set_2.jpg

@@ -1,5 +1,6 @@
 ---
 title: Short Film Pathway
+date: 2026-01-12T12:00:00.000Z
 slug: short-film
 type: oer:Course
 description: Create compelling animated short films from concept to final render. This pathway covers the essential skills for producing narrative-driven CGI films with professional quality animation and compositing.

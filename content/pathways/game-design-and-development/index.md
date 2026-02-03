@@ -1,5 +1,6 @@
 ---
 title: Game design and development
+date: 2026-01-12T12:00:00.000Z
 slug: game-design-and-development
 type: 'oer:Course'
 description: 'Designs gameplay mechanics, levels, and user experiences for video games.'

@@ -1,5 +1,6 @@
 ---
 title: 3D Illustration
+date: 2026-01-12T12:00:00.000Z
 slug: 3d-illustration
 type: 'oer:LearningComponent'
 whoItsFor: null

@@ -814,6 +814,82 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
   return schema;
 }
 /**
+ * Build OER Schema for Associated Material (Articles, Tutorials)
+ * Articles and tutorials are supporting educational content
+ */
+export function buildAssociatedMaterialSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
+  const path = doc._path || '';
+  const fullUrl = `${baseUrl}${path}`;
+  
+  const schema: OERSchema = {
+    '@context': {
+      'oer': 'https://oerschema.org/',
+      'schema': 'https://schema.org/'
+    },
+    '@type': 'oer:AssociatedMaterial',
+    '@id': fullUrl,
+    'name': doc.title,
+    'url': fullUrl,
+    'inLanguage': 'en-US',
+  };
+  
+  // Description
+  if (doc.description) {
+    schema.description = doc.description;
+  }
+  
+  // Author
+  if (doc.author) {
+    schema.author = {
+      '@type': 'Person',
+      'name': doc.author,
+      ...(doc.authorUrl && { 'url': doc.authorUrl })
+    };
+  }
+  
+  // License
+  if (doc.license) {
+    schema.license = getLicenseUrl(doc.license);
+  }
+  
+  // AI Usage Constraint (AIUL)
+  if (doc.aiLicense) {
+    const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
+    schema.aiUsageConstraint = licenses.map((license: string) => ({
+      '@type': 'AIUsageConstraint',
+      'constraintType': getAIULUrl(license),
+      'description': getAIULDescription(license)
+    }));
+  }
+  
+  // Tags as keywords
+  if (doc.tags && doc.tags.length > 0) {
+    schema.keywords = doc.tags;
+  }
+  
+  // Featured image
+  if (doc.image) {
+    schema.image = {
+      '@type': 'ImageObject',
+      'contentUrl': doc.image,
+      ...(doc.imageAlt && { 'description': doc.imageAlt })
+    };
+  }
+  
+  // Published date
+  if (doc.date) {
+    schema.datePublished = doc.date;
+  }
+  
+  // Educational level (difficulty)
+  if (doc.difficulty) {
+    schema.educationalLevel = doc.difficulty;
+  }
+  
+  return schema;
+}
+
+/**
  * Backward compatibility wrapper for buildPathwaySchema
  * @deprecated Use buildPathwaySchema instead
  */

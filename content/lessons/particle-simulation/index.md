@@ -1,5 +1,6 @@
 ---
 title: 'Particle Simulation'
+date: 2026-01-12T12:00:00.000Z
 slug: 'particle-simulation'
 type: 'oer:LearningComponent'
 description: 'Master particle systems to create effects like fire, smoke, water splashes, and other dynamic phenomena.'

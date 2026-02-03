@@ -1,5 +1,6 @@
 ---
 title: Modeling and sculpting a sea creature
+date: 2026-01-12T12:00:00.000Z
 slug: modeling-and-sculpting-a-sea-creature
 difficulty: Advanced
 image: /uploads/reckkzm19AZnEIkJE_image_sculpting-retopo-header-v1.jpg

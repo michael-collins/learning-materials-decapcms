@@ -1,5 +1,6 @@
 ---
 title: 'Character Rigging'
+date: 2026-01-12T12:00:00.000Z
 slug: 'character-rigging'
 type: 'oer:LearningComponent'
 description: 'Learn how to create control rigs for characters and objects, enabling efficient and intuitive animation workflows.'

@@ -1,5 +1,6 @@
 ---
 title: Lighting and Rendering the Airline Chair
+date: 2026-01-12T12:00:00.000Z
 slug: lighting-and-rendering-the-airline-chair
 difficulty: Beginner
 image: /uploads/recbAgArvnM20cFKL_image_rendering-banner.jpg

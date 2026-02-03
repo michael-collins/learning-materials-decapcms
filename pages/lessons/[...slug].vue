@@ -209,6 +209,7 @@ const oerSchema = computed(() => {
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="lesson.title"
         :description="lesson.description"
+        :date="lesson.date"
         :license="lesson.license"
         :image="lesson.image"
         :imageAlt="lesson.imageAlt"

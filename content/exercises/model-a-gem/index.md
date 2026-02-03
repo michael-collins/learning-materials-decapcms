@@ -1,5 +1,6 @@
 ---
 title: Model a Gem
+date: 2026-01-12T12:00:00.000Z
 slug: model-a-gem
 difficulty: Beginner
 image: /uploads/rec14hI66d4Hl61SA_image_gem_image.png

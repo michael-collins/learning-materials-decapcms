@@ -1,5 +1,6 @@
 ---
 title: 'Sea creature: Lighting and rendering'
+date: 2026-01-12T12:00:00.000Z
 slug: sea-creature-lighting-and-rendering
 difficulty: Advanced
 image: /uploads/recoSUxGzMnYSAxjn_image_sculpting-retopo-rendering-PBR-header-v1.jpg

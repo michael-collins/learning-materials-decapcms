@@ -1,5 +1,6 @@
 ---
 title: Illustration and visualization
+date: 2026-01-12T12:00:00.000Z
 slug: illustration-and-visualization
 type: 'oer:Course'
 description: >-

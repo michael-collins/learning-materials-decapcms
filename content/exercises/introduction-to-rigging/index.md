@@ -1,5 +1,6 @@
 ---
 title: Introduction to rigging
+date: 2026-01-12T12:00:00.000Z
 slug: introduction-to-rigging
 difficulty: Beginner
 image: /uploads/recNVyB0NFX6Uu2Ln_image_ex-6-beginner-banner-compressed.jpg
