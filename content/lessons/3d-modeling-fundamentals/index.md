@@ -1,10 +1,9 @@
 ---
 title: 3D Modeling Fundamentals
 slug: 3d-modeling-fundamentals
-type: 'oer:LearningComponent'
-description: >-
-  Master the fundamentals of 3D modeling including polygon modeling techniques,
-  mesh topology, and efficient modeling workflows.
+type: oer:LearningComponent
+description: Master the fundamentals of 3D modeling including polygon modeling
+  techniques, mesh topology, and efficient modeling workflows.
 estimatedDuration: 4 hours
 learningObjectives:
   - Understand polygon modeling concepts and workflows
@@ -14,16 +13,25 @@ learningObjectives:
 items:
   - type: lectures
     __typename: lectures
-    lecture: introduction-to-modeling
-  - type: lectures
-    __typename: lectures
-    lecture: introduction-to-texturing
+    lecture: introduction-to-modeling/index
   - type: exercises
     __typename: exercises
-    exercise: modeling-the-airline-chair
+    exercise: modeling-the-airline-chair/index
+  - type: lectures
+    __typename: lectures
+    lecture: introduction-to-texturing/index
+  - type: exercises
+    __typename: exercises
+    exercise: texturing-the-airline-chair/index
+  - type: lectures
+    __typename: lectures
+    lecture: introduction-to-cameras-lighting-and-rendering/index
+  - type: exercises
+    __typename: exercises
+    exercise: lighting-and-rendering-the-airline-chair/index
   - type: projects
     __typename: projects
-    project: you-dont-see-that-everyday-objects
+    project: you-dont-see-that-everyday-objects/index
 published: true
 allowEmbed: true
 license: CC BY 4.0
