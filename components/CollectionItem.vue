@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
 import BreadcrumbSeparator from '~/components/ui/breadcrumb/BreadcrumbSeparator.vue'
-import { Download, ExternalLink, FileText, FileArchive, File, Copy, Check, ChevronDown, Pencil } from 'lucide-vue-next'
+import { Download, ExternalLink, FileText, FileArchive, File, Copy, Check, ChevronDown, Pencil, Share2, X } from 'lucide-vue-next'
 import Button from '~/components/ui/button/Button.vue'
+import Card from '~/components/ui/card/Card.vue'
+import CardContent from '~/components/ui/card/CardContent.vue'
+import CardHeader from '~/components/ui/card/CardHeader.vue'
+import CardTitle from '~/components/ui/card/CardTitle.vue'
 import CitationDropdown from '~/components/CitationDropdown.vue'
+import { useBodyOverflow } from '~/composables/useBodyOverflow'
 
 interface BreadcrumbSegment {
   label: string
@@ -43,6 +48,8 @@ interface Props {
 const props = defineProps<Props>()
 
 console.log('[CollectionItem] Props received:', { title: props.title, versionStatus: props.versionStatus, allowEmbed: props.allowEmbed })
+
+const { toggle: toggleBodyOverflow } = useBodyOverflow()
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -139,6 +146,12 @@ const isCopied = ref(false)
 const isCitationCopied = ref(false)
 const isEmbedConfigOpen = ref(false)
 const isEmbedPreviewOpen = ref(false)
+const isEmbedModalOpen = ref(false)
+
+// Watch embed modal state and toggle body overflow
+watch(() => isEmbedModalOpen.value, (isOpen) => {
+  toggleBodyOverflow(isOpen)
+})
 const embedShowRubric = ref(true)
 const embedShowAILicense = ref(true)
 
@@ -151,13 +164,28 @@ const embedUrl = computed(() => {
   
   // Add query parameters for config options
   const params = new URLSearchParams()
+  
+  // Include version parameter if present
+  const versionParam = route.query.version
+  if (versionParam && typeof versionParam === 'string') {
+    params.append('version', versionParam)
+  }
+  
   if (!embedShowRubric.value) params.append('hideRubric', 'true')
   if (!embedShowAILicense.value) params.append('hideAILicense', 'true')
   
   const queryString = params.toString()
   const fullPath = queryString ? `${embedPath}?${queryString}` : embedPath
   
-  return `${window.location.origin}${fullPath}`
+  const finalUrl = `${window.location.origin}${fullPath}`
+  console.log('[CollectionItem] embedUrl computed:', { 
+    routePath: route.path, 
+    embedPath, 
+    versionParam, 
+    finalUrl 
+  })
+  
+  return finalUrl
 })
 
 const embedCode = computed(() => {
@@ -300,6 +328,16 @@ const copyCitation = async () => {
               <div class="h-px bg-border" />
               
               <button
+                v-if="allowEmbed"
+                @click.stop="isEmbedModalOpen = true"
+                class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+              >
+                <Share2 class="w-4 h-4" />
+                Embed
+              </button>
+              <div v-if="allowEmbed" class="h-px bg-border" />
+              
+              <button
                 @click.stop="exportCommonCartridge"
                 class="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-b-lg transition-colors text-left"
               >
@@ -420,103 +458,11 @@ const copyCitation = async () => {
 
 
 
-      <div v-if="allowEmbed" class="mt-12 pt-8 border-t">
-        <button
-          @click="isEmbedOpen = !isEmbedOpen"
-          class="flex items-center justify-between w-full text-left group"
-          :aria-label="isEmbedOpen ? 'Hide embed code' : 'Show embed code'"
-          :aria-expanded="isEmbedOpen"
-        >
-          <h2 class="text-2xl font-bold text-foreground">Embed</h2>
-          <ChevronDown
-            :class="['w-5 h-5 text-muted-foreground transition-transform', isEmbedOpen ? 'rotate-180' : '']"
-          />
-        </button>
-        <div v-if="isEmbedOpen" class="mt-6 space-y-6">
-          <!-- Configuration Section -->
-          <div class="border border-border rounded-lg">
-            <button
-              @click="isEmbedConfigOpen = !isEmbedConfigOpen"
-              class="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors rounded-t-lg"
-              :aria-label="isEmbedConfigOpen ? 'Hide embed configuration' : 'Show embed configuration'"
-              :aria-expanded="isEmbedConfigOpen"
-            >
-              <h3 class="text-sm font-semibold text-foreground">Configuration</h3>
-              <ChevronDown
-                :class="['w-4 h-4 text-muted-foreground transition-transform', isEmbedConfigOpen ? 'rotate-180' : '']"
-              />
-            </button>
-            <div v-if="isEmbedConfigOpen" class="px-4 py-3 border-t border-border space-y-3">
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  v-model="embedShowRubric"
-                  class="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
-                />
-                <span class="text-sm text-foreground">Display rubric</span>
-              </label>
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  v-model="embedShowAILicense"
-                  class="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
-                />
-                <span class="text-sm text-foreground">Display AI license</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Embed Code -->
-          <div>
-            <p class="text-sm text-muted-foreground mb-3">
-              Copy the code below to embed this content on your website:
-            </p>
-            <div class="relative">
-              <pre class="p-4 bg-muted dark:bg-[#0a0a0a] rounded-lg border border-border overflow-x-auto text-sm"><code>{{ embedCode }}</code></pre>
-              <Button
-                @click="copyEmbedCode"
-                size="sm"
-                variant="outline"
-                class="absolute top-2 right-2"
-              >
-                <Check v-if="isCopied" class="w-4 h-4 mr-2" />
-                <Copy v-else class="w-4 h-4 mr-2" />
-                {{ isCopied ? 'Copied!' : 'Copy' }}
-              </Button>
-            </div>
-          </div>
-
-          <!-- Preview Section -->
-          <div class="border border-border rounded-lg">
-            <button
-              @click="isEmbedPreviewOpen = !isEmbedPreviewOpen"
-              class="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors rounded-t-lg"
-              :aria-label="isEmbedPreviewOpen ? 'Hide embed preview' : 'Show embed preview'"
-              :aria-expanded="isEmbedPreviewOpen"
-            >
-              <h3 class="text-sm font-semibold text-foreground">Preview</h3>
-              <ChevronDown
-                :class="['w-4 h-4 text-muted-foreground transition-transform', isEmbedPreviewOpen ? 'rotate-180' : '']"
-              />
-            </button>
-            <div v-if="isEmbedPreviewOpen" class="p-4 border-t border-border">
-              <div class="bg-muted/30 rounded-lg overflow-hidden">
-                <iframe
-                  :src="embedUrl"
-                  class="w-full h-96"
-                  frameborder="0"
-                ></iframe>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- AI Usage License (AIUL) -->
       <AIULComponent v-if="aiLicense && shouldShowAILicense" :license="aiLicense" />
 
       <!-- Creative Commons License -->
-      <div v-if="license" class="mt-12 pt-8 border-t">
+      <div v-if="license" class="mt-12 pt-4 border-t">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p class="text-sm text-muted-foreground leading-relaxed">
             <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
@@ -544,6 +490,139 @@ const copyCitation = async () => {
       <!-- OER Schema Curriculum Graph -->
       <OERSchemaGraphWrapper v-if="!isEmbed" />
     </article>
+    
+    <!-- Embed Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div
+          v-if="isEmbedModalOpen"
+          class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          @click.self="isEmbedModalOpen = false"
+          role="presentation"
+        >
+          <div
+            class="relative w-full max-w-7xl h-[95vh] flex flex-col bg-background border border-border rounded-lg shadow-xl overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="embed-modal-title"
+            @click.stop
+          >
+            <!-- Header -->
+            <div class="flex items-start justify-between gap-4 p-6 border-b border-border bg-background shrink-0">
+              <div class="flex-1">
+                <h2 id="embed-modal-title" class="text-2xl font-bold text-foreground">Embed Content</h2>
+                <p class="mt-2 text-sm text-muted-foreground">
+                  Embed this content on your website
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                @click="isEmbedModalOpen = false"
+                aria-label="Close modal"
+                class="shrink-0"
+              >
+                <X class="w-5 h-5" />
+              </Button>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-6 bg-background">
+              <div class="flex flex-col lg:flex-row gap-6 h-full">
+                <!-- Left Column: Configuration and Embed Code -->
+                <div class="flex-1 space-y-6 min-w-0 lg:max-w-[45%]">
+                  <!-- Configuration Section -->
+                  <div class="border border-border rounded-lg overflow-hidden bg-card">
+                    <button
+                      @click="isEmbedConfigOpen = !isEmbedConfigOpen"
+                      class="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors bg-card border-b border-border"
+                      :aria-label="isEmbedConfigOpen ? 'Hide embed configuration' : 'Show embed configuration'"
+                      :aria-expanded="isEmbedConfigOpen"
+                    >
+                      <div class="flex items-center gap-3">
+                        <Icon name="lucide:settings" class="w-4 h-4 text-primary shrink-0" />
+                        <h3 class="text-sm font-semibold text-foreground">Configuration</h3>
+                      </div>
+                      <ChevronDown
+                        :class="['w-4 h-4 text-muted-foreground transition-transform', isEmbedConfigOpen ? 'rotate-180' : '']"
+                      />
+                    </button>
+                    <div v-if="isEmbedConfigOpen" class="px-4 py-4 space-y-3 bg-card">
+                      <label class="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          v-model="embedShowRubric"
+                          class="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                        />
+                        <span class="text-sm text-foreground group-hover:text-primary transition-colors">Display rubric</span>
+                      </label>
+                      <label class="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          v-model="embedShowAILicense"
+                          class="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                        />
+                        <span class="text-sm text-foreground group-hover:text-primary transition-colors">Display AI license</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Embed Code -->
+                  <div class="border border-border rounded-lg overflow-hidden bg-card">
+                    <div class="flex items-center justify-between gap-4 p-4 bg-card border-b border-border">
+                      <div class="flex items-center gap-3">
+                        <Icon name="lucide:code" class="w-4 h-4 text-primary shrink-0" />
+                        <h3 class="text-sm font-semibold text-foreground">Embed Code</h3>
+                      </div>
+                      <Button
+                        @click="copyEmbedCode"
+                        size="sm"
+                        variant="outline"
+                        class="shrink-0"
+                        aria-label="Copy embed code"
+                      >
+                        <Check v-if="isCopied" class="w-4 h-4 mr-2 text-green-600" />
+                        <Copy v-else class="w-4 h-4 mr-2" />
+                        {{ isCopied ? 'Copied' : 'Copy' }}
+                      </Button>
+                    </div>
+                    <div class="relative max-h-64 overflow-auto bg-muted">
+                      <pre class="p-4 text-sm leading-relaxed text-foreground font-mono"><code>{{ embedCode }}</code></pre>
+                    </div>
+                    <div class="p-4 bg-card border-t border-border">
+                      <p class="text-sm text-muted-foreground leading-relaxed">
+                        Copy the code above to embed this content on your website
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Column: Preview -->
+                <div class="flex-1 min-w-0 lg:min-h-[600px]">
+                  <div class="border border-border rounded-lg overflow-hidden bg-card h-full flex flex-col min-h-[500px]">
+                    <div class="flex items-center justify-between w-full px-4 py-3 bg-card border-b border-border">
+                      <div class="flex items-center gap-3">
+                        <Icon name="lucide:monitor" class="w-4 h-4 text-primary shrink-0" />
+                        <h3 class="text-sm font-semibold text-foreground">Preview</h3>
+                      </div>
+                    </div>
+                    <div class="flex-1 bg-muted/30 overflow-hidden">
+                      <iframe
+                        :key="embedUrl"
+                        :src="embedUrl"
+                        class="w-full h-full min-h-[400px] lg:min-h-full"
+                        frameborder="0"
+                        title="Embed preview"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
     
     <!-- Citation copied toast -->
     <Transition name="fade">
@@ -587,5 +666,14 @@ const copyCitation = async () => {
 
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+.modal-enter-active, .modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
 }
 </style>

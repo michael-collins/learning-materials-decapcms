@@ -333,7 +333,7 @@ const licenseDetails = computed(() => {
 </script>
 
 <template>
-  <div v-if="licenseDetails.length > 0" class="mt-8 pt-6 border-t space-y-6">
+  <div v-if="licenseDetails.length > 0" class="mt-8 pt-12 border-t space-y-6">
     <!-- Each license gets its own section -->
     <div 
       v-for="(detail, index) in licenseDetails" 
