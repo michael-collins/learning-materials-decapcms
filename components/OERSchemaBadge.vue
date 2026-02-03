@@ -1,5 +1,5 @@
 <template>
-  <div class="oer-schema-badge">
+  <div class="mt-4 pt-4 border-t border-border">
     <button
       @click="openObjects"
       @keydown.enter="openObjects"
@@ -42,11 +42,3 @@ const handleImageError = (event: Event) => {
   img.style.display = 'none';
 };
 </script>
-
-<style scoped>
-.oer-schema-badge {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgb(229 231 235);
-}
-</style>

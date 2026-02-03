@@ -18,7 +18,12 @@ const { content: lecture, versionParam, currentVersion, latestVersion, isOutdate
 const oerSchema = computed(() => {
   if (!lecture.value) return null
   const baseUrl = useRequestURL().origin
-  return buildSupportingMaterialSchema(lecture.value, baseUrl)
+  // Ensure _path is set on the document
+  const lectureWithPath = {
+    ...lecture.value,
+    _path: `/lectures/${slugString}`
+  }
+  return buildSupportingMaterialSchema(lectureWithPath, baseUrl)
 })
 </script>
 

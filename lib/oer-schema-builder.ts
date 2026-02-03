@@ -693,7 +693,7 @@ function parseDurationToISO8601(duration: string): string | null {
  */
 export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
   const path = doc._path || (doc.slug ? `/lectures/${doc.slug}` : '')
-  const baseId = `${baseUrl}${path}`
+  const fullUrl = `${baseUrl}${path}`
   
   const schema: OERSchema = {
     '@context': {
@@ -701,9 +701,9 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
       'schema': 'https://schema.org/'
     },
     '@type': 'oer:SupportingMaterial',
-    '@id': baseId,
+    '@id': fullUrl,
     'name': doc.title,
-    'url': baseId,
+    'url': fullUrl,
     'inLanguage': 'en-US',
   };
   

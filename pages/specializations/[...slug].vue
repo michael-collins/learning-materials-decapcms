@@ -112,7 +112,7 @@ const embedUrl = computed(() => {
         :imageAlt="specialization.imageAlt"
         :versionStatus="specialization.versionStatus"
         :version="displayVersion"
-        :allowEmbed="false"
+        :allowEmbed="specialization.meta?.allowEmbed"
       >
         <ContentRenderer :value="specialization" />
       </CollectionItem>

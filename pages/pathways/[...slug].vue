@@ -125,7 +125,7 @@ const handleSelectSpec = (spec: any) => {
         :imageAlt="pathway.imageAlt"
         :versionStatus="pathway.versionStatus"
         :version="displayVersion"
-        :allowEmbed="false"
+        :allowEmbed="pathway.meta?.allowEmbed"
       >
         <ContentRenderer :value="pathway" />
       </CollectionItem>

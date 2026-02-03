@@ -65,11 +65,17 @@ const oerSchema = computed(() => {
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
     <div v-if="pathway" key="pathway-content">
-      <!-- Content Section -->
-      <div class="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-foreground prose-p:text-base prose-p:leading-7 prose-li:text-foreground prose-li:text-base prose-code:text-foreground prose-code:text-sm prose-code:bg-muted/50 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-border/50 prose-pre:bg-muted dark:prose-pre:bg-[#0a0a0a] prose-pre:text-foreground prose-pre:border prose-pre:border-border/50 prose-a:text-primary prose-a:font-medium prose-a:no-underline prose-strong:text-foreground prose-blockquote:text-foreground prose-blockquote:border-l-primary container max-w-4xl mx-auto py-8 px-4">
-        <h1>{{ pathway.title }}</h1>
+      <CollectionItem
+        :breadcrumbs="[]"
+        :title="pathway.title"
+        :description="pathway.description"
+        :image="pathway.image"
+        :imageAlt="pathway.imageAlt"
+        :allowEmbed="false"
+        :hideMenu="true"
+      >
         <ContentRenderer :value="pathway" />
-      </div>
+      </CollectionItem>
 
       <!-- Specializations Section -->
       <div v-if="!specializationsLoading && specializations && specializations.length > 0" class="border-t bg-muted/30">

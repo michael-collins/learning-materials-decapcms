@@ -60,15 +60,17 @@ const { data: relatedContent } = await useAsyncData(
       // New format: items array with type-specific keys
       lesson.value.items.forEach((item: any) => {
         console.log('[Lesson Page] Processing item:', item)
-        if (item.type === 'lectures' && item.lecture) {
+        // Check both __typename (from DecapCMS) and type fields
+        const itemType = item.__typename || item.type
+        if ((itemType === 'lectures' || item.lecture) && item.lecture) {
           lectureSlugs.push(item.lecture)
-        } else if (item.type === 'tutorials' && item.tutorial) {
+        } else if ((itemType === 'tutorials' || item.tutorial) && item.tutorial) {
           tutorialSlugs.push(item.tutorial)
-        } else if (item.type === 'exercises' && item.exercise) {
+        } else if ((itemType === 'exercises' || item.exercise) && item.exercise) {
           exerciseSlugs.push(item.exercise)
-        } else if (item.type === 'articles' && item.article) {
+        } else if ((itemType === 'articles' || item.article) && item.article) {
           articleSlugs.push(item.article)
-        } else if (item.type === 'projects' && item.project) {
+        } else if ((itemType === 'projects' || item.project) && item.project) {
           projectSlugs.push(item.project)
         }
       })

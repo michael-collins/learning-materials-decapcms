@@ -49,7 +49,12 @@ const oerSchema = computed(() => {
   if (!lecture.value) return null
   // Get the base URL from the request
   const baseUrl = useRequestURL().origin
-  return buildSupportingMaterialSchema(lecture.value, baseUrl)
+  // Ensure _path is set on the document
+  const lectureWithPath = {
+    ...lecture.value,
+    _path: `/lectures/${baseSlug}`
+  }
+  return buildSupportingMaterialSchema(lectureWithPath, baseUrl)
 })
 </script>
 

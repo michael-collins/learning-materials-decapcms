@@ -28,7 +28,7 @@
               aria-label="Close modal"
               class="shrink-0"
             >
-              <Icon name="lucide:x" class="w-4 h-4" />
+              <Icon name="lucide:x" class="w-5 h-5" />
             </Button>
           </div>
           
