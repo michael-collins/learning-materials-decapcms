@@ -60,40 +60,54 @@ const oerSchema = computed(() => {
   <div>
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
     
-    <div v-if="pending" class="container py-8">
-      <div class="flex justify-center items-center min-h-[400px]">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    <Transition name="fade" mode="out-in">
+      <div v-if="pending" key="loading" class="container py-8">
+        <div class="flex justify-center items-center min-h-[400px]">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
       </div>
-    </div>
-    <div v-else-if="exercise" key="exercise-content">
-      <CollectionItem
-        :breadcrumbs="breadcrumbs"
-        :title="exercise.title"
-        :date="exercise.date"
-        :author="exercise.author"
-        :authorUrl="exercise.authorUrl"
-        :difficulty="exercise.difficulty"
-        :license="exercise.license"
-        :aiLicense="exercise.aiLicense"
-        :allowEmbed="exercise.allowEmbed"
-        :image="exercise.image"
-        :imageAlt="exercise.imageAlt"
-        :prerequisites="exercise.prerequisites"
-        :tags="exercise.tags"
-        :attachments="exercise.attachments"
-        :versionStatus="exercise.versionStatus"
-        :version="displayVersion"
-      >
-        <ContentRenderer :value="exercise" />
-      </CollectionItem>
-    </div>
-    <div v-else class="container py-8">
-      <div class="text-center">
-        <h1 class="text-2xl font-bold mb-4">Exercise not found</h1>
-        <NuxtLink to="/exercises" class="text-primary hover:underline">
-          ← Back to exercises
-        </NuxtLink>
+      <div v-else-if="exercise" key="exercise-content">
+        <CollectionItem
+          :breadcrumbs="breadcrumbs"
+          :title="exercise.title"
+          :date="exercise.date"
+          :author="exercise.author"
+          :authorUrl="exercise.authorUrl"
+          :difficulty="exercise.difficulty"
+          :license="exercise.license"
+          :aiLicense="exercise.aiLicense"
+          :allowEmbed="exercise.allowEmbed"
+          :image="exercise.image"
+          :imageAlt="exercise.imageAlt"
+          :prerequisites="exercise.prerequisites"
+          :tags="exercise.tags"
+          :attachments="exercise.attachments"
+          :versionStatus="exercise.versionStatus"
+          :version="displayVersion"
+        >
+          <ContentRenderer :value="exercise" />
+        </CollectionItem>
       </div>
-    </div>
+      <div v-else key="not-found" class="container py-8">
+        <div class="text-center">
+          <h1 class="text-2xl font-bold mb-4">Exercise not found</h1>
+          <NuxtLink to="/exercises" class="text-primary hover:underline">
+            ← Back to exercises
+          </NuxtLink>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

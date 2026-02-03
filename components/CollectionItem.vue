@@ -168,7 +168,7 @@ const embedShowAILicense = ref(true)
 // Watch embed modal state and toggle body overflow
 watch(() => isEmbedModalOpen.value, (isOpen) => {
   toggleBodyOverflow(isOpen)
-})
+}, { immediate: false })
 
 const embedUrl = computed(() => {
   if (typeof window === 'undefined') return ''
