@@ -119,11 +119,8 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
   // AI Usage Constraint (AIUL)
   if (doc.aiLicense) {
     const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
-    schema.aiUsageConstraint = licenses.map((license: string) => ({
-      '@type': 'AIUsageConstraint',
-      'constraintType': getAIULUrl(license),
-      'description': getAIULDescription(license)
-    }));
+    const constraintUrls = licenses.map((license: string) => getAIULUrl(license));
+    schema['oer:aiUsageConstraint'] = constraintUrls.length === 1 ? constraintUrls[0] : constraintUrls;
   }
   
   // Link to learning objectives
@@ -219,11 +216,8 @@ export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''):
   // AI Usage Constraint (AIUL)
   if (doc.aiLicense) {
     const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
-    schema.aiUsageConstraint = licenses.map((license: string) => ({
-      '@type': 'AIUsageConstraint',
-      'constraintType': getAIULUrl(license),
-      'description': getAIULDescription(license)
-    }));
+    const constraintUrls = licenses.map((license: string) => getAIULUrl(license));
+    schema['oer:aiUsageConstraint'] = constraintUrls.length === 1 ? constraintUrls[0] : constraintUrls;
   }
   
   // Learning Objectives
@@ -855,11 +849,8 @@ export function buildAssociatedMaterialSchema(doc: ParsedContent, baseUrl: strin
   // AI Usage Constraint (AIUL)
   if (doc.aiLicense) {
     const licenses = Array.isArray(doc.aiLicense) ? doc.aiLicense : [doc.aiLicense];
-    schema.aiUsageConstraint = licenses.map((license: string) => ({
-      '@type': 'AIUsageConstraint',
-      'constraintType': getAIULUrl(license),
-      'description': getAIULDescription(license)
-    }));
+    const constraintUrls = licenses.map((license: string) => getAIULUrl(license));
+    schema['oer:aiUsageConstraint'] = constraintUrls.length === 1 ? constraintUrls[0] : constraintUrls;
   }
   
   // Tags as keywords
