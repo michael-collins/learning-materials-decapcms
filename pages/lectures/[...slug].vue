@@ -54,7 +54,8 @@ const oerSchema = computed(() => {
     ...lecture.value,
     _path: `/lectures/${baseSlug}`
   }
-  return buildSupportingMaterialSchema(lectureWithPath, baseUrl)
+  const version = typeof versionParam === 'string' ? versionParam : undefined
+  return buildSupportingMaterialSchema(lectureWithPath, baseUrl, version)
 })
 </script>
 

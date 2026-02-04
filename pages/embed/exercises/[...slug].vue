@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { buildPracticeSchema } from '~/lib/oer-schema-builder'
-import { resolveContentVersion, getLatestVersionNumber } from '~/lib/version-resolver'
+import { resolveContentVersion, getLatestVersionNumber } from '~/composables/useVersionResolver'
 
 const route = useRoute()
 
@@ -63,34 +63,14 @@ console.log('[Embed Exercise Page] Exercise data loaded:', {
 const oerSchema = computed(() => {
   if (!exercise.value) return null
   
-  return buildPracticeSchema({
-    name: exercise.value.title,
-    description: exercise.value.description,
-    author: exercise.value.author,
-    datePublished: exercise.value.date,
-    license: exercise.value.license,
-    difficulty: exercise.value.difficulty,
-    learningResourceType: 'Exercise'
-  })
+  const baseUrl = useRequestURL().origin
+  return buildPracticeSchema(exercise.value, baseUrl, versionParam)
 })
 </script>
 
 <template>
   <div>
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
-    
-    <!-- Version notice banner -->
-    <div v-if="isOutdated && currentVersion && latestVersion" 
-         class="bg-amber-50 border-b border-amber-200 px-4 py-3 text-sm">
-      <div class="container mx-auto flex items-center justify-between">
-        <span class="text-amber-800">
-          📌 Using version {{ currentVersion }}. 
-          <a :href="`?version=latest`" class="underline font-medium hover:text-amber-900">
-            Upgrade to {{ latestVersion }} →
-          </a>
-        </span>
-      </div>
-    </div>
     
     <div v-if="exercise" key="exercise-content">
       <CollectionItem

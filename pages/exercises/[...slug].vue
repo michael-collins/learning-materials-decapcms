@@ -8,7 +8,11 @@ const router = useRouter()
 // Redirect to embed route if embed query parameter is present
 if (route.query.embed === 'true') {
   const slug = Array.isArray(route.params.slug) ? route.params.slug.join('/') : route.params.slug
-  await navigateTo(`/embed/exercises/${slug}`, { replace: true })
+  const versionParam = route.query.version
+  const embedUrl = versionParam && typeof versionParam === 'string' 
+    ? `/embed/exercises/${slug}?version=${versionParam}` 
+    : `/embed/exercises/${slug}`
+  await navigateTo(embedUrl, { replace: true })
 }
 
 definePageMeta({
@@ -63,7 +67,8 @@ const oerSchema = computed(() => {
   if (!exercise.value) return null
   // Get the base URL from the request
   const baseUrl = useRequestURL().origin
-  return buildPracticeSchema(exercise.value, baseUrl)
+  const version = typeof versionParam === 'string' ? versionParam : undefined
+  return buildPracticeSchema(exercise.value, baseUrl, version)
 })
 </script>
 

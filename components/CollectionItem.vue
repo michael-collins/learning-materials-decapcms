@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
@@ -167,6 +167,70 @@ const isCitationCopied = ref(false)
 const isEmbedConfigOpen = ref(false)
 const isEmbedPreviewOpen = ref(false)
 const isEmbedModalOpen = ref(false)
+const isMoreMenuOpen = ref(false)
+const moreMenuRef = ref<HTMLElement | null>(null)
+const embedModalRef = ref<HTMLElement | null>(null)
+const moreMenuButtonRef = ref<HTMLElement | null>(null)
+let previousActiveElement: HTMLElement | null = null
+
+// Close menu when clicking outside
+const closeMenuOnClickOutside = (event: MouseEvent) => {
+  if (moreMenuRef.value && !moreMenuRef.value.contains(event.target as Node)) {
+    isMoreMenuOpen.value = false
+  }
+}
+
+// Close menu on Escape key
+const handleMenuKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && isMoreMenuOpen.value) {
+    isMoreMenuOpen.value = false
+    moreMenuButtonRef.value?.focus()
+  }
+}
+
+// Handle modal keyboard events
+const handleModalKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && isEmbedModalOpen.value) {
+    isEmbedModalOpen.value = false
+  }
+}
+
+watch(isMoreMenuOpen, (newVal) => {
+  if (newVal) {
+    document.addEventListener('click', closeMenuOnClickOutside)
+    document.addEventListener('keydown', handleMenuKeydown)
+  } else {
+    document.removeEventListener('click', closeMenuOnClickOutside)
+    document.removeEventListener('keydown', handleMenuKeydown)
+  }
+})
+
+watch(isEmbedModalOpen, (newVal) => {
+  if (newVal) {
+    // Store currently focused element
+    previousActiveElement = document.activeElement as HTMLElement
+    // Focus modal on next tick after it's rendered
+    nextTick(() => {
+      embedModalRef.value?.focus()
+      toggleBodyOverflow(true)
+    })
+    document.addEventListener('keydown', handleModalKeydown)
+  } else {
+    // Return focus to previous element
+    if (previousActiveElement) {
+      previousActiveElement.focus()
+      previousActiveElement = null
+    }
+    toggleBodyOverflow(false)
+    document.removeEventListener('keydown', handleModalKeydown)
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenuOnClickOutside)
+  document.removeEventListener('keydown', handleMenuKeydown)
+  document.removeEventListener('keydown', handleModalKeydown)
+})
 
 // Watch embed modal state and toggle body overflow
 watch(() => isEmbedModalOpen.value, (isOpen) => {
@@ -315,15 +379,24 @@ const copyCitation = async () => {
       <header class="mb-8 pb-8" :class="{ 'border-b': breadcrumbs.length > 0 }">
         <!-- More menu dropdown -->
         <div v-if="!isEmbed && !hideMenu" class="flex justify-end mb-4">
-          <div class="relative group">
+          <div ref="moreMenuRef" class="relative">
             <Button
+              ref="moreMenuButtonRef"
               size="icon"
               variant="ghost"
-              aria-label="More options"
+              :aria-label="isMoreMenuOpen ? 'Close options menu' : 'Open options menu'"
+              :aria-expanded="isMoreMenuOpen"
+              aria-haspopup="true"
+              @click="isMoreMenuOpen = !isMoreMenuOpen"
             >
               <ChevronDown class="w-5 h-5 text-foreground" />
             </Button>
-            <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div 
+              v-if="isMoreMenuOpen" 
+              class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg z-50"
+              role="menu"
+              aria-orientation="vertical"
+            >
               <!-- Edit button -->
               <a
                 v-if="getDecapEditUrl"
@@ -524,10 +597,12 @@ const copyCitation = async () => {
           role="presentation"
         >
           <div
+            ref="embedModalRef"
             class="relative w-full max-w-7xl h-[95vh] flex flex-col bg-background border border-border rounded-lg shadow-xl overflow-hidden"
             role="dialog"
             aria-modal="true"
             aria-labelledby="embed-modal-title"
+            tabindex="-1"
             @click.stop
           >
             <!-- Header -->

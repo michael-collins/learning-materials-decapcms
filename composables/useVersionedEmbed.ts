@@ -1,5 +1,5 @@
-import { resolveContentVersion, getLatestVersionNumber } from '~/lib/version-resolver'
-import type { VersionedContent } from '~/lib/version-resolver'
+import { resolveContentVersion, getLatestVersionNumber } from '~/composables/useVersionResolver'
+import type { VersionedContent } from '~/composables/useVersionResolver'
 
 /**
  * Composable for versioned embed pages
@@ -62,9 +62,12 @@ export function useVersionedEmbed(contentType: string, slug: string) {
     return currentVersion.value !== latestVersion.value
   })
   
+  // Return versionParam as a ref for consistency
+  const versionParamRef = computed(() => versionParam)
+  
   return {
     content,
-    versionParam,
+    versionParam: versionParamRef,
     currentVersion,
     latestVersion,
     isOutdated

@@ -22,26 +22,13 @@ const oerSchema = computed(() => {
     ...article.value,
     _path: `/articles/${slugString}`
   }
-  return buildAssociatedMaterialSchema(articleWithPath, baseUrl)
+  return buildAssociatedMaterialSchema(articleWithPath, baseUrl, versionParam.value)
 })
 </script>
 
 <template>
   <div>
     <OERSchemaScript v-if="oerSchema" :schema="oerSchema" />
-    
-    <!-- Version notice banner -->
-    <div v-if="isOutdated && currentVersion && latestVersion" 
-         class="bg-amber-50 border-b border-amber-200 px-4 py-3 text-sm">
-      <div class="container mx-auto flex items-center justify-between">
-        <span class="text-amber-800">
-          📌 Using version {{ currentVersion }}. 
-          <a :href="`?version=latest`" class="underline font-medium hover:text-amber-900">
-            Upgrade to {{ latestVersion }} →
-          </a>
-        </span>
-      </div>
-    </div>
     
     <div v-if="article" key="article-content">
       <CollectionItem

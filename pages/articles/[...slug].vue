@@ -38,7 +38,8 @@ const oerSchema = computed(() => {
     ...article.value,
     _path: `/articles/${baseSlug}`
   }
-  return buildAssociatedMaterialSchema(articleWithPath, baseUrl)
+  const version = typeof versionParam === 'string' ? versionParam : undefined
+  return buildAssociatedMaterialSchema(articleWithPath, baseUrl, version)
 })
 </script>
 

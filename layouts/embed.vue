@@ -197,10 +197,26 @@ onUnmounted(() => {
   window.removeEventListener('resize', debouncedResize)
   window.removeEventListener('load', sendCanvasResize)
 })
+
+const route = useRoute()
 </script>
 
 <template>
   <div class="w-full bg-background">
     <slot />
+    
+    <!-- Version indicator badge -->
+    <div 
+      v-if="route.query.version" 
+      class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 flex justify-end"
+    >
+      <span 
+        class="inline-flex items-center rounded-full bg-background border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground"
+        role="status"
+        :aria-label="`Viewing version ${route.query.version}`"
+      >
+        Version {{ route.query.version }}
+      </span>
+    </div>
   </div>
 </template>

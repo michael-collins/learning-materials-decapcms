@@ -37,7 +37,8 @@ const oerSchema = computed(() => {
   if (!project.value) return null
   // Get the base URL from the request
   const baseUrl = useRequestURL().origin
-  return buildAssessmentSchema(project.value, baseUrl)
+  const version = typeof versionParam === 'string' ? versionParam : undefined
+  return buildAssessmentSchema(project.value, baseUrl, version)
 })
 </script>
 

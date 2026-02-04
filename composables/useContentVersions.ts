@@ -71,33 +71,47 @@ export const useContentVersions = async (
         const latestVersionNumber = latestContent?.version || latestContent?.meta?.version
         
         allContent.forEach((item: any) => {
-          // Use the slug and id fields which are properly available
-          const itemSlug = item.slug || ''
-          // Extract path from id: e.g., "exercises/exercises/3d-viewer-test/v/1.0.0.md" -> check if in v/ folder
+          // Extract slug from id path: e.g., "exercises/exercises/3d-viewer-test/v/1.0.0.md"
+          // Pattern: {type}/{type}/{slug}/v/{version}.md or {type}/{type}/{slug}/index.md
           const idParts = item.id?.split('/') || []
           const fileName = idParts.pop() || ''
           const fileNameWithoutExt = fileName.replace('.md', '')
           const parentFolder = idParts[idParts.length - 1] || ''
           
+          // Extract slug from path - it's the part before /v/ or the filename
+          // For "exercises/exercises/3d-viewer-test/v/1.0.0.md", slug is "3d-viewer-test"
+          const itemSlug = parentFolder === 'v' ? idParts[idParts.length - 2] : ''
+          
           // Only process items that are in the same slug folder, in v/ subdirectory, and are version files
           if (itemSlug === baseSlug && parentFolder === 'v' && fileNameWithoutExt.match(/^\d+\.\d+\.\d+$/)) {
             // Get version from item.version or item.meta.version
             const itemVersion = item.version || item.meta?.version
-            const itemPublishEmbed = item.publishEmbed || item.meta?.publishEmbed
+            const itemAllowEmbed = item.allowEmbed || item.meta?.allowEmbed
             const itemVersionStatus = item.versionStatus || item.meta?.versionStatus
+            
+            console.log(`[useContentVersions] Checking archived version ${fileNameWithoutExt}:`, {
+              itemVersion,
+              itemAllowEmbed,
+              itemVersionStatus,
+              latestVersionNumber,
+              sameAsLatest: itemVersion === latestVersionNumber
+            })
             
             // Skip if this archived version has the same version number as the latest
             if (itemVersion === latestVersionNumber) {
+              console.log(`[useContentVersions] ✗ Skipping ${itemVersion}: same as latest`)
               return
             }
             
-            if (itemVersion && itemPublishEmbed && itemVersionStatus === 'archived') {
+            if (itemVersion && itemAllowEmbed && itemVersionStatus === 'archived') {
               console.log(`[useContentVersions] ✓ Adding archived version: ${itemVersion}`)
               versions.value.push({
                 version: itemVersion,
                 versionStatus: itemVersionStatus || 'archived',
                 publishedAt: item.date
               })
+            } else {
+              console.log(`[useContentVersions] ✗ Skipping ${itemVersion}: missing required fields`)
             }
           }
         })

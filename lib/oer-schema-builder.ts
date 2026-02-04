@@ -27,13 +27,24 @@ export interface OERSchema {
  * Build OER Schema for Practice activities (Exercises)
  * Structures as InstructionalPattern with hasComponent for better OER Schema compliance
  */
-export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
+export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = '', versionParam?: string): OERSchema {
   const objectives = extractLearningObjectives(doc.body || '');
   const instructions = extractInstructions(doc.body || '');
   const playlistId = extractYouTubePlaylist(doc.body || '');
   
   // Get path - use _path from Nuxt Content or fallback to slug
-  const path = doc._path || (doc.slug ? `/exercises/${doc.slug}` : '');
+  let path = doc._path || (doc.slug ? `/exercises/${doc.slug}` : '');
+  
+  // If path contains /v/ (versioned path), extract the base path
+  if (path.includes('/v/')) {
+    path = path.substring(0, path.indexOf('/v/'));
+  }
+  
+  // Add version parameter if provided
+  if (versionParam && versionParam !== 'latest') {
+    path = `${path}?version=${versionParam}`;
+  }
+  
   const baseId = `${baseUrl}${path}`;
   
   // Build hasComponent array with sub-components
@@ -169,13 +180,23 @@ export function buildPracticeSchema(doc: ParsedContent, baseUrl: string = ''): O
 /**
  * Build OER Schema for Assessment activities (Projects)
  */
-export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
+export function buildAssessmentSchema(doc: ParsedContent, baseUrl: string = '', versionParam?: string): OERSchema {
   const objectives = extractLearningObjectives(doc.body || '');
   const taskSections = parseTaskSections(doc.body || '');
   const playlistId = extractYouTubePlaylist(doc.body || '');
   
   // Get path - use _path from Nuxt Content or fallback to slug
-  const path = doc._path || (doc.slug ? `/projects/${doc.slug}` : '');
+  let path = doc._path || (doc.slug ? `/projects/${doc.slug}` : '');
+  
+  // If path contains /v/ (versioned path), extract the base path
+  if (path.includes('/v/')) {
+    path = path.substring(0, path.indexOf('/v/'));
+  }
+  
+  // Add version parameter if provided
+  if (versionParam && versionParam !== 'latest') {
+    path = `${path}?version=${versionParam}`;
+  }
   
   const schema: OERSchema = {
     '@context': {
@@ -752,8 +773,19 @@ function parseDurationToISO8601(duration: string): string | null {
  * Build OER Schema for Supporting Material (Lectures)
  * Maintains backward compatibility with existing lectures via oer frontmatter field
  */
-export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
-  const path = doc._path || (doc.slug ? `/lectures/${doc.slug}` : '')
+export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: string = '', versionParam?: string): OERSchema {
+  let path = doc._path || (doc.slug ? `/lectures/${doc.slug}` : '')
+  
+  // If path contains /v/ (versioned path), extract the base path
+  if (path.includes('/v/')) {
+    path = path.substring(0, path.indexOf('/v/'));
+  }
+  
+  // Add version parameter if provided
+  if (versionParam && versionParam !== 'latest') {
+    path = `${path}?version=${versionParam}`;
+  }
+  
   const fullUrl = `${baseUrl}${path}`
   
   const schema: OERSchema = {
@@ -811,8 +843,19 @@ export function buildSupportingMaterialSchema(doc: ParsedContent, baseUrl: strin
  * Build OER Schema for Associated Material (Articles, Tutorials)
  * Articles and tutorials are supporting educational content
  */
-export function buildAssociatedMaterialSchema(doc: ParsedContent, baseUrl: string = ''): OERSchema {
-  const path = doc._path || '';
+export function buildAssociatedMaterialSchema(doc: ParsedContent, baseUrl: string = '', versionParam?: string): OERSchema {
+  let path = doc._path || '';
+  
+  // If path contains /v/ (versioned path), extract the base path
+  if (path.includes('/v/')) {
+    path = path.substring(0, path.indexOf('/v/'));
+  }
+  
+  // Add version parameter if provided
+  if (versionParam && versionParam !== 'latest') {
+    path = `${path}?version=${versionParam}`;
+  }
+  
   const fullUrl = `${baseUrl}${path}`;
   
   const schema: OERSchema = {
