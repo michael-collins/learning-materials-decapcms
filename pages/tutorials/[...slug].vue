@@ -38,7 +38,8 @@ const oerSchema = computed(() => {
     ...tutorial.value,
     _path: `/tutorials/${baseSlug}`
   }
-  return buildAssociatedMaterialSchema(tutorialWithPath, baseUrl)
+  const version = typeof versionParam === 'string' ? versionParam : undefined
+  return buildAssociatedMaterialSchema(tutorialWithPath, baseUrl, version)
 })
 </script>
 

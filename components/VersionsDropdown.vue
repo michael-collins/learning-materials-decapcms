@@ -9,7 +9,7 @@
     </button>
 
     <!-- Nested versions list -->
-    <div v-if="isOpen" class="bg-muted/50 border-t border-b border-border pl-4">
+    <div v-if="isOpen" class="bg-muted/50 border-t border-b border-border pl-4 max-h-64 overflow-y-auto">
       <div v-if="loading" class="px-4 py-2 text-sm text-muted-foreground">Loading...</div>
       <div v-else-if="error" class="px-4 py-2 text-sm text-red-600">{{ error }}</div>
       <div v-else-if="versions.length === 0" class="px-4 py-2 text-sm text-muted-foreground">No versions</div>

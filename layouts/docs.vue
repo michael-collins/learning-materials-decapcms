@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library } from 'lucide-vue-next'
+import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library, AlertCircle, Info } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 import Button from '~/components/ui/button/Button.vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
@@ -8,6 +8,13 @@ import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
 import BreadcrumbSeparator from '~/components/ui/breadcrumb/BreadcrumbSeparator.vue'
 import BreadcrumbPage from '~/components/ui/breadcrumb/BreadcrumbPage.vue'
+import Popover from '~/components/ui/popover/Popover.vue'
+import PopoverTrigger from '~/components/ui/popover/PopoverTrigger.vue'
+import PopoverContent from '~/components/ui/popover/PopoverContent.vue'
+import TooltipProvider from '~/components/ui/tooltip/TooltipProvider.vue'
+import Tooltip from '~/components/ui/tooltip/Tooltip.vue'
+import TooltipTrigger from '~/components/ui/tooltip/TooltipTrigger.vue'
+import TooltipContent from '~/components/ui/tooltip/TooltipContent.vue'
 
 const route = useRoute()
 const { width } = useWindowSize()
@@ -19,6 +26,164 @@ const isMobile = computed(() => width.value < 768)
 
 // Desktop sidebar collapsed state (ignored on mobile)
 const isDesktopCollapsed = ref(false)
+
+// Version comparison logic
+const latestVersion = ref<string | null>(null)
+const currentPageVersion = ref<string | null>(null)
+const allVersions = ref<Array<{ version: string, versionStatus: string }>>([])
+const isValidVersion = ref(true)
+
+// Fetch all versions and latest version
+const fetchLatestVersion = async () => {
+  if (!route.query.version) {
+    // If no version param, fetch current page version
+    await fetchCurrentPageVersion()
+    return
+  }
+  
+  try {
+    const pathParts = route.path.split('/').filter(Boolean)
+    if (pathParts.length >= 2) {
+      const contentType = pathParts[0]
+      const slug = pathParts.slice(1).join('/')
+      
+      // Fetch all available versions
+      const { versions } = await useContentVersions(contentType as any, slug)
+      allVersions.value = versions.value || []
+      
+      // Check if the requested version exists
+      const requestedVersion = route.query.version as string
+      isValidVersion.value = allVersions.value.some(v => v.version === requestedVersion)
+      
+      // Try to fetch the latest version (index.md)
+      const latest = await queryCollection(contentType as any).path(`/${contentType}/${slug}`).first()
+      if (latest?.version) {
+        latestVersion.value = latest.version
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch latest version:', e)
+  }
+}
+
+// Fetch current page version for latest content
+const fetchCurrentPageVersion = async () => {
+  try {
+    const pathParts = route.path.split('/').filter(Boolean)
+    if (pathParts.length >= 2) {
+      const contentType = pathParts[0]
+      const slug = pathParts.slice(1).join('/')
+      
+      const content = await queryCollection(contentType as any).path(`/${contentType}/${slug}`).first()
+      if (content?.version) {
+        currentPageVersion.value = content.version
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch current page version:', e)
+  }
+}
+
+// Parse semantic version
+const parseVersion = (version: string) => {
+  const parts = version.split('.').map(Number)
+  return { major: parts[0] || 0, minor: parts[1] || 0, patch: parts[2] || 0 }
+}
+
+// Determine all available version updates
+const availableUpdates = computed(() => {
+  if (!route.query.version || !latestVersion.value || allVersions.value.length === 0) return []
+  
+  const current = parseVersion(route.query.version as string)
+  const latest = parseVersion(latestVersion.value)
+  
+  const updates = []
+  
+  // Find the highest minor version in the current major version (e.g., 3.4.0 when on 3.3.0)
+  let highestMinorInMajor: { major: number, minor: number, patch: number, versionString: string } | null = null
+  
+  allVersions.value.forEach(v => {
+    const parsed = parseVersion(v.version)
+    // Only consider versions in the same major as current
+    if (parsed.major === current.major && parsed.minor > current.minor) {
+      if (!highestMinorInMajor || parsed.minor > highestMinorInMajor.minor || 
+         (parsed.minor === highestMinorInMajor.minor && parsed.patch > highestMinorInMajor.patch)) {
+        highestMinorInMajor = { ...parsed, versionString: v.version }
+      }
+    }
+  })
+  
+  // Find the highest patch version in the current major.minor (e.g., 3.3.1 when on 3.3.0)
+  let highestPatchInMinor: { major: number, minor: number, patch: number, versionString: string } | null = null
+  
+  allVersions.value.forEach(v => {
+    const parsed = parseVersion(v.version)
+    // Only consider versions in the same major.minor as current
+    if (parsed.major === current.major && parsed.minor === current.minor && parsed.patch > current.patch) {
+      if (!highestPatchInMinor || parsed.patch > highestPatchInMinor.patch) {
+        highestPatchInMinor = { ...parsed, versionString: v.version }
+      }
+    }
+  })
+  
+  // Check for major version update
+  if (latest.major > current.major) {
+    updates.push({
+      type: 'major',
+      title: 'Major Version Update Available',
+      description: `Version ${latestVersion.value} is available and may contain significant updates and breaking changes.`,
+      icon: AlertCircle,
+      version: latestVersion.value
+    })
+  }
+  
+  // Check for minor version update (same major, higher minor)
+  if (highestMinorInMajor) {
+    updates.push({
+      type: 'minor',
+      title: 'Minor Version Update Available',
+      description: `Version ${highestMinorInMajor.versionString} is available and may feature improvements and changes, but should not be significantly different.`,
+      icon: Info,
+      version: highestMinorInMajor.versionString
+    })
+  }
+  
+  // Check for patch update (same major and minor, higher patch)
+  if (highestPatchInMinor) {
+    updates.push({
+      type: 'patch',
+      title: 'Incremental Update Available',
+      description: `Version ${highestPatchInMinor.versionString} is available with minor edits.`,
+      icon: Info,
+      version: highestPatchInMinor.versionString
+    })
+  }
+  
+  return updates
+})
+
+// Backward compatibility - get the most significant update type
+const versionUpdateType = computed(() => {
+  const updates = availableUpdates.value
+  if (updates.length === 0) return null
+  return updates[0].type
+})
+
+const updateMessage = computed(() => {
+  const updates = availableUpdates.value
+  if (updates.length === 0) return null
+  return updates[0]
+})
+
+// Fetch latest version on mount
+onMounted(() => {
+  fetchLatestVersion()
+})
+
+// Re-fetch when route changes
+watch(() => route.query.version, () => {
+  fetchLatestVersion()
+})
 
 const navigationGroups = [
   {
@@ -225,46 +390,185 @@ onUnmounted(() => {
 
     <!-- Main content -->
     <div class="flex-1 overflow-auto flex flex-col">
-      <header class="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          @click="toggleSidebar"
-          class="h-7 w-7"
-        >
-          <Menu class="h-4 w-4 md:hidden" />
-          <PanelLeft class="h-4 w-4 hidden md:block" />
-          <span class="sr-only">Toggle sidebar</span>
-        </Button>
-        
-        <div class="h-4 w-px bg-border mx-2" />
-        
-        <Breadcrumb>
-          <BreadcrumbItem v-for="(crumb, index) in breadcrumbs" :key="index">
-            <BreadcrumbLink v-if="index < breadcrumbs.length - 1" as-child>
-              <NuxtLink :to="crumb.path" class="flex items-center" :aria-label="index === 0 ? 'Home' : crumb.label" :title="index === 0 ? 'Home' : crumb.label">
-                <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" aria-hidden="true" />
-                <span v-else>{{ crumb.label }}</span>
-              </NuxtLink>
-            </BreadcrumbLink>
-            <BreadcrumbPage v-else class="flex items-center" :aria-label="index === 0 ? 'Home' : crumb.label">
-              <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" aria-hidden="true" />
-              <span v-else>{{ crumb.label }}</span>
-            </BreadcrumbPage>
-            <BreadcrumbSeparator v-if="index < breadcrumbs.length - 1">
-              <ChevronRight class="h-4 w-4" />
-            </BreadcrumbSeparator>
-          </BreadcrumbItem>
-        </Breadcrumb>
-        
-        <!-- Version badge for archived content -->
-        <span v-if="route.query.version" class="ml-3 inline-flex items-center rounded-full bg-warning/10 border border-warning/20 px-3 py-1 text-xs font-semibold text-warning">
-          Version {{ route.query.version }}
-        </span>
+      <header class="sticky top-0 z-10 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="flex h-14 items-center gap-2 px-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            @click="toggleSidebar"
+            class="h-7 w-7 shrink-0"
+          >
+            <Menu class="h-4 w-4 md:hidden" />
+            <PanelLeft class="h-4 w-4 hidden md:block" />
+            <span class="sr-only">Toggle sidebar</span>
+          </Button>
+          
+          <div class="h-4 w-px bg-border mx-2 shrink-0" />
+          
+          <!-- Breadcrumbs and version badge with horizontal scroll -->
+          <div class="flex-1 min-w-0 overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+            <div class="flex items-center gap-3 whitespace-nowrap">
+              <Breadcrumb>
+                <BreadcrumbItem v-for="(crumb, index) in breadcrumbs" :key="index">
+                  <BreadcrumbLink v-if="index < breadcrumbs.length - 1" as-child>
+                    <NuxtLink :to="crumb.path" class="flex items-center" :aria-label="index === 0 ? 'Home' : crumb.label" :title="index === 0 ? 'Home' : crumb.label">
+                      <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" aria-hidden="true" />
+                      <span v-else>{{ crumb.label }}</span>
+                    </NuxtLink>
+                  </BreadcrumbLink>
+                  <BreadcrumbPage v-else class="flex items-center" :aria-label="index === 0 ? 'Home' : crumb.label">
+                    <Icon v-if="index === 0" name="mdi:home" class="h-6 w-6" aria-hidden="true" />
+                    <span v-else>{{ crumb.label }}</span>
+                  </BreadcrumbPage>
+                  <BreadcrumbSeparator v-if="index < breadcrumbs.length - 1">
+                    <ChevronRight class="h-4 w-4" />
+                  </BreadcrumbSeparator>
+                </BreadcrumbItem>
+              </Breadcrumb>
+              
+              <!-- Version badge -->
+              <TooltipProvider v-if="route.query.version" :delay-duration="300">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <a 
+                      :href="route.path"
+                      :class="[
+                        'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-200 cursor-pointer group',
+                        !isValidVersion 
+                          ? 'bg-warning/10 border border-warning text-warning hover:bg-warning/20 focus-visible:ring-warning' 
+                          : 'bg-background border border-border text-foreground hover:bg-muted focus-visible:ring-ring'
+                      ]"
+                      :aria-label="`Remove version ${route.query.version} filter and return to latest version`"
+                      role="button"
+                    >
+                      <AlertCircle v-if="!isValidVersion" class="w-3 h-3 transition-transform duration-200" aria-hidden="true" />
+                      <span>Version {{ route.query.version }}</span>
+                      <X class="w-0 h-3 opacity-0 group-hover:w-3 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200" aria-hidden="true" />
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Remove
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
+        </div>
       </header>
       <main class="flex-1">
         <slot />
       </main>
+      
+      <!-- Version indicator badge with popover -->
+      <div 
+        class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 flex justify-end"
+      >
+        <Popover v-if="route.query.version">
+          <PopoverTrigger
+            :class="[
+              'inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-200 cursor-pointer',
+              !isValidVersion
+                ? 'bg-warning/10 border border-warning text-warning hover:bg-warning/20 focus-visible:ring-warning'
+                : 'bg-background border border-border text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring'
+            ]"
+            :aria-label="`View version ${route.query.version} information`"
+          >
+            <AlertCircle v-if="!isValidVersion" class="w-3 h-3 mr-1.5" aria-hidden="true" />
+            Version {{ route.query.version }}
+          </PopoverTrigger>
+          <PopoverContent side="top" align="end" class="w-80">
+            <div class="space-y-3">
+              <!-- Show error if version doesn't exist -->
+              <div v-if="!isValidVersion" class="flex items-start gap-3">
+                <div class="mt-0.5 rounded-full bg-warning/10 p-2">
+                  <AlertCircle class="h-4 w-4 text-warning" />
+                </div>
+                <div class="flex-1 space-y-2">
+                  <div>
+                    <h4 class="font-semibold text-sm text-foreground mb-1">Version Not Found</h4>
+                    <p class="text-xs text-muted-foreground">
+                      Version {{ route.query.version }} does not exist. Showing the latest version instead.
+                    </p>
+                  </div>
+                  <a
+                    :href="route.path"
+                    class="inline-flex items-center text-xs font-medium text-primary hover:underline"
+                  >
+                    View Latest Version ({{ latestVersion }})
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Normal archived version view -->
+              <template v-else>
+                <div>
+                  <h4 class="font-semibold text-sm text-foreground mb-1">Viewing Archived Version</h4>
+                  <p class="text-xs text-muted-foreground">
+                    You are currently viewing version {{ route.query.version }} of this content.
+                  </p>
+                </div>
+                
+                <!-- Show all available updates -->
+                <div v-if="availableUpdates.length > 0" class="space-y-2">
+                  <div 
+                    v-for="update in availableUpdates" 
+                    :key="update.type"
+                    class="p-3 rounded-md bg-muted/50 border border-border"
+                  >
+                    <div class="flex items-start gap-2">
+                      <component :is="update.icon" class="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+                      <div class="flex-1">
+                        <h5 class="font-medium text-xs text-foreground mb-1">{{ update.title }}</h5>
+                        <p class="text-xs text-muted-foreground leading-relaxed">
+                          <a 
+                            :href="`${route.path}?version=${update.version}`"
+                            class="font-medium text-primary hover:underline"
+                          >
+                            Version {{ update.version }}
+                          </a>
+                          {{ update.description.replace(/^Version \d+\.\d+\.\d+ /, '') }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+                <div v-else-if="latestVersion" class="text-xs text-muted-foreground">
+                  This is the latest version ({{ latestVersion }}).
+                </div>
+              </template>
+            </div>
+          </PopoverContent>
+        </Popover>
+        
+        <!-- Latest version badge with popover -->
+        <Popover v-else-if="currentPageVersion">
+          <PopoverTrigger as-child>
+            <button 
+              class="inline-flex items-center rounded-full bg-background border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+              :aria-label="`Current version ${currentPageVersion}. Click for details.`"
+            >
+              Version {{ currentPageVersion }}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" align="end" :side-offset="8" class="w-80">
+            <div class="space-y-3">
+              <div class="flex items-start gap-3">
+                <div class="mt-0.5 rounded-full bg-primary/10 p-2">
+                  <Info class="h-4 w-4 text-primary" />
+                </div>
+                <div class="flex-1 space-y-1">
+                  <p class="text-sm font-medium leading-none">Viewing Latest Version</p>
+                  <p class="text-sm text-muted-foreground">
+                    No updates are available for this content.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+      
       <Footer />
     </div>
   </div>
