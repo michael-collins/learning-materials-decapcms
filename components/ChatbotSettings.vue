@@ -39,9 +39,9 @@ const testingConnection = ref(false)
 const testResult = ref<'success' | 'error' | null>(null)
 
 const providerOptions = [
-  { value: 'openai', label: 'OpenAI', description: 'GPT-4o mini recommended' },
-  { value: 'anthropic', label: 'Anthropic', description: 'Claude 3.5 Haiku recommended' },
-  { value: 'google', label: 'Google', description: 'Gemini 2.0 Flash recommended' },
+  { value: 'openai', label: 'OpenAI', description: 'GPT-5 nano recommended' },
+  { value: 'anthropic', label: 'Anthropic', description: 'Claude Haiku 4.5 recommended' },
+  { value: 'google', label: 'Google', description: 'Gemini 2.5 Flash recommended' },
   { value: 'ollama', label: 'Ollama', description: 'Run models locally on your computer' }
 ] as const
 

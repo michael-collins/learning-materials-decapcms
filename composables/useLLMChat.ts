@@ -20,6 +20,27 @@ interface LLMResponse {
     reason: string
   }>
   error?: string
+  thinking?: {
+    analysis?: string
+    evaluation?: string
+    synthesis?: string
+  }
+  plan?: {
+    title: string
+    description: string
+    steps: Array<{
+      step: number
+      title: string
+      description?: string
+      duration?: string
+      materials: Array<{
+        id: string
+        title: string
+        type: string
+        reason?: string
+      }>
+    }>
+  }
 }
 
 interface ResponseIntent {
@@ -101,11 +122,13 @@ Return only JSON.`
     if (candidates.length <= 1) return candidates
 
     try {
-      const candidateList = candidates.map((item) => ({
+      // Limit to top 15 to reduce prompt size
+      const topCandidates = candidates.slice(0, 15)
+      const candidateList = topCandidates.map((item) => ({
         id: item.id,
         title: item.title,
         type: item.type,
-        description: item.description || ''
+        description: (item.description || '').substring(0, 100) // Truncate to 100 chars
       }))
 
       const systemPrompt = `You are a ranking assistant. Return ONLY a JSON array of ids ordered from most to least relevant to the user's query. Use only the ids provided.`
@@ -124,23 +147,62 @@ Return ONLY a JSON array of ids in best-first order.`
           apiKey,
           model,
           systemPrompt,
-          userPrompt
+          userPrompt,
+          max_tokens: 2000 // Higher limit for reranking large lists
         }
       })
 
-      const raw = response.content?.trim() || ''
-      const parsed = JSON.parse(raw)
+      console.log('[Rerank] Response received:', {
+        hasContent: !!response?.content,
+        contentLength: response?.content?.length || 0,
+        responseKeys: response ? Object.keys(response) : [],
+        fullResponse: response
+      })
+
+      if (!response || !response.content) {
+        console.error('[Rerank] Empty or invalid response from API', {
+          response,
+          type: typeof response,
+          isNull: response === null,
+          isUndefined: response === undefined
+        })
+        return candidates
+      }
+
+      const raw = response.content.trim()
+      if (!raw) {
+        console.error('[Rerank] Empty content in response')
+        return candidates
+      }
+
+      const cleaned = raw
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/```\s*$/i, '')
+        .trim()
+
+      let parsed: any = null
+      try {
+        parsed = JSON.parse(cleaned)
+      } catch (error) {
+        console.error('Rerank JSON parse failed:', error)
+        console.error('Raw response:', raw.substring(0, 500))
+        console.error('Cleaned response:', cleaned.substring(0, 500))
+        return candidates
+      }
       if (!Array.isArray(parsed)) return candidates
 
       const order = parsed.map((id) => String(id))
-      const lookup = new Map(candidates.map((c) => [c.id, c]))
+      const lookup = new Map(topCandidates.map((c) => [c.id, c]))
       const reranked = order
         .map((id) => lookup.get(id))
         .filter(Boolean) as T[]
 
-      // Append any missing items to preserve coverage
-      const remaining = candidates.filter((c) => !order.includes(c.id)) as T[]
-      return [...reranked, ...remaining]
+      // Append any missing items from topCandidates, then remaining unranked candidates
+      const rankedIds = new Set(reranked.map(c => c.id))
+      const remainingTop = topCandidates.filter((c) => !rankedIds.has(c.id)) as T[]
+      const remainingAll = candidates.slice(15) as T[] // Unranked tail
+      return [...reranked, ...remainingTop, ...remainingAll]
     } catch (error) {
       console.error('Rerank error:', error)
       return candidates
@@ -192,6 +254,441 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
     }
   }
 
+  // STAGE 1: Analyze query to understand intent and requirements
+  async function analyzeQuery(
+    query: string,
+    provider: Provider,
+    apiKey: string,
+    model: string,
+    conversation?: ConversationTurn[]
+  ): Promise<{ concepts: string[]; goals: string[]; contentTypes: string[]; wantsPlan: boolean }> {
+    try {
+      const historyBlock = conversation && conversation.length > 0
+        ? `Recent conversation:\n${conversation.slice(-2).map(t => `${t.role}: ${t.content.substring(0, 100)}`).join('\n')}\n\n`
+        : ''
+
+      const systemPrompt = `You are an educational query analyst. Deeply analyze the user's question to extract:
+
+1. **Key concepts/topics**: What subjects, skills, or domains are involved? (2-4 items)
+2. **Learning goals**: What does the user want to achieve? Are they learning basics, practicing, building something, or troubleshooting? (1-3 items)
+3. **Preferred content types**: What format would best help? Options:
+   - lessons: Theory/concepts (when understanding principles)
+   - exercises: Focused hands-on practice (CRITICAL for skill-building - always include when learning to DO something)
+   - projects: Complete builds (for applying multiple skills)
+   - tutorials: Step-by-step guides (for following along)
+   - lectures: In-depth talks (for deep conceptual understanding)
+   - pathways: Learning sequences (for structured progression)
+4. **Wants plan/schedule**: Does the user want a structured learning plan, schedule, roadmap, or sequence? (true/false)
+
+Think carefully about:
+- Skill level implied (beginner, intermediate, advanced)
+- Whether they need theory, practice, or both (if building/creating, MUST include exercises for hands-on practice)
+- Time commitment (quick lookup vs deep learning)
+- Prerequisite knowledge they might need
+
+**IMPORTANT**: 
+- If the user wants to CREATE, BUILD, MAKE, MODEL, or DESIGN something, always include "exercises" in contentTypes for essential hands-on practice.
+- If the user asks to "put together a plan", "create a schedule", "plan my learning", "give me a roadmap", set wantsPlan to true and include diverse content types (lectures, tutorials, exercises, projects, lessons).
+
+Return ONLY valid JSON: {"concepts": ["..."], "goals": ["..."], "contentTypes": ["..."], "wantsPlan": true/false}`
+
+      const userPrompt = `${historyBlock}User question: "${query}"\n\nAnalyze deeply and return JSON.`
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 400 }
+      })
+
+      const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+      const parsed = JSON.parse(cleaned)
+      
+      return {
+        concepts: Array.isArray(parsed.concepts) ? parsed.concepts : [],
+        goals: Array.isArray(parsed.goals) ? parsed.goals : [],
+        contentTypes: Array.isArray(parsed.contentTypes) ? parsed.contentTypes : [],
+        wantsPlan: Boolean(parsed.wantsPlan)
+      }
+    } catch (error) {
+      console.error('[Stage 1] Analysis error:', error)
+      return { concepts: [], goals: [], contentTypes: [], wantsPlan: false }
+    }
+  }
+
+  // STAGE 2: Evaluate search results against analysis
+  async function evaluateResults(
+    query: string,
+    analysis: { concepts: string[]; goals: string[]; contentTypes: string[]; wantsPlan: boolean },
+    searchResults: SearchResult[],
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<Array<{ id: string; score: number; reasoning: string }>> {
+    try {
+      const topResults = searchResults.slice(0, 8).map(r => ({
+        id: r.id,
+        title: r.title,
+        type: r.type,
+        description: (r.description || '').substring(0, 120)
+      }))
+
+      const planGuidance = analysis.wantsPlan 
+        ? '\n\n**PLAN MODE**: User wants a learning schedule. Prioritize diversity - select materials from different types (lectures, tutorials, exercises, projects, lessons) to create a well-rounded progression.'
+        : ''
+
+      const systemPrompt = `You are an evaluation assistant. Score how well each material matches the user's needs.${planGuidance}
+
+Return ONLY valid JSON array:
+[{"id": "/path", "score": 0-10, "reasoning": "brief reason"}]
+
+Higher scores = better match.`
+
+      const userPrompt = `User query: "${query}"
+User needs: ${analysis.concepts.join(', ')}
+Goals: ${analysis.goals.join(', ')}
+Wants plan: ${analysis.wantsPlan}
+
+Materials:
+${JSON.stringify(topResults, null, 2)}
+
+Evaluate and return JSON array.`
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 800 }
+      })
+
+      console.log('[Stage 2] Evaluation response:', response.content?.length, 'chars')
+
+      const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+      const parsed = JSON.parse(cleaned)
+      
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => ({
+          id: String(item.id || ''),
+          score: Number(item.score || 0),
+          reasoning: String(item.reasoning || '')
+        }))
+      }
+      
+      return []
+    } catch (error) {
+      console.error('[Stage 2] Evaluation error:', error)
+      return []
+    }
+  }
+
+  // STAGE 3a: Generate plan structure (titles and material assignments only)
+  async function generatePlanStructure(
+    query: string,
+    analysis: { concepts: string[]; goals: string[] },
+    topEvaluated: Array<{ id: string; score: number; reasoning: string }>,
+    resultMap: Map<string, any>,
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<{ title: string; steps: Array<{ step: number; title: string; duration: string; materialIds: string[] }> }> {
+    const materialsInfo = topEvaluated.map(e => {
+      const result = resultMap.get(e.id)
+      return `[${e.id}] ${result?.title} (${result?.type}) - ${result?.duration || 'varies'}`
+    }).join('\n')
+
+    const systemPrompt = `You are a learning plan architect. Create a structured learning plan by organizing materials into logical steps.
+
+Return ONLY valid JSON:
+{
+  "title": "Plan title",
+  "steps": [
+    {
+      "step": 1,
+      "title": "Step title",
+      "duration": "estimated time",
+      "materialIds": ["id1", "id2"]
+    }
+  ]
+}`
+
+    const userPrompt = `Query: "${query}"
+
+Goals: ${analysis.goals.join(', ')}
+
+Available materials:
+${materialsInfo}
+
+Create a 4-6 step learning plan. Assign 1-2 materials per step. Use the exact material IDs from the list above. Return ONLY JSON.`
+
+    const response = await $fetch<{ content: string }>('/api/chat', {
+      method: 'POST',
+      body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 400 }
+    })
+
+    console.log('[Stage 3a] Plan structure response:', response.content?.length, 'chars')
+
+    const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+    const parsed = JSON.parse(cleaned)
+    
+    return {
+      title: parsed.title || 'Learning Plan',
+      steps: Array.isArray(parsed.steps) ? parsed.steps : []
+    }
+  }
+
+  // STAGE 3b: Generate descriptions for plan steps (in batches)
+  async function generateStepDescriptions(
+    planStructure: { title: string; steps: Array<{ step: number; title: string; duration: string; materialIds: string[] }> },
+    topEvaluated: Array<{ id: string; score: number; reasoning: string }>,
+    resultMap: Map<string, any>,
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<Map<number, string>> {
+    const descriptions = new Map<number, string>()
+    const batchSize = 4
+    
+    // Process steps in batches of 4
+    for (let i = 0; i < planStructure.steps.length; i += batchSize) {
+      const batch = planStructure.steps.slice(i, i + batchSize)
+      
+      const stepsInfo = batch.map(step => {
+        const materials = step.materialIds.map(id => {
+          const result = resultMap.get(id)
+          const evaluation = topEvaluated.find(e => e.id === id)
+          return `  - ${result?.title}: ${evaluation?.reasoning || ''}`
+        }).join('\n')
+        
+        return `Step ${step.step}: ${step.title}\nMaterials:\n${materials}`
+      }).join('\n\n')
+
+      const systemPrompt = `You are a learning guide. Write concise 2-3 sentence descriptions for each learning step.
+
+Return ONLY valid JSON:
+{
+  "descriptions": {
+    "1": "description for step 1",
+    "2": "description for step 2"
+  }
+}`
+
+      const userPrompt = `Write descriptions for these learning steps:
+
+${stepsInfo}
+
+Return ONLY JSON with step numbers as keys.`
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 600 }
+      })
+
+      console.log(`[Stage 3b] Batch ${Math.floor(i / batchSize) + 1} descriptions:`, response.content?.length, 'chars')
+
+      const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+      const parsed = JSON.parse(cleaned)
+      
+      if (parsed.descriptions) {
+        Object.entries(parsed.descriptions).forEach(([stepNum, desc]) => {
+          descriptions.set(Number(stepNum), String(desc))
+        })
+      }
+    }
+    
+    return descriptions
+  }
+
+  // STAGE 3: Synthesize final response
+  async function synthesizeResponse(
+    query: string,
+    analysis: { concepts: string[]; goals: string[]; contentTypes: string[]; wantsPlan: boolean },
+    evaluation: Array<{ id: string; score: number; reasoning: string }>,
+    searchResults: SearchResult[],
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<LLMResponse> {
+    try {
+      // Get top evaluated results - more for plans
+      const topCount = analysis.wantsPlan ? 6 : 3
+      const topEvaluated = evaluation.filter(e => e.score >= 6).slice(0, topCount)
+      const resultMap = new Map(searchResults.map(r => [r.id, r]))
+      
+      // For plans, use multi-step generation
+      if (analysis.wantsPlan) {
+        console.log('[Stage 3] Using multi-step plan generation')
+        
+        // Step 1: Generate plan structure
+        const planStructure = await generatePlanStructure(
+          query,
+          { concepts: analysis.concepts, goals: analysis.goals },
+          topEvaluated,
+          resultMap,
+          provider,
+          apiKey,
+          model
+        )
+        
+        console.log('[Stage 3a] Structure generated:', {
+          stepsCount: planStructure.steps.length,
+          materialIdsPerStep: planStructure.steps.map(s => s.materialIds.length)
+        })
+        
+        // Step 2: Generate descriptions
+        const descriptions = await generateStepDescriptions(
+          planStructure,
+          topEvaluated,
+          resultMap,
+          provider,
+          apiKey,
+          model
+        )
+        
+        // Step 3: Combine everything
+        const planData = {
+          title: planStructure.title,
+          description: `A ${planStructure.steps.length}-step learning plan for ${query}`,
+          steps: planStructure.steps.map(step => {
+            const materials = step.materialIds
+              .map(id => {
+                const result = resultMap.get(id)
+                if (!result) {
+                  console.warn(`[Stage 3] Material not found: ${id}`)
+                  return null
+                }
+                const evaluation = topEvaluated.find(e => e.id === id)
+                return {
+                  id,
+                  title: result.title,
+                  type: result.type,
+                  reason: evaluation?.reasoning || ''
+                }
+              })
+              .filter((m): m is { id: string; title: string; type: string; reason: string } => m !== null)
+            
+            console.log(`[Stage 3] Step ${step.step} materials:`, materials.length, 'found from', step.materialIds.length, 'IDs')
+            
+            return {
+              step: step.step,
+              title: step.title,
+              description: descriptions.get(step.step) || '',
+              duration: step.duration,
+              materials
+            }
+          })
+        }
+        
+        // Generate brief answer
+        const answerPrompt = `Briefly introduce this learning plan in 2 sentences: ${planStructure.title}`
+        const answerResponse = await $fetch<{ content: string }>('/api/chat', {
+          method: 'POST',
+          body: { 
+            provider, 
+            apiKey, 
+            model, 
+            systemPrompt: 'You are a helpful assistant. Respond in 2 sentences.',
+            userPrompt: answerPrompt,
+            max_tokens: 100 
+          }
+        })
+        
+        // Get all unique materials from steps for references
+        const usedMaterialIds = new Set(planStructure.steps.flatMap(s => s.materialIds))
+        const references = Array.from(usedMaterialIds).map(id => {
+          const result = resultMap.get(id)
+          const evaluation = topEvaluated.find(e => e.id === id)
+          return {
+            id,
+            title: result?.title || id,
+            reason: evaluation?.reasoning.substring(0, 150) || ''
+          }
+        })
+        
+        return {
+          content: answerResponse.content.trim(),
+          references,
+          plan: planData
+        }
+      }
+      
+      // Regular response (non-plan)
+      const materials = topEvaluated.map((ev, idx) => {
+        const result = resultMap.get(ev.id)
+        if (!result) return ''
+        const durationInfo = result.duration ? ` [~${result.duration}]` : ''
+        return `[${idx + 1}] "${result.title}" (${result.type})${durationInfo}
+   Path: ${result.id}
+   Match: ${ev.reasoning}`
+      }).filter(Boolean).join('\n\n')
+
+      const systemPrompt = `You are a learning assistant. Provide a helpful response using ONLY the materials provided.
+
+Return ONLY valid JSON:
+{
+  "answer": "2-3 sentence response",
+  "references": [{"id": "string", "reason": "string"}]
+}`
+
+      const userPrompt = `User question: "${query}"
+
+Available materials:
+${materials}
+
+Provide guidance using these materials. Return JSON.`
+
+      console.log('[Stage 3] Request (regular mode):', { 
+        materialsCount: topEvaluated.length,
+        promptLength: systemPrompt.length + userPrompt.length
+      })
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: { 
+          provider, 
+          apiKey, 
+          model, 
+          systemPrompt, 
+          userPrompt, 
+          max_tokens: 600 
+        }
+      }).catch((error) => {
+        console.error('[Stage 3] API Error Details:', {
+          status: error.status,
+          statusCode: error.statusCode,
+          statusMessage: error.statusMessage,
+          message: error.message,
+          data: error.data,
+          fullError: JSON.stringify(error, null, 2)
+        })
+        throw error
+      })
+
+      console.log('[Stage 3] Synthesis response (regular mode):', response.content?.length, 'chars')
+
+      const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+      const parsed = JSON.parse(cleaned)
+      
+      const allowedIds = new Set(topEvaluated.map(e => e.id))
+      const references = Array.isArray(parsed.references)
+        ? parsed.references
+            .filter((r: any) => allowedIds.has(r.id))
+            .map((r: any) => {
+              const result = resultMap.get(r.id)
+              return {
+                id: r.id,
+                title: result?.title || r.id,
+                reason: String(r.reason || '').substring(0, 150)
+              }
+            })
+        : []
+
+      return {
+        content: String(parsed.answer || ''),
+        references,
+        plan: undefined
+      }
+    } catch (error) {
+      console.error('[Stage 3] Synthesis error:', error)
+      return { content: '', references: [], plan: undefined }
+    }
+  }
+
   async function generateResponse(
     query: string,
     searchResults: SearchResult[],
@@ -199,189 +696,51 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
     apiKey: string,
     model: string,
     intent?: ResponseIntent,
-    conversation?: ConversationTurn[]
+    conversation?: ConversationTurn[],
+    onThinkingUpdate?: (stage: string, content: string, complete: boolean) => void
   ): Promise<LLMResponse> {
     try {
-      // Build context from search results
-      const context = searchResults.slice(0, 5).map((result, idx) => {
-        let contextText = `[${idx + 1}] "${result.title}"\n`
-        contextText += `   Type: ${result.type}\n`
-        contextText += `   Path: ${result.id}\n`
-        
-        if (result.description) {
-          contextText += `   Description: ${result.description}\n`
-        }
-        
-        if (result.difficulty) {
-          contextText += `   Difficulty: ${result.difficulty}\n`
-        }
-        
-        if (result.duration) {
-          contextText += `   Duration: ${result.duration}\n`
-        }
-        
-        if (result.learningObjectives && result.learningObjectives.length > 0) {
-          contextText += `   Learning Objectives:\n`
-          result.learningObjectives.slice(0, 3).forEach((obj: string) => {
-            contextText += `   - ${obj}\n`
-          })
-        }
-        
-        if (result.topics && result.topics.length > 0) {
-          contextText += `   Topics: ${result.topics.join(', ')}\n`
-        }
-        
-        return contextText
-      }).join('\n')
-      const responseMode = intent?.wantsPlan
-        ? 'plan'
-        : intent?.wantsLookup
-          ? 'lookup'
-          : intent?.wantsTroubleshooting
-            ? 'troubleshoot'
-            : 'general'
+      console.log('[MultiStage] Starting three-stage reasoning...')
 
-      const allowedIds = new Set(searchResults.map((result) => result.id))
-      const allowedItems = searchResults.map((result) => `- ${result.title} | ${result.id}`).join('\n')
-      const allowedLookup = new Map(searchResults.map((result) => [
-        result.id,
-        {
-          title: result.title,
-          type: result.type,
-          description: result.description || '',
-          difficulty: result.difficulty || '',
-          duration: result.duration || ''
-        }
-      ]))
+      // STAGE 1: Analyze query
+      onThinkingUpdate?.('Analyzing', 'Understanding your question...', false)
+      const analysis = await analyzeQuery(query, provider, apiKey, model, conversation)
+      const planMode = analysis.wantsPlan ? ' [Plan mode]' : ''
+      const analysisText = `Key concepts: ${analysis.concepts.join(', ')}\nGoals: ${analysis.goals.join(', ')}\nPreferred types: ${analysis.contentTypes.join(', ')}${planMode}`
+      onThinkingUpdate?.('Analyzing', analysisText, true)
+      console.log('[MultiStage] Analysis:', analysis)
 
-      // System prompt for the assistant
-      const systemPrompt = `You are a learning assistant for an educational platform. You help students and teachers use ONLY the educational materials provided to you.
+      // STAGE 2: Evaluate results
+      onThinkingUpdate?.('Evaluating', 'Scoring materials for relevance...', false)
+      const evaluation = await evaluateResults(query, analysis, searchResults, provider, apiKey, model)
+      const topScored = evaluation.filter(e => e.score >= 6).length
+      const evalText = `Reviewed ${evaluation.length} materials, ${topScored} highly relevant`
+      onThinkingUpdate?.('Evaluating', evalText, true)
+      console.log('[MultiStage] Evaluation:', evaluation.length, 'results scored')
 
-    CRITICAL RULES:
-    1. ONLY reference materials that are explicitly provided in the search results
-    2. DO NOT make up or suggest courses, lessons, or exercises that aren't in the search results
-    3. If the search results don't contain relevant materials, say so honestly
-    4. Always include specific titles and paths from the search results when referencing materials
-    5. Be concise and practical - focus on the actual materials available
-    6. NEVER reference attachments, images, or media captions as separate materials
-    7. NEVER invent titles. Use EXACT titles from the allowed list only
+      // STAGE 3: Synthesize response
+      onThinkingUpdate?.('Synthesizing', analysis.wantsPlan ? 'Building your learning plan...' : 'Crafting your response...', false)
+      const synthesis = await synthesizeResponse(query, analysis, evaluation, searchResults, provider, apiKey, model)
+      const synthText = analysis.wantsPlan && synthesis.plan
+        ? `Created ${synthesis.plan.steps.length}-step learning plan`
+        : `Generated answer with ${synthesis.references?.length || 0} references`
+      onThinkingUpdate?.('Synthesizing', synthText, true)
+      console.log('[MultiStage] Synthesis complete')
 
-    RESPONSE MODES:
-    - lookup: return 1–3 exact matches
-    - plan: create a short schedule ONLY using provided materials
-    - troubleshoot: link to the most relevant material(s) and cite the section reason
-    - general: summarize best matches and provide next steps
-
-    OUTPUT FORMAT (REQUIRED):
-    Return ONLY valid JSON with this shape:
-    {
-      "answer": "short response text",
-      "references": [
-        {"id": "/path/to/material", "reason": "why it matches"}
-      ]
-    }
-
-    Your job is to help users navigate the EXISTING materials, not to create imaginary content.`
-
-      const historyBlock = (conversation && conversation.length > 0)
-        ? `Conversation History (most recent last):\n${conversation.map((turn) => `- ${turn.role.toUpperCase()}: ${turn.content}`).join('\n')}\n\n`
-        : ''
-
-      const userPrompt = `${historyBlock}User Question: ${query}
-    Response Mode: ${responseMode}
-    User Intent:
-    - wantsPlan: ${intent?.wantsPlan ?? false}
-    - wantsLookup: ${intent?.wantsLookup ?? false}
-    - wantsTroubleshooting: ${intent?.wantsTroubleshooting ?? false}
-    - wantsPractice: ${intent?.wantsPractice ?? false}
-    - wantsTheory: ${intent?.wantsTheory ?? false}
-    - wantsTimeboxed: ${intent?.wantsTimeboxed ?? false}
-    - contentType: ${intent?.contentType ?? 'none'}
-
-    Allowed Materials (EXACT TITLES AND PATHS ONLY):
-    ${allowedItems}
-
-    Available Learning Materials (THESE ARE THE ONLY MATERIALS YOU CAN REFERENCE):
-    ${context}
-
-    Instructions: Answer the user's question using ONLY the materials listed above. If these materials don't fully address the question, acknowledge what's missing rather than making up content. Be specific about which materials you're recommending and why they're relevant.`
-
-      function formatStructuredResponse(
-        raw: string,
-        allowedIds: Set<string>,
-        lookup: Map<string, { title: string; type: string; description?: string; difficulty?: string; duration?: string }>
-      ): { content: string; references: Array<{ id: string; title: string; reason: string }> } | null {
-        try {
-          const cleaned = raw
-            .replace(/^```json\s*/i, '')
-            .replace(/^```\s*/i, '')
-            .replace(/```\s*$/i, '')
-            .trim()
-
-          const parsed = JSON.parse(cleaned)
-          if (!parsed || typeof parsed !== 'object') return null
-
-          const answer = typeof parsed.answer === 'string' ? parsed.answer.trim() : ''
-          const refs = Array.isArray(parsed.references) ? parsed.references : []
-
-          const filtered = refs
-            .filter((r: any) => r && typeof r.id === 'string' && allowedIds.has(r.id))
-            .map((r: any) => {
-              const meta = lookup.get(r.id)
-              const baseReason = meta?.description || ''
-              const typeLabel = meta?.type ? meta.type.replace(/^\w/, c => c.toUpperCase()) : 'Material'
-              const reason = baseReason
-                ? `${typeLabel}: ${baseReason}`
-                : `${typeLabel} relevant to your request.`
-
-              return {
-                id: r.id,
-                title: meta?.title || r.id,
-                reason
-              }
-            })
-
-          if (!answer && filtered.length === 0) return null
-
-          return {
-            content: answer || 'Here are the most relevant materials:',
-            references: filtered
-          }
-        } catch {
-          return null
+      return {
+        content: synthesis.content,
+        references: synthesis.references,
+        plan: synthesis.plan,
+        thinking: {
+          analysis: analysisText,
+          evaluation: evalText,
+          synthesis: synthText
         }
       }
-
-      // Call our server API endpoint instead of provider APIs directly
-      const response = await $fetch<{ content: string }>('/api/chat', {
-        method: 'POST',
-        body: {
-          provider,
-          apiKey,
-          model,
-          systemPrompt,
-          userPrompt
-        }
-      })
-
-      const structured = formatStructuredResponse(response.content, allowedIds, allowedLookup)
-      if (structured) {
-        return { content: structured.content, references: structured.references }
-      }
-
-      // If the model returned JSON but parsing failed, avoid showing raw JSON
-      if (response.content?.trim().startsWith('{')) {
-        return { content: 'I found relevant materials, but the response format was invalid. Please try again.' }
-      }
-
-      return { content: response.content }
     } catch (error: any) {
       console.error('LLM API Error:', error)
       
-      // Extract error message from various error formats
       let errorMessage = 'Failed to generate response'
-      
-      // Nuxt $fetch errors have data.message or data.statusMessage
       if (error.data?.message) {
         errorMessage = error.data.message
       } else if (error.data?.statusMessage) {

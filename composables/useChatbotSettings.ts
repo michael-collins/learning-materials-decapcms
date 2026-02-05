@@ -18,58 +18,63 @@ export interface ModelOption {
 export const AVAILABLE_MODELS: Record<Provider, ModelOption[]> = {
   openai: [
     {
-      id: 'gpt-4o-mini',
-      name: 'GPT-4o mini',
-      description: 'Fast and affordable - recommended for most queries'
-    },
-    {
-      id: 'gpt-4o',
-      name: 'GPT-4o',
-      description: 'Balanced performance for complex questions'
-    },
-    {
       id: 'gpt-5-nano',
       name: 'GPT-5 nano',
-      description: 'Latest generation, very efficient'
+      description: 'Fastest, most cost-efficient - recommended for most queries'
     },
     {
       id: 'gpt-5-mini',
       name: 'GPT-5 mini',
-      description: 'Latest generation, good balance'
+      description: 'Fast and affordable with good balance'
+    },
+    {
+      id: 'gpt-5.2',
+      name: 'GPT-5.2',
+      description: 'Latest generation - best for coding and agentic tasks'
+    },
+    {
+      id: 'gpt-4.1',
+      name: 'GPT-4.1',
+      description: 'Smartest non-reasoning model from previous generation'
     }
   ],
   anthropic: [
     {
-      id: 'claude-3-5-haiku-20241022',
-      name: 'Claude 3.5 Haiku',
-      description: 'Fast and efficient - recommended for most queries'
+      id: 'claude-haiku-4-5-20251001',
+      name: 'Claude Haiku 4.5',
+      description: 'Fastest with near-frontier intelligence - recommended for most queries'
     },
     {
-      id: 'claude-3-5-sonnet-20241022',
-      name: 'Claude 3.5 Sonnet',
-      description: 'Balanced intelligence and speed'
+      id: 'claude-sonnet-4-5-20250929',
+      name: 'Claude Sonnet 4.5',
+      description: 'Best combination of speed and intelligence'
     },
     {
-      id: 'claude-sonnet-4-20250514',
-      name: 'Claude Sonnet 4',
-      description: 'Latest generation, very capable'
+      id: 'claude-opus-4-6',
+      name: 'Claude Opus 4.6',
+      description: 'Most intelligent - best for coding and complex reasoning'
     }
   ],
   google: [
     {
-      id: 'gemini-2.0-flash-exp',
-      name: 'Gemini 2.0 Flash',
-      description: 'Fast and efficient - recommended for most queries'
+      id: 'gemini-2.5-flash',
+      name: 'Gemini 2.5 Flash',
+      description: 'Best price-performance - recommended for most queries'
     },
     {
-      id: 'gemini-1.5-flash',
-      name: 'Gemini 1.5 Flash',
-      description: 'Previous generation, well-tested'
+      id: 'gemini-3-flash',
+      name: 'Gemini 3 Flash',
+      description: 'Latest generation - balanced for speed and scale'
     },
     {
-      id: 'gemini-1.5-pro',
-      name: 'Gemini 1.5 Pro',
-      description: 'More capable for complex reasoning'
+      id: 'gemini-2.5-pro',
+      name: 'Gemini 2.5 Pro',
+      description: 'Advanced thinking model for complex reasoning'
+    },
+    {
+      id: 'gemini-3-pro',
+      name: 'Gemini 3 Pro',
+      description: 'Most intelligent - best for multimodal understanding'
     }
   ],
   ollama: [
@@ -101,13 +106,49 @@ const SETTINGS_KEY = 'chatbot-settings'
 const defaultSettings: ChatbotSettings = {
   provider: 'openai',
   apiKey: '',
-  model: 'gpt-4o-mini',
+  model: 'gpt-5-nano',
   enhancedMode: false
 }
 
-export function useChatbotSettings() {
-  const settings = ref<ChatbotSettings>(loadSettings())
+// Shared state - single source of truth
+const settings = ref<ChatbotSettings>(loadSettings())
+
+// Auto-save on changes (client-side only)
+if (typeof window !== 'undefined') {
+  watch(settings, () => {
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings.value))
+    } catch (error) {
+      console.error('Failed to save chatbot settings:', error)
+    }
+  }, { deep: true })
+}
+
+function loadSettings(): ChatbotSettings {
+  if (typeof window === 'undefined') {
+    return { ...defaultSettings }
+  }
   
+  try {
+    const stored = localStorage.getItem(SETTINGS_KEY)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      // Validate that the stored model exists for the provider
+      const availableForProvider = AVAILABLE_MODELS[parsed.provider as Provider]
+      if (!availableForProvider || !availableForProvider.some(m => m.id === parsed.model)) {
+        // Invalid model, use first available for provider
+        parsed.model = availableForProvider?.[0]?.id || defaultSettings.model
+      }
+      return { ...defaultSettings, ...parsed }
+    }
+  } catch (error) {
+    console.error('Failed to load chatbot settings:', error)
+  }
+  
+  return { ...defaultSettings }
+}
+
+export function useChatbotSettings() {
   const availableModels = computed(() => AVAILABLE_MODELS[settings.value.provider])
   
   const currentModel = computed(() => 
@@ -122,27 +163,6 @@ export function useChatbotSettings() {
   })
 
   const canUseEnhancedMode = computed(() => isConfigured.value)
-
-  function loadSettings(): ChatbotSettings {
-    try {
-      const stored = localStorage.getItem(SETTINGS_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        return { ...defaultSettings, ...parsed }
-      }
-    } catch (error) {
-      console.error('Failed to load chatbot settings:', error)
-    }
-    return { ...defaultSettings }
-  }
-
-  function saveSettings() {
-    try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings.value))
-    } catch (error) {
-      console.error('Failed to save chatbot settings:', error)
-    }
-  }
 
   function updateProvider(provider: Provider) {
     settings.value.provider = provider
@@ -178,9 +198,6 @@ export function useChatbotSettings() {
     settings.value.apiKey = ''
     settings.value.enhancedMode = false
   }
-
-  // Auto-save on changes
-  watch(settings, saveSettings, { deep: true })
 
   return {
     settings,

@@ -1,8 +1,8 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, systemPrompt, userPrompt } = body
+  const { provider, apiKey, model, systemPrompt, userPrompt, max_tokens } = body
 
-  console.log('[Chat API] Request received:', { provider, model, hasApiKey: !!apiKey })
+  console.log('[Chat API] Request received:', { provider, model, hasApiKey: !!apiKey, max_tokens })
 
   if (!provider || !systemPrompt || !userPrompt) {
     console.error('[Chat API] Missing required parameters')
@@ -15,13 +15,13 @@ export default defineEventHandler(async (event) => {
   try {
     switch (provider) {
       case 'openai':
-        return await callOpenAI(apiKey, model, systemPrompt, userPrompt)
+        return await callOpenAI(apiKey, model, systemPrompt, userPrompt, max_tokens)
       case 'anthropic':
-        return await callAnthropic(apiKey, model, systemPrompt, userPrompt)
+        return await callAnthropic(apiKey, model, systemPrompt, userPrompt, max_tokens)
       case 'google':
-        return await callGoogle(apiKey, model, systemPrompt, userPrompt)
+        return await callGoogle(apiKey, model, systemPrompt, userPrompt, max_tokens)
       case 'ollama':
-        return await callOllama(model, systemPrompt, userPrompt)
+        return await callOllama(model, systemPrompt, userPrompt, max_tokens)
       default:
         throw createError({
           statusCode: 400,
@@ -48,7 +48,8 @@ async function callOpenAI(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  max_tokens?: number
 ) {
   // GPT-4o and newer models use max_completion_tokens, older models use max_tokens
   const isNewerModel = model.includes('gpt-4o') || model.includes('gpt-5')
@@ -63,7 +64,7 @@ async function callOpenAI(
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt }
     ],
-    [tokenParam]: 800
+    [tokenParam]: max_tokens || 800
   }
   
   // Only add temperature for non-GPT-5 models
@@ -84,6 +85,12 @@ async function callOpenAI(
     const errorData = await response.json().catch(() => ({}))
     const errorMessage = errorData.error?.message || `OpenAI API error: ${response.status}`
     
+    console.error('[Chat API] OpenAI error:', {
+      status: response.status,
+      message: errorMessage,
+      error: errorData
+    })
+    
     if (response.status === 401) {
       throw createError({
         statusCode: 401,
@@ -98,14 +105,53 @@ async function callOpenAI(
   }
 
   const data = await response.json()
-  return { content: data.choices[0].message.content }
+  
+  console.log('[Chat API] OpenAI response:', {
+    hasChoices: !!data.choices,
+    choicesLength: data.choices?.length || 0,
+    hasContent: !!data.choices?.[0]?.message?.content,
+    contentLength: data.choices?.[0]?.message?.content?.length || 0,
+    finishReason: data.choices?.[0]?.finish_reason,
+    refusal: data.choices?.[0]?.message?.refusal,
+    usage: data.usage
+  })
+  
+  const content = data.choices?.[0]?.message?.content || ''
+  const finishReason = data.choices?.[0]?.finish_reason
+  const refusal = data.choices?.[0]?.message?.refusal
+  
+  if (!content) {
+    console.error('[Chat API] Empty content from OpenAI:', {
+      finishReason,
+      refusal,
+      model,
+      requestedTokens: requestBody[tokenParam]
+    })
+    
+    if (refusal) {
+      throw createError({
+        statusCode: 400,
+        message: `OpenAI refused to respond: ${refusal}`
+      })
+    }
+    
+    if (finishReason === 'length') {
+      throw createError({
+        statusCode: 400,
+        message: 'Response was cut off due to length limit. Try a shorter query.'
+      })
+    }
+  }
+  
+  return { content }
 }
 
 async function callAnthropic(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  max_tokens?: number
 ) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -120,7 +166,7 @@ async function callAnthropic(
       messages: [
         { role: 'user', content: userPrompt }
       ],
-      max_tokens: 800,
+      max_tokens: max_tokens || 800,
       temperature: 0.7
     })
   })
@@ -150,7 +196,8 @@ async function callGoogle(
   apiKey: string,
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  max_tokens?: number
 ) {
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -167,7 +214,7 @@ async function callGoogle(
         }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 800
+          maxOutputTokens: max_tokens || 800
         }
       })
     }
@@ -197,7 +244,8 @@ async function callGoogle(
 async function callOllama(
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  max_tokens?: number
 ) {
   const response = await fetch('http://localhost:11434/api/chat', {
     method: 'POST',
@@ -213,7 +261,7 @@ async function callOllama(
       stream: false,
       options: {
         temperature: 0.7,
-        num_predict: 800
+        num_predict: max_tokens || 800
       }
     })
   })

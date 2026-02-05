@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings } from 'lucide-vue-next'
+import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download } from 'lucide-vue-next'
 import { Dialog, DialogContentFullscreen, DialogContentPopover, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import Button from '~/components/ui/button/Button.vue'
 import Textarea from '~/components/ui/textarea/Textarea.vue'
 import ChatbotSettings from '~/components/ChatbotSettings.vue'
 import { useChatbotSettings } from '~/composables/useChatbotSettings'
 import { useLLMChat } from '~/composables/useLLMChat'
+import { useLearningPlanExport } from '~/composables/useLearningPlanExport'
 
 interface Message {
   id: string
@@ -14,6 +15,11 @@ interface Message {
   content: string
   timestamp: Date
   model?: string // The AI model used to generate this response
+  thinking?: {
+    stage: string
+    content: string
+    complete: boolean
+  }[]
   references?: Array<{
     id: string
     title: string
@@ -27,6 +33,22 @@ interface Message {
     difficulty?: string
     duration?: string
   }>
+  plan?: {
+    title: string
+    description: string
+    steps: Array<{
+      step: number
+      title: string
+      description?: string
+      duration?: string
+      materials: Array<{
+        id: string
+        title: string
+        type: string
+        reason?: string
+      }>
+    }>
+  }
 }
 
 const props = defineProps<{
@@ -43,6 +65,7 @@ const isOpen = computed({
 })
 
 const { loadIndex, search, hybridSearch, detectIntent, isLoading: searchIndexLoading, isLoaded } = useSchemaEnhancedSearch()
+const { exportToWord } = useLearningPlanExport()
 
 const CHAT_HISTORY_KEY = 'ai-chat-history'
 const CHAT_HISTORY_MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
@@ -111,7 +134,7 @@ const messagesEndRef = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 const settingsOpen = ref(false)
 
-const { settings, canUseEnhancedMode, isConfigured } = useChatbotSettings()
+const { settings, canUseEnhancedMode, isConfigured, currentModel } = useChatbotSettings()
 const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
 
 // Load search index when component mounts
@@ -212,6 +235,20 @@ async function sendMessage() {
 
     let expandedQueryForRetrieval = query
 
+    // Lightweight generic expansion for common nouns (not tied to specific content)
+    const genericSynonyms: Record<string, string[]> = {
+      furniture: ['chair', 'table', 'sofa', 'seating'],
+      seating: ['chair', 'stool', 'bench']
+    }
+    const lowerQuery = query.toLowerCase()
+    const genericTerms = Object.entries(genericSynonyms)
+      .filter(([key]) => lowerQuery.includes(key))
+      .flatMap(([, terms]) => terms)
+
+    if (genericTerms.length > 0) {
+      expandedQueryForRetrieval = `${expandedQueryForRetrieval} ${genericTerms.join(' ')}`
+    }
+
     // Use LLM retrieval hints to improve coverage and content-type targeting
     if (settings.value.enhancedMode && isConfigured.value) {
       const hints = await generateRetrievalHints(
@@ -293,8 +330,38 @@ async function sendMessage() {
     // Use LLM if enhanced mode is enabled and configured
     if (settings.value.enhancedMode && isConfigured.value) {
       console.log('[Chat] Using LLM for response')
+      
+      // Create assistant message with thinking placeholder
+      const assistantId = (Date.now() + 1).toString()
+      const thinkingMessage: Message = {
+        id: assistantId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+        model: settings.value.model,
+        thinking: []
+      }
+      messages.value.push(thinkingMessage)
+      await nextTick()
+      messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' })
+      
       try {
-        const conversationContext = buildConversationContext(8)
+        const conversationContext = buildConversationContext(4)
+        
+        // Callback to update thinking in real-time
+        const onThinkingUpdate = (stage: string, content: string, complete: boolean) => {
+          const msg = messages.value.find(m => m.id === assistantId)
+          if (msg && msg.thinking) {
+            const existingIdx = msg.thinking.findIndex(t => t.stage === stage)
+            if (existingIdx >= 0) {
+              msg.thinking[existingIdx] = { stage, content, complete }
+            } else {
+              msg.thinking.push({ stage, content, complete })
+            }
+          }
+          nextTick(() => messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' }))
+        }
+        
         llmResponse = await generateResponse(
           query,
           results,
@@ -302,20 +369,33 @@ async function sendMessage() {
           settings.value.apiKey,
           settings.value.model,
           intent,
-          conversationContext
+          conversationContext,
+          onThinkingUpdate
         )
         
-        if (llmResponse.error) {
-          // Fall back to basic response if LLM fails
-          responseText = `⚠️ **Enhanced mode error:** ${llmResponse.error}\n\nFalling back to search results:\n\n${buildContextResponse(query, results)}`
-        } else {
-          responseText = llmResponse.content
+        // Update message with final response
+        const msg = messages.value.find(m => m.id === assistantId)
+        if (msg) {
+          if (llmResponse.error) {
+            msg.content = `⚠️ **Enhanced mode error:** ${llmResponse.error}\n\nFalling back to search results:\n\n${buildContextResponse(query, results)}`
+          } else {
+            msg.content = llmResponse.content
+            msg.references = llmResponse.references
+            msg.plan = llmResponse.plan
+          }
         }
       } catch (error: any) {
-        // Fall back to basic response if LLM fails
-        console.error('LLM Error:', error)
-        responseText = `⚠️ **Enhanced mode unavailable:** ${error.message}\n\nShowing search results instead:\n\n${buildContextResponse(query, results)}`
+        // Update message with error
+        const msg = messages.value.find(m => m.id === assistantId)
+        if (msg) {
+          msg.content = `⚠️ **Enhanced mode unavailable:** ${error.message}\n\nShowing search results instead:\n\n${buildContextResponse(query, results)}`
+        }
       }
+      
+      isLoading.value = false
+      await nextTick()
+      messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' })
+      return
     } else {
       console.log('[Chat] Using basic search response')
       // Use basic context response
@@ -373,7 +453,7 @@ function formatTime(date: Date) {
   })
 }
 
-function buildConversationContext(limit = 6) {
+function buildConversationContext(limit = 4) {
   return messages.value
     .filter(m => m.role === 'user' || m.role === 'assistant')
     .slice(-limit)
@@ -381,6 +461,20 @@ function buildConversationContext(limit = 6) {
       role: m.role,
       content: m.content
     }))
+}
+
+async function downloadPlan(message: Message) {
+  if (!message.plan) return
+  
+  try {
+    await exportToWord(
+      message.plan.title,
+      message.plan.description,
+      message.plan.steps
+    )
+  } catch (error) {
+    console.error('Failed to export plan:', error)
+  }
 }
 
 function parseMarkdown(text: string): string {
@@ -423,7 +517,7 @@ function parseMarkdown(text: string): string {
           <h2 class="text-base font-semibold">Learning Assistant</h2>
           <p v-if="settings.enhancedMode" class="text-[10px] text-muted-foreground flex items-center gap-1">
             <Sparkles class="h-2.5 w-2.5" />
-            Enhanced mode
+            Enhanced mode · {{ currentModel.name }}
           </p>
         </div>
         <Button
@@ -472,7 +566,76 @@ function parseMarkdown(text: string): string {
                 <Bot class="h-3 w-3 text-primary-foreground" />
               </div>
               <div class="flex-1 space-y-2 overflow-hidden">
+                <!-- Thinking Process -->
+                <div v-if="message.thinking && message.thinking.length > 0" class="space-y-1 mb-3">
+                  <div
+                    v-for="think in message.thinking"
+                    :key="think.stage"
+                    class="flex items-start gap-2 text-[10px] text-muted-foreground"
+                  >
+                    <div class="flex items-center gap-1 min-w-[80px]">
+                      <div v-if="!think.complete" class="h-2 w-2 rounded-full bg-primary/60 animate-pulse"></div>
+                      <div v-else class="h-2 w-2 rounded-full bg-primary/30"></div>
+                      <span class="font-medium">{{ think.stage }}</span>
+                    </div>
+                    <span class="flex-1 leading-relaxed opacity-80">{{ think.content }}</span>
+                  </div>
+                </div>
+
                 <div class="text-xs leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
+
+                <!-- Learning Plan -->
+                <div v-if="message.plan" class="space-y-3 mt-4">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-semibold text-foreground">📋 Learning Plan</p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      @click="downloadPlan(message)"
+                      class="h-7 text-xs gap-1"
+                    >
+                      <Download class="h-3 w-3" />
+                      Download Plan
+                    </Button>
+                  </div>
+                  
+                  <div class="flex flex-col gap-3">
+                    <div
+                      v-for="(step, idx) in message.plan.steps"
+                      :key="step.step"
+                      class="flex gap-3 relative"
+                    >
+                      <!-- Step indicator -->
+                      <div class="flex flex-col items-center">
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold bg-primary text-primary-foreground">
+                          {{ step.step }}
+                        </div>
+                        <div v-if="idx !== message.plan.steps.length - 1" class="w-0.5 flex-1 bg-border min-h-6 mt-1"></div>
+                      </div>
+                      
+                      <!-- Step content -->
+                      <div class="flex-1 pb-2">
+                        <div class="flex items-center gap-2 mb-1">
+                          <h4 class="text-sm font-semibold">{{ step.title }}</h4>
+                          <span v-if="step.duration" class="text-[10px] text-muted-foreground">{{ step.duration }}</span>
+                        </div>
+                        <p v-if="step.description" class="text-xs text-muted-foreground mb-2">{{ step.description }}</p>
+                        <div v-if="step.materials.length > 0" class="flex flex-wrap gap-1.5">
+                          <NuxtLink
+                            v-for="material in step.materials"
+                            :key="material.id"
+                            :to="material.id"
+                            class="inline-flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-xs font-medium text-foreground hover:bg-accent hover:border-primary/50 transition-colors"
+                            :title="material.reason"
+                          >
+                            <span class="text-[10px] text-muted-foreground">{{ material.type }}</span>
+                            <span class="truncate max-w-[120px]">{{ material.title }}</span>
+                          </NuxtLink>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div v-if="message.references && message.references.length > 0" class="space-y-1">
                   <p class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Recommended</p>
@@ -587,7 +750,7 @@ function parseMarkdown(text: string): string {
           <p class="text-sm text-muted-foreground flex items-center gap-1.5">
             Discover courses, lessons, and learning paths
             <span v-if="settings.enhancedMode" class="inline-flex items-center gap-1 text-xs text-primary">
-              • <Sparkles class="h-3 w-3" /> Enhanced
+              • <Sparkles class="h-3 w-3" /> Enhanced · {{ currentModel.name }}
             </span>
           </p>
         </div>
@@ -646,8 +809,83 @@ function parseMarkdown(text: string): string {
               <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/90 to-primary mt-1">
                 <Bot class="h-4 w-4 text-primary-foreground" />
               </div>
-              <div class="flex-1 space-y-2 overflow-hidden">
+              <div class="flex-1 space-y-3 overflow-hidden">
+                <!-- Thinking Process (Fullscreen) -->
+                <div v-if="message.thinking && message.thinking.length > 0" class="space-y-2 mb-4 p-3 rounded-lg bg-muted/50 border">
+                  <p class="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <Sparkles class="h-3 w-3" />
+                    Thinking Process
+                  </p>
+                  <div
+                    v-for="think in message.thinking"
+                    :key="think.stage"
+                    class="flex items-start gap-2.5 text-xs"
+                  >
+                    <div class="flex items-center gap-1.5 min-w-[100px]">
+                      <div v-if="!think.complete" class="h-2.5 w-2.5 rounded-full bg-primary/60 animate-pulse"></div>
+                      <div v-else class="h-2.5 w-2.5 rounded-full bg-primary/30"></div>
+                      <span class="font-medium">{{ think.stage }}</span>
+                    </div>
+                    <span class="flex-1 leading-relaxed text-muted-foreground">{{ think.content }}</span>
+                  </div>
+                </div>
+
                 <div class="text-sm leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
+
+                <!-- Learning Plan (Fullscreen) -->
+                <div v-if="message.plan" class="space-y-4 mt-4">
+                  <div class="flex items-center justify-between">
+                    <p class="text-base font-semibold text-foreground flex items-center gap-2">
+                      📋 {{ message.plan.title }}
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      @click="downloadPlan(message)"
+                      class="gap-2"
+                    >
+                      <Download class="h-4 w-4" />
+                      Download Plan
+                    </Button>
+                  </div>
+                  
+                  <div class="flex flex-col gap-4">
+                    <div
+                      v-for="(step, idx) in message.plan.steps"
+                      :key="step.step"
+                      class="flex gap-4 relative"
+                    >
+                      <!-- Step indicator -->
+                      <div class="flex flex-col items-center">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold bg-primary text-primary-foreground">
+                          {{ step.step }}
+                        </div>
+                        <div v-if="idx !== message.plan.steps.length - 1" class="w-0.5 flex-1 bg-border min-h-8 mt-2"></div>
+                      </div>
+                      
+                      <!-- Step content -->
+                      <div class="flex-1 pb-3">
+                        <div class="flex items-center gap-2 mb-2">
+                          <h4 class="text-base font-semibold">{{ step.title }}</h4>
+                          <span v-if="step.duration" class="text-xs text-muted-foreground">{{ step.duration }}</span>
+                        </div>
+                        <p v-if="step.description" class="text-sm text-muted-foreground mb-3">{{ step.description }}</p>
+                        <div v-if="step.materials.length > 0" class="flex flex-wrap gap-2">
+                          <NuxtLink
+                            v-for="material in step.materials"
+                            :key="material.id"
+                            :to="material.id"
+                            class="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:border-primary/50 transition-colors"
+                            :title="material.reason"
+                          >
+                            <span class="text-xs text-muted-foreground">{{ material.type }}</span>
+                            <span class="truncate max-w-[200px]">{{ material.title }}</span>
+                          </NuxtLink>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div v-if="message.references && message.references.length > 0" class="space-y-2">
                   <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Recommended</p>
