@@ -1,0 +1,116 @@
+name: Test Version Snapshots
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'content/exercises/**/index.md'
+      - 'content/tutorials/**/index.md'
+      - 'content/lectures/**/index.md'
+      - 'content/articles/**/index.md'
+      - 'content/projects/**/index.md'
+      - 'content/lessons/**/index.md'
+      - 'content/pathways/**/index.md'
+      - 'content/specializations/**/index.md'
+
+jobs:
+  test-snapshots:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full history to compare
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test version snapshot creation (dry-run)
+        id: test-snapshots
+        run: |
+          echo "Running snapshot script in dry-run mode..."
+          npm run version:snapshot -- --dry-run > snapshot-output.txt 2>&1
+          cat snapshot-output.txt
+          
+          # Check if any snapshots would be created
+          if grep -q "would be created:" snapshot-output.txt; then
+            echo "has-snapshots=true" >> $GITHUB_OUTPUT
+            echo "✅ Script will create version snapshots"
+          else
+            echo "has-snapshots=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No version snapshots would be created"
+          fi
+
+      - name: Comment on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('snapshot-output.txt', 'utf8');
+            
+            const hasSnapshots = '${{ steps.test-snapshots.outputs.has-snapshots }}' === 'true';
+            
+            const emoji = hasSnapshots ? '📸' : 'ℹ️';
+            const title = hasSnapshots 
+              ? '**Version Snapshots Test - Snapshots Will Be Created**' 
+              : '**Version Snapshots Test - No Snapshots Needed**';
+            
+            const body = emoji + ' ' + title + '\n\n```\n' + output + '\n```\n\n' + 
+              (hasSnapshots 
+                ? '✅ When this PR is merged, the auto-create workflow will create these snapshot files.' 
+                : 'ℹ️ No version changes detected. No snapshots will be created when merged.');
+
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Version Snapshots Test')
+            );
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## Version Snapshot Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** Dry Run (no files created)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Output" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat snapshot-output.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

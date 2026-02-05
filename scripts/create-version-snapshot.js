@@ -3,6 +3,10 @@
 /**
  * Create immutable version snapshots when content is published
  * Uses git history to create snapshots of the previous version
+ * 
+ * Usage:
+ *   node scripts/create-version-snapshot.js           # Normal mode - creates files
+ *   node scripts/create-version-snapshot.js --dry-run # Test mode - shows what would be created
  */
 
 import fs from 'fs';
@@ -17,10 +21,17 @@ const __dirname = path.dirname(__filename);
 const contentTypes = ['exercises', 'tutorials', 'lectures', 'articles', 'projects', 'lessons', 'pathways', 'specializations'];
 const rootDir = path.join(__dirname, '..');
 
+// Check for dry-run mode
+const isDryRun = process.argv.includes('--dry-run');
+
 let snapshotsCreated = 0;
 let errors = 0;
 
-console.log('🔄 Creating version snapshots from git history...\n');
+if (isDryRun) {
+  console.log('🧪 DRY RUN MODE - No files will be created\n');
+} else {
+  console.log('🔄 Creating version snapshots from git history...\n');
+}
 
 // Process each content type
 for (const type of contentTypes) {
@@ -98,11 +109,6 @@ for (const type of contentTypes) {
         return;
       }
 
-      // Create v/ directory if it doesn't exist
-      if (!fs.existsSync(versionDir)) {
-        fs.mkdirSync(versionDir, { recursive: true });
-      }
-
       // Parse the old content to modify frontmatter
       const { data: oldFrontmatter, content: oldMarkdown } = matter(oldContent);
 
@@ -116,10 +122,22 @@ for (const type of contentTypes) {
       };
 
       const snapshotContent = matter.stringify(oldMarkdown, snapshotFrontmatter);
-      fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
 
-      console.log(`   ✓ ${folder}/index.md v${oldVersion} → v${currentVersion} (created snapshot from git history)`);
-      snapshotsCreated++;
+      if (isDryRun) {
+        // Dry run - just report what would be created
+        console.log(`   ✓ ${folder}/index.md v${oldVersion} → v${currentVersion} (would create: v/${snapshotFileName})`);
+        snapshotsCreated++;
+      } else {
+        // Create v/ directory if it doesn't exist
+        if (!fs.existsSync(versionDir)) {
+          fs.mkdirSync(versionDir, { recursive: true });
+        }
+
+        // Write snapshot file
+        fs.writeFileSync(snapshotPath, snapshotContent, 'utf-8');
+        console.log(`   ✓ ${folder}/index.md v${oldVersion} → v${currentVersion} (created snapshot from git history)`);
+        snapshotsCreated++;
+      }
 
     } catch (error) {
       console.error(`   ✗ ${folder}/index.md - Error: ${error.message}`);
@@ -134,16 +152,21 @@ for (const type of contentTypes) {
 console.log('='.repeat(60));
 console.log('📊 SUMMARY');
 console.log('='.repeat(60));
-console.log(`✓ Snapshots created: ${snapshotsCreated}`);
+console.log(`✓ Snapshots ${isDryRun ? 'would be' : ''} created: ${snapshotsCreated}`);
 console.log(`✗ Errors: ${errors}`);
 console.log('='.repeat(60));
 
 if (snapshotsCreated > 0) {
-  console.log('\n💡 Next steps:');
-  console.log('   1. Review the created snapshot files');
-  console.log('   2. These will be committed automatically by GitHub Actions');
+  if (isDryRun) {
+    console.log('\n✅ Dry run successful!');
+    console.log('The script will create these snapshots when run normally.');
+  } else {
+    console.log('\n💡 Next steps:');
+    console.log('   1. Review the created snapshot files');
+    console.log('   2. These will be committed automatically by GitHub Actions');
+  }
 } else {
-  console.log('\nℹ No version bumps detected - no snapshots created');
+  console.log(`\nℹ No version bumps detected - no snapshots ${isDryRun ? 'would be' : ''} created`);
 }
 
 process.exit(errors > 0 ? 1 : 0);
