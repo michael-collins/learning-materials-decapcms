@@ -70,10 +70,59 @@ Integrate a chatbot-based query system that allows students to ask questions abo
 
 **In Progress**
 - 🔄 LLM response grounding and relevance tuning (prompting + retrieval scoring)
+- 🔄 Learning plan generation with step-by-step materials and Word export
 
 **Planned**
 - ⏳ Streaming responses
 - ⏳ Usage/error analytics for common queries
+- ⏳ **Advanced Course Construction AI** (see section 2.1 below)
+
+#### 2.1 Advanced Course Construction AI
+
+**Description**  
+Evolve the chatbot into a comprehensive course construction tool that understands pedagogical context, prerequisites, time constraints, and institutional requirements.
+
+**Capabilities**
+
+*Contextual Analysis*
+- Analyze and consider course prerequisites before generating recommendations
+- Understand time constraints specified by the user or inferred from context
+- Recognize when content is part of a structured course with specific requirements
+- Support course skeleton workflows where faculty provide structure and AI fills in materials
+
+*Content Awareness*
+- Scan video transcripts and media descriptions for relevant content matching
+- Understand pedagogical intention and learning objectives alignment
+- Identify gaps in content coverage and recommend additions
+- Link to contribution instructions when relevant content is missing from the platform
+
+*Interactive Guidance*
+- Ask clarifying questions to better understand user needs
+- Guide users through course construction workflows step-by-step
+- Provide recommendations based on educational best practices
+- Support iterative refinement of course plans
+
+*Export & Integration*
+- Generate Common Cartridge (IMS CC) exports for LMS import
+- Support SCORM packaging for course materials
+- Export complete course structures with materials, assessments, and metadata
+- Integration with institutional LMS systems
+
+**Technical Considerations**
+- Course skeleton data structure and storage (possibly new content type)
+- Video transcript indexing and semantic search
+- Pedagogical rule engine and constraint satisfaction
+- Multi-turn conversation context management
+- Common Cartridge XML generation library
+- Gap analysis algorithms for content recommendations
+- Contribution workflow integration
+
+**Related Files**
+- `/composables/useLLMChat.ts` - Enhanced reasoning stages
+- `/composables/useCourseConstructor.ts` - New composable for course building
+- `/content/courses/` - Course skeleton storage
+- `/lib/common-cartridge-export.ts` - Export utilities
+- `/server/api/courses/` - Course management API
 
 ### Related Files
 - `/components/AIChatInterface.vue`
