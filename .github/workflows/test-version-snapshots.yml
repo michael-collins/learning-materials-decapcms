@@ -58,21 +58,16 @@ jobs:
             
             const hasSnapshots = '${{ steps.test-snapshots.outputs.has-snapshots }}' === 'true';
             
-            let emoji = hasSnapshots ? '📸' : 'ℹ️';
-            let title = hasSnapshots 
+            const emoji = hasSnapshots ? '📸' : 'ℹ️';
+            const title = hasSnapshots 
               ? '**Version Snapshots Test - Snapshots Will Be Created**' 
               : '**Version Snapshots Test - No Snapshots Needed**';
             
-            const body = `${emoji} ${title}
+            const body = emoji + ' ' + title + '\n\n```\n' + output + '\n```\n\n' + 
+              (hasSnapshots 
+                ? '✅ When this PR is merged, the auto-create workflow will create these snapshot files.' 
+                : 'ℹ️ No version changes detected. No snapshots will be created when merged.');
 
-\`\`\`
-${output}
-\`\`\`
-
-${hasSnapshots 
-  ? '✅ When this PR is merged, the auto-create workflow will create these snapshot files.' 
-  : 'ℹ️ No version changes detected. No snapshots will be created when merged.'}
-`;
             
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
