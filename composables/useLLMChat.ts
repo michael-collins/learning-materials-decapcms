@@ -14,6 +14,11 @@ interface SearchResult {
 
 interface LLMResponse {
   content: string
+  references?: Array<{
+    id: string
+    title: string
+    reason: string
+  }>
   error?: string
 }
 
@@ -36,6 +41,111 @@ interface ConversationTurn {
 }
 
 export function useLLMChat() {
+  async function generateRetrievalHints(
+    query: string,
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<{ keywords: string[]; preferredTypes: string[] }> {
+    try {
+      const systemPrompt = `You are a retrieval assistant. Return ONLY valid JSON with two fields: "keywords" and "preferredTypes".
+
+Rules:
+- keywords: 3–8 short phrases likely to appear in material titles or tags
+- preferredTypes: zero or more of ["lessons","exercises","projects","lectures","articles","tutorials","pathways","specializations"]
+- Do not include extra text or code fences.`
+
+      const userPrompt = `User query: "${query}"
+
+Return only JSON.`
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: {
+          provider,
+          apiKey,
+          model,
+          systemPrompt,
+          userPrompt
+        }
+      })
+
+      const raw = response.content?.trim() || ''
+      const cleaned = raw
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/```\s*$/i, '')
+        .trim()
+
+      const parsed = JSON.parse(cleaned)
+      const keywords = Array.isArray(parsed?.keywords)
+        ? parsed.keywords.map((k: any) => String(k).trim()).filter((k: string) => k.length > 1)
+        : []
+      const preferredTypes = Array.isArray(parsed?.preferredTypes)
+        ? parsed.preferredTypes.map((t: any) => String(t).trim())
+        : []
+
+      return { keywords: keywords.slice(0, 8), preferredTypes }
+    } catch (error) {
+      console.error('Retrieval hints error:', error)
+      return { keywords: [], preferredTypes: [] }
+    }
+  }
+  async function rerankResults<T extends { id: string; title: string; type: string; description?: string }>(
+    query: string,
+    candidates: T[],
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<T[]> {
+    if (candidates.length <= 1) return candidates
+
+    try {
+      const candidateList = candidates.map((item) => ({
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        description: item.description || ''
+      }))
+
+      const systemPrompt = `You are a ranking assistant. Return ONLY a JSON array of ids ordered from most to least relevant to the user's query. Use only the ids provided.`
+
+      const userPrompt = `User query: "${query}"
+
+Candidates:
+${JSON.stringify(candidateList, null, 2)}
+
+Return ONLY a JSON array of ids in best-first order.`
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: {
+          provider,
+          apiKey,
+          model,
+          systemPrompt,
+          userPrompt
+        }
+      })
+
+      const raw = response.content?.trim() || ''
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return candidates
+
+      const order = parsed.map((id) => String(id))
+      const lookup = new Map(candidates.map((c) => [c.id, c]))
+      const reranked = order
+        .map((id) => lookup.get(id))
+        .filter(Boolean) as T[]
+
+      // Append any missing items to preserve coverage
+      const remaining = candidates.filter((c) => !order.includes(c.id)) as T[]
+      return [...reranked, ...remaining]
+    } catch (error) {
+      console.error('Rerank error:', error)
+      return candidates
+    }
+  }
   async function generateQueryExpansion(
     query: string,
     provider: Provider,
@@ -138,9 +248,9 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
         {
           title: result.title,
           type: result.type,
-          description: result.description,
-          difficulty: result.difficulty,
-          duration: result.duration
+          description: result.description || '',
+          difficulty: result.difficulty || '',
+          duration: result.duration || ''
         }
       ]))
 
@@ -199,10 +309,16 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
       function formatStructuredResponse(
         raw: string,
         allowedIds: Set<string>,
-        lookup: Map<string, { title: string; type: string; description: string; difficulty: string; duration: string }>
-      ): string | null {
+        lookup: Map<string, { title: string; type: string; description?: string; difficulty?: string; duration?: string }>
+      ): { content: string; references: Array<{ id: string; title: string; reason: string }> } | null {
         try {
-          const parsed = JSON.parse(raw)
+          const cleaned = raw
+            .replace(/^```json\s*/i, '')
+            .replace(/^```\s*/i, '')
+            .replace(/```\s*$/i, '')
+            .trim()
+
+          const parsed = JSON.parse(cleaned)
           if (!parsed || typeof parsed !== 'object') return null
 
           const answer = typeof parsed.answer === 'string' ? parsed.answer.trim() : ''
@@ -227,15 +343,10 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
 
           if (!answer && filtered.length === 0) return null
 
-          let content = answer || 'Here are the most relevant materials:'
-          if (filtered.length > 0) {
-            content += '\n\n**Recommended materials:**\n'
-            for (const ref of filtered) {
-              content += `- ${ref.title} (${ref.id})${ref.reason ? ` — ${ref.reason}` : ''}\n`
-            }
+          return {
+            content: answer || 'Here are the most relevant materials:',
+            references: filtered
           }
-
-          return content.trim()
         } catch {
           return null
         }
@@ -254,7 +365,16 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
       })
 
       const structured = formatStructuredResponse(response.content, allowedIds, allowedLookup)
-      return { content: structured ?? response.content }
+      if (structured) {
+        return { content: structured.content, references: structured.references }
+      }
+
+      // If the model returned JSON but parsing failed, avoid showing raw JSON
+      if (response.content?.trim().startsWith('{')) {
+        return { content: 'I found relevant materials, but the response format was invalid. Please try again.' }
+      }
+
+      return { content: response.content }
     } catch (error: any) {
       console.error('LLM API Error:', error)
       
@@ -283,6 +403,8 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
 
   return {
     generateResponse,
-    generateQueryExpansion
+    generateQueryExpansion,
+    rerankResults,
+    generateRetrievalHints
   }
 }

@@ -14,6 +14,11 @@ interface Message {
   content: string
   timestamp: Date
   model?: string // The AI model used to generate this response
+  references?: Array<{
+    id: string
+    title: string
+    reason: string
+  }>
   sources?: Array<{
     title: string
     type: string
@@ -37,7 +42,7 @@ const isOpen = computed({
   set: (value) => emit('update:open', value)
 })
 
-const { loadIndex, search, detectIntent, isLoading: searchIndexLoading, isLoaded } = useSchemaEnhancedSearch()
+const { loadIndex, search, hybridSearch, detectIntent, isLoading: searchIndexLoading, isLoaded } = useSchemaEnhancedSearch()
 
 const CHAT_HISTORY_KEY = 'ai-chat-history'
 const CHAT_HISTORY_MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
@@ -107,7 +112,7 @@ const isFullscreen = ref(false)
 const settingsOpen = ref(false)
 
 const { settings, canUseEnhancedMode, isConfigured } = useChatbotSettings()
-const { generateResponse, generateQueryExpansion } = useLLMChat()
+const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
 
 // Load search index when component mounts
 onMounted(async () => {
@@ -204,12 +209,59 @@ async function sendMessage() {
     let results = search(query, { limit: 10 })
     const intent = detectIntent(query)
     const topScore = (results[0] as any)?.score || 0
+
+    let expandedQueryForRetrieval = query
+
+    // Use LLM retrieval hints to improve coverage and content-type targeting
+    if (settings.value.enhancedMode && isConfigured.value) {
+      const hints = await generateRetrievalHints(
+        query,
+        settings.value.provider,
+        settings.value.apiKey,
+        settings.value.model
+      )
+
+      if (hints.keywords.length > 0) {
+        expandedQueryForRetrieval = `${query} ${hints.keywords.join(' ')}`
+        const expandedResults = search(expandedQueryForRetrieval, { limit: 10 })
+        const merged = new Map<string, any>()
+        for (const item of [...results, ...expandedResults]) {
+          merged.set(item.id, item)
+        }
+        results = Array.from(merged.values())
+      }
+
+      if (hints.preferredTypes.length > 0) {
+        const preferredSet = new Set(hints.preferredTypes)
+        results = results.sort((a, b) => {
+          const aPref = preferredSet.has(a.type) ? 1 : 0
+          const bPref = preferredSet.has(b.type) ? 1 : 0
+          if (aPref !== bPref) return bPref - aPref
+          return (b.score || 0) - (a.score || 0)
+        })
+      }
+    }
     
     console.log('[Chat] Enhanced mode:', settings.value.enhancedMode, 'Configured:', isConfigured.value)
     console.log('[Chat] Provider:', settings.value.provider, 'Model:', settings.value.model)
     
     let responseText = ''
+    let llmResponse: { content: string; error?: string; references?: Array<{ id: string; title: string; reason: string }> } | null = null
     
+    // Use hybrid retrieval (embeddings + lexical) when supported
+    if (settings.value.enhancedMode && isConfigured.value && (settings.value.provider === 'openai' || settings.value.provider === 'google')) {
+      try {
+        results = await hybridSearch(expandedQueryForRetrieval, {
+          limit: 30,
+          provider: settings.value.provider,
+          apiKey: settings.value.apiKey,
+          model: settings.value.provider === 'openai' ? 'text-embedding-3-small' : 'text-embedding-004'
+        })
+      } catch (error) {
+        console.error('Hybrid search failed, falling back to lexical:', error)
+      }
+    }
+
     // If enhanced mode is enabled and results are weak, expand the query using LLM
     if (settings.value.enhancedMode && isConfigured.value && (results.length === 0 || topScore < 10)) {
       const expandedTerms = await generateQueryExpansion(
@@ -221,16 +273,29 @@ async function sendMessage() {
 
       if (expandedTerms.length > 0) {
         const expandedQuery = `${query} ${expandedTerms.join(' ')}`
-        results = search(expandedQuery, { limit: 5 })
+        results = search(expandedQuery, { limit: 10 })
       }
     }
+
+    // Rerank results with LLM for better semantic ordering (enhanced mode only)
+    if (settings.value.enhancedMode && isConfigured.value && results.length > 1) {
+      results = await rerankResults(
+        query,
+        results.slice(0, 30),
+        settings.value.provider,
+        settings.value.apiKey,
+        settings.value.model
+      )
+    }
+
+    results = results.slice(0, 10)
 
     // Use LLM if enhanced mode is enabled and configured
     if (settings.value.enhancedMode && isConfigured.value) {
       console.log('[Chat] Using LLM for response')
       try {
         const conversationContext = buildConversationContext(8)
-        const llmResponse = await generateResponse(
+        llmResponse = await generateResponse(
           query,
           results,
           settings.value.provider,
@@ -263,6 +328,7 @@ async function sendMessage() {
       content: responseText,
       timestamp: new Date(),
       model: settings.value.enhancedMode ? settings.value.model : undefined,
+      references: settings.value.enhancedMode ? (llmResponse?.references || undefined) : undefined,
       sources: results.slice(0, 5).map(r => ({
         title: r.title,
         type: r.type,
@@ -407,6 +473,21 @@ function parseMarkdown(text: string): string {
               </div>
               <div class="flex-1 space-y-2 overflow-hidden">
                 <div class="text-xs leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
+
+                <div v-if="message.references && message.references.length > 0" class="space-y-1">
+                  <p class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Recommended</p>
+                  <div class="flex flex-wrap gap-1.5">
+                    <NuxtLink
+                      v-for="ref in message.references"
+                      :key="ref.id"
+                      :to="ref.id"
+                      class="inline-flex items-center gap-1 rounded-full border bg-card px-2 py-1 text-[10px] font-medium text-foreground hover:bg-accent hover:border-primary/50 transition-colors"
+                      :title="ref.reason"
+                    >
+                      <span class="truncate max-w-[140px]">{{ ref.title }}</span>
+                    </NuxtLink>
+                  </div>
+                </div>
                 
                 <!-- Sources (Compact for popover) -->
                 <div v-if="message.sources && message.sources.length > 0" class="space-y-1.5">
@@ -567,6 +648,21 @@ function parseMarkdown(text: string): string {
               </div>
               <div class="flex-1 space-y-2 overflow-hidden">
                 <div class="text-sm leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
+
+                <div v-if="message.references && message.references.length > 0" class="space-y-2">
+                  <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Recommended</p>
+                  <div class="flex flex-wrap gap-2">
+                    <NuxtLink
+                      v-for="ref in message.references"
+                      :key="ref.id"
+                      :to="ref.id"
+                      class="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:border-primary/50 transition-colors"
+                      :title="ref.reason"
+                    >
+                      <span class="truncate max-w-[220px]">{{ ref.title }}</span>
+                    </NuxtLink>
+                  </div>
+                </div>
                 
                 <!-- Sources -->
                 <div v-if="message.sources && message.sources.length > 0" class="space-y-2">

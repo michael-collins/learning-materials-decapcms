@@ -54,6 +54,8 @@ interface SearchIntent {
 interface SearchResult extends SearchIndexItem {
   score: number
   matchReason: string[]
+  semanticScore?: number
+  combinedScore?: number
 }
 
 export function useSchemaEnhancedSearch() {
@@ -158,12 +160,11 @@ export function useSchemaEnhancedSearch() {
     return concepts
   }
 
-  function search(query: string, options: { limit?: number } = {}): SearchResult[] {
+  function scoreAll(query: string): SearchResult[] {
     if (!searchIndex.value) {
       throw new Error('Search index not loaded')
     }
     
-    const limit = options.limit || 10
     const intent = detectIntent(query)
     const expandedTerms = expandQueryWithSynonyms(query).map(normalizeTerm)
     const queryConcepts = extractQueryConcepts(query)
@@ -280,11 +281,126 @@ export function useSchemaEnhancedSearch() {
         matchReason: matchReasons.slice(0, 3) // Keep top 3 reasons
       }
     })
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
     
     return results
+  }
+
+  function search(query: string, options: { limit?: number } = {}): SearchResult[] {
+    const limit = options.limit || 10
+    return scoreAll(query)
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+  }
+
+  async function getEmbeddings(
+    texts: string[],
+    provider: string,
+    apiKey: string,
+    model?: string
+  ): Promise<number[][]> {
+    const response = await $fetch<{ embeddings: number[][] }>('/api/embeddings', {
+      method: 'POST',
+      body: { provider, apiKey, model, input: texts }
+    })
+    return response.embeddings
+  }
+
+  function cosineSimilarity(a?: number[], b?: number[]) {
+    if (!a || !b || a.length === 0 || b.length === 0) return 0
+    const len = Math.min(a.length, b.length)
+    let dot = 0
+    let aNorm = 0
+    let bNorm = 0
+    for (let i = 0; i < len; i++) {
+      const aVal = a[i] ?? 0
+      const bVal = b[i] ?? 0
+      dot += aVal * bVal
+      aNorm += aVal * aVal
+      bNorm += bVal * bVal
+    }
+    return dot / (Math.sqrt(aNorm) * Math.sqrt(bNorm) + 1e-10)
+  }
+
+  async function hybridSearch(
+    query: string,
+    options: { limit?: number; provider: string; apiKey: string; model?: string } 
+  ): Promise<SearchResult[]> {
+    if (!searchIndex.value) throw new Error('Search index not loaded')
+    if (typeof window === 'undefined') return search(query, { limit: options.limit })
+
+    const limit = options.limit || 10
+    const all = scoreAll(query)
+
+    // Prepare embedding cache
+    const cacheKey = `semantic-embeddings:${options.provider}:${options.model || 'default'}:${searchIndex.value.stats.buildDate}`
+    const cached = localStorage.getItem(cacheKey)
+    let itemEmbeddings: number[][] | null = null
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        if (Array.isArray(parsed.embeddings)) {
+          itemEmbeddings = parsed.embeddings
+        }
+      } catch {
+        itemEmbeddings = null
+      }
+    }
+
+    // Build embeddings if missing or mismatched
+    if (!itemEmbeddings || itemEmbeddings.length !== searchIndex.value.content.length) {
+      const texts = searchIndex.value.content.map(item => [
+        item.title,
+        item.description,
+        item.tags?.join(' '),
+        item.learningObjectives?.join(' ')
+      ].filter(Boolean).join(' '))
+
+      // Batch embeddings to reduce request size
+      const batchSize = 50
+      const embeddings: number[][] = []
+      for (let i = 0; i < texts.length; i += batchSize) {
+        const batch = texts.slice(i, i + batchSize)
+        const batchEmbeddings = await getEmbeddings(batch, options.provider, options.apiKey, options.model)
+        embeddings.push(...batchEmbeddings)
+      }
+
+      itemEmbeddings = embeddings
+      localStorage.setItem(cacheKey, JSON.stringify({ embeddings }))
+    }
+
+    // Query embedding
+    const [queryEmbedding] = await getEmbeddings([query], options.provider, options.apiKey, options.model)
+    if (!queryEmbedding) {
+      return search(query, { limit })
+    }
+
+    // Compute semantic scores
+    const semanticScores = itemEmbeddings.map((emb) => cosineSimilarity(queryEmbedding, emb))
+
+    const maxLex = Math.max(...all.map(r => r.score)) || 1
+    const minLex = Math.min(...all.map(r => r.score)) || 0
+    const maxSem = Math.max(...semanticScores) || 1
+    const minSem = Math.min(...semanticScores) || 0
+
+    const lexWeight = maxLex < 5 ? 0.3 : 0.6
+    const semWeight = 1 - lexWeight
+
+    const combined = all.map((item, idx) => {
+      const lexNorm = (item.score - minLex) / (maxLex - minLex + 1e-6)
+      const semScore = semanticScores[idx] ?? 0
+      const semNorm = (semScore - minSem) / (maxSem - minSem + 1e-6)
+      const combinedScore = lexNorm * lexWeight + semNorm * semWeight
+      return {
+        ...item,
+        semanticScore: semanticScores[idx],
+        combinedScore
+      }
+    })
+
+    return combined
+      .sort((a, b) => (b.combinedScore || 0) - (a.combinedScore || 0))
+      .slice(0, limit)
   }
 
   function suggestLearningPath(topic: string) {
@@ -304,6 +420,7 @@ export function useSchemaEnhancedSearch() {
   return {
     loadIndex,
     search,
+    hybridSearch,
     suggestLearningPath,
     detectIntent,
     isLoading,
