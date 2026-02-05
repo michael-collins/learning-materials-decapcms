@@ -18,6 +18,10 @@ jobs:
   test-snapshots:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: read
+      pull-requests: write
+    
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
