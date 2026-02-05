@@ -1,0 +1,3265 @@
+{
+  "content": [
+    {
+      "id": "/lessons/3d-modeling-fundamentals",
+      "title": "3D Modeling Fundamentals",
+      "type": "oer:LearningComponent",
+      "description": "Master the fundamentals of 3D modeling including polygon modeling",
+      "searchText": "3d modeling fundamentals master the fundamentals of 3d modeling including polygon modeling understand polygon modeling concepts and workflows create 3d geometry using basic modeling tools apply proper topology principles to models develop efficient modeling techniques \nlearn the core principles and techniques of 3d modeling, focusing on polygon modeling methods that form the foundation for all 3d content creation.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand polygon modeling concepts and workflows",
+        "Create 3D geometry using basic modeling tools",
+        "Apply proper topology principles to models",
+        "Develop efficient modeling techniques"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.1",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/animation-principles",
+      "title": "Animation Principles",
+      "type": "oer:LearningComponent",
+      "description": "Learn the twelve principles of animation and how to apply them to create believable movement in 3D animation.",
+      "searchText": "animation principles learn the twelve principles of animation and how to apply them to create believable movement in 3d animation. 'understand the twelve principles of animation' 'apply timing and spacing to create believable motion' 'use squash and stretch effectively' 'create anticipation and follow-through in animations' 'develop strong poses and silhouettes' \nmaster the fundamental principles of animation that bring characters and objects to life through believable movement and performance.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand the twelve principles of animation'",
+        "'Apply timing and spacing to create believable motion'",
+        "'Use squash and stretch effectively'",
+        "'Create anticipation and follow-through in animations'",
+        "'Develop strong poses and silhouettes'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/ar-vr-development",
+      "title": "AR/VR Development",
+      "type": "oer:LearningComponent",
+      "description": "Explore augmented and virtual reality development, creating immersive experiences with proper UX considerations.",
+      "searchText": "ar/vr development explore augmented and virtual reality development, creating immersive experiences with proper ux considerations. 'understand ar/vr design principles' 'create vr-optimized content' 'implement comfortable locomotion systems' 'design intuitive vr interactions' 'test and iterate vr experiences' 'apply performance optimization for vr' \nlearn the unique requirements and best practices for creating augmented and virtual reality experiences that are comfortable and engaging.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "5 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand AR/VR design principles'",
+        "'Create VR-optimized content'",
+        "'Implement comfortable locomotion systems'",
+        "'Design intuitive VR interactions'",
+        "'Test and iterate VR experiences'",
+        "'Apply performance optimization for VR'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/camera-composition",
+      "title": "Camera and Composition",
+      "type": "oer:LearningComponent",
+      "description": "Master camera settings, placement, and composition principles to create visually compelling rendered images and animations.",
+      "searchText": "camera and composition master camera settings, placement, and composition principles to create visually compelling rendered images and animations. 'understand camera settings and properties' 'apply composition principles to 3d scenes' 'create effective camera angles and movements' 'use focal length and depth of field creatively' \nlearn how to set up and control virtual cameras, applying cinematography and composition principles to create professional-quality renders.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "2 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand camera settings and properties'",
+        "'Apply composition principles to 3D scenes'",
+        "'Create effective camera angles and movements'",
+        "'Use focal length and depth of field creatively'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/character-rigging",
+      "title": "Character Rigging",
+      "type": "oer:LearningComponent",
+      "description": "Learn how to create control rigs for characters and objects, enabling efficient and intuitive animation workflows.",
+      "searchText": "character rigging learn how to create control rigs for characters and objects, enabling efficient and intuitive animation workflows. 'understand rigging concepts and terminology' 'create bone structures for characters' 'set up ik and fk controls' 'build custom control shapes' 'test and refine rig functionality' \ndevelop skills in character rigging, learning how to create control systems that allow animators to pose and animate characters efficiently.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "5 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand rigging concepts and terminology'",
+        "'Create bone structures for characters'",
+        "'Set up IK and FK controls'",
+        "'Build custom control shapes'",
+        "'Test and refine rig functionality'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/constraints-animation-controls",
+      "title": "Constraints and Animation Controls",
+      "type": "oer:LearningComponent",
+      "description": "Master the use of constraints and control systems to create complex animations with efficient workflows.",
+      "searchText": "constraints and animation controls master the use of constraints and control systems to create complex animations with efficient workflows. 'apply various constraint types effectively' 'use constraints to create mechanical animations' 'set up parent-child relationships' 'implement aim and track constraints' 'combine constraints for complex behaviors' \nlearn how to use constraints and control systems to create sophisticated animations while maintaining efficient and flexible workflows.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "3 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Apply various constraint types effectively'",
+        "'Use constraints to create mechanical animations'",
+        "'Set up parent-child relationships'",
+        "'Implement aim and track constraints'",
+        "'Combine constraints for complex behaviors'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/deformers-shape-keys",
+      "title": "Deformers and Shape Keys",
+      "type": "oer:LearningComponent",
+      "description": "Explore deformation techniques and shape keys for creating facial expressions, muscle movement, and organic deformations.",
+      "searchText": "deformers and shape keys explore deformation techniques and shape keys for creating facial expressions, muscle movement, and organic deformations. 'understand deformer types and applications' 'create and manage shape keys' 'apply lattice and curve deformers' 'animate blend shapes and morph targets' 'combine deformers for complex effects' \nmaster deformation techniques including shape keys and various deformer types to create organic movement and facial animation.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "3 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand deformer types and applications'",
+        "'Create and manage shape keys'",
+        "'Apply lattice and curve deformers'",
+        "'Animate blend shapes and morph targets'",
+        "'Combine deformers for complex effects'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/digital-sculpting",
+      "title": "Digital Sculpting",
+      "type": "oer:LearningComponent",
+      "description": "Master organic modeling through digital sculpting techniques, creating detailed characters and organic forms.",
+      "searchText": "digital sculpting master organic modeling through digital sculpting techniques, creating detailed characters and organic forms. 'understand sculpting tools and workflows' 'create organic forms using sculpting techniques' 'apply anatomy principles to character sculpts' 'manage subdivision levels and detail' 'retopologize sculpts for animation' \nlearn digital sculpting techniques for creating highly detailed organic models, characters, and illustrations with natural forms.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "5 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand sculpting tools and workflows'",
+        "'Create organic forms using sculpting techniques'",
+        "'Apply anatomy principles to character sculpts'",
+        "'Manage subdivision levels and detail'",
+        "'Retopologize sculpts for animation'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/drawing-for-3d-design",
+      "title": "Drawing for 3D Design",
+      "type": "oer:LearningComponent",
+      "description": "Develop drawing and sketching skills to support 3D design work, including concept development and reference creation.",
+      "searchText": "drawing for 3d design develop drawing and sketching skills to support 3d design work, including concept development and reference creation. 'apply drawing fundamentals to 3d design' 'create concept sketches for 3d models' 'understand form, perspective, and proportion' 'develop visual reference materials' 'translate 2d concepts into 3d designs' \nstrengthen design skills through drawing exercises and concept development, learning how to translate ideas from 2d sketches into 3d models.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Apply drawing fundamentals to 3D design'",
+        "'Create concept sketches for 3D models'",
+        "'Understand form, perspective, and proportion'",
+        "'Develop visual reference materials'",
+        "'Translate 2D concepts into 3D designs'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/environment-design-realtime",
+      "title": "Environment Design for Real-time",
+      "type": "oer:LearningComponent",
+      "description": "Learn to design and build optimized 3D environments for real-time applications, games, and interactive experiences.",
+      "searchText": "environment design for real-time learn to design and build optimized 3d environments for real-time applications, games, and interactive experiences. 'design environments for real-time rendering' 'create modular and reusable assets' 'apply level design principles' 'optimize environments for performance' 'implement efficient lighting strategies' \nmaster environment design for real-time applications, learning to create engaging spaces while maintaining performance constraints.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "5 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Design environments for real-time rendering'",
+        "'Create modular and reusable assets'",
+        "'Apply level design principles'",
+        "'Optimize environments for performance'",
+        "'Implement efficient lighting strategies'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/exporting-delivery",
+      "title": "Exporting and Delivery",
+      "type": "oer:LearningComponent",
+      "description": "Master export settings, file formats, and delivery workflows for various output requirements and platforms.",
+      "searchText": "exporting and delivery master export settings, file formats, and delivery workflows for various output requirements and platforms. 'understand file formats and codecs' 'configure export settings appropriately' 'prepare files for different delivery platforms' 'manage file sizes and quality' 'create delivery packages and documentation' \nlearn proper export procedures and delivery workflows to ensure your composited work meets technical specifications and quality requirements.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "2 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand file formats and codecs'",
+        "'Configure export settings appropriately'",
+        "'Prepare files for different delivery platforms'",
+        "'Manage file sizes and quality'",
+        "'Create delivery packages and documentation'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/hard-surface-modeling",
+      "title": "Hard Surface Modeling",
+      "type": "oer:LearningComponent",
+      "description": "Master hard surface modeling techniques for creating mechanical objects, products, and architectural elements with clean geometry.",
+      "searchText": "hard surface modeling master hard surface modeling techniques for creating mechanical objects, products, and architectural elements with clean geometry. 'apply hard surface modeling techniques' 'create clean edge flow and topology' 'use modifiers for non-destructive workflows' 'model mechanical and manufactured objects' 'maintain precision and accuracy in models' \ndevelop proficiency in hard surface modeling for creating precise, clean geometric forms typical of products, vehicles, and architectural elements.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "5 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Apply hard surface modeling techniques'",
+        "'Create clean edge flow and topology'",
+        "'Use modifiers for non-destructive workflows'",
+        "'Model mechanical and manufactured objects'",
+        "'Maintain precision and accuracy in models'"
+      ],
+      "prerequisites": [
+        "__typename: lessons"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/history-of-cgi",
+      "title": "History of CGI",
+      "type": "oer:LearningComponent",
+      "description": "Explore the evolution and development of computer-generated imagery from its early beginnings to modern applications across film, gaming, and advertising industries.",
+      "searchText": "history of cgi explore the evolution and development of computer-generated imagery from its early beginnings to modern applications across film, gaming, and advertising industries. 'trace the historical development of cgi technology' 'identify key milestones and innovations in cgi history' 'understand how cgi transformed various industries' 'recognize pioneering artists and studios in cgi development' \nan introduction to the history and evolution of computer-generated imagery, exploring how cgi has transformed visual storytelling and design across multiple industries.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "2 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Trace the historical development of CGI technology'",
+        "'Identify key milestones and innovations in CGI history'",
+        "'Understand how CGI transformed various industries'",
+        "'Recognize pioneering artists and studios in CGI development'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/lighting-principles",
+      "title": "Lighting Principles",
+      "type": "oer:LearningComponent",
+      "description": "Explore fundamental lighting principles and techniques for creating mood, atmosphere, and visual interest in 3D scenes.",
+      "searchText": "lighting principles explore fundamental lighting principles and techniques for creating mood, atmosphere, and visual interest in 3d scenes. 'understand three-point lighting setup' 'apply different light types effectively' 'create mood and atmosphere with lighting' 'use hdri and environmental lighting' 'balance light intensity and color' \nlearn the fundamental principles of lighting in 3d, including light types, placement strategies, and techniques for creating compelling visual scenes.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "3 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand three-point lighting setup'",
+        "'Apply different light types effectively'",
+        "'Create mood and atmosphere with lighting'",
+        "'Use HDRI and environmental lighting'",
+        "'Balance light intensity and color'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/match-moving-camera-tracking",
+      "title": "Match Moving and Camera Tracking",
+      "type": "oer:LearningComponent",
+      "description": "Learn camera tracking and match moving techniques to integrate CGI elements seamlessly with live-action footage.",
+      "searchText": "match moving and camera tracking learn camera tracking and match moving techniques to integrate cgi elements seamlessly with live-action footage. 'track camera movement in footage' 'solve camera motion accurately' 'match cgi camera to tracked data' 'align cgi elements with footage' 'handle tracking challenges and errors' \nmaster camera tracking techniques to accurately match cgi cameras to live-action footage for seamless visual effects integration.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Track camera movement in footage'",
+        "'Solve camera motion accurately'",
+        "'Match CGI camera to tracked data'",
+        "'Align CGI elements with footage'",
+        "'Handle tracking challenges and errors'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/particle-simulation",
+      "title": "Particle Simulation",
+      "type": "oer:LearningComponent",
+      "description": "Master particle systems to create effects like fire, smoke, water splashes, and other dynamic phenomena.",
+      "searchText": "particle simulation master particle systems to create effects like fire, smoke, water splashes, and other dynamic phenomena. 'create and configure particle systems' 'control particle behavior and appearance' 'simulate natural phenomena' 'optimize particle count for performance' 'render particles effectively' \nlearn to create and control particle systems for generating a wide range of visual effects from fire and smoke to magical elements.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "5 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Create and configure particle systems'",
+        "'Control particle behavior and appearance'",
+        "'Simulate natural phenomena'",
+        "'Optimize particle count for performance'",
+        "'Render particles effectively'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/physics-simulation-fundamentals",
+      "title": "Physics Simulation Fundamentals",
+      "type": "oer:LearningComponent",
+      "description": "Learn the fundamentals of physics simulation including rigid body dynamics, collisions, and force interactions.",
+      "searchText": "physics simulation fundamentals learn the fundamentals of physics simulation including rigid body dynamics, collisions, and force interactions. 'understand physics simulation principles' 'set up rigid body simulations' 'configure collision properties' 'apply forces and constraints' 'optimize simulation performance' \nmaster the fundamentals of physics simulation to create realistic dynamic effects and destruction sequences.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand physics simulation principles'",
+        "'Set up rigid body simulations'",
+        "'Configure collision properties'",
+        "'Apply forces and constraints'",
+        "'Optimize simulation performance'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/post-effects-color-grading",
+      "title": "Post Effects and Color Grading",
+      "type": "oer:LearningComponent",
+      "description": "Apply post-production effects and color grading techniques to enhance and finalize composited images.",
+      "searchText": "post effects and color grading apply post-production effects and color grading techniques to enhance and finalize composited images. 'apply color correction and grading' 'use effects like glow, blur, and grain' 'match colors across different elements' 'create consistent visual style' 'apply final polish and finishing touches' \nlearn to apply post-production effects and color grading to create polished, cohesive final images with professional visual quality.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Apply color correction and grading'",
+        "'Use effects like glow, blur, and grain'",
+        "'Match colors across different elements'",
+        "'Create consistent visual style'",
+        "'Apply final polish and finishing touches'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/procedural-compositing-workflows",
+      "title": "Procedural Compositing Workflows",
+      "type": "oer:LearningComponent",
+      "description": "Master node-based compositing workflows using software like Nuke, learning to build flexible and efficient compositing networks.",
+      "searchText": "procedural compositing workflows master node-based compositing workflows using software like nuke, learning to build flexible and efficient compositing networks. 'understand node-based compositing principles' 'build efficient compositing networks' 'use procedural techniques for flexibility' 'organize and document node graphs' 'create reusable compositing setups' \nlearn procedural, node-based compositing workflows that provide flexibility and efficiency in post-production work.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand node-based compositing principles'",
+        "'Build efficient compositing networks'",
+        "'Use procedural techniques for flexibility'",
+        "'Organize and document node graphs'",
+        "'Create reusable compositing setups'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/realtime-engines",
+      "title": "Real-time Engines",
+      "type": "oer:LearningComponent",
+      "description": "Learn to work with game engines like Unity and Unreal Engine, implementing 3D assets and creating interactive experiences.",
+      "searchText": "real-time engines learn to work with game engines like unity and unreal engine, implementing 3d assets and creating interactive experiences. 'navigate game engine interfaces' 'import and configure 3d assets' 'set up materials and shaders' 'implement real-time lighting' 'create basic interactive elements' 'optimize performance and build settings' \ngain proficiency in game engines, learning how to import assets, configure materials, and build interactive real-time experiences.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "6 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Navigate game engine interfaces'",
+        "'Import and configure 3D assets'",
+        "'Set up materials and shaders'",
+        "'Implement real-time lighting'",
+        "'Create basic interactive elements'",
+        "'Optimize performance and build settings'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/render-layers-passes",
+      "title": "Render Layers and Passes",
+      "type": "oer:LearningComponent",
+      "description": "Learn to work with render layers and passes to maintain flexibility and control in the compositing process.",
+      "searchText": "render layers and passes learn to work with render layers and passes to maintain flexibility and control in the compositing process. 'understand render pass types and uses' 'set up render layers in 3d software' 'combine passes effectively in compositing' 'use aovs for maximum flexibility' 'troubleshoot pass-related issues' \nmaster the use of render layers and passes to maintain maximum control and flexibility when compositing 3d renders.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "3 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand render pass types and uses'",
+        "'Set up render layers in 3D software'",
+        "'Combine passes effectively in compositing'",
+        "'Use AOVs for maximum flexibility'",
+        "'Troubleshoot pass-related issues'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/rendering-techniques",
+      "title": "Rendering Techniques",
+      "type": "oer:LearningComponent",
+      "description": "Learn rendering workflows, engine settings, and optimization techniques to produce high-quality final images.",
+      "searchText": "rendering techniques learn rendering workflows, engine settings, and optimization techniques to produce high-quality final images. 'understand rendering engines and their settings' 'configure render settings for quality output' 'optimize render times effectively' 'set up render layers and passes' 'export renders in appropriate formats' \nmaster the rendering process from setup to final output, learning how to configure render engines and optimize settings for professional results.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "3 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Understand rendering engines and their settings'",
+        "'Configure render settings for quality output'",
+        "'Optimize render times effectively'",
+        "'Set up render layers and passes'",
+        "'Export renders in appropriate formats'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/texturing-uv-mapping",
+      "title": "Texturing and UV Mapping",
+      "type": "oer:LearningComponent",
+      "description": ">-",
+      "searchText": "texturing and uv mapping >- understand uv coordinate systems create efficient uv layouts apply textures to 3d models create and configure pbr materials minimize texture stretching and distortion \nmaster the art of uv mapping and texturing, learning how to properly unwrap 3d models and apply high-quality textures and materials.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand UV coordinate systems",
+        "Create efficient UV layouts",
+        "Apply textures to 3D models",
+        "Create and configure PBR materials",
+        "Minimize texture stretching and distortion"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lessons/vfx-compositing-integration",
+      "title": "VFX Compositing Integration",
+      "type": "oer:LearningComponent",
+      "description": "Learn to integrate simulated VFX elements with live-action footage through advanced compositing techniques.",
+      "searchText": "vfx compositing integration learn to integrate simulated vfx elements with live-action footage through advanced compositing techniques. 'integrate simulated elements with footage' 'match lighting and atmosphere' 'add motion blur and depth effects' 'create realistic shadows and reflections' 'finalize vfx shots for delivery' \nmaster the integration of vfx elements with live-action footage, creating seamless and believable final composites.\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "4 hours",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "'Integrate simulated elements with footage'",
+        "'Match lighting and atmosphere'",
+        "'Add motion blur and depth effects'",
+        "'Create realistic shadows and reflections'",
+        "'Finalize VFX shots for delivery'"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/3d-viewer-test",
+      "title": "3D Model Viewer Test",
+      "type": "exercises",
+      "description": "",
+      "searchText": "3d model viewer test # 3d model viewer test page\n\nthis page demonstrates the 3d model viewer component capabilities.\n\n## example 1: sketchfab embed\n\nthis example shows how to embed a sketchfab model:\n\n\n\n::sketchfab-component{src=\"https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c\" title=\"haus\" height=\"600px\"}\n::\n\n## example 2: uploaded gltf file (placeholder)\n\nonce you upload a .glb or .gltf file, you can reference it like this:\n\n::threed-viewer-component{src=\"/uploads/boxes-sculpt-1.glb\" title=\"b",
+      "tags": [],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "4.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/animated-procedural-textures",
+      "title": "Animated procedural textures",
+      "type": "exercises",
+      "description": "",
+      "searchText": "animated procedural textures blender aftereffects adobe media encoder in this exercise, you will create a textured anime-style waterfall in blender, render a final blender animation as an image sequence, and import it into after effects. you will create a compressed video in a web streaming format called h.264.\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrxtsiplp7diugzxsrwup8uh\" title=\"animated procedural textures tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with adding nodes to procedurally generate moving text",
+      "tags": [
+        "Blender",
+        "AfterEffects",
+        "Adobe Media Encoder"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/animated-textures",
+      "title": "Animated textures",
+      "type": "exercises",
+      "description": ">-",
+      "searchText": "animated textures >- blender aftereffects adobe media encoder \nin this exercise, you will apply an image sequence as texture object in blender, render a final blender animation as an image sequence, and import it into after effects. you will create a compressed video in a web streaming format called h.264.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadruwrugasfhfykuojjo1izwh\" title=\"animated textures tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with adding animation sequences as moving textures on 3d geom",
+      "tags": [
+        "Blender",
+        "AfterEffects",
+        "Adobe Media Encoder"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/animating-a-bouncing-ball",
+      "title": "Bouncing Ball Reference",
+      "type": "image/png",
+      "description": "Bouncing ball animation reference",
+      "searchText": "bouncing ball reference bouncing ball animation reference blender \nin this exercise, level 1 students will practice keyframe animation to animate a bouncing ball\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrvjwkujn1ht3gcuzxpue29m\" title=\"animating a bouncing ball tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice keyframe animation of translation, rotation, and scale properties.\n2. become familiarized with keyframe animation.\n3. apply principles of animation\n\n## instructions\n\n1. watch linked tutorials in learning resources ",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/animating-tetris",
+      "title": "Animating Tetris",
+      "type": "exercises",
+      "description": "",
+      "searchText": "animating tetris blender \nin this exercise, students will creatively interpret the game, tetris created in 1984 by alexey pajitnov, into a 10 seconds or longer animation.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadruev-pnxbisi7g3yu_pufgv\" title=\"animating tetris tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice applying the 12 principles of animation\n2. practice keyframe animation of translation, rotation, and scale properties.\n3. practice applying camera effects.\n\n## instructions\n",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/animating-virtual-creatures",
+      "title": "Animating virtual creatures",
+      "type": "exercises",
+      "description": "",
+      "searchText": "animating virtual creatures blender in this exercise, you will practice animation techniques by recreating creatures from evolved virtual creatures by karl sims.\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrvl5oapws44r45oz65njyei\" title=\"animating virtual creatures tutorial\"}\n::\n\n## learning objectives\n\n1. practice applying the 12 principles of animation\n2. practice keyframe animation of translation, rotation, and scale properties.\n3. practice applying camera effects.\n\n## instructions\n\n1. watch t",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/applying-textures-to-3-unique-chess-sets",
+      "title": "Blue And White Water Splash: Pawel Czerwinski",
+      "type": "image/jpeg",
+      "description": "Blue And White Water Splash: Pawel Czerwinski - https://unsplash.com/",
+      "searchText": "blue and white water splash: pawel czerwinski blue and white water splash: pawel czerwinski - https://unsplash.com/ blender \nin this exercise, you will apply image textures to a chess board and pieces\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qlih4xckx3q86mju84qpgoj\" title=\"applying textures to 3 unique chess sets tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using texture images and the uv editor\n2. short introduction to material nodes\n3. practice appending objects and importing containers into different blender files\n\n## instructions\n\n**this week we will begin adding text",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/introduction-to-animation",
+      "title": "Introduction to animation",
+      "type": "exercises",
+      "description": "",
+      "searchText": "introduction to animation blender \nin this exercise, level 1 students will practice keyframe animation, parenting, animating the camera with a target, and manipulating curves in the graph editor.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrucq3o-avwz3a6mqtd8o9uj\" title=\"introduction to animation tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice keyframe animation of translation, rotation, and scale properties.\n2. become familiarized with keyframe animation.\n3. become familiarized with the p",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/introduction-to-rigging",
+      "title": "Base character mesh",
+      "type": "application/octet-stream",
+      "description": "Starter character mesh",
+      "searchText": "base character mesh starter character mesh blender \nin this exercise, students will practice correcting a character model's edge-flow and set up an armature rig to pose the character in a sitting position.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrx4lok4gv0xjdsvpb31qotj\" title=\"introduction to rigging tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice setting up inverse kinematics (ik) bone constraints.\n2. practice modeling to good edge flow for deformation.\n3. become familiarized with creating and binding",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/lighting-and-rendering-the-airline-chair",
+      "title": "Airline Chair Example render",
+      "type": "image/jpeg",
+      "description": "Airline Chair example render",
+      "searchText": "airline chair example render airline chair example render blender lighting \nin this exercise, you will create a final render of the kem weber airline chair. you will practice setting up 3-point lighting, adding cameras, creating a backdrop, optionally adding additional textures to the materials, configuring render settings, and doing some post-production cleanup in photoshop.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrvabq0miye-oy-pze6jab7q\" title=\"lighting and rendering the airline chair tutorial\"}\n::\n\n\n## learning objectives\n\n1. ",
+      "tags": [
+        "Blender",
+        "Lighting"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/low-poly-non-photorealistic-rendering",
+      "title": "Low poly non-photorealistic rendering",
+      "type": "exercises",
+      "description": "",
+      "searchText": "low poly non-photorealistic rendering blender \nin this exercise, you will practice modeling a character in a t-pose and rendering using an npr workflow.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrx6h44iemo7htkjg9htjgvb\" title=\"low poly non-photorealistic rendering tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with the npr workflow.\n2. learn the character modeling workflow\n\n## instructions\n\n1. model a polygonal character in the [t pose](https://www.animatorisland.com/the-t-pose-all-about",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/model-a-gem",
+      "title": "Model a Gem",
+      "type": "exercises",
+      "description": "",
+      "searchText": "model a gem blender \nmodel a custom gem\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qn9xcnefk2urkb8mw1b4lqb\" title=\"model a gem tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using 3d software interface and terminology.\n2. use modeling workflows to create high quality topology and edge flow.\n3. familiarize yourself with a cumulative number of hotkeys and operations (it's a good idea to keep a personal log of hotkeys and operators that you will likely use again, as you go).\n\n",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/model-a-snowflake",
+      "title": "Model a Snowflake",
+      "type": "exercises",
+      "description": "",
+      "searchText": "model a snowflake blender \nin this exercise, you will learn how to model 3 snowflakes\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qla1afmxpkvj6jqwoxnygmy\" title=\"model a snowflake tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using 3d software interface and terminology.\n2. use modeling workflows to create high quality topology and edge flow.\n3. familiarize yourself with a cumulative number of hotkeys and operations (it's a good idea to keep a personal log of hotkeys and operators",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-basic-knight",
+      "title": "Knight Back Reference",
+      "type": "image/jpeg",
+      "description": "Knight Back Reference",
+      "searchText": "knight back reference knight back reference blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qliqriwysgljwrie6r8np2f\" title=\"modeling a basic knight tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself with a c",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-bishop",
+      "title": "Reference illustration of a Bishop from side view",
+      "type": "image/jpeg",
+      "description": "Reference illustration of a Bishop from side view",
+      "searchText": "reference illustration of a bishop from side view reference illustration of a bishop from side view blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qn9ewcl-arvg3qweq_h-wvg\" title=\"modeling a bishop tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using the boolean operator and fixing any irregularities it may create\n2. practice working from reference images\n3. practice using 3d software interface and terminology.\n4. use modeling workflows to",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-chavet-121-series-no-6-knight",
+      "title": "Chavet 121 series no 6: Knight ",
+      "type": "image/jpeg",
+      "description": "Chavet 121 series no 6: Knight ",
+      "searchText": "chavet 121 series no 6: knight  chavet 121 series no 6: knight  blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qlafonfbirwwtx83zq-6k4t\" title=\"modeling a chavet 121 series no 6 knight tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize ",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-chessboard",
+      "title": "Modeling a Chessboard",
+      "type": "exercises",
+      "description": "",
+      "searchText": "modeling a chessboard blender \nhow to make a chess board\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qksjy4znxgwrbvfklaoofvu\" title=\"modeling a chessboard tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using 3d software interface and terminology.\n2. use modeling workflows to create high quality topology and edge flow.\n3. familiarize yourself with a cumulative number of hotkeys and operations (it's a good idea to keep a personal log of hotkeys and operators that you will likely use aga",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-diamond",
+      "title": "Modeling a Diamond",
+      "type": "exercises",
+      "description": "",
+      "searchText": "modeling a diamond blender \nmodel a diamond\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qnq4fsbvqw-ijrzd6eomx1h\" title=\"modeling a diamond tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using 3d software interface and terminology.\n2. use modeling workflows to create high quality topology and edge flow.\n3. familiarize yourself with a cumulative number of hotkeys and operations (it's a good idea to keep a personal log of hotkeys and operators that you will likely use again, as you go",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-figurative-knight",
+      "title": "Figurative Knight Front Side Reference Image",
+      "type": "image/jpeg",
+      "description": "Figurative Knight Front Side Reference Image",
+      "searchText": "figurative knight front side reference image figurative knight front side reference image blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qlem8qkrx_rchaaemz3ohzh\" title=\"modeling a figurative knight tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself wit",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-king",
+      "title": "Reference Image for the Front and Back of a King",
+      "type": "image/jpeg",
+      "description": "Reference Image for the Front and Back of a King",
+      "searchText": "reference image for the front and back of a king reference image for the front and back of a king blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qmz7dfmd7keech5h9b3zlgu\" title=\"modeling a king tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself with a cumulativ",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-low-poly-animal-and-introduction-to-particles",
+      "title": "Modeling a Low Poly Animal and Introduction to Particles",
+      "type": "exercises",
+      "description": "",
+      "searchText": "modeling a low poly animal and introduction to particles blender \n## instructions\n\nthis week i want you to make a low poly animal. ideally, you will have more than one reference image. below is a demonstration of how i would approach resolving a low poly model with only a profile image. for your assignment i encourage you to work from multiple reference images instead. however, some of the techniques i use to calculate volume and resolve topological flow may be of help. there is an additional video in the playlist that demonstrates the use of particles as a m",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-metal-horse-head",
+      "title": "Metal Horse Left Reference Image",
+      "type": "image/jpeg",
+      "description": "Metal Horse Left Reference Image",
+      "searchText": "metal horse left reference image metal horse left reference image blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qnmcpc_vs1rgjaqfm4esue9\" title=\"modeling a metal horse head tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself with",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-pawn",
+      "title": "Illustration of the Side View of Pawn",
+      "type": "image/jpeg",
+      "description": "Illustration of the Side View of Pawn",
+      "searchText": "illustration of the side view of pawn illustration of the side view of pawn blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qkyyjlpgk2zmvzqih_yk8dx\" title=\"modeling a pawn tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself with a cumulativ",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-queen",
+      "title": "Reference Image of the Side of a Queen Chess Piece",
+      "type": "image/jpeg",
+      "description": "Reference Image of the Side of a Queen Chess Piece",
+      "searchText": "reference image of the side of a queen chess piece reference image of the side of a queen chess piece blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5qkznwa0ssvo8i2imil7btof\" title=\"modeling a queen tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself with a cumulati",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-rook",
+      "title": "Reference Image for the Top of a Basic Rook",
+      "type": "image/jpeg",
+      "description": "Reference Image for the Top of a Basic Rook",
+      "searchText": "reference image for the top of a basic rook reference image for the top of a basic rook blender \nin this exercise, you will practice polygonal modeling fundamentals and using reference images to create a chess piece\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=plcajw37cz5ql40pesctlh1xnhlds8f0cb\" title=\"modeling a rook tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice working from reference images\n2. practice using 3d software interface and terminology.\n3. use modeling workflows to create high quality topology and edge flow.\n4. familiarize yourself with a cumulativ",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-a-room",
+      "title": "Modeling a room",
+      "type": "exercises",
+      "description": "",
+      "searchText": "modeling a room blender \nin this exercise, you will practice polygonal modeling fundamentals and will use 3d software to build a polygonal model of an interior space.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrvp_vzysefaskkpdhmdpfrk\" title=\"modeling a room tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software terminology\n2. practice polygonal modeling workflows\n3. perform fundamental polygonal modeling operations including extrude, merge, bridge, and bevel",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-and-sculpting-a-sea-creature",
+      "title": "Modeling and sculpting a sea creature",
+      "type": "exercises",
+      "description": "",
+      "searchText": "modeling and sculpting a sea creature blender \nin this exercise, you will practice sculpting tools and workflows, as well as go through the process of retopology. you will end up with two models, a high resolution sculpt and a base mesh that will be ready for texturing.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrw9sylyer8dpret38xynl_5\" title=\"modeling and sculpting a sea creature tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d sculpting tools and terminology.\n2. use sculpting tool",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-random-objects",
+      "title": "Modeling random objects",
+      "type": "exercises",
+      "description": "",
+      "searchText": "modeling random objects blender \nin this exercise, you will practice polygonal modeling fundamentals and will use 3d software to build a polygonal model of three random objects.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrutpysfhyf4j_w6pgi6aes9\" title=\"modeling random objects tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software terminology\n2. practice polygonal modeling workflows\n3. perform fundamental polygonal modeling operations including extrude, merge, bridge",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/modeling-the-airline-chair",
+      "title": "Airline Chair side view",
+      "type": "image/jpeg",
+      "description": "Airline Chair designed by KEM Weber.",
+      "searchText": "airline chair side view airline chair designed by kem weber. blender modeling \nin this exercise, you will practice polygonal modeling fundamentals and will use 3d software to build a polygonal model of the 1930s kem weber airline chair.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrxnibdsahylyodx8f45jk9f\" title=\"modeling the airline chair tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice using 3d software interface and terminology.\n2. use modeling workflows to create high quality topology and edge flow.\n3. demonstrate understanding of ",
+      "tags": [
+        "Blender",
+        "Modeling"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/rendering-a-room",
+      "title": "Rendering a room",
+      "type": "exercises",
+      "description": "",
+      "searchText": "rendering a room blender \nin this exercise, you will continue working on your objects and create a lighting and background setup for final rendering.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadru-xvcelslbw7dqn4n1yj54\" title=\"rendering a room tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice configuring render settings to create a high quality render in blender.\n2. apply appropriate lighting strategies to light the room\n\n## instructions\n\n1. watch the tutorials in learning resources.",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/rendering-random-objects",
+      "title": "Rendering random objects",
+      "type": "exercises",
+      "description": "",
+      "searchText": "rendering random objects blender \nin this exercise, you will continue working on your objects and create a lighting and background setup for final rendering.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrwacwxtnu9ymgbqfudztdls\" title=\"rendering random objects tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice configuring render settings to create a high quality render in blender.\n2. practice setting up normal and specular maps to increase the realism for principled rendering.\n3. gain familiar",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/rigging-a-human",
+      "title": "Rigging a human",
+      "type": "exercises",
+      "description": "",
+      "searchText": "rigging a human blender \nin this exercise, students will practice modeling, rigging, and animating a human.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrwpkllkm8ovibj1akhivonl\" title=\"rigging a human tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice setting up inverse kinematics (ik) bone constraints.\n2. practice modeling to good edge flow for deformation.\n3. become familiarized with creating and binding an armature using the rigify add-on.\n4. become familiarized with vertex weight",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/rigging-a-quadruped",
+      "title": "Rigging a quadruped",
+      "type": "exercises",
+      "description": "",
+      "searchText": "rigging a quadruped blender \nin this exercise, students will practice modeling, rigging, and animating a quadruped animal.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrv1srfv9wfkj605z0hzqlxs\" title=\"rigging a quadruped tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice setting up inverse kinematics (ik) bone constraints.\n2. practice modeling to good edge flow for deformation.\n3. become familiarized with creating and binding an armature using the rigify add-on.\n4. become familiarized wit",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/rigging-a-robot-arm",
+      "title": "Rigging a robot arm",
+      "type": "exercises",
+      "description": "",
+      "searchText": "rigging a robot arm blender \nin this exercise, students will practice modeling, rigging, and animating a hard-surface robot arm.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrx1grpud5zhmgyjovrjpn69\" title=\"rigging a robot arm tutorial\"}\n::\n\n\n## learning objectives\n\n1. practice setting up inverse kinematics (ik) bone constraints.\n2. practice hard surface modeling.\n3. become familiarized with creating and binding an armature for hard surface models.\n\n## instructions\n\n1. watch the tutorials.",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/sculpting-retopo-and-texturing",
+      "title": "Sculpting, retopo, and texturing",
+      "type": "exercises",
+      "description": "",
+      "searchText": "sculpting, retopo, and texturing blender \nin this exercise, you continue working on your creature sculpt. you will practice unwrapping uvs, exporting a uv map, and creating textures in 2d image editing software like photoshop.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadru8k-0ahxzkvrqwlcjt7yaw\" title=\"sculpting, retopo, and texturing tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software interface and terminology.\n2. use texturing workflows to add color and texture to your po",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/sculpture-garden",
+      "title": "Sculpture Garden",
+      "type": "exercises",
+      "description": "",
+      "searchText": "sculpture garden blender \nin this exercise, you will practice using pbr materials, modeling, lighting, and rendering. you will also use compositional theory from art and design to organize elements in a 3d scene to create an image.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrxmwbv0ko-erblfnywukksd\" title=\"sculpture garden tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with the pbr workflow.\n2. practice image composition techniques from art and design theory.\n\n## instr",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/sea-creature-lighting-and-rendering",
+      "title": "Sea creature: Lighting and rendering",
+      "type": "exercises",
+      "description": "",
+      "searchText": "sea creature: lighting and rendering blender \nin this exercise, you continue working on the sea creature. you will practice lighting and rendering.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrv3t6j1m7_93ulpjq-axohv\" title=\"sea creature: lighting and rendering tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software interface and terminology.\n2. use lighting and rendering workflows and tools to create an underwater scene.\n\n## instructions\n\n1. watch the tutorials in learning resourc",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/sea-creature-non-photorealistic-rendering",
+      "title": "Sea creature: Non-photorealistic rendering",
+      "type": "exercises",
+      "description": "",
+      "searchText": "sea creature: non-photorealistic rendering blender \nin this exercise, you will model an environment for your creature from the previous exercises. you will also set up npr shaders, freestyle lines, and use the compositor to achieve a comic visual style.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrwh22nk2hfngbeeaxmp3s_e\" title=\"sea creature: non-photorealistic rendering tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized rendering workflows for non-photorealistic rendering (npr)\n2. gain understandin",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/sea-creature-texturing",
+      "title": "Sea creature: Texturing",
+      "type": "exercises",
+      "description": "",
+      "searchText": "sea creature: texturing blender substance painter \nin this exercise, you continue working on the sea creature. you will practice unwrapping uvs, exporting a uv map, and creating textures in 2d image editing software like substance painter and/or photoshop.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadruu3msav9eforij5j2e3uvv\" title=\"sea creature: texturing tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software interface and terminology.\n2. use texturing workflows to add color and textur",
+      "tags": [
+        "Blender",
+        "Substance Painter"
+      ],
+      "difficulty": "Advanced",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/share-one-completed-set",
+      "title": "Share One Completed Set",
+      "type": "exercises",
+      "description": "",
+      "searchText": "share one completed set blender \nin this exercise, you will apply image textures to a chess board and pieces\n\n\n\n## learning objectives\n\n1. practice rendering images for submissions\n\n## instructions\n\n\n**for this assignment, you will submit 3 total images.**\n<br>  \ndevelop and refine a single chess set based on observation over time, peer and instructor feedback.\n<br>  \n**submit three renders of _this individual_ set to both _canvas_ _and the corresponding discussion thread for review_.** \n<br>  make sure that your assignment is",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Kenneth Ian Brill",
+      "course": "DART 203",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/texturing-a-room",
+      "title": "Texturing a room",
+      "type": "exercises",
+      "description": "",
+      "searchText": "texturing a room blender \nin this exercise, you will continue working on your objects. practice unwrapping uvs, exporting uv maps, and create textures in 2d image editing software like photoshop.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrvw5dp65bkpjf6ifdkpf2el\" title=\"texturing a room tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software interface and terminology.\n2. use texturing workflows to add color and texture to your polygonal models.\n3. perform fund",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/texturing-random-objects",
+      "title": "Texturing random objects",
+      "type": "exercises",
+      "description": "",
+      "searchText": "texturing random objects blender \nin this exercise, you will continue working on your objects. practice unwrapping uvs, exporting uv maps, and create textures in 2d image editing software like photoshop.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrwipzpdr5zyk4-egwfzmahg\" title=\"texturing random objects tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software interface and terminology.\n2. use texturing workflows to add color and texture to your polygonal models.\n3. perf",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/exercises/texturing-the-airline-chair",
+      "title": "Airline Chair side view",
+      "type": "image/jpeg",
+      "description": "Airline Chair designed by KEM Weber.",
+      "searchText": "airline chair side view airline chair designed by kem weber. blender texturing \nin this exercise, you will practice unwrapping uvs, exporting a uv map, and creating textures in 2d image editing software like photoshop. you will then apply your textures to a polygonal model of the kem weber airline chair.\n\n\n::iframe-component{src=\"https://youtube.com/embed/videoseries?list=pl-v2nchtadrugw6oioatkvbscp12c9mjq\" title=\"texturing the airline chair tutorial\"}\n::\n\n\n## learning objectives\n\n1. become familiarized with 3d software interface and terminology.\n2. use modeling workflows ",
+      "tags": [
+        "Blender",
+        "Texturing"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/projects/ideas-in-motion",
+      "title": "Storyboard Template (pdf)",
+      "type": "application/pdf",
+      "description": "Storyboard template",
+      "searchText": "storyboard template (pdf) storyboard template blender aftereffects \nin this project, you will apply creative 3d production workflows to develop a 30 second animation. you will pursue your own interests while balance solving for the project's theme.\n\n\n\n## learning objectives\n\n1. demonstrate understanding of 3d modeling, rendering, and animation skills.\n2. apply animation principles.\n3. apply fundamental principles of color and composition theory.\n4. practice concept development and ideation skills.\n\n## requirements\n\nfor this the project, you will design, model, ",
+      "tags": [
+        "Blender",
+        "AfterEffects"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/projects/you-dont-see-that-everyday-objects",
+      "title": "Work Statement Worksheet (.doc)",
+      "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "description": "Work statement worksheet",
+      "searchText": "work statement worksheet (.doc) work statement worksheet blender \nfor this project, you will produce 3d rendered images of products and other objects you experience every day, but with one slight difference. you will augment the object in such a way to inhibit its utility, material qualities, or its system or environmental context.\n<br><br>\nto explore these concepts, we delve into the philosophical realm of objects and their existence, considering how we interact with them in both a functional and perceptual sense. **_[ontology](https://www.merriam-webster.co",
+      "tags": [
+        "Blender"
+      ],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lectures/introduction-to-animation",
+      "title": "Introduction to Animation",
+      "type": "lectures",
+      "description": "",
+      "searchText": "introduction to animation \n## presentation\n\n::google-slides-component{id=\"2pacx-1vtksgvumlzy3wax5o0e8zipbwbffsuzgyubuccvint9pjubvpibqtr9qejs6yq6xff5e7419mfneajn\" title=\"introduction to animation\"}\n::\n\n\n\n## topics covered\n\n- 1. **screenings**\n    - [fairytales of motion by alan warburton](https://www.youtube.com/watch?v=hk6sxggq_qq)\n    - [illusion of life](https://vimeo.com/93206523)\n    - [newton’s 3 laws of motion](https://vimeo.com/159043081)\n    - [animation mentor](https://www.youtube.com/watch?v=ctrboi0pvgi)\n    - ",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lectures/introduction-to-cameras-lighting-and-rendering",
+      "title": "Introduction to Cameras, Lighting, and Rendering",
+      "type": "oer:SupportingMaterial",
+      "description": "",
+      "searchText": "introduction to cameras, lighting, and rendering \n## presentation\n\n::google-slides-component{id=\"2pacx-1vr8tl1dcvefuklba1s1ub-dyxcnqzq_4mdswke1ppmpoj4gtby5etm2_akykcz33gyclq4xuyixe61d\" title=\"introduction to modeling\"}\n::\n\n## topics covered\n\n- 1. **video screening**\n    1. [“spectacle, speculation, spam”](https://alanwarburton.co.uk/spectacle-speculation-spam) by alan warburton\n    2. [lighting theory by andrew price](https://www.youtube.com/playlist?list=pljeaoinr3zgh9vcr47kss5w8pejbniiwk)\n2. **demo**\n    1. [lighting and rendering video (une",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lectures/introduction-to-modeling",
+      "title": "Introduction to Modeling",
+      "type": "lectures",
+      "description": "",
+      "searchText": "introduction to modeling \n## presentation\n\n::google-slides-component{id=\"2pacx-1vqzhgphzzwl_7iw-fasx3delelbxrrqg11toinudqnzxylx3qdhgbvkmgm1wtdhuq9jnnrovi0jsivp\" title=\"introduction to modeling\"}\n::\n\n\n\n## topics covered\n\n- 1. **presentation:**\n    1. [modeling primer](https://docs.google.com/presentation/d/e/2pacx-1vqzhgphzzwl_7iw-fasx3delelbxrrqg11toinudqnzxylx3qdhgbvkmgm1wtdhuq9jnnrovi0jsivp/pub?start=false&loop=false&delayms=3000&slide=id.p)\n2. **video screening**\n    1. [the analog and the digital](https://www.youtub",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/lectures/introduction-to-texturing",
+      "title": "Introduction to Texturing",
+      "type": "lectures",
+      "description": "",
+      "searchText": "introduction to texturing \n## presentation\n\n::google-slides-component{id=\"2pacx-1vtkzhenqyxv6fs5q3e_h1p0qwrwdhlfd6t-uephf5mlug6wr1a_54dhy2lyjgez6_oww2cffpsmvm0v\" title=\"introduction to texturing\"}\n::\n\n\n\n## topics covered\n\n- 1. **video screening**\n    1. [amino assets](https://vimeo.com/2826822) by zeitguised\n    2. [bee 3d animated short](https://vimeo.com/44228708)\n    3. lighting technical director: [riccardo zoccarato](https://vimeo.com/200015451)\n    4. student reel: [cindy jang](https://vimeo.com/52911102)\n    5. [c",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "DART 303",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/articles/3d-career-development",
+      "title": "3D Career Development",
+      "type": "articles",
+      "description": "An overview of opportunities in 3D fields.",
+      "searchText": "3d career development an overview of opportunities in 3d fields. ## animation, vfx, and game industry\n\n**talk to mentors:** [getting development advice contacts list](https://docs.google.com/spreadsheets/d/e/2pacx-1vryvefal_guvbo0iuy3evgpm0fwagci-z8e5cz6hoyz9n8gcok4dge0rml-x0pwqrnjgqte-v7phtqb/pubhtml \"getting development advice contacts list\")\n\n### job postings\n\nchris mayne curates what might be the the most comprehensive job posting resource available. see his google spreadsheet below.\n\n* [animation, vfx, and game industry job postings curated by chris mayn",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/articles/3d-communities",
+      "title": "3D Communities",
+      "type": "articles",
+      "description": "Get involved with communities of practice for 3D fields.",
+      "searchText": "3d communities get involved with communities of practice for 3d fields. find your people!\n\n## local events\n\n[happy valley animation festival](https://happyvalleyanimationfestival.org/ \"https://happyvalleyanimationfestival.org/\")\n\n## conference volunteering\n\n* [siggraph sv program](https://sv.siggraph.org/)\n* [idga](https://igda.org/gdc2020-2/volunteer/)\n\n## groups\n\n* penn state university park: [penn state digital media group](https://www.facebook.com/psudigitalmedia/)\n* penn state world campus: [dmd program club](https://www.facebook.com/psudmdclub/)\n* [meetup.com]",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/articles/getting-started-in-3d-animation",
+      "title": "Getting started in 3D Animation",
+      "type": "articles",
+      "description": "We discuss the hardware, software, and other aspects of",
+      "searchText": "getting started in 3d animation we discuss the hardware, software, and other aspects of ## a note about hardware\n\nif you currently use macosx, many software packages will be available to you with varying levels of stability. blender runs extremely well on macosx. windows based computers and nvidia graphics cards have considerably more wide-spread software and peripheral support. additionally, windows computers tend to cost less for higher spec'd machines. apple eliminated advanced driver support for nvidia graphics cards in there newer operating systems and is moving away from inte",
+      "tags": [],
+      "difficulty": "",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/tutorials/building-your-first-nuxt-app",
+      "title": "Building Your First Nuxt App",
+      "type": "tutorials",
+      "description": "A step-by-step tutorial on creating a complete Nuxt application from scratch.",
+      "searchText": "building your first nuxt app a step-by-step tutorial on creating a complete nuxt application from scratch. \n# building your first nuxt app\n\nthis tutorial will walk you through creating a complete nuxt application from scratch. by the end, you'll have a working app with routing, components, and content.\n\n## prerequisites\n\nbefore starting, make sure you have:\n\n- node.js 18 or newer installed\n- a code editor (vs code recommended)\n- basic knowledge of vue.js\n\n## step 1: create a new project\n\nfirst, create a new nuxt project:\n\n```bash\nnpx nuxi@latest init my-first-app\n```\n\nnavigate to your project:\n\n```ba",
+      "tags": [],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Learning Materials Team",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/tutorials/working-with-decapcms",
+      "title": "Working with DecapCMS",
+      "type": "tutorials",
+      "description": "Learn how to integrate and use DecapCMS for content management in your Nuxt application.",
+      "searchText": "working with decapcms learn how to integrate and use decapcms for content management in your nuxt application. \n# working with decapcms\n\ndecapcms (formerly netlify cms) is an open-source content management system that works with git-based workflows. this tutorial shows you how to integrate it with nuxt.\n\n## what is decapcms?\n\ndecapcms is a git-based cms that:\n\n- stores content in your git repository\n- provides a user-friendly admin interface\n- works with any static site generator\n- supports real-time previews\n\n## installation\n\n### step 1: install decapcms\n\nadd decapcms to your project:\n\n```bash\nnpm insta",
+      "tags": [],
+      "difficulty": "Intermediate",
+      "duration": "",
+      "author": "Learning Materials Team",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/compositor",
+      "title": "Compositor Pathway",
+      "type": "oer:Course",
+      "description": "Master the art and technique of digital compositing for film and video. This focused pathway provides the essential skills needed to combine CGI elements with live-action footage and create seamless final images for professional productions.",
+      "searchText": "compositor pathway master the art and technique of digital compositing for film and video. this focused pathway provides the essential skills needed to combine cgi elements with live-action footage and create seamless final images for professional productions. compositing post-production vfx color grading nuke after effects integrate cgi elements with live-action footage seamlessly apply color correction and grading techniques use keying and rotoscoping for element isolation create realistic lighting and shadow integration understand compositing workflows and node-based systems deliver final outputs to professional specifications \nthis streamlined pathway focuses specifically on digital compositing skills, providing students with the technical and artistic abilities needed to work in post-production facilities. students will learn to combine multiple elements into final, polished images for film, television, and digital media.\n\n## who this is for\n\nthis pathway is ideal for students interested in:\n- post-production and finishing\n- visual effects compositing\n- color grading and correction\n- motion graphics integration\n- co",
+      "tags": [
+        "Compositing",
+        "Post-production",
+        "VFX",
+        "Color Grading",
+        "Nuke",
+        "After Effects"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "14 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Integrate CGI elements with live-action footage seamlessly",
+        "Apply color correction and grading techniques",
+        "Use keying and rotoscoping for element isolation",
+        "Create realistic lighting and shadow integration",
+        "Understand compositing workflows and node-based systems",
+        "Deliver final outputs to professional specifications"
+      ],
+      "prerequisites": [
+        "Basic understanding of images and color",
+        "Fundamental computer skills"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/digital-fabrication",
+      "title": "Digital fabrication",
+      "type": "oer:Course",
+      "description": ">-",
+      "searchText": "digital fabrication >- \nutilizes 3d printing or cnc machining to create physical objects from digital designs.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/fundamentals",
+      "title": "Fundamentals",
+      "type": "oer:Course",
+      "description": "The essentials.",
+      "searchText": "fundamentals the essentials. \nthe essentials.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/game-artist",
+      "title": "Game Artist Pathway",
+      "type": "oer:Course",
+      "description": "Become a skilled game artist capable of creating optimized 3D assets for real-time environments. This pathway covers the complete skillset needed for game development, from foundational CGI to advanced real-time optimization and interactive design.",
+      "searchText": "game artist pathway become a skilled game artist capable of creating optimized 3d assets for real-time environments. this pathway covers the complete skillset needed for game development, from foundational cgi to advanced real-time optimization and interactive design. game development real-time 3d modeling game engine interactive vr/ar create game-ready 3d assets with efficient topology implement content in game engines like unreal and unity optimize models and textures for real-time rendering design interactive environments for games understand technical constraints and performance budgets collaborate with game development teams \nthis pathway prepares students for careers in the game industry, focusing on the creation of 3d content for interactive and real-time applications. students will learn to balance artistic quality with technical performance requirements, creating assets that work seamlessly in game engines and virtual reality platforms.\n\n## who this is for\n\nthis pathway is perfect for students interested in:\n- video game development\n- virtual reality experiences\n- augmented reality applications\n- interactive ins",
+      "tags": [
+        "Game Development",
+        "Real-time",
+        "3D Modeling",
+        "Game Engine",
+        "Interactive",
+        "VR/AR"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "26 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Create game-ready 3D assets with efficient topology",
+        "Implement content in game engines like Unreal and Unity",
+        "Optimize models and textures for real-time rendering",
+        "Design interactive environments for games",
+        "Understand technical constraints and performance budgets",
+        "Collaborate with game development teams"
+      ],
+      "prerequisites": [
+        "Basic computer literacy",
+        "Interest in games and interactive media"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/game-design-and-development",
+      "title": "Game design and development",
+      "type": "oer:Course",
+      "description": "Designs gameplay mechanics, levels, and user experiences for video games.",
+      "searchText": "game design and development designs gameplay mechanics, levels, and user experiences for video games. \ndesigns gameplay mechanics, levels, and user experiences for video games.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/illustration-and-visualization",
+      "title": "Illustration and visualization",
+      "type": "oer:Course",
+      "description": ">-",
+      "searchText": "illustration and visualization >- \ncreates realistic architectural visualizations for design, marketing, or presentations.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/lighting-and-cinematography",
+      "title": "Lighting and cinematography",
+      "type": "oer:Course",
+      "description": "Sets up lighting and camera angles to create visually compelling 3D scenes.",
+      "searchText": "lighting and cinematography sets up lighting and camera angles to create visually compelling 3d scenes. \nsets up lighting and camera angles to create visually compelling 3d scenes.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/motion-graphics",
+      "title": "Motion graphics",
+      "type": "oer:Course",
+      "description": ">-",
+      "searchText": "motion graphics >- \ncreates animated graphics for multimedia projects, often involving typography and visual effects.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/product-design",
+      "title": "Product design",
+      "type": "oer:Course",
+      "description": "Designs consumer products in 3D for manufacturing or visualization purposes.",
+      "searchText": "product design designs consumer products in 3d for manufacturing or visualization purposes. \ndesigns consumer products in 3d for manufacturing or visualization purposes.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/production-management",
+      "title": "Production management",
+      "type": "oer:Course",
+      "description": " Oversees the planning and execution of 3D projects, ensuring deadlines and budgets are met.",
+      "searchText": "production management  oversees the planning and execution of 3d projects, ensuring deadlines and budgets are met. \n oversees the planning and execution of 3d projects, ensuring deadlines and budgets are met.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/short-film",
+      "title": "Short Film Pathway",
+      "type": "oer:Course",
+      "description": "Create compelling animated short films from concept to final render. This pathway covers the essential skills for producing narrative-driven CGI films with professional quality animation and compositing.",
+      "searchText": "short film pathway create compelling animated short films from concept to final render. this pathway covers the essential skills for producing narrative-driven cgi films with professional quality animation and compositing. animation short film storytelling production pipeline develop strong storytelling and narrative skills for animation create character performances that convey emotion and personality produce complete animated short films from concept to completion apply professional compositing and finishing techniques understand animation production pipelines and workflows \nthis pathway is designed for aspiring animators who want to create narrative-driven short films using 3d animation. students will progress from foundational cgi skills through character animation and compositing, developing the complete skillset needed to produce professional-quality animated shorts.\n\n## who this is for\n\nthis pathway is ideal for students aiming to work in:\n- animation studios\n- independent animation projects\n- film production companies\n- advertising and commercial animation\n- ",
+      "tags": [
+        "Animation",
+        "Short Film",
+        "Storytelling",
+        "Production Pipeline"
+      ],
+      "difficulty": "Intermediate",
+      "duration": "24 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Develop strong storytelling and narrative skills for animation",
+        "Create character performances that convey emotion and personality",
+        "Produce complete animated short films from concept to completion",
+        "Apply professional compositing and finishing techniques",
+        "Understand animation production pipelines and workflows"
+      ],
+      "prerequisites": [
+        "Basic artistic skills",
+        "Fundamental computer literacy"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/short-film-and-vfx",
+      "title": "Short Film and VFX Pathway",
+      "type": "oer:Course",
+      "description": "A comprehensive pathway for creating animated short films with visual effects. This pathway combines traditional animation techniques with advanced simulation and compositing skills to produce cinematic CGI content with professional VFX elements.",
+      "searchText": "short film and vfx pathway a comprehensive pathway for creating animated short films with visual effects. this pathway combines traditional animation techniques with advanced simulation and compositing skills to produce cinematic cgi content with professional vfx elements. animation vfx short film compositing production pipeline create complete animated short films from concept to final render integrate realistic visual effects with animated content apply professional compositing workflows to enhance final output collaborate in team-based production environments understand the full pipeline from pre-production to post-production \nthis pathway is designed for aspiring animation and vfx artists who want to create high-quality animated short films with professional-grade visual effects. students will progress from foundational cgi skills through advanced animation and simulation techniques, culminating in the ability to produce complete animated narratives with integrated vfx elements.\n\n## who this is for\n\nthis pathway is ideal for students aiming to work in:\n- animation studios\n- vfx houses\n- film production companies\n- i",
+      "tags": [
+        "Animation",
+        "VFX",
+        "Short Film",
+        "Compositing",
+        "Production Pipeline"
+      ],
+      "difficulty": "Advanced",
+      "duration": "32 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Create complete animated short films from concept to final render",
+        "Integrate realistic visual effects with animated content",
+        "Apply professional compositing workflows to enhance final output",
+        "Collaborate in team-based production environments",
+        "Understand the full pipeline from pre-production to post-production"
+      ],
+      "prerequisites": [
+        "Basic understanding of 3D software",
+        "Fundamental artistic skills"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/pathways/visual-effects-vfx",
+      "title": "Visual Effects (VFX)",
+      "type": "oer:Course",
+      "description": "Integrates CGI elements into live-action footage and blends them seamlessly.",
+      "searchText": "visual effects (vfx) integrates cgi elements into live-action footage and blends them seamlessly. \nintegrates cgi elements into live-action footage and blends them seamlessly.\n\n## learning objectives\n\nobjective example\n\n## examples\n\n- example artist or studio\n\n\n## specializations\n\nthis pathway includes the following specializations:\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT6M",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/3d-design",
+      "title": "3D Design",
+      "type": "oer:InstructionalPattern",
+      "description": "Advanced 3D modeling and design techniques for creating compelling illustrations, character sculpts, and product designs. This specialization emphasizes artistic principles, rendering techniques, and story-driven 3D artwork.",
+      "searchText": "3d design advanced 3d modeling and design techniques for creating compelling illustrations, character sculpts, and product designs. this specialization emphasizes artistic principles, rendering techniques, and story-driven 3d artwork. understand the principles of 3d modeling and how they apply to creating illustrative artwork develop proficiency in using 3d software for modeling, texturing, and rendering high-quality images learn to create detailed and realistic textures and materials for 3d models gain knowledge of lighting techniques to enhance the visual appeal of 3d illustrations explore the use of rendering engines and settings to produce final images suitable for various applications analyze and apply artistic principles such as composition, color theory, and perspective in 3d illustrations \nthis specialization focuses on creating high-quality 3d artwork for illustration, character design, and product visualization. students will learn to balance artistic vision with technical execution, creating compelling 3d designs that tell stories and communicate ideas.\n\n## lessons\n\ndrawing for design, sculpting, hard surface modeling\n",
+      "tags": [],
+      "difficulty": "Intermediate",
+      "duration": "10 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand the principles of 3D modeling and how they apply to creating illustrative artwork",
+        "Develop proficiency in using 3D software for modeling, texturing, and rendering high-quality images",
+        "Learn to create detailed and realistic textures and materials for 3D models",
+        "Gain knowledge of lighting techniques to enhance the visual appeal of 3D illustrations",
+        "Explore the use of rendering engines and settings to produce final images suitable for various applications",
+        "Analyze and apply artistic principles such as composition, color theory, and perspective in 3D illustrations"
+      ],
+      "prerequisites": [
+        "CGI Foundations"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/3d-illustration",
+      "title": "3D Illustration",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "3d illustration \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/3d-printing",
+      "title": "3D printing",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "3d printing \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/animation-for-film-production",
+      "title": "Animation for Film Production",
+      "type": "oer:InstructionalPattern",
+      "description": "Advanced animation techniques for cinematic storytelling. This specialization covers character performance, acting for animation, camera work, and production pipelines for animated film projects.",
+      "searchText": "animation for film production advanced animation techniques for cinematic storytelling. this specialization covers character performance, acting for animation, camera work, and production pipelines for animated film projects. understand the animation production pipeline for film, from concept to final output develop skills in character animation, focusing on acting and performance to convey emotion and personality learn to animate complex scenes involving multiple characters and interactions gain knowledge of camera movements, shot composition, and staging in animated films explore the use of storyboards, animatics, and previsualization to plan and refine animation sequences analyze and critique animated films to identify successful animation techniques and storytelling methods \nthis advanced specialization focuses on the art of character animation for film and cinematic projects. students will learn to create believable, emotionally resonant performances while working within professional production pipelines and collaborative workflows.\n",
+      "tags": [],
+      "difficulty": "Advanced",
+      "duration": "10 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand the animation production pipeline for film, from concept to final output",
+        "Develop skills in character animation, focusing on acting and performance to convey emotion and personality",
+        "Learn to animate complex scenes involving multiple characters and interactions",
+        "Gain knowledge of camera movements, shot composition, and staging in animated films",
+        "Explore the use of storyboards, animatics, and previsualization to plan and refine animation sequences",
+        "Analyze and critique animated films to identify successful animation techniques and storytelling methods"
+      ],
+      "prerequisites": [
+        "Introductory Animation",
+        "Compositing"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/archviz",
+      "title": "Archviz",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "archviz \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/cgi-foundations",
+      "title": "CGI Foundations",
+      "type": "oer:InstructionalPattern",
+      "description": "Master the fundamental concepts and techniques of computer-generated imagery. This specialization covers essential 3D modeling, texturing, lighting, and rendering principles that form the foundation for all CGI work.",
+      "searchText": "cgi foundations master the fundamental concepts and techniques of computer-generated imagery. this specialization covers essential 3d modeling, texturing, lighting, and rendering principles that form the foundation for all cgi work. understand the fundamental principles of computer-generated imagery (cgi) and its applications develop proficiency in using basic 3d modeling tools and techniques gain knowledge of the essential elements of 3d rendering, including lighting, shading, and texturing learn to create and manipulate 3d assets, including characters, environments, and props explore the pipeline and workflow of a typical cgi project from concept to final output analyze the history and evolution of cgi in various industries such as film, gaming, and advertising \nthis foundational specialization introduces students to the core concepts and workflows of computer-generated imagery. students will learn industry-standard terminology, basic 3d modeling techniques, and the principles of materials, lighting, and rendering that apply across all cgi disciplines.\n\n## lessons\n\nhistory, modeling, texturing/uv, lighting, camera, rendering\n\n## projects\n\n- modeling a chair\n- modeling a room\n\n## test-out requirements\n\n1. polygonal models have good edge flow\n2. models h",
+      "tags": [],
+      "difficulty": "Beginner",
+      "duration": "8 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand the fundamental principles of computer-generated imagery (CGI) and its applications",
+        "Develop proficiency in using basic 3D modeling tools and techniques",
+        "Gain knowledge of the essential elements of 3D rendering, including lighting, shading, and texturing",
+        "Learn to create and manipulate 3D assets, including characters, environments, and props",
+        "Explore the pipeline and workflow of a typical CGI project from concept to final output",
+        "Analyze the history and evolution of CGI in various industries such as film, gaming, and advertising"
+      ],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/character-animation",
+      "title": "Character animation",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "character animation \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/character-design-for-games-or-film",
+      "title": "Character design for games or film",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "character design for games or film \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/comic-illustration",
+      "title": "Comic illustration",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "comic illustration \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/compositing",
+      "title": "|",
+      "type": "oer:InstructionalPattern",
+      "description": "",
+      "searchText": "| understand the role of compositing in the post-production process develop skills in using compositing software such as adobe after effects, nuke, or fusion learn to integrate multiple visual elements, including cgi, live-action footage, and effects, into a cohesive final image gain knowledge of color grading, keying, and masking techniques to enhance visual consistency explore advanced compositing techniques, such as rotoscoping and motion tracking analyze composited scenes to evaluate the effectiveness of visual integration and storytelling \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [
+        "Understand the role of compositing in the post-production process",
+        "Develop skills in using compositing software such as Adobe After Effects, Nuke, or Fusion",
+        "Learn to integrate multiple visual elements, including CGI, live-action footage, and effects, into a cohesive final image",
+        "Gain knowledge of color grading, keying, and masking techniques to enhance visual consistency",
+        "Explore advanced compositing techniques, such as rotoscoping and motion tracking",
+        "Analyze composited scenes to evaluate the effectiveness of visual integration and storytelling"
+      ],
+      "prerequisites": [
+        "CGI Foundations"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/environment-design",
+      "title": "Environment design",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "environment design \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/fundamentals",
+      "title": "Fundamentals",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "fundamentals \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/generalist",
+      "title": "Generalist",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "generalist \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example generalist\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/introductory-animation",
+      "title": "Introductory Animation",
+      "type": "oer:InstructionalPattern",
+      "description": "Learn the principles of animation and how to bring 3D characters and objects to life. This specialization covers keyframe animation, timing, spacing, and the twelve principles of animation.",
+      "searchText": "introductory animation learn the principles of animation and how to bring 3d characters and objects to life. this specialization covers keyframe animation, timing, spacing, and the twelve principles of animation. understand the basic principles of animation, including timing, spacing, and movement develop skills in keyframe animation and learn how to create smooth transitions between poses gain familiarity with animation software and tools used in the industry learn to animate simple characters and objects, focusing on basic actions like walking, jumping, and interacting explore different types of animation, such as 2d, 3d, and stop-motion, and their unique characteristics analyze and critique animated works to identify effective animation techniques and storytelling \nthis specialization introduces students to the art and technique of 3d animation. building on traditional animation principles, students will learn to create believable movement through careful observation, planning, and execution of animated sequences.\n\n## lessons\n\nanimation, rigging, constraints, deformers\n",
+      "tags": [],
+      "difficulty": "Beginner",
+      "duration": "6 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand the basic principles of animation, including timing, spacing, and movement",
+        "Develop skills in keyframe animation and learn how to create smooth transitions between poses",
+        "Gain familiarity with animation software and tools used in the industry",
+        "Learn to animate simple characters and objects, focusing on basic actions like walking, jumping, and interacting",
+        "Explore different types of animation, such as 2D, 3D, and stop-motion, and their unique characteristics",
+        "Analyze and critique animated works to identify effective animation techniques and storytelling"
+      ],
+      "prerequisites": [
+        "CGI Foundations"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/lighting-and-cinematography",
+      "title": "Lighting and cinematography",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "lighting and cinematography \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/modeler",
+      "title": "Modeler",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "modeler \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example modeler\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/modeling-and-texturing",
+      "title": "Modeling and texturing",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "modeling and texturing \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/previz-art",
+      "title": "Previz art",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "previz art \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/product-id-design",
+      "title": "Product (ID) design",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "product (id) design \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/production-management",
+      "title": "Production management",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "production management \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/projection-mapping",
+      "title": "Projection mapping",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "projection mapping \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/realistic-sculpting",
+      "title": "Realistic Sculpting",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "realistic sculpting \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/realtime-for-immersive-environments",
+      "title": "Realtime for Immersive Environments",
+      "type": "oer:InstructionalPattern",
+      "description": "Create optimized content for real-time rendering in game engines and virtual reality. This specialization covers performance optimization, shader development, lighting for real-time, and interactive environment design.",
+      "searchText": "realtime for immersive environments create optimized content for real-time rendering in game engines and virtual reality. this specialization covers performance optimization, shader development, lighting for real-time, and interactive environment design. understand the concepts and technologies behind real-time rendering and immersive environments develop skills in using real-time engines like unity or unreal engine for creating interactive 3d experiences learn to optimize 3d models and textures for real-time performance gain knowledge of creating interactive elements and user interfaces within immersive environments explore the application of virtual reality (vr) and augmented reality (ar) in immersive experiences analyze and evaluate real-time projects to understand best practices in design, interactivity, and performance \nthis advanced specialization prepares students to create content for real-time applications, with emphasis on virtual reality, augmented reality, and game engine workflows. students will learn to balance visual quality with performance requirements while creating immersive interactive experiences.\n\n## lessons\n\nenvironment design, realtime engines, ar/vr\n",
+      "tags": [],
+      "difficulty": "Advanced",
+      "duration": "8 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand the concepts and technologies behind real-time rendering and immersive environments",
+        "Develop skills in using real-time engines like Unity or Unreal Engine for creating interactive 3D experiences",
+        "Learn to optimize 3D models and textures for real-time performance",
+        "Gain knowledge of creating interactive elements and user interfaces within immersive environments",
+        "Explore the application of virtual reality (VR) and augmented reality (AR) in immersive experiences",
+        "Analyze and evaluate real-time projects to understand best practices in design, interactivity, and performance"
+      ],
+      "prerequisites": [
+        "CGI Foundations"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/rigging",
+      "title": "Rigging",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "rigging \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/rigging-artist",
+      "title": "Rigging artist",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "rigging artist \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example rigging\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/scientific-visualization",
+      "title": "Scientific visualization",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "scientific visualization \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/shader-writing",
+      "title": "Shader writing",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "shader writing \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/short-film",
+      "title": "Short film",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "short film \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/simulation-and-character-effects",
+      "title": "Simulation and character effects",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "simulation and character effects \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/storyboarding-and-animatics",
+      "title": "Storyboarding and animatics",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "storyboarding and animatics \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/texture-artist",
+      "title": "Texture artist",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "texture artist \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example texture\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/tool-building",
+      "title": "Tool building",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "tool building \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/transportation-design",
+      "title": "Transportation design",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "transportation design \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/vfx-and-simulation",
+      "title": "VFX and Simulation",
+      "type": "oer:InstructionalPattern",
+      "description": "Create realistic visual effects using simulation systems. This specialization covers particle systems, fluid dynamics, rigid body physics, cloth simulation, and dynamic effects for film and video.",
+      "searchText": "vfx and simulation create realistic visual effects using simulation systems. this specialization covers particle systems, fluid dynamics, rigid body physics, cloth simulation, and dynamic effects for film and video. understand the principles and techniques used in visual effects (vfx) and simulation develop proficiency in using vfx software for creating realistic simulations of natural phenomena (e.g., fire, water, smoke) learn to integrate vfx elements seamlessly into live-action footage gain knowledge of particle systems, dynamics, and procedural generation techniques explore the role of compositing in combining vfx elements with other visual layers analyze and critique vfx sequences to identify effective techniques and areas for improvement \nthis specialization explores the technical and artistic aspects of creating visual effects through simulation. students will learn to harness physics-based systems to create believable dynamic effects for film, television, and other media.\n\n## lessons\n\nphysics, particle simulation, match moving, compositing\n",
+      "tags": [],
+      "difficulty": "Advanced",
+      "duration": "8 weeks",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [
+        "Understand the principles and techniques used in visual effects (VFX) and simulation",
+        "Develop proficiency in using VFX software for creating realistic simulations of natural phenomena (e.g., fire, water, smoke)",
+        "Learn to integrate VFX elements seamlessly into live-action footage",
+        "Gain knowledge of particle systems, dynamics, and procedural generation techniques",
+        "Explore the role of compositing in combining VFX elements with other visual layers",
+        "Analyze and critique VFX sequences to identify effective techniques and areas for improvement"
+      ],
+      "prerequisites": [
+        "CGI Foundations",
+        "Compositing"
+      ],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    },
+    {
+      "id": "/specializations/vj-loops",
+      "title": "VJ Loops",
+      "type": "oer:LearningComponent",
+      "description": "",
+      "searchText": "vj loops \n## who it's for\n\nto be defined\n\n## learning objectives\n\n1. objective example\n\n\n\n## lessons\n\nto be defined\n\n\n",
+      "tags": [],
+      "difficulty": "",
+      "duration": "PT8W",
+      "author": "Michael Collins",
+      "course": [],
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest"
+    }
+  ],
+  "conceptGraph": {
+    "modeling": {
+      "relatedConcepts": [
+        "topology",
+        "polygon",
+        "geometry",
+        "animation",
+        "sculpting",
+        "character",
+        "blender",
+        "particle",
+        "modeling",
+        "rendering",
+        "environment",
+        "asset",
+        "game development",
+        "real-time",
+        "3d modeling",
+        "game engine",
+        "interactive",
+        "vr/ar",
+        "texturing",
+        "lighting",
+        "material",
+        "pipeline"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises",
+        "image/jpeg",
+        "lectures",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "topology": {
+      "relatedConcepts": [
+        "modeling",
+        "polygon",
+        "geometry",
+        "rendering",
+        "environment",
+        "asset",
+        "game development",
+        "real-time",
+        "3d modeling",
+        "game engine",
+        "interactive",
+        "vr/ar"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "polygon": {
+      "relatedConcepts": [
+        "modeling",
+        "topology",
+        "geometry"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "geometry": {
+      "relatedConcepts": [
+        "modeling",
+        "topology",
+        "polygon"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "animation": {
+      "relatedConcepts": [
+        "camera",
+        "rigging",
+        "character",
+        "modeling",
+        "sculpting",
+        "blender",
+        "compositing",
+        "pipeline",
+        "animation",
+        "short film",
+        "storytelling",
+        "production pipeline",
+        "simulation",
+        "vfx",
+        "environment",
+        "keyframe"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "image/png",
+        "exercises",
+        "lectures",
+        "articles",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "camera": {
+      "relatedConcepts": [
+        "animation",
+        "rendering",
+        "lighting",
+        "character",
+        "pipeline"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:SupportingMaterial",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "rigging": {
+      "relatedConcepts": [
+        "animation",
+        "character",
+        "blender"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "character": {
+      "relatedConcepts": [
+        "animation",
+        "rigging",
+        "modeling",
+        "sculpting",
+        "mesh",
+        "blender",
+        "compositing",
+        "pipeline",
+        "short film",
+        "storytelling",
+        "production pipeline",
+        "texturing",
+        "rendering",
+        "lighting",
+        "material",
+        "camera",
+        "environment",
+        "asset",
+        "keyframe",
+        "simulation"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "application/octet-stream",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "sculpting": {
+      "relatedConcepts": [
+        "modeling",
+        "animation",
+        "character",
+        "blender",
+        "texturing"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "material": {
+      "relatedConcepts": [
+        "lighting",
+        "shader",
+        "asset",
+        "texturing",
+        "uv mapping",
+        "modeling",
+        "rendering",
+        "character"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "rendering": {
+      "relatedConcepts": [
+        "lighting",
+        "environment",
+        "level design",
+        "asset",
+        "blender",
+        "camera",
+        "modeling",
+        "topology",
+        "game development",
+        "real-time",
+        "3d modeling",
+        "game engine",
+        "interactive",
+        "vr/ar",
+        "texturing",
+        "material",
+        "character",
+        "pipeline",
+        "shader"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises",
+        "oer:SupportingMaterial",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "lighting": {
+      "relatedConcepts": [
+        "rendering",
+        "environment",
+        "level design",
+        "asset",
+        "shader",
+        "material",
+        "compositing",
+        "vfx",
+        "blender",
+        "lighting",
+        "camera",
+        "node",
+        "post-production",
+        "color grading",
+        "nuke",
+        "after effects",
+        "modeling",
+        "texturing",
+        "character",
+        "pipeline"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "image/jpeg",
+        "exercises",
+        "oer:SupportingMaterial",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "environment": {
+      "relatedConcepts": [
+        "rendering",
+        "lighting",
+        "level design",
+        "asset",
+        "modeling",
+        "topology",
+        "game development",
+        "real-time",
+        "3d modeling",
+        "game engine",
+        "interactive",
+        "vr/ar",
+        "animation",
+        "simulation",
+        "compositing",
+        "vfx",
+        "pipeline",
+        "short film",
+        "production pipeline",
+        "texturing",
+        "character",
+        "shader"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "level design": {
+      "relatedConcepts": [
+        "rendering",
+        "lighting",
+        "environment",
+        "asset"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "asset": {
+      "relatedConcepts": [
+        "rendering",
+        "lighting",
+        "environment",
+        "level design",
+        "shader",
+        "material",
+        "modeling",
+        "topology",
+        "game development",
+        "real-time",
+        "3d modeling",
+        "game engine",
+        "interactive",
+        "vr/ar",
+        "texturing",
+        "character",
+        "pipeline"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "simulation": {
+      "relatedConcepts": [
+        "particle",
+        "animation",
+        "compositing",
+        "vfx",
+        "environment",
+        "pipeline",
+        "short film",
+        "production pipeline",
+        "character",
+        "procedural"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "particle": {
+      "relatedConcepts": [
+        "simulation",
+        "modeling",
+        "blender",
+        "compositing",
+        "vfx",
+        "procedural"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "compositing": {
+      "relatedConcepts": [
+        "procedural",
+        "node",
+        "lighting",
+        "vfx",
+        "compositing",
+        "post-production",
+        "color grading",
+        "nuke",
+        "after effects",
+        "animation",
+        "character",
+        "pipeline",
+        "short film",
+        "storytelling",
+        "production pipeline",
+        "simulation",
+        "environment",
+        "particle"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "procedural": {
+      "relatedConcepts": [
+        "compositing",
+        "node",
+        "blender",
+        "aftereffects",
+        "adobe media encoder",
+        "simulation",
+        "vfx",
+        "particle"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "node": {
+      "relatedConcepts": [
+        "compositing",
+        "procedural",
+        "lighting",
+        "vfx",
+        "post-production",
+        "color grading",
+        "nuke",
+        "after effects"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "shader": {
+      "relatedConcepts": [
+        "lighting",
+        "material",
+        "asset",
+        "rendering",
+        "environment"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "texturing": {
+      "relatedConcepts": [
+        "material",
+        "uv mapping",
+        "sculpting",
+        "blender",
+        "substance painter",
+        "texturing",
+        "modeling",
+        "rendering",
+        "lighting",
+        "character",
+        "environment",
+        "asset",
+        "pipeline"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "exercises",
+        "image/jpeg",
+        "lectures",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "uv mapping": {
+      "relatedConcepts": [
+        "texturing",
+        "material"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "vfx": {
+      "relatedConcepts": [
+        "lighting",
+        "compositing",
+        "node",
+        "post-production",
+        "vfx",
+        "color grading",
+        "nuke",
+        "after effects",
+        "animation",
+        "simulation",
+        "environment",
+        "pipeline",
+        "short film",
+        "production pipeline",
+        "particle",
+        "procedural"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent",
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "mesh": {
+      "relatedConcepts": [
+        "character",
+        "blender"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "application/octet-stream"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "game design": {
+      "relatedConcepts": [],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:Course"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "motion graphics": {
+      "relatedConcepts": [],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:Course"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "pipeline": {
+      "relatedConcepts": [
+        "animation",
+        "compositing",
+        "character",
+        "short film",
+        "storytelling",
+        "production pipeline",
+        "simulation",
+        "vfx",
+        "environment",
+        "camera",
+        "modeling",
+        "texturing",
+        "rendering",
+        "lighting",
+        "asset"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:Course",
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "3d printing": {
+      "relatedConcepts": [],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:LearningComponent"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    },
+    "keyframe": {
+      "relatedConcepts": [
+        "animation",
+        "character"
+      ],
+      "actionTypes": [],
+      "contentTypes": [
+        "oer:InstructionalPattern"
+      ],
+      "prerequisites": [],
+      "leadsTo": []
+    }
+  },
+  "synonymMap": {
+    "3d": [
+      "three-dimensional",
+      "3d modeling",
+      "3d graphics",
+      "three dimensional"
+    ],
+    "modeling": [
+      "modelling",
+      "model creation",
+      "mesh creation",
+      "geometry creation"
+    ],
+    "mesh": [
+      "geometry",
+      "model",
+      "3d object",
+      "polygon mesh"
+    ],
+    "polygon": [
+      "poly",
+      "polygonal",
+      "mesh"
+    ],
+    "texture": [
+      "texturing",
+      "material",
+      "shading",
+      "surface"
+    ],
+    "animation": [
+      "animating",
+      "animate",
+      "motion",
+      "movement"
+    ],
+    "render": [
+      "rendering",
+      "rendered",
+      "output",
+      "final image"
+    ],
+    "beginner": [
+      "intro",
+      "introduction",
+      "basic",
+      "fundamentals",
+      "getting started",
+      "start"
+    ],
+    "advanced": [
+      "expert",
+      "professional",
+      "complex",
+      "sophisticated"
+    ],
+    "tutorial": [
+      "guide",
+      "walkthrough",
+      "how-to",
+      "lesson"
+    ],
+    "exercise": [
+      "practice",
+      "hands-on",
+      "activity",
+      "drill"
+    ],
+    "project": [
+      "assignment",
+      "assessment",
+      "capstone"
+    ],
+    "learn": [
+      "study",
+      "understand",
+      "master",
+      "discover"
+    ],
+    "create": [
+      "make",
+      "build",
+      "construct",
+      "produce"
+    ],
+    "character": [
+      "avatar",
+      "figure",
+      "person",
+      "creature"
+    ],
+    "environment": [
+      "scene",
+      "world",
+      "setting",
+      "landscape"
+    ]
+  },
+  "stats": {
+    "totalItems": 126,
+    "contentTypes": {
+      "oer:LearningComponent": 52,
+      "exercises": 28,
+      "image/png": 1,
+      "image/jpeg": 13,
+      "application/octet-stream": 1,
+      "application/pdf": 1,
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": 1,
+      "lectures": 3,
+      "oer:SupportingMaterial": 1,
+      "articles": 3,
+      "tutorials": 2,
+      "oer:Course": 13,
+      "oer:InstructionalPattern": 7
+    },
+    "buildDate": "2026-02-05T16:51:43.225Z"
+  }
+}

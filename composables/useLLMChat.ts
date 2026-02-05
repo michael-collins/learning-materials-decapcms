@@ -1,0 +1,288 @@
+import type { Provider } from './useChatbotSettings'
+
+interface SearchResult {
+  title: string
+  type: string
+  description?: string
+  difficulty?: string
+  duration?: string
+  learningObjectives?: string[]
+  prerequisites?: string[]
+  topics?: string[]
+  id: string
+}
+
+interface LLMResponse {
+  content: string
+  error?: string
+}
+
+interface ResponseIntent {
+  wantsBeginner: boolean
+  wantsAdvanced: boolean
+  wantsPrerequisites: boolean
+  wantsPractice: boolean
+  wantsTheory: boolean
+  contentType: string | null
+  wantsPlan: boolean
+  wantsLookup: boolean
+  wantsTroubleshooting: boolean
+  wantsTimeboxed: boolean
+}
+
+interface ConversationTurn {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export function useLLMChat() {
+  async function generateQueryExpansion(
+    query: string,
+    provider: Provider,
+    apiKey: string,
+    model: string
+  ): Promise<string[]> {
+    try {
+      const systemPrompt = `You are a query expansion assistant. Your task is to provide short, concrete search terms that map a user's interest to likely content titles and tags. Return ONLY a JSON array of 3-8 short phrases. Do not include extra text.`
+
+      const userPrompt = `User query: "${query}"
+
+Return a JSON array of 3-8 short phrases that could appear in course or exercise titles/tags. Keep phrases concise.`
+
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: {
+          provider,
+          apiKey,
+          model,
+          systemPrompt,
+          userPrompt
+        }
+      })
+
+      const raw = response.content?.trim() || ''
+      try {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          return parsed.map((t) => String(t).trim()).filter((t) => t.length > 1).slice(0, 8)
+        }
+      } catch {
+        // Fallback: parse bullet/line-separated text
+        return raw
+          .split(/\n|,/)
+          .map((t) => t.replace(/^[-*\d.\s]+/, '').trim())
+          .filter((t) => t.length > 1)
+          .slice(0, 8)
+      }
+
+      return []
+    } catch (error) {
+      console.error('Query expansion error:', error)
+      return []
+    }
+  }
+
+  async function generateResponse(
+    query: string,
+    searchResults: SearchResult[],
+    provider: Provider,
+    apiKey: string,
+    model: string,
+    intent?: ResponseIntent,
+    conversation?: ConversationTurn[]
+  ): Promise<LLMResponse> {
+    try {
+      // Build context from search results
+      const context = searchResults.slice(0, 5).map((result, idx) => {
+        let contextText = `[${idx + 1}] "${result.title}"\n`
+        contextText += `   Type: ${result.type}\n`
+        contextText += `   Path: ${result.id}\n`
+        
+        if (result.description) {
+          contextText += `   Description: ${result.description}\n`
+        }
+        
+        if (result.difficulty) {
+          contextText += `   Difficulty: ${result.difficulty}\n`
+        }
+        
+        if (result.duration) {
+          contextText += `   Duration: ${result.duration}\n`
+        }
+        
+        if (result.learningObjectives && result.learningObjectives.length > 0) {
+          contextText += `   Learning Objectives:\n`
+          result.learningObjectives.slice(0, 3).forEach((obj: string) => {
+            contextText += `   - ${obj}\n`
+          })
+        }
+        
+        if (result.topics && result.topics.length > 0) {
+          contextText += `   Topics: ${result.topics.join(', ')}\n`
+        }
+        
+        return contextText
+      }).join('\n')
+      const responseMode = intent?.wantsPlan
+        ? 'plan'
+        : intent?.wantsLookup
+          ? 'lookup'
+          : intent?.wantsTroubleshooting
+            ? 'troubleshoot'
+            : 'general'
+
+      const allowedIds = new Set(searchResults.map((result) => result.id))
+      const allowedItems = searchResults.map((result) => `- ${result.title} | ${result.id}`).join('\n')
+      const allowedLookup = new Map(searchResults.map((result) => [
+        result.id,
+        {
+          title: result.title,
+          type: result.type,
+          description: result.description,
+          difficulty: result.difficulty,
+          duration: result.duration
+        }
+      ]))
+
+      // System prompt for the assistant
+      const systemPrompt = `You are a learning assistant for an educational platform. You help students and teachers use ONLY the educational materials provided to you.
+
+    CRITICAL RULES:
+    1. ONLY reference materials that are explicitly provided in the search results
+    2. DO NOT make up or suggest courses, lessons, or exercises that aren't in the search results
+    3. If the search results don't contain relevant materials, say so honestly
+    4. Always include specific titles and paths from the search results when referencing materials
+    5. Be concise and practical - focus on the actual materials available
+    6. NEVER reference attachments, images, or media captions as separate materials
+    7. NEVER invent titles. Use EXACT titles from the allowed list only
+
+    RESPONSE MODES:
+    - lookup: return 1–3 exact matches
+    - plan: create a short schedule ONLY using provided materials
+    - troubleshoot: link to the most relevant material(s) and cite the section reason
+    - general: summarize best matches and provide next steps
+
+    OUTPUT FORMAT (REQUIRED):
+    Return ONLY valid JSON with this shape:
+    {
+      "answer": "short response text",
+      "references": [
+        {"id": "/path/to/material", "reason": "why it matches"}
+      ]
+    }
+
+    Your job is to help users navigate the EXISTING materials, not to create imaginary content.`
+
+      const historyBlock = (conversation && conversation.length > 0)
+        ? `Conversation History (most recent last):\n${conversation.map((turn) => `- ${turn.role.toUpperCase()}: ${turn.content}`).join('\n')}\n\n`
+        : ''
+
+      const userPrompt = `${historyBlock}User Question: ${query}
+    Response Mode: ${responseMode}
+    User Intent:
+    - wantsPlan: ${intent?.wantsPlan ?? false}
+    - wantsLookup: ${intent?.wantsLookup ?? false}
+    - wantsTroubleshooting: ${intent?.wantsTroubleshooting ?? false}
+    - wantsPractice: ${intent?.wantsPractice ?? false}
+    - wantsTheory: ${intent?.wantsTheory ?? false}
+    - wantsTimeboxed: ${intent?.wantsTimeboxed ?? false}
+    - contentType: ${intent?.contentType ?? 'none'}
+
+    Allowed Materials (EXACT TITLES AND PATHS ONLY):
+    ${allowedItems}
+
+    Available Learning Materials (THESE ARE THE ONLY MATERIALS YOU CAN REFERENCE):
+    ${context}
+
+    Instructions: Answer the user's question using ONLY the materials listed above. If these materials don't fully address the question, acknowledge what's missing rather than making up content. Be specific about which materials you're recommending and why they're relevant.`
+
+      function formatStructuredResponse(
+        raw: string,
+        allowedIds: Set<string>,
+        lookup: Map<string, { title: string; type: string; description: string; difficulty: string; duration: string }>
+      ): string | null {
+        try {
+          const parsed = JSON.parse(raw)
+          if (!parsed || typeof parsed !== 'object') return null
+
+          const answer = typeof parsed.answer === 'string' ? parsed.answer.trim() : ''
+          const refs = Array.isArray(parsed.references) ? parsed.references : []
+
+          const filtered = refs
+            .filter((r: any) => r && typeof r.id === 'string' && allowedIds.has(r.id))
+            .map((r: any) => {
+              const meta = lookup.get(r.id)
+              const baseReason = meta?.description || ''
+              const typeLabel = meta?.type ? meta.type.replace(/^\w/, c => c.toUpperCase()) : 'Material'
+              const reason = baseReason
+                ? `${typeLabel}: ${baseReason}`
+                : `${typeLabel} relevant to your request.`
+
+              return {
+                id: r.id,
+                title: meta?.title || r.id,
+                reason
+              }
+            })
+
+          if (!answer && filtered.length === 0) return null
+
+          let content = answer || 'Here are the most relevant materials:'
+          if (filtered.length > 0) {
+            content += '\n\n**Recommended materials:**\n'
+            for (const ref of filtered) {
+              content += `- ${ref.title} (${ref.id})${ref.reason ? ` — ${ref.reason}` : ''}\n`
+            }
+          }
+
+          return content.trim()
+        } catch {
+          return null
+        }
+      }
+
+      // Call our server API endpoint instead of provider APIs directly
+      const response = await $fetch<{ content: string }>('/api/chat', {
+        method: 'POST',
+        body: {
+          provider,
+          apiKey,
+          model,
+          systemPrompt,
+          userPrompt
+        }
+      })
+
+      const structured = formatStructuredResponse(response.content, allowedIds, allowedLookup)
+      return { content: structured ?? response.content }
+    } catch (error: any) {
+      console.error('LLM API Error:', error)
+      
+      // Extract error message from various error formats
+      let errorMessage = 'Failed to generate response'
+      
+      // Nuxt $fetch errors have data.message or data.statusMessage
+      if (error.data?.message) {
+        errorMessage = error.data.message
+      } else if (error.data?.statusMessage) {
+        errorMessage = error.data.statusMessage
+      } else if (error.statusMessage) {
+        errorMessage = error.statusMessage
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      console.error('Error message:', errorMessage)
+      
+      return {
+        content: '',
+        error: errorMessage
+      }
+    }
+  }
+
+  return {
+    generateResponse,
+    generateQueryExpansion
+  }
+}

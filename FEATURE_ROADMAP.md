@@ -36,8 +36,8 @@ Implement a de-listing capability to disable UI browsing of certain materials, s
 
 ## 2. Chatbot Query System
 
-**Status:** Planned  
-**Priority:** TBD
+**Status:** In Progress  
+**Priority:** High
 
 ### Description
 Integrate a chatbot-based query system that allows students to ask questions about the materials repository and receive intelligent responses.
@@ -47,6 +47,7 @@ Integrate a chatbot-based query system that allows students to ask questions abo
 - Search across all content types (lessons, lectures, articles, projects, etc.)
 - Context-aware responses with links to relevant materials
 - Integration with existing content structure and metadata
+- Improve LLM response grounding and relevance (no hallucinated content, better matching to repository materials)
 - Optional: Track common queries for content improvement insights
 
 ### Technical Considerations
@@ -54,13 +55,32 @@ Integrate a chatbot-based query system that allows students to ask questions abo
 - Implement content indexing for semantic search
 - Design UI component for chat interface
 - Consider embedding options for external sites
+- Prompt/response constraints to keep answers tied to indexed materials
+- Relevance tuning, evaluation prompts, and regression test prompts
 - Privacy and data handling considerations
 - Rate limiting and API cost management
 
+### Implementation Progress
+
+**Completed**
+- ✅ Schema-enhanced search index and query scoring
+- ✅ Chat UI (popover + fullscreen) with message history
+- ✅ Settings for provider/model selection and BYOK storage
+- ✅ Server API proxy for provider requests (CORS-safe)
+
+**In Progress**
+- 🔄 LLM response grounding and relevance tuning (prompting + retrieval scoring)
+
+**Planned**
+- ⏳ Streaming responses
+- ⏳ Usage/error analytics for common queries
+
 ### Related Files
-- New component: `/components/ChatbotInterface.vue` (or similar)
-- New composable: `/composables/useChatbot.ts`
-- Possible server API routes: `/server/api/chatbot/`
+- `/components/AIChatInterface.vue`
+- `/components/ChatbotSettings.vue`
+- `/composables/useSchemaEnhancedSearch.ts`
+- `/composables/useLLMChat.ts`
+- `/server/api/chat.post.ts`
 
 ---
 
@@ -314,4 +334,4 @@ Future features to be determined based on user feedback and platform evolution.
 
 ---
 
-*Last Updated: February 2, 2026*
+*Last Updated: February 5, 2026*
