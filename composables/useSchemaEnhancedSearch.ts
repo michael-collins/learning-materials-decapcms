@@ -180,7 +180,25 @@ export function useSchemaEnhancedSearch() {
     }
     
     // Score each content item
-    const results = searchIndex.value.content.map(item => {
+    const validContentTypes = ['lessons', 'exercises', 'projects', 'tutorials', 'lectures', 'articles', 'pathways', 'specializations']
+    
+    const results = searchIndex.value.content
+      .filter(item => {
+        // Filter out image attachments - they have MIME types like image/jpeg
+        if (item.type && item.type.startsWith('image/')) {
+          return false
+        }
+        // Only include valid learning content types
+        if (!validContentTypes.includes(item.type)) {
+          return false
+        }
+        // Ensure it has a valid path (learning materials start with /)
+        if (!item.id || !item.id.startsWith('/')) {
+          return false
+        }
+        return true
+      })
+      .map(item => {
       let score = 0
       const matchReasons: string[] = []
       const searchableText = item.searchText

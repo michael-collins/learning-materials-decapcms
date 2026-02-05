@@ -163,16 +163,35 @@ function parseFrontmatter(yaml: string): Partial<ContentItem> {
   let currentKey = ''
   let currentArray: string[] = []
   let inArray = false
+  let skipNestedArrayObjects = false
   
   for (const line of lines) {
     const trimmed = line.trim()
     if (!trimmed || trimmed.startsWith('#')) continue
     
+    // Detect indentation level - skip nested properties in array objects
+    const indentation = line.match(/^\s*/)?.[0].length || 0
+    
     // Array item
     if (trimmed.startsWith('- ')) {
       if (inArray) {
-        currentArray.push(trimmed.substring(2).trim())
+        // This is an array item - if it has a key:value after the dash, it's an object array
+        const afterDash = trimmed.substring(2).trim()
+        if (afterDash.includes(':')) {
+          // Array of objects - we'll skip nested properties
+          skipNestedArrayObjects = true
+          currentArray.push(afterDash)
+        } else {
+          // Array of strings
+          skipNestedArrayObjects = false
+          currentArray.push(afterDash)
+        }
       }
+      continue
+    }
+    
+    // Skip nested properties within array objects (indented more than the array itself)
+    if (skipNestedArrayObjects && indentation > 2) {
       continue
     }
     
@@ -180,20 +199,22 @@ function parseFrontmatter(yaml: string): Partial<ContentItem> {
     const colonIndex = trimmed.indexOf(':')
     if (colonIndex > 0) {
       // Save previous array
-      if (inArray && currentKey) {
+      if (inArray && currentKey && indentation <= 0) {
         result[currentKey] = currentArray
         currentArray = []
         inArray = false
+        skipNestedArrayObjects = false
       }
       
       const key = trimmed.substring(0, colonIndex).trim()
       const value = trimmed.substring(colonIndex + 1).trim()
       
-      if (!value) {
-        // Start of array or object
+      if (!value && indentation === 0) {
+        // Start of array or object at root level
         currentKey = key
         inArray = true
-      } else {
+      } else if (indentation === 0) {
+        // Only process root-level key-value pairs
         result[key] = parseValue(value)
       }
     }

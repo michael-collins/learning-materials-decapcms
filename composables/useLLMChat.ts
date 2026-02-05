@@ -612,25 +612,39 @@ Return ONLY JSON with step numbers as keys.`
         const result = resultMap.get(ev.id)
         if (!result) return ''
         const durationInfo = result.duration ? ` [~${result.duration}]` : ''
-        return `[${idx + 1}] "${result.title}" (${result.type})${durationInfo}
-   Path: ${result.id}
-   Match: ${ev.reasoning}`
+        return `[ID: ${result.id}]
+Title: "${result.title}"
+Type: ${result.type}${durationInfo}
+Relevance: ${ev.reasoning}`
       }).filter(Boolean).join('\n\n')
 
       const systemPrompt = `You are a learning assistant. Provide a helpful response using ONLY the materials provided.
 
+CRITICAL: You MUST include ALL materials you mention in the "references" array using their exact ID values.
+
 Return ONLY valid JSON:
 {
-  "answer": "2-3 sentence response",
-  "references": [{"id": "string", "reason": "string"}]
+  "answer": "2-3 sentence response that guides the user",
+  "references": [
+    {"id": "exact ID from materials list", "reason": "why this helps"}
+  ]
+}
+
+Example:
+{
+  "answer": "Start with Material A to learn basics, then use Material B for practice.",
+  "references": [
+    {"id": "/lessons/example-lesson", "reason": "Covers fundamentals"},
+    {"id": "/exercises/practice-task", "reason": "Hands-on practice"}
+  ]
 }`
 
       const userPrompt = `User question: "${query}"
 
-Available materials:
+Available materials (use these IDs in your references):
 ${materials}
 
-Provide guidance using these materials. Return JSON.`
+Provide guidance and include ALL mentioned materials in references array. Return JSON.`
 
       console.log('[Stage 3] Request (regular mode):', { 
         materialsCount: topEvaluated.length,
@@ -664,10 +678,25 @@ Provide guidance using these materials. Return JSON.`
       const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
       const parsed = JSON.parse(cleaned)
       
+      console.log('[Stage 3] Parsed response:', {
+        hasAnswer: !!parsed.answer,
+        answerLength: parsed.answer?.length || 0,
+        referencesCount: parsed.references?.length || 0,
+        referenceIds: parsed.references?.map((r: any) => r.id) || []
+      })
+      
       const allowedIds = new Set(topEvaluated.map(e => e.id))
+      console.log('[Stage 3] Allowed IDs:', Array.from(allowedIds))
+      
       const references = Array.isArray(parsed.references)
         ? parsed.references
-            .filter((r: any) => allowedIds.has(r.id))
+            .filter((r: any) => {
+              const allowed = allowedIds.has(r.id)
+              if (!allowed) {
+                console.warn('[Stage 3] Filtered out reference with unknown ID:', r.id)
+              }
+              return allowed
+            })
             .map((r: any) => {
               const result = resultMap.get(r.id)
               return {
@@ -677,6 +706,8 @@ Provide guidance using these materials. Return JSON.`
               }
             })
         : []
+
+      console.log('[Stage 3] Final references:', references.length, 'kept')
 
       return {
         content: String(parsed.answer || ''),
