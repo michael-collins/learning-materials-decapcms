@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText } from 'lucide-vue-next'
-import { Dialog, DialogContentFullscreen, DialogContentPopover, DialogTitle, DialogDescription } from '~/components/ui/dialog'
+import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText, MoreVertical, X } from 'lucide-vue-next'
+import { Dialog, DialogContentFullscreen, DialogContentPopover, DialogTitle, DialogDescription, DialogClose } from '~/components/ui/dialog'
+import Popover from '~/components/ui/popover/Popover.vue'
+import PopoverContent from '~/components/ui/popover/PopoverContent.vue'
+import PopoverTrigger from '~/components/ui/popover/PopoverTrigger.vue'
 import Button from '~/components/ui/button/Button.vue'
 import Textarea from '~/components/ui/textarea/Textarea.vue'
 import ChatbotSettings from '~/components/ChatbotSettings.vue'
@@ -140,6 +143,7 @@ const abortController = ref<AbortController | null>(null)
 const messagesEndRef = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 const settingsOpen = ref(false)
+const moreMenuOpen = ref(false)
 
 const { settings, canUseEnhancedMode, isConfigured, currentModel } = useChatbotSettings()
 const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
@@ -595,7 +599,7 @@ function parseMarkdown(text: string): string {
       <DialogDescription class="sr-only">Chat with the AI learning assistant to find educational materials and get help with your learning journey.</DialogDescription>
       
       <!-- Header -->
-      <div class="flex items-center gap-3 border-b pl-4 pr-10 py-3 shrink-0">
+      <div class="flex items-center gap-3 border-b pl-4 pr-3 py-3 shrink-0">
         <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary/90 to-primary shrink-0">
           <Sparkles class="h-4 w-4 text-primary-foreground" />
         </div>
@@ -606,24 +610,56 @@ function parseMarkdown(text: string): string {
             Enhanced mode · {{ currentModel.name }}
           </p>
         </div>
+        <Popover v-model:open="moreMenuOpen">
+          <PopoverTrigger as-child>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8"
+              title="More options"
+            >
+              <MoreVertical class="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-48 p-1" align="end">
+            <Button
+              variant="ghost"
+              class="w-full justify-start h-9 px-2 text-sm font-normal"
+              @click="settingsOpen = true; moreMenuOpen = false"
+            >
+              <Settings class="h-4 w-4 mr-2" />
+              Settings
+            </Button>
+            <Button
+              variant="ghost"
+              class="w-full justify-start h-9 px-2 text-sm font-normal text-destructive hover:text-destructive"
+              @click="clearChatHistory(); moreMenuOpen = false"
+            >
+              <Trash2 class="h-4 w-4 mr-2" />
+              Clear History
+            </Button>
+          </PopoverContent>
+        </Popover>
         <Button
           variant="ghost"
-          size="sm"
-          @click="settingsOpen = true"
-          class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8 p-0"
-          title="Settings"
-        >
-          <Settings class="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+          size="icon"
           @click="isFullscreen = true"
-          class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8 p-0"
+          class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8"
           title="Expand to fullscreen"
         >
           <Maximize2 class="h-4 w-4" />
         </Button>
+        <div class="w-px h-5 bg-border" />
+        <DialogClose as-child>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8"
+            title="Close"
+          >
+            <X class="h-4 w-4" />
+          </Button>
+        </DialogClose>
       </div>
 
       <!-- Mode Selector -->
@@ -902,7 +938,7 @@ function parseMarkdown(text: string): string {
       <DialogDescription class="sr-only">Chat with the AI learning assistant to find educational materials and get help with your learning journey.</DialogDescription>
       
       <!-- Header -->
-      <div class="flex items-center gap-3 border-b pl-6 pr-12 py-4 shrink-0">
+      <div class="flex items-center gap-3 border-b pl-6 pr-6 py-4 shrink-0">
         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/90 to-primary shrink-0">
           <Sparkles class="h-5 w-5 text-primary-foreground" />
         </div>
@@ -915,34 +951,56 @@ function parseMarkdown(text: string): string {
             </span>
           </p>
         </div>
+        <Popover v-model:open="moreMenuOpen">
+          <PopoverTrigger as-child>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10"
+              title="More options"
+            >
+              <MoreVertical class="h-5 w-5" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-48 p-1" align="end">
+            <Button
+              variant="ghost"
+              class="w-full justify-start h-9 px-2 text-sm font-normal"
+              @click="settingsOpen = true; moreMenuOpen = false"
+            >
+              <Settings class="h-4 w-4 mr-2" />
+              Settings
+            </Button>
+            <Button
+              variant="ghost"
+              class="w-full justify-start h-9 px-2 text-sm font-normal text-destructive hover:text-destructive"
+              @click="clearChatHistory(); moreMenuOpen = false"
+            >
+              <Trash2 class="h-4 w-4 mr-2" />
+              Clear History
+            </Button>
+          </PopoverContent>
+        </Popover>
         <Button
           variant="ghost"
-          size="sm"
-          @click="settingsOpen = true"
-          class="text-muted-foreground hover:text-foreground shrink-0"
-          title="Settings"
-        >
-          <Settings class="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
+          size="icon"
           @click="isFullscreen = false"
-          class="text-muted-foreground hover:text-foreground shrink-0"
+          class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10"
           title="Exit fullscreen"
         >
-          <Minimize2 class="h-4 w-4" />
+          <Minimize2 class="h-5 w-5" />
         </Button>
-        <Button
-          v-if="messages.length > 1"
-          variant="ghost"
-          size="sm"
-          @click="clearChatHistory"
-          class="text-muted-foreground hover:text-destructive shrink-0"
-          title="Clear chat history"
-        >
-          <Trash2 class="h-4 w-4" />
-        </Button>
+        <div class="w-px h-6 bg-border" />
+        <DialogClose as-child>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10"
+            title="Close"
+          >
+            <X class="h-5 w-5" />
+          </Button>
+        </DialogClose>
       </div>
 
       <!-- Mode Selector -->
