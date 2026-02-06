@@ -81,6 +81,18 @@ const CHAT_HISTORY_MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
 
 // Load messages from localStorage or use default
 const loadChatHistory = () => {
+  // Only access localStorage on client side
+  if (typeof window === 'undefined') {
+    return [
+      {
+        id: '1',
+        role: 'assistant',
+        content: "Hello! I'm your learning assistant. I can help you discover learning materials, answer questions about courses and lessons, and suggest learning paths.\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses with your own API key.",
+        timestamp: new Date()
+      }
+    ]
+  }
+  
   try {
     const stored = localStorage.getItem(CHAT_HISTORY_KEY)
     if (stored) {
@@ -110,6 +122,9 @@ const messages = ref<Message[]>(loadChatHistory())
 
 // Save messages to localStorage
 const saveChatHistory = () => {
+  // Only access localStorage on client side
+  if (typeof window === 'undefined') return
+  
   try {
     localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify({
       messages: messages.value,
