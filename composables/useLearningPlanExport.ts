@@ -159,191 +159,117 @@ export function useLearningPlanExport() {
   }
 
   const exportConceptToWord = async (content: string) => {
+    console.log('[Export] Starting RTF concept export, content length:', content?.length)
     
-    // Parse the markdown-formatted concept summary
+    if (!content || typeof content !== 'string') {
+      throw new Error('Invalid content provided for export')
+    }
+    
+    // Helper to clean and escape text for RTF
+    const cleanText = (text: string): string => {
+      return text
+        // Remove emojis and special unicode characters
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+        .replace(/[🎯🎨🔍🛠️✅📋💡]/g, '')
+        // Convert smart quotes and other special chars (dashes handled earlier in main loop)
+        .replace(/'/g, "'")  // smart single quote
+        .replace(/'/g, "'")  // smart single quote
+        .replace(/"/g, '"')  // smart double quote
+        .replace(/"/g, '"')  // smart double quote
+        .replace(/…/g, '...')  // ellipsis
+        // Escape RTF special characters
+        .replace(/\\/g, '\\\\')
+        .replace(/{/g, '\\{')
+        .replace(/}/g, '\\}')
+        .trim()
+    }
+    
+    // Helper to process inline markdown (bold, italic)
+    const processInline = (text: string): string => {
+      let result = cleanText(text)
+      // Replace **bold** with RTF bold codes
+      result = result.replace(/\*\*([^*]+)\*\*/g, '{\\b $1}')
+      // Replace *italic* with RTF italic codes (single asterisk)
+      result = result.replace(/\*([^*]+)\*/g, '{\\i $1}')
+      return result
+    }
+    
+    // Generate RTF content
+    let rtf = '{\\rtf1\\ansi\\deff0\n'
+    rtf += '{\\fonttbl{\\f0\\froman\\fcharset0 Times New Roman;}}\n'
+    rtf += '\\viewkind4\\uc1\\pard\\f0\\fs24\n'
+    
     const lines = content.split('\n')
-    const paragraphs: any[] = []
     
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]?.trim()
-      if (!line) continue // Skip empty lines
+    for (const line of lines) {
+      let trimmed = line.trim()
+      if (!trimmed) {
+        rtf += '\\par\n'
+        continue
+      }
       
-      try {
-        if (line.startsWith('# ')) {
-          // Main heading
-          const text = line.replace(/^#\s+/, '').replace(/🎯\s*/, '')
-          paragraphs.push(new Paragraph({
-            text,
-            heading: HeadingLevel.HEADING_1,
-            spacing: { after: 200 }
-          }))
-        } else if (line.startsWith('## ')) {
-          // Section heading
-          const text = line.replace(/^##\s+/, '').replace(/[🎨🔍🛠️✅📋]\s*/, '')
-          paragraphs.push(new Paragraph({
-            text,
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 300, after: 100 }
-          }))
-        } else if (line.match(/^\*\*[^*]+\*\*:\s*/)) {
-          // Label with content (e.g., "**Project Title:** Something")
-          const match = line.match(/^\*\*([^*]+)\*\*:\s*(.*)/)
-          if (match) {
-            paragraphs.push(new Paragraph({
-              children: [
-                new TextRun({
-                  text: match[1] + ': ',
-                  bold: true
-                }),
-                new TextRun({
-                  text: match[2]
-                })
-              ],
-              spacing: { after: 100 }
-            }))
-          }
-        } else if (line.match(/^\*\*[^*]+\*\*$/)) {
-          // Bold line only
-          paragraphs.push(new Paragraph({
-            children: [
-              new TextRun({
-                text: line.replace(/\*\*/g, ''),
-                bold: true
-              })
-            ],
-            spacing: { after: 100 }
-          }))
-        } else if (line.match(/^[0-9]+\.\s/)) {
-          // Numbered list
-          const text = line.replace(/^[0-9]+\.\s+/, '')
-          paragraphs.push(new Paragraph({
-            text,
-            numbering: { reference: 'default-numbering', level: 0 },
-            spacing: { after: 50 }
-          }))
-        } else if (line.match(/^[-*]\s/)) {
-          // Bullet list
-          const text = line.replace(/^[-*]\s+/, '')
-          paragraphs.push(new Paragraph({
-            text,
-            bullet: { level: 0 },
-            spacing: { after: 50 }
-          }))
-        } else if (line === '---') {
-          // Horizontal rule
-          paragraphs.push(new Paragraph({
-            text: '',
-            border: {
-              bottom: {
-                color: 'auto',
-                space: 1,
-                style: 'single',
-                size: 6
-              }
-            },
-            spacing: { before: 200, after: 200 }
-          }))
-        } else if (line.match(/^\*[^*]+\*$/)) {
-          // Italic note (single asterisks)
-          paragraphs.push(new Paragraph({
-            children: [
-              new TextRun({
-                text: line.replace(/\*/g, ''),
-                italics: true,
-                color: '666666'
-              })
-            ],
-            spacing: { before: 200, after: 100 }
-          }))
-        } else {
-          // Regular paragraph - handle inline bold
-          const parts: any[] = []
-          const boldPattern = /\*\*([^*]+)\*\*/g
-          let lastIndex = 0
-          let match
-          
-          while ((match = boldPattern.exec(line)) !== null) {
-            // Add text before bold
-            if (match.index > lastIndex) {
-              parts.push(new TextRun({
-                text: line.substring(lastIndex, match.index)
-              }))
-            }
-            // Add bold text
-            parts.push(new TextRun({
-              text: match[1],
-              bold: true
-            }))
-            lastIndex = match.index + match[0].length
-          }
-          
-          // Add remaining text
-          if (lastIndex < line.length) {
-            parts.push(new TextRun({
-              text: line.substring(lastIndex)
-            }))
-          }
-          
-          paragraphs.push(new Paragraph({
-            children: parts.length > 0 ? parts : [new TextRun({ text: line })],
-            spacing: { after: 100 }
-          }))
+      // Convert em/en dashes to regular hyphens FIRST, before any other processing
+      trimmed = trimmed.replace(/—/g, '-').replace(/–/g, '-')
+      
+      if (trimmed.startsWith('# ')) {
+        // H1 - Large, bold
+        const text = processInline(trimmed.substring(2))
+        rtf += `\\pard\\sb240\\sa120\\b\\fs32 ${text}\\b0\\fs24\\par\n`
+      } else if (trimmed.startsWith('## ')) {
+        // H2 - Medium, bold
+        const text = processInline(trimmed.substring(3))
+        rtf += `\\pard\\sb180\\sa100\\b\\fs28 ${text}\\b0\\fs24\\par\n`
+      } else if (trimmed.startsWith('### ')) {
+        // H3 - Smaller, bold
+        const text = processInline(trimmed.substring(4))
+        rtf += `\\pard\\sb120\\sa80\\b\\fs26 ${text}\\b0\\fs24\\par\n`
+      } else if (trimmed.match(/^[0-9]+\.\s/)) {
+        // Numbered list - keep the number
+        const text = processInline(trimmed)
+        rtf += `\\pard\\li360\\sa60 ${text}\\par\n`
+      } else if (trimmed.match(/^[-*]\s/)) {
+        // Bullet list - remove the markdown bullet/hyphen
+        let text = trimmed.substring(2).trim()
+        // Remove ALL leading hyphens, dashes, and spaces aggressively
+        while (text.match(/^[-—–\s]/)) {
+          text = text.substring(1).trim()
         }
-      } catch (err) {
-        console.error('Error processing line:', line, err)
-        // Fallback: just add as plain text
-        paragraphs.push(new Paragraph({
-          text: line,
-          spacing: { after: 100 }
-        }))
+        const processed = processInline(text)
+        rtf += `\\pard\\li360\\sa60 \\bullet  ${processed}\\par\n`
+      } else if (trimmed === '---') {
+        // Horizontal rule
+        rtf += `\\pard\\sb120\\sa120\\brdrb\\brdrs\\brdrw10\\brsp20\\par\n`
+      } else {
+        // Regular paragraph
+        const text = processInline(trimmed)
+        rtf += `\\pard\\sa100 ${text}\\par\n`
       }
     }
     
     // Add footer
-    paragraphs.push(
-      new Paragraph({
-        text: '',
-        spacing: { before: 300 }
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: `Generated on ${new Date().toLocaleDateString()}`,
-            italics: true,
-            color: '999999',
-            size: 18
-          })
-        ]
-      })
-    )
+    rtf += '\\pard\\sb240\\sa60\\i\\fs20 Generated on ' + new Date().toLocaleDateString() + '\\i0\\fs24\\par\n'
+    rtf += '}\n'
     
-    const doc = new Document({
-      sections: [{
-        properties: {},
-        children: paragraphs
-      }],
-      numbering: {
-        config: [{
-          reference: 'default-numbering',
-          levels: [
-            {
-              level: 0,
-              format: LevelFormat.DECIMAL,
-              text: '%1.',
-              alignment: AlignmentType.LEFT
-            }
-          ]
-        }]
-      }
-    })
+    console.log('[Export] Generated RTF, length:', rtf.length)
     
-    try {
-      const fileName = `project_concept_${new Date().toISOString().slice(0, 10)}.docx`
-      await downloadDocx(doc, fileName)
-    } catch (err) {
-      console.error('Failed to generate Word document:', err)
-      throw new Error('Failed to generate Word document. Please try again.')
-    }
+    // Create blob and download
+    const blob = new Blob([rtf], { type: 'application/rtf' })
+    const fileName = `project_concept_${new Date().toISOString().slice(0, 10)}.rtf`
+    
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    link.style.display = 'none'
+    document.body.appendChild(link)
+    link.click()
+    
+    setTimeout(() => {
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 500)
+    
+    console.log('[Export] RTF download completed successfully')
   }
   
   return {

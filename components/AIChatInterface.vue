@@ -605,10 +605,15 @@ function parseMarkdown(text: string): string {
         </div>
         <div class="flex-1 min-w-0">
           <h2 class="text-base font-semibold">Learning Assistant</h2>
-          <p v-if="settings.enhancedMode" class="text-[10px] text-muted-foreground flex items-center gap-1">
+          <button
+            v-if="settings.enhancedMode"
+            @click="settingsOpen = true"
+            class="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+            title="Open settings"
+          >
             <Sparkles class="h-2.5 w-2.5" />
             Enhanced mode · {{ currentModel.name }}
-          </p>
+          </button>
         </div>
         <Popover v-model:open="moreMenuOpen">
           <PopoverTrigger as-child>
@@ -946,9 +951,14 @@ function parseMarkdown(text: string): string {
           <h2 class="text-lg font-semibold">Learning Assistant</h2>
           <p class="text-sm text-muted-foreground flex items-center gap-1.5">
             Discover courses, lessons, and learning paths
-            <span v-if="settings.enhancedMode" class="inline-flex items-center gap-1 text-xs text-primary">
+            <button
+              v-if="settings.enhancedMode"
+              @click="settingsOpen = true"
+              class="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 cursor-pointer transition-colors"
+              title="Open settings"
+            >
               • <Sparkles class="h-3 w-3" /> Enhanced · {{ currentModel.name }}
-            </span>
+            </button>
           </p>
         </div>
         <Popover v-model:open="moreMenuOpen">
