@@ -2,11 +2,10 @@
 import { Github, Twitter, Mail, Sun, Moon, Bot } from 'lucide-vue-next'
 import Button from '~/components/ui/button/Button.vue'
 import AIChatInterface from '~/components/AIChatInterface.vue'
-import { ref } from 'vue'
 
 const currentYear = new Date().getFullYear()
 const { isDark, toggleTheme } = useTheme()
-const chatOpen = ref(false)
+const { isOpen: chatOpen } = useChatState()
 </script>
 
 <template>

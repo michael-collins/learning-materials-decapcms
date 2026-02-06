@@ -592,7 +592,7 @@ function parseMarkdown(text: string): string {
 </script>
 
 <template>
-  <Dialog v-model:open="isOpen">
+  <Dialog v-model:open="isOpen" :modal="isFullscreen">
     <!-- Popover Mode -->
     <DialogContentPopover v-if="!isFullscreen" class="flex flex-col p-0 gap-0">
       <DialogTitle class="sr-only">Learning Assistant Chat</DialogTitle>
