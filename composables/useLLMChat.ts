@@ -1,4 +1,5 @@
 import type { Provider } from './useChatbotSettings'
+import type { ChatMode } from './useChatModes'
 
 interface SearchResult {
   title: string
@@ -260,11 +261,20 @@ Return a JSON array of 3-8 short phrases that could appear in course or exercise
     provider: Provider,
     apiKey: string,
     model: string,
-    conversation?: ConversationTurn[]
+    mode?: ChatMode,
+    conversation?: ConversationTurn[],
+    signal?: AbortSignal
   ): Promise<{ concepts: string[]; goals: string[]; contentTypes: string[]; wantsPlan: boolean }> {
     try {
       const historyBlock = conversation && conversation.length > 0
         ? `Recent conversation:\n${conversation.slice(-2).map(t => `${t.role}: ${t.content.substring(0, 100)}`).join('\n')}\n\n`
+        : ''
+
+      // Get mode-specific guidance
+      const { getModeConfig } = useChatModes()
+      const modeGuidance = mode ? getModeConfig(mode).systemPromptSuffix : ''
+      const modeContext = mode && mode !== 'ask' 
+        ? `\n\nCONTEXT: User has selected "${mode}" mode. Focus analysis on: ${modeGuidance}`
         : ''
 
       const systemPrompt = `You are an educational query analyst. Deeply analyze the user's question to extract:
@@ -289,6 +299,7 @@ Think carefully about:
 **IMPORTANT**: 
 - If the user wants to CREATE, BUILD, MAKE, MODEL, or DESIGN something, always include "exercises" in contentTypes for essential hands-on practice.
 - If the user asks to "put together a plan", "create a schedule", "plan my learning", "give me a roadmap", set wantsPlan to true and include diverse content types (lectures, tutorials, exercises, projects, lessons).
+- OVERRIDE: If mode is NOT "ask" and NOT "plan", ALWAYS set wantsPlan to false. If mode IS "plan", ALWAYS set wantsPlan to true.${modeContext}
 
 Return ONLY valid JSON: {"concepts": ["..."], "goals": ["..."], "contentTypes": ["..."], "wantsPlan": true/false}`
 
@@ -296,17 +307,24 @@ Return ONLY valid JSON: {"concepts": ["..."], "goals": ["..."], "contentTypes": 
 
       const response = await $fetch<{ content: string }>('/api/chat', {
         method: 'POST',
-        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 400 }
+        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 400 },
+        signal
       })
 
       const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
       const parsed = JSON.parse(cleaned)
       
+      // Force wantsPlan based on mode:
+      // - plan mode: always true (user explicitly wants a plan)
+      // - other non-ask modes (concept, writing, etc.): always false
+      // - ask mode: use LLM's analysis
+      const forcedWantsPlan = mode === 'plan' ? true : (mode && mode !== 'ask' ? false : Boolean(parsed.wantsPlan))
+      
       return {
         concepts: Array.isArray(parsed.concepts) ? parsed.concepts : [],
         goals: Array.isArray(parsed.goals) ? parsed.goals : [],
         contentTypes: Array.isArray(parsed.contentTypes) ? parsed.contentTypes : [],
-        wantsPlan: Boolean(parsed.wantsPlan)
+        wantsPlan: forcedWantsPlan
       }
     } catch (error) {
       console.error('[Stage 1] Analysis error:', error)
@@ -321,7 +339,8 @@ Return ONLY valid JSON: {"concepts": ["..."], "goals": ["..."], "contentTypes": 
     searchResults: SearchResult[],
     provider: Provider,
     apiKey: string,
-    model: string
+    model: string,
+    signal?: AbortSignal
   ): Promise<Array<{ id: string; score: number; reasoning: string }>> {
     try {
       const topResults = searchResults.slice(0, 8).map(r => ({
@@ -354,7 +373,8 @@ Evaluate and return JSON array.`
 
       const response = await $fetch<{ content: string }>('/api/chat', {
         method: 'POST',
-        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 800 }
+        body: { provider, apiKey, model, systemPrompt, userPrompt, max_tokens: 800 },
+        signal
       })
 
       console.log('[Stage 2] Evaluation response:', response.content?.length, 'chars')
@@ -502,7 +522,10 @@ Return ONLY JSON with step numbers as keys.`
     searchResults: SearchResult[],
     provider: Provider,
     apiKey: string,
-    model: string
+    model: string,
+    mode?: ChatMode,
+    conversation?: ConversationTurn[],
+    signal?: AbortSignal
   ): Promise<LLMResponse> {
     try {
       // Get top evaluated results - more for plans
@@ -585,7 +608,8 @@ Return ONLY JSON with step numbers as keys.`
             systemPrompt: 'You are a helpful assistant. Respond in 2 sentences.',
             userPrompt: answerPrompt,
             max_tokens: 100 
-          }
+          },
+          signal
         })
         
         // Get all unique materials from steps for references
@@ -618,38 +642,119 @@ Type: ${result.type}${durationInfo}
 Relevance: ${ev.reasoning}`
       }).filter(Boolean).join('\n\n')
 
-      const systemPrompt = `You are a learning assistant. Provide a helpful response using ONLY the materials provided.
+      // Get mode-specific guidance - keep it minimal
+      const { getModeConfig } = useChatModes()
+      let modeInstruction = ''
+      // Detect if this is a summary generation request (triggered by UI button or special prefix)
+      const isConceptSummaryRequest = mode === 'concept' && query.startsWith('__GENERATE_CONCEPT_SUMMARY__')
+      if (mode && mode !== 'ask') {
+        const modeLabel = getModeConfig(mode).label
+        if (mode === 'concept') {
+          const turnCount = conversation ? conversation.filter(t => t.role === 'user').length + 1 : 1
+          console.log(`[Concept Mode] Turn count: ${turnCount}, Conversation length: ${conversation?.length || 0}, Summary requested: ${isConceptSummaryRequest}`)
+          
+          if (isConceptSummaryRequest) {
+            // User clicked "Generate Summary" — produce the deliverable
+            modeInstruction = `\n\nGENERATE THE PROJECT CONCEPT SUMMARY NOW. Use ALL information from the conversation history. Your "answer" field must be the complete formatted markdown document below. Do NOT ask any more questions.
 
-CRITICAL: You MUST include ALL materials you mention in the "references" array using their exact ID values.
+# 🎯 PROJECT CONCEPT
+**Title:** [Create a compelling 3-5 word project title]
+**One-Line:** [Capture the complete concept in one sentence]
+**Media:** [Format + any hybrid/experimental aspects discussed]
+
+## 📋 Overview
+[2-3 paragraphs: what the project is, themes it explores, how it approaches the topic, intended impact on the audience]
+
+## 🎨 Visual Direction
+**Aesthetic:** [Based on conversation, or suggest 2-3 concrete options if not discussed]
+**Key Elements:** [Specific visual motifs, techniques, or stylistic choices that convey the concept]
+
+## 🔍 Research & Inspiration
+**Artists to Explore:**
+1. [Real Artist Name] - [Why their work directly connects to this project's themes]
+2. [Real Artist Name] - [Why their work directly connects to this project's themes]  
+3. [Real Artist Name] - [Why their work directly connects to this project's themes]
+
+**Essential Reading/Viewing:**
+- [Real book, article, documentary, or video] - [How it connects]
+- [Real book, article, documentary, or video] - [How it connects]
+- [Real book, article, documentary, or video] - [How it connects]
+
+IMPORTANT: Recommend REAL artists and sources from your knowledge that genuinely relate to the project's themes. Never write "TBD".
+
+## 🛠️ Skills & Tools
+**Skills:** [Specific technical skills needed based on media format]
+**Tools:** [Recommend specific software/tools, or suggest options if not discussed]
+**Level:** [Assess from project scope, or suggest a reasonable starting level]
+
+## ✅ Scope & Feasibility  
+[Realistic assessment of what's achievable, potential challenges, rough time estimate]
+
+## 🎯 Success Criteria
+**This project should communicate:**
+- [Extract from conversation]
+- [Extract from conversation]
+
+---
+*Concept developed collaboratively. Refine and iterate as you develop the project.*
+
+For any topics the user didn't discuss, provide your best suggestions based on what WAS discussed. Never leave sections blank or write "TBD".`
+          } else {
+            // Natural conversation mode
+            const softNudge = turnCount >= 4
+              ? `\n\nNote: You've had a good conversation. If you feel you have enough information, you can suggest that the user generate their concept summary using the button below the chat. But if they're still exploring ideas, keep engaging naturally.`
+              : ''
+            modeInstruction = `\n\nMODE: ${modeLabel}.
+Have a natural, encouraging conversation about their project concept. Review the conversation history and DO NOT repeat questions already answered. Ask 2-3 focused follow-up questions based on what's still unclear or unexplored. Keep your response concise (2-4 sentences + questions).${softNudge}`
+          }
+          console.log(`[Concept Mode] Instruction length: ${modeInstruction.length}`)
+        } else if (mode === 'plan') {
+          modeInstruction = `\n\nMODE: ${modeLabel}. Create a comprehensive, structured learning plan with step-by-step progression, recommended materials from the provided list, and time estimates. Organize content from foundational to advanced.`
+        } else {
+          modeInstruction = `\n\nMODE: ${modeLabel}.`
+        }
+      }
+
+      // When generating concept summary, skip materials and use higher token limit
+      const isForcingSummary = isConceptSummaryRequest
+
+      const systemPrompt = `You are a learning assistant.${modeInstruction}
 
 Return ONLY valid JSON:
 {
-  "answer": "2-3 sentence response that guides the user",
+  "answer": "Your response",
   "references": [
-    {"id": "exact ID from materials list", "reason": "why this helps"}
-  ]
-}
-
-Example:
-{
-  "answer": "Start with Material A to learn basics, then use Material B for practice.",
-  "references": [
-    {"id": "/lessons/example-lesson", "reason": "Covers fundamentals"},
-    {"id": "/exercises/practice-task", "reason": "Hands-on practice"}
+    {"id": "exact ID from materials", "reason": "why relevant"}
   ]
 }`
 
-      const userPrompt = `User question: "${query}"
+      // Strip the trigger prefix from the query before sending to the LLM
+      const cleanQuery = isConceptSummaryRequest
+        ? query.replace('__GENERATE_CONCEPT_SUMMARY__', '').trim() || 'Generate the project concept summary from our conversation.'
+        : query
 
-Available materials (use these IDs in your references):
+      const userPrompt = isForcingSummary
+        ? `User: "${cleanQuery}"\n\nUsing everything discussed in the conversation, create the complete project concept summary now.`
+        : `User: "${cleanQuery}"
+
+Materials available:
 ${materials}
 
-Provide guidance and include ALL mentioned materials in references array. Return JSON.`
+Respond with JSON.`
 
       console.log('[Stage 3] Request (regular mode):', { 
         materialsCount: topEvaluated.length,
-        promptLength: systemPrompt.length + userPrompt.length
+        promptLength: systemPrompt.length + userPrompt.length,
+        hasConversation: !!conversation,
+        conversationLength: conversation?.length || 0,
+        isForcingSummary
       })
+
+      // Pass conversation history as messages array for proper context
+      const conversationMessages = conversation?.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }))
 
       const response = await $fetch<{ content: string }>('/api/chat', {
         method: 'POST',
@@ -658,9 +763,11 @@ Provide guidance and include ALL mentioned materials in references array. Return
           apiKey, 
           model, 
           systemPrompt, 
-          userPrompt, 
-          max_tokens: 600 
-        }
+          userPrompt,
+          messages: conversationMessages,
+          max_tokens: isForcingSummary ? 2000 : 600 
+        },
+        signal
       }).catch((error) => {
         console.error('[Stage 3] API Error Details:', {
           status: error.status,
@@ -726,24 +833,53 @@ Provide guidance and include ALL mentioned materials in references array. Return
     provider: Provider,
     apiKey: string,
     model: string,
+    mode?: ChatMode,
     intent?: ResponseIntent,
     conversation?: ConversationTurn[],
-    onThinkingUpdate?: (stage: string, content: string, complete: boolean) => void
+    onThinkingUpdate?: (stage: string, content: string, complete: boolean) => void,
+    signal?: AbortSignal
   ): Promise<LLMResponse> {
     try {
       console.log('[MultiStage] Starting three-stage reasoning...')
 
+      // Skip material search for concept mode - it's purely conversational
+      if (mode === 'concept') {
+        console.log('[MultiStage] Concept mode: skipping material search')
+        
+        onThinkingUpdate?.('Analyzing', 'Understanding your project concept...', false)
+        const analysis = { concepts: [], goals: [], contentTypes: [], wantsPlan: false }
+        onThinkingUpdate?.('Analyzing', 'Project concept development', true)
+        
+        onThinkingUpdate?.('Synthesizing', 'Crafting your response...', false)
+        const synthesis = await synthesizeResponse(query, analysis, [], [], provider, apiKey, model, mode, conversation, signal)
+        onThinkingUpdate?.('Synthesizing', 'Response complete', true)
+        
+        console.log('[MultiStage] Synthesis complete')
+        
+        return {
+          content: synthesis.content,
+          references: synthesis.references || [],
+          plan: undefined,
+          thinking: {
+            analysis: 'Project concept development',
+            evaluation: '',
+            synthesis: 'Response complete'
+          }
+        }
+      }
+
       // STAGE 1: Analyze query
       onThinkingUpdate?.('Analyzing', 'Understanding your question...', false)
-      const analysis = await analyzeQuery(query, provider, apiKey, model, conversation)
+      const analysis = await analyzeQuery(query, provider, apiKey, model, mode, conversation, signal)
       const planMode = analysis.wantsPlan ? ' [Plan mode]' : ''
-      const analysisText = `Key concepts: ${analysis.concepts.join(', ')}\nGoals: ${analysis.goals.join(', ')}\nPreferred types: ${analysis.contentTypes.join(', ')}${planMode}`
+      const modeLabel = mode && mode !== 'ask' ? ` [${mode} mode]` : ''
+      const analysisText = `Key concepts: ${analysis.concepts.join(', ')}\nGoals: ${analysis.goals.join(', ')}\nPreferred types: ${analysis.contentTypes.join(', ')}${planMode}${modeLabel}`
       onThinkingUpdate?.('Analyzing', analysisText, true)
       console.log('[MultiStage] Analysis:', analysis)
 
       // STAGE 2: Evaluate results
       onThinkingUpdate?.('Evaluating', 'Scoring materials for relevance...', false)
-      const evaluation = await evaluateResults(query, analysis, searchResults, provider, apiKey, model)
+      const evaluation = await evaluateResults(query, analysis, searchResults, provider, apiKey, model, signal)
       const topScored = evaluation.filter(e => e.score >= 6).length
       const evalText = `Reviewed ${evaluation.length} materials, ${topScored} highly relevant`
       onThinkingUpdate?.('Evaluating', evalText, true)
@@ -751,7 +887,7 @@ Provide guidance and include ALL mentioned materials in references array. Return
 
       // STAGE 3: Synthesize response
       onThinkingUpdate?.('Synthesizing', analysis.wantsPlan ? 'Building your learning plan...' : 'Crafting your response...', false)
-      const synthesis = await synthesizeResponse(query, analysis, evaluation, searchResults, provider, apiKey, model)
+      const synthesis = await synthesizeResponse(query, analysis, evaluation, searchResults, provider, apiKey, model, mode, conversation, signal)
       const synthText = analysis.wantsPlan && synthesis.plan
         ? `Created ${synthesis.plan.steps.length}-step learning plan`
         : `Generated answer with ${synthesis.references?.length || 0} references`

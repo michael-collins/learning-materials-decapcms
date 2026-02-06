@@ -71,13 +71,72 @@ Integrate a chatbot-based query system that allows students to ask questions abo
 **In Progress**
 - 🔄 LLM response grounding and relevance tuning (prompting + retrieval scoring)
 - 🔄 Learning plan generation with step-by-step materials and Word export
+- 🔄 **Mode-based architecture for specialized guidance** (see section 2.1 below)
 
 **Planned**
 - ⏳ Streaming responses
 - ⏳ Usage/error analytics for common queries
-- ⏳ **Advanced Course Construction AI** (see section 2.1 below)
+- ⏳ **Advanced Course Construction AI** (see section 2.2 below)
 
-#### 2.1 Advanced Course Construction AI
+#### 2.1 Mode-Based Architecture
+
+**Status:** In Progress  
+**Description**  
+Extensible mode system that provides specialized AI guidance for different learning contexts, similar to GitHub Copilot's agent/ask/edit/plan modes.
+
+**Implemented Modes**
+
+*Ask Mode (Default)*
+- General learning assistant
+- Material discovery and recommendations
+- Quick answers to learning questions
+
+*Plan Mode*
+- Structured learning plan generation
+- Step-by-step progression with materials
+- Time estimates and scheduling
+- Word document export
+
+**Guide Modes (Planned)**
+
+*Concept Guide Mode*
+- Deep concept exploration and relationships
+- Prerequisite identification
+- Theory-to-practice connections
+- Socratic questioning approach
+
+*Writing Guide Mode*
+- Technical and creative writing development
+- Genre-specific guidance
+- Style and structure templates
+- Peer review workflows
+
+*Career Guide Mode*
+- Professional development pathways
+- Portfolio building guidance
+- Industry role mapping
+- Skill progression tracking
+
+*Theory Guide Mode*
+- Theoretical framework exploration
+- Historical context and evolution
+- Critical analysis exercises
+- Philosophy and principles
+
+**Technical Implementation**
+- Mode configuration system with specialized prompts
+- Mode-specific analysis and synthesis strategies
+- UI mode selector with descriptions
+- Persistent mode selection (localStorage)
+- Auto-detection based on query patterns
+- Integration with existing multi-stage LLM pipeline
+
+**Related Files**
+- `/composables/useChatModes.ts` - Mode configuration and management
+- `/composables/useLLMChat.ts` - Mode-aware response generation
+- `/components/AIChatInterface.vue` - Mode selector UI
+
+#### 2.2 Advanced Course Construction AI
 
 **Description**  
 Evolve the chatbot into a comprehensive course construction tool that understands pedagogical context, prerequisites, time constraints, and institutional requirements.
@@ -346,7 +405,121 @@ Create visual representations of prerequisite relationships to help learners und
 
 ---
 
-## 8. TBD
+## 8. Learning Tools Suite
+
+**Status:** In Progress  
+**Priority:** Medium
+
+### Description
+Comprehensive suite of interactive tools to help students organize, explore, and engage with learning materials in structured ways.
+
+### 8.1 Outline Builder
+
+**Status:** Planned  
+**Priority:** Medium
+
+**Description**  
+Visual tool for organizing learning resources into custom hierarchical structures using indentation.
+
+**Requirements**
+- Drag-and-drop interface for organizing content
+- Search and select from existing materials (lessons, lectures, exercises, etc.)
+- Create hierarchical structures using indentation
+- Reorder and nest content at multiple levels
+- Add custom notes and sections
+- Save and name outlines for later reference
+- Share outlines with others
+- Export outlines in multiple formats (PDF, Markdown, JSON, Common Cartridge)
+- Import existing course structures or pathways
+- Version control for outline iterations
+
+**Technical Considerations**
+- Tree data structure for hierarchical organization
+- Drag-and-drop library (e.g., @dnd-kit/core, vue-draggable-next)
+- Local storage and/or database persistence
+- Export utilities for various formats
+- Integration with existing content queries
+- Collaborative editing considerations (optional)
+
+**Related Files**
+- `/pages/tools/outline-builder.vue` (created)
+- New component: `/components/OutlineBuilder.vue`
+- New composable: `/composables/useOutlineBuilder.ts`
+- Server API: `/server/api/outlines/`
+
+### 8.2 Interactive Guides
+
+**Status:** Planned  
+**Priority:** Medium
+
+**Description**  
+Structured, interactive guides that help students engage with learning materials through specific pedagogical approaches.
+
+**Planned Guides**
+
+*Concept Development Guide*
+- Step-by-step exploration of key concepts
+- Progressive complexity building
+- Interactive exercises and checks for understanding
+- Links to relevant materials for deeper learning
+- Visual concept mapping
+
+*Writing Guide*
+- Technical and creative writing skill development
+- Genre-specific guidance (academic, technical documentation, creative)
+- Writing exercises with automated feedback suggestions
+- Style and structure templates
+- Peer review workflows
+
+*Career Guide*
+- Professional development pathways
+- Portfolio building guidance
+- Interview preparation resources
+- Industry-specific skill mapping
+- Networking and job search strategies
+
+*Theory & Philosophy Guide*
+- Exploration of theoretical frameworks
+- Historical context and evolution of ideas
+- Critical analysis exercises
+- Connections between theory and practice
+- Guided reading lists
+
+**Technical Considerations**
+- Multi-step workflow system with progress tracking
+- Content recommendation engine for guide-specific materials
+- User input collection and response generation
+- Progress persistence and resume functionality
+- Adaptive pathways based on user responses
+- Integration with AI chat for personalized guidance
+- Analytics for guide effectiveness
+
+**Related Files**
+- `/pages/tools/guides/index.vue` (created)
+- `/pages/tools/guides/concept-development.vue`
+- `/pages/tools/guides/writing.vue`
+- `/pages/tools/guides/career.vue`
+- `/pages/tools/guides/theory-philosophy.vue`
+- New component: `/components/GuideWorkflow.vue`
+- New composable: `/composables/useGuideProgress.ts`
+- Server API: `/server/api/guides/`
+
+### Implementation Progress
+
+**Completed**
+- ✅ Created Tools section in navigation
+- ✅ Created placeholder pages for Outline Builder and Guides
+- ✅ Defined initial guide structure (concept dev, writing, career, theory/philosophy)
+
+**Planned**
+- ⏳ Implement Outline Builder drag-and-drop interface
+- ⏳ Design guide workflow system
+- ⏳ Develop first interactive guide (TBD based on priority)
+- ⏳ Integration with AI chat for enhanced interactivity
+
+---
+
+## 9. TBD
 
 **Status:** Placeholder  
 **Priority:** TBD
@@ -383,4 +556,4 @@ Future features to be determined based on user feedback and platform evolution.
 
 ---
 
-*Last Updated: February 5, 2026*
+*Last Updated: February 6, 2026*

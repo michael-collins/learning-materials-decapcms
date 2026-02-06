@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download } from 'lucide-vue-next'
+import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText } from 'lucide-vue-next'
 import { Dialog, DialogContentFullscreen, DialogContentPopover, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import Button from '~/components/ui/button/Button.vue'
 import Textarea from '~/components/ui/textarea/Textarea.vue'
@@ -8,6 +8,7 @@ import ChatbotSettings from '~/components/ChatbotSettings.vue'
 import { useChatbotSettings } from '~/composables/useChatbotSettings'
 import { useLLMChat } from '~/composables/useLLMChat'
 import { useLearningPlanExport } from '~/composables/useLearningPlanExport'
+import { useChatModes } from '~/composables/useChatModes'
 
 interface Message {
   id: string
@@ -65,7 +66,12 @@ const isOpen = computed({
 })
 
 const { loadIndex, search, hybridSearch, detectIntent, isLoading: searchIndexLoading, isLoaded } = useSchemaEnhancedSearch()
-const { exportToWord } = useLearningPlanExport()
+const { exportToWord, exportConceptToWord } = useLearningPlanExport()
+const { currentMode, modeConfig, allModes, setMode, loadMode } = useChatModes()
+
+// Mode dropdown state
+const isModeDropdownOpen = ref(false)
+const modeDropdownRef = ref<HTMLElement | null>(null)
 
 const CHAT_HISTORY_KEY = 'ai-chat-history'
 const CHAT_HISTORY_MAX_AGE = 24 * 60 * 60 * 1000 // 24 hours
@@ -130,6 +136,7 @@ watch(messages, () => {
 }, { deep: true })
 const inputText = ref('')
 const isLoading = ref(false)
+const abortController = ref<AbortController | null>(null)
 const messagesEndRef = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 const settingsOpen = ref(false)
@@ -137,10 +144,43 @@ const settingsOpen = ref(false)
 const { settings, canUseEnhancedMode, isConfigured, currentModel } = useChatbotSettings()
 const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
 
+// Concept mode: show "Generate the concept" button after at least one user+assistant exchange
+const canGenerateConceptSummary = computed(() => {
+  if (currentMode.value !== 'concept') return false
+  if (isLoading.value) return false
+  // Need at least 1 user message that got a response (greeting + user msg + AI reply = 3+)
+  const userCount = messages.value.filter(m => m.role === 'user').length
+  return userCount >= 1 && messages.value.length >= 3
+})
+
+// Already has a generated concept summary in this session — but allow regeneration
+const hasConceptSummary = computed(() => {
+  // Only hide the button if the LAST assistant message contains a concept summary
+  // This allows regeneration after continuing the conversation
+  const lastAssistant = [...messages.value].reverse().find(m => m.role === 'assistant')
+  return lastAssistant?.content.includes('# 🎯 PROJECT CONCEPT') ?? false
+})
+
+async function generateConceptSummary() {
+  if (isLoading.value) return
+  // Send a special trigger that the LLM composable recognizes
+  inputText.value = '__GENERATE_CONCEPT_SUMMARY__'
+  await sendMessage()
+}
+
 // Load search index when component mounts
 onMounted(async () => {
   try {
     await loadIndex()
+    loadMode() // Load saved chat mode
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (!target.closest('.mode-dropdown')) {
+        isModeDropdownOpen.value = false
+      }
+    })
   } catch (error) {
     console.error('Failed to load search index:', error)
   }
@@ -196,6 +236,14 @@ function buildContextResponse(query: string, results: any[]): string {
   return response.trim()
 }
 
+function stopGeneration() {
+  if (abortController.value) {
+    abortController.value.abort()
+    abortController.value = null
+  }
+  isLoading.value = false
+}
+
 async function sendMessage() {
   if (!inputText.value.trim() || isLoading.value) return
   
@@ -214,7 +262,9 @@ async function sendMessage() {
   const userMessage: Message = {
     id: Date.now().toString(),
     role: 'user',
-    content: inputText.value,
+    content: inputText.value.startsWith('__GENERATE_CONCEPT_SUMMARY__')
+      ? '📋 Generate my project concept summary'
+      : inputText.value,
     timestamp: new Date()
   }
   
@@ -222,6 +272,7 @@ async function sendMessage() {
   const query = inputText.value
   inputText.value = ''
   isLoading.value = true
+  abortController.value = new AbortController()
   
   // Scroll to bottom
   await nextTick()
@@ -346,7 +397,9 @@ async function sendMessage() {
       messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' })
       
       try {
-        const conversationContext = buildConversationContext(4)
+        // Concept mode needs full conversation history; other modes use last 4 messages
+        const contextLimit = currentMode.value === 'concept' ? 20 : 4
+        const conversationContext = buildConversationContext(contextLimit)
         
         // Callback to update thinking in real-time
         const onThinkingUpdate = (stage: string, content: string, complete: boolean) => {
@@ -368,9 +421,11 @@ async function sendMessage() {
           settings.value.provider,
           settings.value.apiKey,
           settings.value.model,
+          currentMode.value, // Pass current chat mode
           intent,
           conversationContext,
-          onThinkingUpdate
+          onThinkingUpdate,
+          abortController.value?.signal
         )
         
         // Update message with final response
@@ -393,6 +448,7 @@ async function sendMessage() {
       }
       
       isLoading.value = false
+      abortController.value = null
       await nextTick()
       messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' })
       return
@@ -435,6 +491,7 @@ async function sendMessage() {
     messages.value.push(errorMessage)
   } finally {
     isLoading.value = false
+    abortController.value = null
   }
 }
 
@@ -474,6 +531,17 @@ async function downloadPlan(message: Message) {
     )
   } catch (error) {
     console.error('Failed to export plan:', error)
+  }
+}
+
+async function downloadConcept(message: Message) {
+  try {
+    console.log('[Download] Starting concept export, content length:', message.content.length)
+    await exportConceptToWord(message.content)
+    console.log('[Download] Concept export completed successfully')
+  } catch (error) {
+    console.error('Failed to export concept:', error)
+    alert('Failed to download concept document. Please check the browser console for details.')
   }
 }
 
@@ -540,6 +608,44 @@ function parseMarkdown(text: string): string {
         </Button>
       </div>
 
+      <!-- Mode Selector -->
+      <div class="px-3 py-2 border-b border-border">
+        <div ref="modeDropdownRef" class="mode-dropdown relative">
+          <Button
+            @click.stop="isModeDropdownOpen = !isModeDropdownOpen"
+            variant="outline"
+            class="w-full justify-start h-8 text-xs gap-2"
+            :aria-expanded="isModeDropdownOpen"
+          >
+            <Icon :name="modeConfig.icon" class="h-3 w-3" />
+            <span class="flex-1 text-left">{{ modeConfig.label }}</span>
+            <ChevronDown :class="['h-3 w-3 transition-transform duration-200', isModeDropdownOpen ? 'rotate-180' : '']" />
+          </Button>
+          
+          <Transition name="dropdown">
+            <div
+              v-if="isModeDropdownOpen"
+              class="absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden"
+              @click.stop
+            >
+              <button
+                v-for="mode in allModes"
+                :key="mode.id"
+                @click="setMode(mode.id); isModeDropdownOpen = false"
+                class="w-full flex items-center gap-2 px-2 py-2 text-xs hover:bg-muted transition-colors text-left"
+              >
+                <Icon :name="mode.icon" class="h-3.5 w-3.5 shrink-0" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <span class="font-medium">{{ mode.label }}</span>
+                  <span class="text-[10px] text-muted-foreground line-clamp-1">{{ mode.description }}</span>
+                </div>
+                <Check v-if="currentMode === mode.id" class="h-3.5 w-3.5 shrink-0 text-primary" />
+              </button>
+            </div>
+          </Transition>
+        </div>
+      </div>
+
       <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto px-4">
         <div class="py-4 space-y-4">
@@ -583,6 +689,19 @@ function parseMarkdown(text: string): string {
                 </div>
 
                 <div class="text-xs leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
+
+                <!-- Concept Summary Export Button -->
+                <div v-if="message.role === 'assistant' && message.content.includes('# 🎯 PROJECT CONCEPT')" class="mt-4 flex justify-end">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    @click="downloadConcept(message)"
+                    class="h-7 text-xs gap-1"
+                  >
+                    <Download class="h-3 w-3" />
+                    Download Concept
+                  </Button>
+                </div>
 
                 <!-- Learning Plan -->
                 <div v-if="message.plan" class="space-y-3 mt-4">
@@ -694,6 +813,19 @@ function parseMarkdown(text: string): string {
             </div>
           </div>
 
+          <!-- Concept mode: Generate the concept button (inside chat area) -->
+          <div v-if="canGenerateConceptSummary && !hasConceptSummary" class="flex justify-center py-3">
+            <Button
+              size="sm"
+              class="gap-2 text-xs bg-foreground text-background hover:bg-foreground/90 shadow-sm"
+              :disabled="isLoading"
+              @click="generateConceptSummary"
+            >
+              <FileText class="h-3.5 w-3.5" />
+              Generate the concept
+            </Button>
+          </div>
+
           <!-- Loading indicator -->
           <div v-if="isLoading" class="flex gap-2 items-start">
             <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/90 to-primary mt-1">
@@ -724,9 +856,20 @@ function parseMarkdown(text: string): string {
             @keydown="handleKeydown"
           />
           <Button
+            v-if="isLoading"
+            type="button"
+            size="sm"
+            @click="stopGeneration"
+            class="shrink-0"
+            variant="destructive"
+          >
+            <Icon name="lucide:square" class="h-4 w-4" />
+          </Button>
+          <Button
+            v-else
             type="submit"
             size="sm"
-            :disabled="!inputText.trim() || isLoading"
+            :disabled="!inputText.trim()"
             class="shrink-0"
           >
             <Send class="h-4 w-4" />
@@ -784,6 +927,44 @@ function parseMarkdown(text: string): string {
         </Button>
       </div>
 
+      <!-- Mode Selector -->
+      <div class="px-6 py-3 border-b border-border">
+        <div ref="modeDropdownRef" class="mode-dropdown relative">
+          <Button
+            @click.stop="isModeDropdownOpen = !isModeDropdownOpen"
+            variant="outline"
+            class="w-full justify-start h-9 text-sm gap-2"
+            :aria-expanded="isModeDropdownOpen"
+          >
+            <Icon :name="modeConfig.icon" class="h-4 w-4" />
+            <span class="flex-1 text-left">{{ modeConfig.label }}</span>
+            <ChevronDown :class="['h-4 w-4 transition-transform duration-200', isModeDropdownOpen ? 'rotate-180' : '']" />
+          </Button>
+          
+          <Transition name="dropdown">
+            <div
+              v-if="isModeDropdownOpen"
+              class="absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden"
+              @click.stop
+            >
+              <button
+                v-for="mode in allModes"
+                :key="mode.id"
+                @click="setMode(mode.id); isModeDropdownOpen = false"
+                class="w-full flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted transition-colors text-left"
+              >
+                <Icon :name="mode.icon" class="h-4 w-4 shrink-0" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <span class="font-medium">{{ mode.label }}</span>
+                  <span class="text-xs text-muted-foreground line-clamp-1">{{ mode.description }}</span>
+                </div>
+                <Check v-if="currentMode === mode.id" class="h-4 w-4 shrink-0 text-primary" />
+              </button>
+            </div>
+          </Transition>
+        </div>
+      </div>
+
       <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto px-6">
         <div class="py-6 space-y-6 max-w-3xl mx-auto">
@@ -831,6 +1012,19 @@ function parseMarkdown(text: string): string {
                 </div>
 
                 <div class="text-sm leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
+
+                <!-- Concept Summary Export Button (Fullscreen) -->
+                <div v-if="message.role === 'assistant' && message.content.includes('# 🎯 PROJECT CONCEPT')" class="mt-4 flex justify-end">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    @click="downloadConcept(message)"
+                    class="gap-2"
+                  >
+                    <Download class="h-4 w-4" />
+                    Download Concept
+                  </Button>
+                </div>
 
                 <!-- Learning Plan (Fullscreen) -->
                 <div v-if="message.plan" class="space-y-4 mt-4">
@@ -951,6 +1145,18 @@ function parseMarkdown(text: string): string {
             </div>
           </div>
 
+          <!-- Concept mode: Generate the concept button (inside chat area) -->
+          <div v-if="canGenerateConceptSummary && !hasConceptSummary" class="flex justify-center py-4">
+            <Button
+              class="gap-2 bg-foreground text-background hover:bg-foreground/90 shadow-sm"
+              :disabled="isLoading"
+              @click="generateConceptSummary"
+            >
+              <FileText class="h-4 w-4" />
+              Generate the concept
+            </Button>
+          </div>
+
           <!-- Loading Indicator -->
           <div v-if="isLoading" class="flex gap-3 items-start">
             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/90 to-primary mt-1">
@@ -983,8 +1189,20 @@ function parseMarkdown(text: string): string {
               @keydown="handleKeydown"
             />
             <Button
+              v-if="isLoading"
+              type="button"
+              @click="stopGeneration"
+              size="icon"
+              variant="destructive"
+              class="absolute bottom-2 right-2 h-8 w-8"
+            >
+              <Icon name="lucide:square" class="h-4 w-4" />
+              <span class="sr-only">Stop generation</span>
+            </Button>
+            <Button
+              v-else
               type="submit"
-              :disabled="!inputText.trim() || isLoading"
+              :disabled="!inputText.trim()"
               size="icon"
               class="absolute bottom-2 right-2 h-8 w-8"
             >
@@ -1003,3 +1221,16 @@ function parseMarkdown(text: string): string {
   <!-- Settings Dialog -->
   <ChatbotSettings v-model:open="settingsOpen" />
 </template>
+
+<style scoped>
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.2s ease;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+</style>

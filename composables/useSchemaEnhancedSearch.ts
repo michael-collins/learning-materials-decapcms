@@ -384,7 +384,33 @@ export function useSchemaEnhancedSearch() {
       }
 
       itemEmbeddings = embeddings
-      localStorage.setItem(cacheKey, JSON.stringify({ embeddings }))
+      
+      // Try to cache embeddings, but don't fail if quota exceeded
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ embeddings }))
+      } catch (e: any) {
+        if (e.name === 'QuotaExceededError') {
+          console.warn('⚠️ localStorage quota exceeded, clearing old embedding caches')
+          // Clear old embedding caches to make room
+          const keysToRemove: string[] = []
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key?.startsWith('semantic-embeddings:') && key !== cacheKey) {
+              keysToRemove.push(key)
+            }
+          }
+          keysToRemove.forEach(key => localStorage.removeItem(key))
+          
+          // Try one more time after clearing
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ embeddings }))
+          } catch {
+            console.warn('⚠️ Still unable to cache embeddings, will regenerate on next search')
+          }
+        } else {
+          console.error('Failed to cache embeddings:', e)
+        }
+      }
     }
 
     // Query embedding

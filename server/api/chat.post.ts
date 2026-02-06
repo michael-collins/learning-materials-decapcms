@@ -1,10 +1,10 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, systemPrompt, userPrompt, max_tokens } = body
+  const { provider, apiKey, model, systemPrompt, userPrompt, max_tokens, messages } = body
 
-  console.log('[Chat API] Request received:', { provider, model, hasApiKey: !!apiKey, max_tokens })
+  console.log('[Chat API] Request received:', { provider, model, hasApiKey: !!apiKey, max_tokens, hasMessages: !!messages })
 
-  if (!provider || !systemPrompt || !userPrompt) {
+  if (!provider || !systemPrompt) {
     console.error('[Chat API] Missing required parameters')
     throw createError({
       statusCode: 400,
@@ -12,16 +12,25 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Support either messages array (preferred) or userPrompt (legacy)
+  if (!messages && !userPrompt) {
+    console.error('[Chat API] Missing messages or userPrompt')
+    throw createError({
+      statusCode: 400,
+      message: 'Missing messages or userPrompt'
+    })
+  }
+
   try {
     switch (provider) {
       case 'openai':
-        return await callOpenAI(apiKey, model, systemPrompt, userPrompt, max_tokens)
+        return await callOpenAI(apiKey, model, systemPrompt, userPrompt, max_tokens, messages)
       case 'anthropic':
-        return await callAnthropic(apiKey, model, systemPrompt, userPrompt, max_tokens)
+        return await callAnthropic(apiKey, model, systemPrompt, userPrompt, max_tokens, messages)
       case 'google':
-        return await callGoogle(apiKey, model, systemPrompt, userPrompt, max_tokens)
+        return await callGoogle(apiKey, model, systemPrompt, userPrompt, max_tokens, messages)
       case 'ollama':
-        return await callOllama(model, systemPrompt, userPrompt, max_tokens)
+        return await callOllama(model, systemPrompt, userPrompt, max_tokens, messages)
       default:
         throw createError({
           statusCode: 400,
@@ -49,7 +58,8 @@ async function callOpenAI(
   model: string,
   systemPrompt: string,
   userPrompt: string,
-  max_tokens?: number
+  max_tokens?: number,
+  conversationMessages?: Array<{ role: string; content: string }>
 ) {
   // GPT-4o and newer models use max_completion_tokens, older models use max_tokens
   const isNewerModel = model.includes('gpt-4o') || model.includes('gpt-5')
@@ -58,12 +68,21 @@ async function callOpenAI(
   // GPT-5 models only support default temperature (1)
   const isGPT5 = model.includes('gpt-5')
   
+  // Build messages array: system + conversation history + current user prompt
+  const messages = conversationMessages 
+    ? [
+        { role: 'system', content: systemPrompt },
+        ...conversationMessages,
+        { role: 'user', content: userPrompt }
+      ]
+    : [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]
+  
   const requestBody: any = {
     model,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ],
+    messages,
     [tokenParam]: max_tokens || 800
   }
   
@@ -71,6 +90,13 @@ async function callOpenAI(
   if (!isGPT5) {
     requestBody.temperature = 0.7
   }
+  
+  console.log('[Chat API] OpenAI request:', {
+    model,
+    messageCount: messages.length,
+    hasConversation: !!conversationMessages,
+    [tokenParam]: requestBody[tokenParam]
+  })
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
