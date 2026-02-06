@@ -548,14 +548,32 @@ async function downloadConcept(message: Message) {
 function parseMarkdown(text: string): string {
   let html = text
   
+  // Headings (must come before bold to avoid conflicts)
+  html = html.replace(/^### (.+)$/gm, '<h3 class="text-sm font-semibold mt-3 mb-1">$1</h3>')
+  html = html.replace(/^## (.+)$/gm, '<h2 class="text-base font-semibold mt-4 mb-2">$1</h2>')
+  html = html.replace(/^# (.+)$/gm, '<h1 class="text-lg font-bold mt-4 mb-2">$1</h1>')
+  
   // Bold
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   
   // Italic
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
   
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr class="my-3 border-border">')
+  
+  // Numbered lists
+  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<li class="ml-4">$2</li>')
+  html = html.replace(/(<li class="ml-4">.*?<\/li>\n?)+/g, (match) => {
+    // Check if it's part of a bullet list by looking for • in context
+    if (!match.includes('•')) {
+      return '<ol class="list-decimal list-outside space-y-0.5 my-2">' + match + '</ol>'
+    }
+    return match
+  })
+  
   // Bullet lists - handle them before line break conversion
-  html = html.replace(/^• (.+)$/gm, '<li class="ml-4">$1</li>')
+  html = html.replace(/^[•\-]\s+(.+)$/gm, '<li class="ml-4">$1</li>')
   html = html.replace(/(<li class="ml-4">.*<\/li>\n?)+/g, '<ul class="list-disc list-outside space-y-0.5 my-2">$&</ul>')
   
   // Line breaks - convert double newlines to paragraph breaks, single to br
