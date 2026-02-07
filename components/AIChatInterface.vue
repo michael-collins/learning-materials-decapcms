@@ -159,6 +159,21 @@ const messagesEndRef = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 const settingsOpen = ref(false)
 const moreMenuOpen = ref(false)
+const isMobile = ref(false)
+
+// Check if viewport is mobile size
+const checkMobileViewport = () => {
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth < 640 // sm breakpoint
+  }
+}
+
+// Auto-exit fullscreen when switching to mobile viewport
+watch(isMobile, (newIsMobile) => {
+  if (newIsMobile && isFullscreen.value) {
+    isFullscreen.value = false
+  }
+})
 
 const { settings, canUseEnhancedMode, isConfigured, currentModel } = useChatbotSettings()
 const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
@@ -193,12 +208,38 @@ onMounted(async () => {
     await loadIndex()
     loadMode() // Load saved chat mode
     
+    // Initial mobile check
+    checkMobileViewport()
+    
     // Close dropdown when clicking outside
-    document.addEventListener('click', (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (!target.closest('.mode-dropdown')) {
         isModeDropdownOpen.value = false
       }
+    }
+    
+    // Close dropdown on Escape key
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isModeDropdownOpen.value) {
+        isModeDropdownOpen.value = false
+      }
+    }
+    
+    // Check mobile viewport on resize
+    const handleResize = () => {
+      checkMobileViewport()
+    }
+    
+    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('resize', handleResize)
+    
+    // Cleanup on unmount
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('resize', handleResize)
     })
   } catch (error) {
     console.error('Failed to load search index:', error)
@@ -623,11 +664,11 @@ function parseMarkdown(text: string): string {
           <button
             v-if="settings.enhancedMode"
             @click="settingsOpen = true"
-            class="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
-            title="Open settings"
+            class="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded"
+            :aria-label="'Enhanced mode enabled using ' + currentModel.name + '. Click to open settings'"
           >
             <Sparkles class="h-2.5 w-2.5" />
-            Enhanced mode · {{ currentModel.name }}
+            {{ currentModel.name }}
           </button>
         </div>
         <Popover v-model:open="moreMenuOpen">
@@ -635,8 +676,8 @@ function parseMarkdown(text: string): string {
             <Button
               variant="ghost"
               size="icon"
-              class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8"
-              title="More options"
+              class="text-muted-foreground hover:text-foreground shrink-0 h-9 w-9 sm:h-8 sm:w-8 touch-manipulation"
+              aria-label="More options"
             >
               <MoreVertical class="h-4 w-4" />
             </Button>
@@ -644,7 +685,7 @@ function parseMarkdown(text: string): string {
           <PopoverContent class="w-48 p-1" align="end">
             <Button
               variant="ghost"
-              class="w-full justify-start h-9 px-2 text-sm font-normal"
+              class="w-full justify-start h-10 sm:h-9 px-2 text-sm font-normal touch-manipulation"
               @click="settingsOpen = true; moreMenuOpen = false"
             >
               <Settings class="h-4 w-4 mr-2" />
@@ -652,7 +693,7 @@ function parseMarkdown(text: string): string {
             </Button>
             <Button
               variant="ghost"
-              class="w-full justify-start h-9 px-2 text-sm font-normal text-destructive hover:text-destructive"
+              class="w-full justify-start h-10 sm:h-9 px-2 text-sm font-normal text-destructive hover:text-destructive touch-manipulation"
               @click="clearChatHistory(); moreMenuOpen = false"
             >
               <Trash2 class="h-4 w-4 mr-2" />
@@ -661,21 +702,22 @@ function parseMarkdown(text: string): string {
           </PopoverContent>
         </Popover>
         <Button
+          v-if="!isMobile"
           variant="ghost"
           size="icon"
           @click="isFullscreen = true"
-          class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8"
-          title="Expand to fullscreen"
+          class="text-muted-foreground hover:text-foreground shrink-0 h-9 w-9 sm:h-8 sm:w-8 touch-manipulation"
+          aria-label="Expand to fullscreen"
         >
           <Maximize2 class="h-4 w-4" />
         </Button>
-        <div class="w-px h-5 bg-border" />
+        <div v-if="!isMobile" class="w-px h-5 bg-border" />
         <DialogClose as-child>
           <Button
             variant="ghost"
             size="icon"
-            class="text-muted-foreground hover:text-foreground shrink-0 h-8 w-8"
-            title="Close"
+            class="text-muted-foreground hover:text-foreground shrink-0 h-9 w-9 sm:h-8 sm:w-8 touch-manipulation"
+            aria-label="Close chat"
           >
             <X class="h-4 w-4" />
           </Button>
@@ -688,8 +730,11 @@ function parseMarkdown(text: string): string {
           <Button
             @click.stop="isModeDropdownOpen = !isModeDropdownOpen"
             variant="outline"
-            class="w-full justify-start h-8 text-xs gap-2"
+            class="w-full justify-start h-9 sm:h-8 text-xs gap-2 touch-manipulation"
             :aria-expanded="isModeDropdownOpen"
+            aria-haspopup="listbox"
+            aria-label="Select chat mode"
+            :aria-controls="isModeDropdownOpen ? 'mode-dropdown-list' : undefined"
           >
             <Icon :name="modeConfig.icon" class="h-3 w-3" />
             <span class="flex-1 text-left">{{ modeConfig.label }}</span>
@@ -699,6 +744,9 @@ function parseMarkdown(text: string): string {
           <Transition name="dropdown">
             <div
               v-if="isModeDropdownOpen"
+              id="mode-dropdown-list"
+              role="listbox"
+              :aria-label="'Chat modes'"
               class="absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden"
               @click.stop
             >
@@ -706,7 +754,9 @@ function parseMarkdown(text: string): string {
                 v-for="mode in allModes"
                 :key="mode.id"
                 @click="setMode(mode.id); isModeDropdownOpen = false"
-                class="w-full flex items-center gap-2 px-2 py-2 text-xs hover:bg-muted transition-colors text-left"
+                role="option"
+                :aria-selected="currentMode === mode.id"
+                class="w-full flex items-center gap-2 px-2 py-2.5 sm:py-2 text-xs hover:bg-muted transition-colors text-left min-h-[44px] sm:min-h-0 touch-manipulation"
               >
                 <Icon :name="mode.icon" class="h-3.5 w-3.5 shrink-0" />
                 <div class="flex flex-col flex-1 min-w-0">
@@ -964,15 +1014,15 @@ function parseMarkdown(text: string): string {
         </div>
         <div class="flex-1 min-w-0">
           <h2 class="text-lg font-semibold">Learning Assistant</h2>
-          <p class="text-sm text-muted-foreground flex items-center gap-1.5">
-            Discover courses, lessons, and learning paths
+          <p class="text-sm text-muted-foreground flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-1.5">
+            <span>Discover courses, lessons, and learning paths</span>
             <button
               v-if="settings.enhancedMode"
               @click="settingsOpen = true"
-              class="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 cursor-pointer transition-colors"
-              title="Open settings"
+              class="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded"
+              :aria-label="'Enhanced mode enabled using ' + currentModel.name + '. Click to open settings'"
             >
-              • <Sparkles class="h-3 w-3" /> Enhanced · {{ currentModel.name }}
+              <span class="hidden sm:inline">•</span> <Sparkles class="h-3 w-3" /> {{ currentModel.name }}
             </button>
           </p>
         </div>
@@ -981,8 +1031,8 @@ function parseMarkdown(text: string): string {
             <Button
               variant="ghost"
               size="icon"
-              class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10"
-              title="More options"
+              class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10 touch-manipulation"
+              aria-label="More options"
             >
               <MoreVertical class="h-5 w-5" />
             </Button>
@@ -990,7 +1040,7 @@ function parseMarkdown(text: string): string {
           <PopoverContent class="w-48 p-1" align="end">
             <Button
               variant="ghost"
-              class="w-full justify-start h-9 px-2 text-sm font-normal"
+              class="w-full justify-start h-10 sm:h-9 px-2 text-sm font-normal touch-manipulation"
               @click="settingsOpen = true; moreMenuOpen = false"
             >
               <Settings class="h-4 w-4 mr-2" />
@@ -998,7 +1048,7 @@ function parseMarkdown(text: string): string {
             </Button>
             <Button
               variant="ghost"
-              class="w-full justify-start h-9 px-2 text-sm font-normal text-destructive hover:text-destructive"
+              class="w-full justify-start h-10 sm:h-9 px-2 text-sm font-normal text-destructive hover:text-destructive touch-manipulation"
               @click="clearChatHistory(); moreMenuOpen = false"
             >
               <Trash2 class="h-4 w-4 mr-2" />
@@ -1007,21 +1057,22 @@ function parseMarkdown(text: string): string {
           </PopoverContent>
         </Popover>
         <Button
+          v-if="!isMobile"
           variant="ghost"
           size="icon"
           @click="isFullscreen = false"
-          class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10"
-          title="Exit fullscreen"
+          class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10 touch-manipulation"
+          aria-label="Exit fullscreen"
         >
           <Minimize2 class="h-5 w-5" />
         </Button>
-        <div class="w-px h-6 bg-border" />
+        <div v-if="!isMobile" class="w-px h-6 bg-border" />
         <DialogClose as-child>
           <Button
             variant="ghost"
             size="icon"
-            class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10"
-            title="Close"
+            class="text-muted-foreground hover:text-foreground shrink-0 h-10 w-10 touch-manipulation"
+            aria-label="Close chat"
           >
             <X class="h-5 w-5" />
           </Button>
@@ -1034,8 +1085,11 @@ function parseMarkdown(text: string): string {
           <Button
             @click.stop="isModeDropdownOpen = !isModeDropdownOpen"
             variant="outline"
-            class="w-full justify-start h-9 text-sm gap-2"
+            class="w-full justify-start h-10 sm:h-9 text-sm gap-2 touch-manipulation"
             :aria-expanded="isModeDropdownOpen"
+            aria-haspopup="listbox"
+            aria-label="Select chat mode"
+            :aria-controls="isModeDropdownOpen ? 'mode-dropdown-list-fullscreen' : undefined"
           >
             <Icon :name="modeConfig.icon" class="h-4 w-4" />
             <span class="flex-1 text-left">{{ modeConfig.label }}</span>
@@ -1045,6 +1099,9 @@ function parseMarkdown(text: string): string {
           <Transition name="dropdown">
             <div
               v-if="isModeDropdownOpen"
+              id="mode-dropdown-list-fullscreen"
+              role="listbox"
+              :aria-label="'Chat modes'"
               class="absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden"
               @click.stop
             >
@@ -1052,7 +1109,9 @@ function parseMarkdown(text: string): string {
                 v-for="mode in allModes"
                 :key="mode.id"
                 @click="setMode(mode.id); isModeDropdownOpen = false"
-                class="w-full flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-muted transition-colors text-left"
+                role="option"
+                :aria-selected="currentMode === mode.id"
+                class="w-full flex items-center gap-2 px-3 py-3 sm:py-2.5 text-sm hover:bg-muted transition-colors text-left min-h-[48px] sm:min-h-0 touch-manipulation"
               >
                 <Icon :name="mode.icon" class="h-4 w-4 shrink-0" />
                 <div class="flex flex-col flex-1 min-w-0">

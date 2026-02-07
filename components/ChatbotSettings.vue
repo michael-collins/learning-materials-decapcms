@@ -94,21 +94,25 @@ async function testConnection() {
 
 <template>
   <Dialog v-model:open="isOpen">
-    <DialogContent class="sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
+    <DialogContent 
+      class="sm:max-w-[550px] max-h-[85vh] overflow-y-auto"
+      aria-labelledby="settings-dialog-title"
+      aria-describedby="settings-dialog-description"
+    >
       <DialogHeader>
-        <DialogTitle class="flex items-center gap-2">
-          <Settings class="h-5 w-5" />
+        <DialogTitle id="settings-dialog-title" class="flex items-center gap-2 text-base sm:text-lg">
+          <Settings class="h-4 w-4 sm:h-5 sm:w-5" />
           Chatbot Settings
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription id="settings-dialog-description">
           Configure AI provider to enable enhanced conversational responses
         </DialogDescription>
       </DialogHeader>
 
       <div class="space-y-4 py-3">
         <!-- Enhanced Mode Toggle -->
-        <div class="rounded-lg border bg-muted/50 p-3">
-          <div class="flex items-start justify-between gap-3">
+        <div class="rounded-lg border bg-muted/50 p-3 sm:p-4">
+          <div class="flex flex-col sm:flex-row items-start sm:justify-between gap-3">
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-0.5">
                 <Sparkles class="h-4 w-4 text-primary" />
@@ -126,8 +130,10 @@ async function testConnection() {
               size="sm"
               :disabled="!canUseEnhancedMode"
               @click="toggleEnhancedMode"
-              class="shrink-0 min-w-[100px]"
+              class="shrink-0 min-w-[100px] sm:min-w-[120px] w-full sm:w-auto h-10 sm:h-9"
               :class="{ 'bg-green-600 hover:bg-green-700 text-white': settings.enhancedMode }"
+              :aria-label="settings.enhancedMode ? 'Enhanced mode is enabled. Click to disable.' : 'Enable enhanced mode'"
+              :aria-pressed="settings.enhancedMode"
             >
               <Check v-if="settings.enhancedMode" class="h-4 w-4 mr-1" />
               <AlertTriangle v-else class="h-4 w-4 mr-1" />
@@ -138,14 +144,21 @@ async function testConnection() {
 
         <!-- Provider Selection -->
         <div class="space-y-2">
-          <Label class="text-sm">AI Provider</Label>
-          <RadioGroup :model-value="settings.provider" @update:model-value="(value: string) => updateProvider(value as Provider)">
+          <Label class="text-sm font-medium">AI Provider</Label>
+          <RadioGroup 
+            :model-value="settings.provider" 
+            @update:model-value="(value: string) => updateProvider(value as Provider)"
+            role="radiogroup"
+            aria-label="Select AI provider"
+          >
             <div
               v-for="option in providerOptions"
               :key="option.value"
-              class="flex items-start space-x-2 rounded-md border p-2.5 cursor-pointer hover:bg-accent transition-colors"
+              class="flex items-start space-x-2 rounded-md border p-3 sm:p-2.5 cursor-pointer hover:bg-accent transition-colors min-h-[44px]"
               :class="{ 'border-primary bg-accent': settings.provider === option.value }"
               @click="updateProvider(option.value as Provider)"
+              role="radio"
+              :aria-checked="settings.provider === option.value"
             >
               <RadioGroupItem :value="option.value" :id="option.value" class="mt-0.5" />
               <div class="flex-1 min-w-0">
@@ -183,24 +196,29 @@ async function testConnection() {
                 :model-value="settings.apiKey"
                 @update:model-value="updateApiKey"
                 :placeholder="settings.provider === 'openai' ? 'sk-... or sk-proj-...' : settings.provider === 'google' ? 'AIza...' : 'sk-ant-...'"
-                class="pr-16 text-sm h-9"
+                class="pr-16 text-sm h-10 sm:h-9"
+                aria-label="API key"
+                :aria-describedby="settings.provider !== 'ollama' ? 'api-key-help' : undefined"
               />
               <Button
                 variant="ghost"
                 size="sm"
-                class="absolute right-0.5 top-0.5 h-8 text-xs"
+                class="absolute right-0.5 top-0.5 h-9 sm:h-8 text-xs touch-manipulation"
                 @click="showApiKey = !showApiKey"
+                :aria-label="showApiKey ? 'Hide API key' : 'Show API key'"
+                :aria-pressed="showApiKey"
               >
                 {{ showApiKey ? 'Hide' : 'Show' }}
               </Button>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <Button
                 variant="outline"
                 size="sm"
                 @click="testConnection"
                 :disabled="!settings.apiKey || testingConnection"
-                class="h-7 text-xs"
+                class="h-9 sm:h-7 text-xs min-w-[80px] touch-manipulation"
+                :aria-label="testingConnection ? 'Testing connection' : 'Test API key connection'"
               >
                 {{ testingConnection ? 'Testing...' : 'Test' }}
               </Button>
@@ -213,13 +231,14 @@ async function testConnection() {
                 Invalid
               </div>
             </div>
-            <p class="text-xs text-muted-foreground">
+            <p id="api-key-help" class="text-xs text-muted-foreground">
               Get your key from
               <a
                 :href="settings.provider === 'openai' ? 'https://platform.openai.com/api-keys' : settings.provider === 'google' ? 'https://aistudio.google.com/apikey' : 'https://console.anthropic.com/settings/keys'"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-primary hover:underline"
+                class="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+                :aria-label="'Get API key from ' + (settings.provider === 'openai' ? 'OpenAI' : settings.provider === 'google' ? 'Google AI Studio' : 'Anthropic')"
               >
                 {{ settings.provider === 'openai' ? 'OpenAI' : settings.provider === 'google' ? 'Google AI Studio' : 'Anthropic' }}
               </a>
@@ -248,14 +267,21 @@ async function testConnection() {
 
         <!-- Model Selection -->
         <div class="space-y-2">
-          <Label class="text-sm">Model</Label>
-          <RadioGroup :model-value="settings.model" @update:model-value="updateModel">
+          <Label class="text-sm font-medium">Model</Label>
+          <RadioGroup 
+            :model-value="settings.model" 
+            @update:model-value="updateModel"
+            role="radiogroup"
+            aria-label="Select AI model"
+          >
             <div
               v-for="model in availableModels"
               :key="model.id"
-              class="flex items-start space-x-2 rounded-md border p-2.5 cursor-pointer hover:bg-accent transition-colors"
+              class="flex items-start space-x-2 rounded-md border p-3 sm:p-2.5 cursor-pointer hover:bg-accent transition-colors min-h-[44px]"
               :class="{ 'border-primary bg-accent': settings.model === model.id }"
               @click="updateModel(model.id)"
+              role="radio"
+              :aria-checked="settings.model === model.id"
             >
               <RadioGroupItem :value="model.id" :id="model.id" class="mt-0.5" />
               <div class="flex-1 min-w-0">
