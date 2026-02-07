@@ -11,9 +11,17 @@ const { isOpen: chatOpen } = useChatState()
 <template>
   <footer class="border-t bg-background">
     <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="flex gap-6 text-sm text-muted-foreground justify-end items-center">
+      <div class="flex gap-2 text-sm text-muted-foreground justify-end items-center">
         
-        <NuxtLink to="/about" class="hover:text-foreground transition-colors">About</NuxtLink>
+        <Button
+          variant="ghost"
+          size="sm"
+          as="a"
+          href="/about"
+          aria-label="About"
+        >
+          About
+        </Button>
         <Button
           variant="ghost"
           size="icon"
@@ -22,9 +30,15 @@ const { isOpen: chatOpen } = useChatState()
         >
           <Bot class="h-5 w-5" />
         </Button>
-        <a href="https://github.com/michael-collins/learning-materials-decapcms" class="text-muted-foreground hover:text-foreground transition-colors" aria-label="GitHub">
-            <Github class="h-5 w-5" />
-          </a>
+        <Button
+          variant="ghost"
+          size="icon"
+          as="a"
+          href="https://github.com/michael-collins/learning-materials-decapcms"
+          aria-label="GitHub"
+        >
+          <Github class="h-5 w-5" />
+        </Button>
         <div class="ml-2 pl-2 border-l">
           <Button
               variant="ghost"
