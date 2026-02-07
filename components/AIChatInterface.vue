@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText, MoreVertical, X } from 'lucide-vue-next'
+import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText, MoreVertical, X, Copy } from 'lucide-vue-next'
 import { Dialog, DialogContentFullscreen, DialogContentPopover, DialogTitle, DialogDescription, DialogClose } from '~/components/ui/dialog'
 import Popover from '~/components/ui/popover/Popover.vue'
 import PopoverContent from '~/components/ui/popover/PopoverContent.vue'
@@ -87,7 +87,7 @@ const loadChatHistory = () => {
       {
         id: '1',
         role: 'assistant',
-        content: "Hello! I'm your learning assistant. I can help you discover learning materials, answer questions about courses and lessons, and suggest learning paths.\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses with your own API key.",
+        content: "Hello! I'm Nav Bot 3000, your learning assistant. I can help you discover learning materials, answer questions about courses and lessons, and suggest learning paths.\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses with your own API key.",
         timestamp: new Date()
       }
     ]
@@ -112,7 +112,7 @@ const loadChatHistory = () => {
     {
       id: '1',
       role: 'assistant',
-      content: "Hello! I'm your learning assistant. I can help you discover learning materials, answer questions about courses and lessons, and suggest learning paths.\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses with your own API key.",
+      content: "Hello! I'm Nav Bot 3000, your learning assistant. I can help you discover learning materials, answer questions about courses and lessons, and suggest learning paths.\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses with your own API key.",
       timestamp: new Date()
     }
   ]
@@ -156,6 +156,7 @@ const inputText = ref('')
 const isLoading = ref(false)
 const abortController = ref<AbortController | null>(null)
 const messagesEndRef = ref<HTMLElement | null>(null)
+const textareaRef = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 const settingsOpen = ref(false)
 const moreMenuOpen = ref(false)
@@ -178,7 +179,7 @@ watch(isMobile, (newIsMobile) => {
 const { settings, canUseEnhancedMode, isConfigured, currentModel } = useChatbotSettings()
 const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
 
-// Concept mode: show "Generate the concept" button after at least one user+assistant exchange
+// Concept mode: show "Generate Project Brief" button after at least one user+assistant exchange
 const canGenerateConceptSummary = computed(() => {
   if (currentMode.value !== 'concept') return false
   if (isLoading.value) return false
@@ -192,7 +193,8 @@ const hasConceptSummary = computed(() => {
   // Only hide the button if the LAST assistant message contains a concept summary
   // This allows regeneration after continuing the conversation
   const lastAssistant = [...messages.value].reverse().find(m => m.role === 'assistant')
-  return lastAssistant?.content.includes('# 🎯 PROJECT CONCEPT') ?? false
+  if (!lastAssistant) return false
+  return lastAssistant.content.includes('# PROJECT CONCEPT') || lastAssistant.content.includes('# 🎯 PROJECT CONCEPT')
 })
 
 async function generateConceptSummary() {
@@ -605,6 +607,14 @@ async function downloadConcept(message: Message) {
   }
 }
 
+async function copyMessageContent(message: Message) {
+  try {
+    await navigator.clipboard.writeText(message.content)
+  } catch (error) {
+    console.error('[Copy] Failed to copy message:', error)
+  }
+}
+
 function parseMarkdown(text: string): string {
   let html = text
   
@@ -650,7 +660,11 @@ function parseMarkdown(text: string): string {
 <template>
   <Dialog v-model:open="isOpen" :modal="isFullscreen">
     <!-- Popover Mode -->
-    <DialogContentPopover v-if="!isFullscreen" class="flex flex-col p-0 gap-0">
+    <DialogContentPopover 
+      v-if="!isFullscreen" 
+      class="flex flex-col p-0 gap-0"
+      @open-auto-focus="(e) => { e.preventDefault(); textareaRef?.focus() }"
+    >
       <DialogTitle class="sr-only">Learning Assistant Chat</DialogTitle>
       <DialogDescription class="sr-only">Chat with the AI learning assistant to find educational materials and get help with your learning journey.</DialogDescription>
       
@@ -660,7 +674,7 @@ function parseMarkdown(text: string): string {
           <Sparkles class="h-4 w-4 text-primary-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <h2 class="text-base font-semibold">Learning Assistant</h2>
+          <h2 class="text-base font-semibold">Nav Bot 3000</h2>
           <button
             v-if="settings.enhancedMode"
             @click="settingsOpen = true"
@@ -726,7 +740,9 @@ function parseMarkdown(text: string): string {
 
       <!-- Mode Selector -->
       <div class="px-3 py-2 border-b border-border">
-        <div ref="modeDropdownRef" class="mode-dropdown relative">
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-medium text-muted-foreground shrink-0">Mode</label>
+          <div ref="modeDropdownRef" class="mode-dropdown relative flex-1">
           <Button
             @click.stop="isModeDropdownOpen = !isModeDropdownOpen"
             variant="outline"
@@ -767,6 +783,7 @@ function parseMarkdown(text: string): string {
               </button>
             </div>
           </Transition>
+          </div>
         </div>
       </div>
 
@@ -796,6 +813,18 @@ function parseMarkdown(text: string): string {
                 <Bot class="h-3 w-3 text-primary-foreground" />
               </div>
               <div class="flex-1 space-y-2 overflow-hidden">
+                <!-- Copy Button -->
+                <div class="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity mb-1">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    @click="copyMessageContent(message)"
+                    class="h-6 w-6"
+                    title="Copy message"
+                  >
+                    <Copy class="h-3 w-3" />
+                  </Button>
+                </div>
                 <!-- Thinking Process -->
                 <div v-if="message.thinking && message.thinking.length > 0" class="space-y-1 mb-3">
                   <div
@@ -815,15 +844,14 @@ function parseMarkdown(text: string): string {
                 <div class="text-xs leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
 
                 <!-- Concept Summary Export Button -->
-                <div v-if="message.role === 'assistant' && message.content.includes('# 🎯 PROJECT CONCEPT')" class="mt-4 flex justify-end">
+                <div v-if="message.role === 'assistant' && (message.content.includes('# PROJECT CONCEPT') || message.content.includes('# 🎯 PROJECT CONCEPT'))" class="mt-4 flex justify-center">
                   <Button
                     size="sm"
-                    variant="outline"
                     @click="downloadConcept(message)"
                     class="h-7 text-xs gap-1"
                   >
                     <Download class="h-3 w-3" />
-                    Download Concept
+                    Download Project Brief (.docx)
                   </Button>
                 </div>
 
@@ -918,11 +946,25 @@ function parseMarkdown(text: string): string {
                   </div>
                 </div>
                 
-                <div class="flex items-center gap-2 text-[10px] text-muted-foreground">
-                  <span>{{ formatTime(message.timestamp) }}</span>
-                  <span v-if="message.model" class="flex items-center gap-1">
-                    • <Sparkles class="h-2.5 w-2.5" /> {{ message.model }}
-                  </span>
+                <!-- Divider -->
+                <div class="border-t my-3"></div>
+                
+                <div class="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                  <div class="flex items-center gap-2">
+                    <span>{{ formatTime(message.timestamp) }}</span>
+                    <span v-if="message.model" class="flex items-center gap-1">
+                      • <Sparkles class="h-2.5 w-2.5" /> {{ message.model }}
+                    </span>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    @click="copyMessageContent(message)"
+                    class="h-6 w-6"
+                    title="Copy message"
+                  >
+                    <Copy class="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -946,7 +988,7 @@ function parseMarkdown(text: string): string {
               @click="generateConceptSummary"
             >
               <FileText class="h-3.5 w-3.5" />
-              Generate the concept
+              Generate Project Brief
             </Button>
           </div>
 
@@ -973,6 +1015,7 @@ function parseMarkdown(text: string): string {
       <div class="border-t bg-background px-4 py-3 shrink-0">
         <form @submit.prevent="sendMessage" class="flex items-end gap-2">
           <Textarea
+            ref="textareaRef"
             v-model="inputText"
             placeholder="Ask a question..."
             :disabled="isLoading"
@@ -1004,8 +1047,8 @@ function parseMarkdown(text: string): string {
 
     <!-- Fullscreen Mode -->
     <DialogContentFullscreen v-else class="flex flex-col p-0 gap-0">
-      <DialogTitle class="sr-only">Learning Assistant Chat</DialogTitle>
-      <DialogDescription class="sr-only">Chat with the AI learning assistant to find educational materials and get help with your learning journey.</DialogDescription>
+      <DialogTitle class="sr-only">Nav Bot 3000 Chat</DialogTitle>
+      <DialogDescription class="sr-only">Chat with Nav Bot 3000, your AI learning assistant, to find educational materials and get help with your learning journey.</DialogDescription>
       
       <!-- Header -->
       <div class="flex items-center gap-3 border-b pl-6 pr-6 py-4 shrink-0">
@@ -1013,7 +1056,7 @@ function parseMarkdown(text: string): string {
           <Sparkles class="h-5 w-5 text-primary-foreground" />
         </div>
         <div class="flex-1 min-w-0">
-          <h2 class="text-lg font-semibold">Learning Assistant</h2>
+          <h2 class="text-lg font-semibold">Nav Bot 3000</h2>
           <p class="text-sm text-muted-foreground flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-1.5">
             <span>Discover courses, lessons, and learning paths</span>
             <button
@@ -1081,7 +1124,9 @@ function parseMarkdown(text: string): string {
 
       <!-- Mode Selector -->
       <div class="px-6 py-3 border-b border-border">
-        <div ref="modeDropdownRef" class="mode-dropdown relative">
+        <div class="flex items-center gap-3">
+          <label class="text-sm font-medium text-muted-foreground shrink-0">Mode</label>
+          <div ref="modeDropdownRef" class="mode-dropdown relative flex-1">
           <Button
             @click.stop="isModeDropdownOpen = !isModeDropdownOpen"
             variant="outline"
@@ -1122,6 +1167,7 @@ function parseMarkdown(text: string): string {
               </button>
             </div>
           </Transition>
+          </div>
         </div>
       </div>
 
@@ -1151,6 +1197,18 @@ function parseMarkdown(text: string): string {
                 <Bot class="h-4 w-4 text-primary-foreground" />
               </div>
               <div class="flex-1 space-y-3 overflow-hidden">
+                <!-- Copy Button (Fullscreen) -->
+                <div class="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity -mb-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    @click="copyMessageContent(message)"
+                    class="h-8 w-8"
+                    title="Copy message"
+                  >
+                    <Copy class="h-4 w-4" />
+                  </Button>
+                </div>
                 <!-- Thinking Process (Fullscreen) -->
                 <div v-if="message.thinking && message.thinking.length > 0" class="space-y-2 mb-4 p-3 rounded-lg bg-muted/50 border">
                   <p class="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
@@ -1174,15 +1232,14 @@ function parseMarkdown(text: string): string {
                 <div class="text-sm leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
 
                 <!-- Concept Summary Export Button (Fullscreen) -->
-                <div v-if="message.role === 'assistant' && message.content.includes('# 🎯 PROJECT CONCEPT')" class="mt-4 flex justify-end">
+                <div v-if="message.role === 'assistant' && (message.content.includes('# PROJECT CONCEPT') || message.content.includes('# 🎯 PROJECT CONCEPT'))" class="mt-4 flex justify-center">
                   <Button
                     size="sm"
-                    variant="outline"
                     @click="downloadConcept(message)"
                     class="gap-2"
                   >
                     <Download class="h-4 w-4" />
-                    Download Concept
+                    Download Project Brief (.docx)
                   </Button>
                 </div>
 
@@ -1285,11 +1342,25 @@ function parseMarkdown(text: string): string {
                   </div>
                 </div>
                 
-                <div class="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{{ formatTime(message.timestamp) }}</span>
-                  <span v-if="message.model" class="flex items-center gap-1">
-                    • <Sparkles class="h-3 w-3" /> {{ message.model }}
-                  </span>
+                <!-- Divider -->
+                <div class="border-t my-4"></div>
+                
+                <div class="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <div class="flex items-center gap-2">
+                    <span>{{ formatTime(message.timestamp) }}</span>
+                    <span v-if="message.model" class="flex items-center gap-1">
+                      • <Sparkles class="h-3 w-3" /> {{ message.model }}
+                    </span>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    @click="copyMessageContent(message)"
+                    class="h-8 w-8"
+                    title="Copy message"
+                  >
+                    <Copy class="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1313,7 +1384,7 @@ function parseMarkdown(text: string): string {
               @click="generateConceptSummary"
             >
               <FileText class="h-4 w-4" />
-              Generate the concept
+              Generate Project Brief
             </Button>
           </div>
 
@@ -1342,6 +1413,7 @@ function parseMarkdown(text: string): string {
         <form @submit.prevent="sendMessage" class="space-y-2">
           <div class="relative flex items-end gap-2">
             <Textarea
+              ref="textareaRef"
               v-model="inputText"
               placeholder="Ask a question about learning materials..."
               :disabled="isLoading"

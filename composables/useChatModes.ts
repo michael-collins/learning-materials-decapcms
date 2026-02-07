@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 
-export type ChatMode = 'ask' | 'plan' | 'concept' | 'writing' | 'career' | 'theory'
+export type ChatMode = 'auto' | 'ask' | 'plan' | 'concept' | 'career'
 
 export interface ChatModeConfig {
   id: ChatMode
@@ -13,6 +13,14 @@ export interface ChatModeConfig {
 }
 
 const CHAT_MODES: Record<ChatMode, ChatModeConfig> = {
+  auto: {
+    id: 'auto',
+    label: 'Auto',
+    description: 'Automatically detect the best mode for your question',
+    icon: 'lucide:shapes',
+    systemPromptSuffix: 'Respond appropriately based on the type of question or request.',
+    requiresEnhancedMode: false
+  },
   ask: {
     id: 'ask',
     label: 'Ask',
@@ -39,15 +47,6 @@ const CHAT_MODES: Record<ChatMode, ChatModeConfig> = {
     detectKeywords: ['project', 'concept', 'idea', 'theme', 'what should i make', 'project idea', 'develop', 'brainstorm', 'assignment'],
     requiresEnhancedMode: true
   },
-  writing: {
-    id: 'writing',
-    label: 'Writing Guide',
-    description: 'Improve technical and creative writing skills',
-    icon: 'lucide:pen-tool',
-    systemPromptSuffix: 'Help users develop writing skills for technical documentation, artist statements, and academic work. Provide structured guidance on genre conventions, style, and effective communication. Suggest exercises and review strategies.',
-    detectKeywords: ['write', 'writing', 'document', 'essay', 'paper', 'statement', 'describe'],
-    requiresEnhancedMode: true
-  },
   career: {
     id: 'career',
     label: 'Career Guide',
@@ -56,22 +55,13 @@ const CHAT_MODES: Record<ChatMode, ChatModeConfig> = {
     systemPromptSuffix: 'Guide users in career development, portfolio building, and professional skill acquisition. Connect learning materials to industry roles, recommend skill-building paths, and provide practical career advice.',
     detectKeywords: ['career', 'job', 'industry', 'professional', 'portfolio', 'work', 'employment'],
     requiresEnhancedMode: true
-  },
-  theory: {
-    id: 'theory',
-    label: 'Theory Guide',
-    description: 'Explore theoretical frameworks and philosophy',
-    icon: 'lucide:book-open',
-    systemPromptSuffix: 'Explore theoretical frameworks, philosophical foundations, and historical context. Connect abstract theory to practical application, trace evolution of ideas, and encourage critical thinking about underlying principles.',
-    detectKeywords: ['theory', 'philosophy', 'framework', 'why', 'context', 'history', 'critical'],
-    requiresEnhancedMode: true
   }
 }
 
 const CHAT_MODE_KEY = 'ai-chat-mode'
 
 export function useChatModes() {
-  const currentMode = ref<ChatMode>('ask')
+  const currentMode = ref<ChatMode>('auto')
 
   // Load saved mode from localStorage
   const loadMode = () => {
@@ -107,8 +97,10 @@ export function useChatModes() {
   const detectMode = (query: string): ChatMode | null => {
     const lowerQuery = query.toLowerCase()
     
-    // Check each mode's detection keywords
+    // Check each mode's detection keywords (skip auto and ask)
     for (const mode of Object.values(CHAT_MODES)) {
+      if (mode.id === 'auto' || mode.id === 'ask') continue
+      
       if (mode.detectKeywords) {
         for (const keyword of mode.detectKeywords) {
           if (lowerQuery.includes(keyword)) {
@@ -118,7 +110,22 @@ export function useChatModes() {
       }
     }
     
-    return null
+    // Default to ask if no specific mode detected
+    return 'ask'
+  }
+
+  // Get effective mode (resolves 'auto' to detected mode)
+  const getEffectiveMode = (query?: string): ChatMode => {
+    if (currentMode.value === 'auto' && query) {
+      return detectMode(query) || 'ask'
+    }
+    return currentMode.value
+  }
+
+  // Get effective mode config
+  const effectiveModeConfig = (query?: string) => {
+    const mode = getEffectiveMode(query)
+    return CHAT_MODES[mode]
   }
 
   const getModeConfig = (mode: ChatMode): ChatModeConfig => {
@@ -132,6 +139,8 @@ export function useChatModes() {
     setMode,
     loadMode,
     detectMode,
+    getEffectiveMode,
+    effectiveModeConfig,
     getModeConfig
   }
 }

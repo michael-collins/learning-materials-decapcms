@@ -657,19 +657,19 @@ Relevance: ${ev.reasoning}`
             // User clicked "Generate Summary" — produce the deliverable
             modeInstruction = `\n\nGENERATE THE PROJECT CONCEPT SUMMARY NOW. Use ALL information from the conversation history. Your "answer" field must be the complete formatted markdown document below. Do NOT ask any more questions.
 
-# 🎯 PROJECT CONCEPT
+# PROJECT CONCEPT
 **Title:** [Create a compelling 3-5 word project title]
-**One-Line:** [Capture the complete concept in one sentence]
+**One-liner:** [Capture the complete concept in one sentence]
 **Media:** [Format + any hybrid/experimental aspects discussed]
 
-## 📋 Overview
+## Overview
 [2-3 paragraphs: what the project is, themes it explores, how it approaches the topic, intended impact on the audience]
 
-## 🎨 Visual Direction
+## Visual Direction
 **Aesthetic:** [Based on conversation, or suggest 2-3 concrete options if not discussed]
 **Key Elements:** [Specific visual motifs, techniques, or stylistic choices that convey the concept]
 
-## 🔍 Research & Inspiration
+## Research & Inspiration
 **Artists to Explore:**
 1. [Real Artist Name] - [Why their work directly connects to this project's themes]
 2. [Real Artist Name] - [Why their work directly connects to this project's themes]  
@@ -680,17 +680,15 @@ Relevance: ${ev.reasoning}`
 - [Real book, article, documentary, or video] - [How it connects]
 - [Real book, article, documentary, or video] - [How it connects]
 
-IMPORTANT: Recommend REAL artists and sources from your knowledge that genuinely relate to the project's themes. Never write "TBD".
-
-## 🛠️ Skills & Tools
+## Skills & Tools
 **Skills:** [Specific technical skills needed based on media format]
 **Tools:** [Recommend specific software/tools, or suggest options if not discussed]
 **Level:** [Assess from project scope, or suggest a reasonable starting level]
 
-## ✅ Scope & Feasibility  
+## Scope & Feasibility  
 [Realistic assessment of what's achievable, potential challenges, rough time estimate]
 
-## 🎯 Success Criteria
+## Success Criteria
 **This project should communicate:**
 - [Extract from conversation]
 - [Extract from conversation]

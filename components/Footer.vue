@@ -18,7 +18,7 @@ const { isOpen: chatOpen } = useChatState()
           variant="ghost"
           size="icon"
           @click="chatOpen = true"
-          aria-label="Open AI Learning Assistant"
+          aria-label="Open Nav Bot 3000"
         >
           <Bot class="h-5 w-5" />
         </Button>

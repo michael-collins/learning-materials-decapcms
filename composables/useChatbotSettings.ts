@@ -112,6 +112,14 @@ const defaultSettings: ChatbotSettings = {
 
 // Shared state - single source of truth
 const settings = ref<ChatbotSettings>(loadSettings())
+const dynamicModels = ref<Record<Provider, ModelOption[] | null>>({
+  openai: null,
+  anthropic: null,
+  google: null,
+  ollama: null
+})
+const loadingModels = ref(false)
+const showAllModels = ref(false)
 
 // Auto-save on changes (client-side only)
 if (typeof window !== 'undefined') {
@@ -148,12 +156,121 @@ function loadSettings(): ChatbotSettings {
   return { ...defaultSettings }
 }
 
+async function fetchModels(provider: Provider, apiKey: string): Promise<ModelOption[]> {
+  if (provider === 'ollama') {
+    try {
+      const response = await fetch('http://localhost:11434/api/tags')
+      if (!response.ok) throw new Error('Ollama not running')
+      const data = await response.json()
+      return data.models?.map((m: any) => ({
+        id: m.name,
+        name: m.name,
+        description: `Size: ${(m.size / 1024 / 1024 / 1024).toFixed(1)}GB`
+      })) || AVAILABLE_MODELS.ollama
+    } catch (error) {
+      console.warn('Failed to fetch Ollama models, using defaults:', error)
+      return AVAILABLE_MODELS.ollama
+    }
+  }
+
+  if (!apiKey) {
+    return AVAILABLE_MODELS[provider]
+  }
+
+  try {
+    let url = ''
+    let headers: Record<string, string> = {}
+
+    switch (provider) {
+      case 'openai':
+        url = 'https://api.openai.com/v1/models'
+        headers = { 'Authorization': `Bearer ${apiKey}` }
+        break
+      case 'anthropic':
+        // Anthropic doesn't have a models endpoint, use hardcoded
+        return AVAILABLE_MODELS.anthropic
+      case 'google':
+        url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+        break
+      default:
+        return AVAILABLE_MODELS[provider]
+    }
+
+    const response = await fetch(url, { headers })
+    if (!response.ok) {
+      console.warn(`Failed to fetch ${provider} models, using defaults`)
+      return AVAILABLE_MODELS[provider]
+    }
+
+    const data = await response.json()
+    let models: ModelOption[] = []
+
+    if (provider === 'openai') {
+      // Filter to chat completion models, sort by most recent
+      models = data.data
+        ?.filter((m: any) => {
+          const id = m.id.toLowerCase()
+          // Include GPT models, exclude embeddings, audio, vision-only, and legacy
+          return (
+            id.startsWith('gpt') || 
+            id.startsWith('o1') || 
+            id.startsWith('o3')
+          ) && 
+          !id.includes('embedding') &&
+          !id.includes('audio') &&
+          !id.includes('whisper') &&
+          !id.includes('dall-e') &&
+          !id.includes('tts') &&
+          !id.includes('realtime')
+        })
+        ?.sort((a: any, b: any) => {
+          // Sort by creation date, newest first
+          return (b.created || 0) - (a.created || 0)
+        })
+        ?.map((m: any) => ({
+          id: m.id,
+          name: m.id,
+          description: m.owned_by || 'OpenAI model'
+        })) || []
+    } else if (provider === 'google') {
+      // Filter to generation models
+      models = data.models
+        ?.filter((m: any) => 
+          m.name.includes('gemini') && 
+          m.supportedGenerationMethods?.includes('generateContent')
+        )
+        ?.map((m: any) => ({
+          id: m.name.replace('models/', ''),
+          name: m.displayName || m.name.replace('models/', ''),
+          description: m.description || 'Google Gemini model'
+        })) || []
+    }
+
+    // If we got models, return them, otherwise use defaults
+    return models.length > 0 ? models : AVAILABLE_MODELS[provider]
+  } catch (error) {
+    console.warn(`Error fetching ${provider} models, using defaults:`, error)
+    return AVAILABLE_MODELS[provider]
+  }
+}
+
 export function useChatbotSettings() {
-  const availableModels = computed(() => AVAILABLE_MODELS[settings.value.provider])
+  const availableModels = computed(() => {
+    // If showing all models and we have dynamic models, use those
+    if (showAllModels.value) {
+      const dynamic = dynamicModels.value[settings.value.provider]
+      if (dynamic && dynamic.length > 0) return dynamic
+    }
+    // Otherwise show curated hardcoded list
+    return AVAILABLE_MODELS[settings.value.provider]
+  })
   
-  const currentModel = computed(() => 
-    availableModels.value.find(m => m.id === settings.value.model) || availableModels.value[0]
-  )
+  const currentModel = computed(() => {
+    if (availableModels.value.length === 0) {
+      return { id: '', name: 'No models available', description: '' }
+    }
+    return availableModels.value.find(m => m.id === settings.value.model) || availableModels.value[0]
+  })
   
   const isConfigured = computed(() => {
     if (settings.value.provider === 'ollama') {
@@ -199,16 +316,36 @@ export function useChatbotSettings() {
     settings.value.enhancedMode = false
   }
 
+  async function loadModels(provider: Provider, apiKey: string) {
+    loadingModels.value = true
+    try {
+      const models = await fetchModels(provider, apiKey)
+      dynamicModels.value[provider] = models
+      
+      // If current model is not in the new list, switch to first available
+      if (!models.some(m => m.id === settings.value.model)) {
+        settings.value.model = models[0].id
+      }
+    } catch (error) {
+      console.error('Failed to load models:', error)
+    } finally {
+      loadingModels.value = false
+    }
+  }
+
   return {
     settings,
     availableModels,
     currentModel,
     isConfigured,
     canUseEnhancedMode,
+    loadingModels,
+    showAllModels,
     updateProvider,
     updateApiKey,
     updateModel,
     toggleEnhancedMode,
-    clearApiKey
+    clearApiKey,
+    loadModels
   }
 }

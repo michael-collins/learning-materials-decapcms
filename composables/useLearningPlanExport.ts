@@ -159,117 +159,133 @@ export function useLearningPlanExport() {
   }
 
   const exportConceptToWord = async (content: string) => {
-    console.log('[Export] Starting RTF concept export, content length:', content?.length)
+    console.log('[Export] Starting Word concept export, content length:', content?.length)
     
     if (!content || typeof content !== 'string') {
       throw new Error('Invalid content provided for export')
     }
     
-    // Helper to clean and escape text for RTF
-    const cleanText = (text: string): string => {
-      return text
-        // Remove emojis and special unicode characters
-        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-        .replace(/[🎯🎨🔍🛠️✅📋💡]/g, '')
-        // Convert smart quotes and other special chars (dashes handled earlier in main loop)
-        .replace(/'/g, "'")  // smart single quote
-        .replace(/'/g, "'")  // smart single quote
-        .replace(/"/g, '"')  // smart double quote
-        .replace(/"/g, '"')  // smart double quote
-        .replace(/…/g, '...')  // ellipsis
-        // Escape RTF special characters
-        .replace(/\\/g, '\\\\')
-        .replace(/{/g, '\\{')
-        .replace(/}/g, '\\}')
-        .trim()
+    // Helper to parse markdown text into TextRun objects
+    const parseInlineMarkdown = (text: string): TextRun[] => {
+      const runs: TextRun[] = []
+      const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g)
+      
+      for (const part of parts) {
+        if (!part) continue
+        
+        if (part.startsWith('**') && part.endsWith('**')) {
+          // Bold text
+          runs.push(new TextRun({
+            text: part.slice(2, -2),
+            bold: true
+          }))
+        } else if (part.startsWith('*') && part.endsWith('*')) {
+          // Italic text
+          runs.push(new TextRun({
+            text: part.slice(1, -1),
+            italics: true
+          }))
+        } else {
+          // Regular text
+          runs.push(new TextRun({ text: part }))
+        }
+      }
+      
+      return runs
     }
-    
-    // Helper to process inline markdown (bold, italic)
-    const processInline = (text: string): string => {
-      let result = cleanText(text)
-      // Replace **bold** with RTF bold codes
-      result = result.replace(/\*\*([^*]+)\*\*/g, '{\\b $1}')
-      // Replace *italic* with RTF italic codes (single asterisk)
-      result = result.replace(/\*([^*]+)\*/g, '{\\i $1}')
-      return result
-    }
-    
-    // Generate RTF content
-    let rtf = '{\\rtf1\\ansi\\deff0\n'
-    rtf += '{\\fonttbl{\\f0\\froman\\fcharset0 Times New Roman;}}\n'
-    rtf += '\\viewkind4\\uc1\\pard\\f0\\fs24\n'
     
     const lines = content.split('\n')
+    const paragraphs: Paragraph[] = []
     
     for (const line of lines) {
-      let trimmed = line.trim()
+      const trimmed = line.trim()
+      
       if (!trimmed) {
-        rtf += '\\par\n'
+        // Empty line
+        paragraphs.push(new Paragraph({ text: '' }))
         continue
       }
       
-      // Convert em/en dashes to regular hyphens FIRST, before any other processing
-      trimmed = trimmed.replace(/—/g, '-').replace(/–/g, '-')
+      // Remove emoji unicode (docx handles text better than RTF)
+      const cleanLine = trimmed
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+        .replace(/[🎯🎨🔍🛠️✅📋💡]/g, '')
       
-      if (trimmed.startsWith('# ')) {
-        // H1 - Large, bold
-        const text = processInline(trimmed.substring(2))
-        rtf += `\\pard\\sb240\\sa120\\b\\fs32 ${text}\\b0\\fs24\\par\n`
-      } else if (trimmed.startsWith('## ')) {
-        // H2 - Medium, bold
-        const text = processInline(trimmed.substring(3))
-        rtf += `\\pard\\sb180\\sa100\\b\\fs28 ${text}\\b0\\fs24\\par\n`
-      } else if (trimmed.startsWith('### ')) {
-        // H3 - Smaller, bold
-        const text = processInline(trimmed.substring(4))
-        rtf += `\\pard\\sb120\\sa80\\b\\fs26 ${text}\\b0\\fs24\\par\n`
-      } else if (trimmed.match(/^[0-9]+\.\s/)) {
-        // Numbered list - keep the number
-        const text = processInline(trimmed)
-        rtf += `\\pard\\li360\\sa60 ${text}\\par\n`
-      } else if (trimmed.match(/^[-*]\s/)) {
-        // Bullet list - remove the markdown bullet/hyphen
-        let text = trimmed.substring(2).trim()
-        // Remove ALL leading hyphens, dashes, and spaces aggressively
-        while (text.match(/^[-—–\s]/)) {
-          text = text.substring(1).trim()
-        }
-        const processed = processInline(text)
-        rtf += `\\pard\\li360\\sa60 \\bullet  ${processed}\\par\n`
-      } else if (trimmed === '---') {
-        // Horizontal rule
-        rtf += `\\pard\\sb120\\sa120\\brdrb\\brdrs\\brdrw10\\brsp20\\par\n`
+      if (cleanLine.startsWith('# ')) {
+        // H1
+        const text = cleanLine.substring(2)
+        paragraphs.push(new Paragraph({
+          children: parseInlineMarkdown(text),
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 200 }
+        }))
+      } else if (cleanLine.startsWith('## ')) {
+        // H2
+        const text = cleanLine.substring(3)
+        paragraphs.push(new Paragraph({
+          children: parseInlineMarkdown(text),
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 200, after: 120 }
+        }))
+      } else if (cleanLine.startsWith('### ')) {
+        // H3
+        const text = cleanLine.substring(4)
+        paragraphs.push(new Paragraph({
+          children: parseInlineMarkdown(text),
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 120, after: 80 }
+        }))
+      } else if (cleanLine.match(/^[0-9]+\.\s/)) {
+        // Numbered list - keep as regular text with indent
+        paragraphs.push(new Paragraph({
+          children: parseInlineMarkdown(cleanLine),
+          indent: { left: 360 },
+          spacing: { after: 80 }
+        }))
+      } else if (cleanLine.match(/^[-*]\s/)) {
+        // Bullet list
+        const text = cleanLine.substring(2).trim()
+        paragraphs.push(new Paragraph({
+          children: parseInlineMarkdown(text),
+          bullet: { level: 0 },
+          spacing: { after: 80 }
+        }))
+      } else if (cleanLine === '---') {
+        // Horizontal rule (represented as a line of dashes)
+        paragraphs.push(new Paragraph({
+          text: '_______________________________________________',
+          spacing: { before: 200, after: 200 }
+        }))
       } else {
         // Regular paragraph
-        const text = processInline(trimmed)
-        rtf += `\\pard\\sa100 ${text}\\par\n`
+        paragraphs.push(new Paragraph({
+          children: parseInlineMarkdown(cleanLine),
+          spacing: { after: 120 }
+        }))
       }
     }
     
-    // Add footer
-    rtf += '\\pard\\sb240\\sa60\\i\\fs20 Generated on ' + new Date().toLocaleDateString() + '\\i0\\fs24\\par\n'
-    rtf += '}\n'
+    // Don't add footer - it's already in the AI-generated content
     
-    console.log('[Export] Generated RTF, length:', rtf.length)
+    const doc = new Document({
+      styles: {
+        default: {
+          document: {
+            run: {
+              font: 'Helvetica'
+            }
+          }
+        }
+      },
+      sections: [{
+        properties: {},
+        children: paragraphs
+      }]
+    })
     
-    // Create blob and download
-    const blob = new Blob([rtf], { type: 'application/rtf' })
-    const fileName = `project_concept_${new Date().toISOString().slice(0, 10)}.rtf`
-    
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = fileName
-    link.style.display = 'none'
-    document.body.appendChild(link)
-    link.click()
-    
-    setTimeout(() => {
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-    }, 500)
-    
-    console.log('[Export] RTF download completed successfully')
+    const fileName = `project_concept_${new Date().toISOString().slice(0, 10)}.docx`
+    await downloadDocx(doc, fileName)
+    console.log('[Export] Word document export completed successfully')
   }
   
   return {
