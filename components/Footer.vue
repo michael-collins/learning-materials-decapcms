@@ -24,6 +24,15 @@ const { isOpen: chatOpen } = useChatState()
         </Button>
         <Button
           variant="ghost"
+          size="sm"
+          as="a"
+          href="/terms"
+          aria-label="Terms of Use"
+        >
+          Terms
+        </Button>
+        <Button
+          variant="ghost"
           size="icon"
           @click="chatOpen = true"
           aria-label="Open Nav Bot 3000"
