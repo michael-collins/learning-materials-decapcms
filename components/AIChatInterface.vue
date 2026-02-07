@@ -184,8 +184,10 @@ const canGenerateConceptSummary = computed(() => {
   if (currentMode.value !== 'concept') return false
   if (isLoading.value) return false
   // Need at least 1 user message that got a response (greeting + user msg + AI reply = 3+)
+  // And the last message must be from the assistant (response completed)
   const userCount = messages.value.filter(m => m.role === 'user').length
-  return userCount >= 1 && messages.value.length >= 3
+  const lastMessage = messages.value[messages.value.length - 1]
+  return userCount >= 1 && messages.value.length >= 3 && lastMessage?.role === 'assistant'
 })
 
 // Already has a generated concept summary in this session — but allow regeneration
