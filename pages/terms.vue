@@ -57,7 +57,7 @@ definePageMeta({
       </p>
 
       <h2>3. AI-Powered Features</h2>
-      <h3>AI Chat Assistant ("Nav Bot 3000")</h3>
+      <h3>AI Chat Assistant</h3>
       <p>
         This website includes an AI-powered chatbot to assist with navigation and content discovery. 
         By using this feature, you acknowledge and agree that:
