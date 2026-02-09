@@ -1,5 +1,6 @@
 import type { Provider } from './useChatbotSettings'
 import type { ChatMode } from './useChatModes'
+import { useRubrics } from './useRubrics'
 
 interface SearchResult {
   title: string
@@ -655,7 +656,7 @@ Relevance: ${ev.reasoning}`
           
           if (isConceptSummaryRequest) {
             // User clicked "Generate Summary" — produce the deliverable
-            modeInstruction = `\n\nGENERATE THE PROJECT CONCEPT SUMMARY NOW. Use ALL information from the conversation history. Your "answer" field must be the complete formatted markdown document below. Do NOT ask any more questions.
+            modeInstruction = `\n\nGENERATE THE PROJECT CONCEPT SUMMARY NOW. Use ALL information from the conversation history. Return ONLY the formatted markdown document below (no JSON, no code blocks, just the markdown content). Do NOT ask any more questions.
 
 # PROJECT CONCEPT
 **Title:** [Create a compelling 3-5 word project title]
@@ -708,6 +709,51 @@ Have a natural, encouraging conversation about their project concept. Review the
           console.log(`[Concept Mode] Instruction length: ${modeInstruction.length}`)
         } else if (mode === 'plan') {
           modeInstruction = `\n\nMODE: ${modeLabel}. Create a comprehensive, structured learning plan with step-by-step progression, recommended materials from the provided list, and time estimates. Organize content from foundational to advanced.`
+        } else if (mode === 'critique') {
+          const turnCount = conversation ? conversation.filter(t => t.role === 'user').length + 1 : 1
+          
+          // Include actual rubric criteria so feedback is grounded in real assessment standards
+          const { formatAllRubricsForPrompt } = useRubrics()
+          const rubricContext = formatAllRubricsForPrompt()
+          
+          modeInstruction = `\n\nMODE: ${modeLabel}.
+You are a peer review and critique coach with access to the actual grading rubrics used in this curriculum.
+
+ASSESSMENT RUBRICS:
+${rubricContext}
+
+The user has chosen a focus area — adapt your guidance accordingly:
+- **Critique Prep**: Help them organize talking points about their own work. Ask what type of assignment it is (exercise, project, written statement) so you can reference the correct rubric. Walk through each criterion: how does their work measure up? Help them anticipate questions.
+- **Give Feedback**: Guide them through constructive feedback grounded in the rubric criteria. For each criterion, help them articulate: 1) What meets the standard and why, 2) Specific suggestions for strengthening weak areas, 3) Questions for the creator. Always tie feedback to specific rubric criteria.
+- **Process Feedback**: Help them sort through critique notes. Map feedback they received to specific rubric criteria. Identify patterns, distinguish actionable vs subjective feedback, and prioritize what to address based on rubric weight.
+- **Self-Evaluate**: Guide them through a systematic self-assessment against the rubric. Ask what type of assignment it is, then walk through each criterion one by one: what evidence demonstrates they've met it? Where are the gaps?
+
+IMPORTANT: When the user mentions what type of work they're doing (exercise, project, written statement, task), reference the specific grading criteria from that rubric. Ground your feedback in these real assessment standards rather than generic advice.
+
+Review conversation history. Ask 2-3 focused follow-up questions at a time. Be specific — ask for details about the actual work. Keep responses concise and encouraging.${turnCount >= 3 ? '\n\nYou\'ve built good context. Start providing structured feedback mapped to specific rubric criteria.' : ''}`
+        } else if (mode === 'pathway') {
+          modeInstruction = `\n\nMODE: ${modeLabel}.
+You are a curriculum pathway advisor. Your goal is to help the user find the right learning path based on their interests, goals, and experience level.
+- Recommend specific pathways, specializations, and sequences from the available materials
+- Ask about: what topics excite them, what they already know, what they want to build toward
+- Help them see connections between different subjects and skills
+- If materials are available, reference specific ones by title and explain why they fit
+- Consider prerequisites and suggest a logical progression
+Keep responses encouraging and help them feel confident in their chosen direction.`
+        } else if (mode === 'explain') {
+          modeInstruction = `\n\nMODE: ${modeLabel}.
+You are a patient concept explainer. Follow this pattern:
+1. **Simple explanation** with an everyday analogy the user can relate to
+2. **Concrete example** showing the concept in practice
+3. **Why it matters** — practical relevance to their work or studies
+
+Rules:
+- Start at a foundational level unless the user indicates they're advanced
+- Avoid jargon; if you must use a technical term, define it immediately
+- After explaining, offer: "Would you like me to go deeper, or explain a related concept?"
+- If relevant materials exist in the curriculum, mention them naturally
+- Use formatting (bold key terms, bullet points) for clarity
+- Keep each explanation focused — one concept at a time`
         } else {
           modeInstruction = `\n\nMODE: ${modeLabel}.`
         }
@@ -716,7 +762,11 @@ Have a natural, encouraging conversation about their project concept. Review the
       // When generating concept summary, skip materials and use higher token limit
       const isForcingSummary = isConceptSummaryRequest
 
-      const systemPrompt = `You are a learning assistant.${modeInstruction}
+      const systemPrompt = isForcingSummary
+        ? `You are a learning assistant.${modeInstruction}
+
+Return the complete markdown document directly. Do not wrap it in JSON or code blocks.`
+        : `You are a learning assistant.${modeInstruction}
 
 Return ONLY valid JSON:
 {
@@ -732,7 +782,7 @@ Return ONLY valid JSON:
         : query
 
       const userPrompt = isForcingSummary
-        ? `User: "${cleanQuery}"\n\nUsing everything discussed in the conversation, create the complete project concept summary now.`
+        ? `User: "${cleanQuery}"\n\nUsing everything discussed in the conversation, create the complete project concept summary now as a formatted markdown document.`
         : `User: "${cleanQuery}"
 
 Materials available:
@@ -779,6 +829,23 @@ Respond with JSON.`
       })
 
       console.log('[Stage 3] Synthesis response (regular mode):', response.content?.length, 'chars')
+
+      // For concept summary generation, return markdown directly without JSON parsing
+      if (isForcingSummary) {
+        // Strip markdown code block markers if present
+        const cleaned = response.content
+          .replace(/^```markdown\s*/i, '')
+          .replace(/^```md\s*/i, '')
+          .replace(/^```\s*/i, '')
+          .replace(/```\s*$/i, '')
+          .trim()
+        console.log('[Stage 3] Concept summary generated:', cleaned.length, 'chars')
+        return {
+          content: cleaned,
+          references: [],
+          plan: undefined
+        }
+      }
 
       const cleaned = response.content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
       const parsed = JSON.parse(cleaned)
@@ -840,13 +907,14 @@ Respond with JSON.`
     try {
       console.log('[MultiStage] Starting three-stage reasoning...')
 
-      // Skip material search for concept mode - it's purely conversational
-      if (mode === 'concept') {
-        console.log('[MultiStage] Concept mode: skipping material search')
+      // Skip material search for concept and critique modes - they're purely conversational
+      if (mode === 'concept' || mode === 'critique') {
+        const modeDesc = mode === 'concept' ? 'Project concept development' : 'Peer review & critique coaching'
+        console.log(`[MultiStage] ${modeDesc}: skipping material search`)
         
-        onThinkingUpdate?.('Analyzing', 'Understanding your project concept...', false)
+        onThinkingUpdate?.('Analyzing', mode === 'concept' ? 'Understanding your project concept...' : 'Preparing critique guidance...', false)
         const analysis = { concepts: [], goals: [], contentTypes: [], wantsPlan: false }
-        onThinkingUpdate?.('Analyzing', 'Project concept development', true)
+        onThinkingUpdate?.('Analyzing', modeDesc, true)
         
         onThinkingUpdate?.('Synthesizing', 'Crafting your response...', false)
         const synthesis = await synthesizeResponse(query, analysis, [], [], provider, apiKey, model, mode, conversation, signal)
@@ -859,7 +927,7 @@ Respond with JSON.`
           references: synthesis.references || [],
           plan: undefined,
           thinking: {
-            analysis: 'Project concept development',
+            analysis: modeDesc,
             evaluation: '',
             synthesis: 'Response complete'
           }

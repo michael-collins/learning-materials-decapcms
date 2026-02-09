@@ -31,6 +31,7 @@ const {
   settings,
   availableModels,
   currentModel,
+  dynamicModels,
   updateProvider,
   updateApiKey,
   updateModel,
@@ -54,6 +55,33 @@ const isSaving = ref(false)
 const justSaved = ref(false)
 const isProviderDropdownOpen = ref(false)
 const isModelDropdownOpen = ref(false)
+
+// Draft-aware model list (uses draft provider, not saved provider)
+const draftAvailableModels = computed(() => {
+  const provider = draftProvider.value
+  const dynamic = dynamicModels.value[provider]
+
+  // For Ollama, always prefer dynamically loaded models (actual installed models)
+  if (provider === 'ollama' && dynamic && dynamic.length > 0) {
+    return dynamic
+  }
+
+  // For cloud providers, show dynamic models only when "Show All" is toggled
+  if (showAllModels.value && dynamic && dynamic.length > 0) {
+    return dynamic
+  }
+
+  // Otherwise show curated hardcoded list
+  return AVAILABLE_MODELS[provider]
+})
+
+// Draft-aware selected model display
+const draftSelectedModel = computed(() => {
+  if (draftAvailableModels.value.length === 0) {
+    return { id: '', name: 'No models available', description: '' }
+  }
+  return draftAvailableModels.value.find(m => m.id === draftModel.value) || draftAvailableModels.value[0]
+})
 
 // Reset draft to saved settings
 function resetToSaved() {
@@ -93,6 +121,16 @@ watch(draftProvider, (newProvider) => {
     loadModels('ollama', '')
   } else if (draftApiKey.value) {
     loadModels(newProvider, draftApiKey.value)
+  }
+})
+
+// When dynamic models finish loading for the draft provider, auto-select first if current draft model isn't in the list
+watch(loadingModels, (loading) => {
+  if (!loading) {
+    const models = dynamicModels.value[draftProvider.value]
+    if (models && models.length > 0 && !models.some(m => m.id === draftModel.value)) {
+      draftModel.value = models[0].id
+    }
   }
 })
 
@@ -140,8 +178,11 @@ async function saveSettings() {
 // Handle provider change
 function handleProviderChange(provider: Provider) {
   draftProvider.value = provider
-  // Set default model for new provider
-  draftModel.value = AVAILABLE_MODELS[provider][0].id
+  // For Ollama, don't set a hardcoded default — wait for dynamic models to load
+  // For other providers, set default model immediately
+  if (provider !== 'ollama') {
+    draftModel.value = AVAILABLE_MODELS[provider][0].id
+  }
   testResult.value = null
 }
 
@@ -423,7 +464,7 @@ async function testConnection() {
               :disabled="loadingModels || (draftProvider !== 'ollama' && !draftApiKey)"
             >
               <span class="flex-1 text-left">
-                {{ loadingModels ? 'Loading models...' : (draftProvider !== 'ollama' && !draftApiKey) ? 'Enter API key first' : currentModel.name }}
+                {{ loadingModels ? 'Loading models...' : (draftProvider !== 'ollama' && !draftApiKey) ? 'Enter API key first' : draftSelectedModel.name }}
               </span>
               <ChevronDown v-if="!loadingModels" :class="['h-4 w-4 transition-transform duration-200', isModelDropdownOpen ? 'rotate-180' : '']" />
             </Button>
@@ -436,11 +477,11 @@ async function testConnection() {
                 class="absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden"
                 @click.stop
               >
-                <div v-if="availableModels.length === 0" class="px-3 py-4 text-sm text-muted-foreground text-center">
+                <div v-if="draftAvailableModels.length === 0" class="px-3 py-4 text-sm text-muted-foreground text-center">
                   Enter an API key to load models
                 </div>
                 <button
-                  v-for="model in availableModels"
+                  v-for="model in draftAvailableModels"
                   :key="model.id"
                   @click="draftModel = model.id; isModelDropdownOpen = false"
                   role="option"

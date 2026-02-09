@@ -177,8 +177,26 @@ async function callAnthropic(
   model: string,
   systemPrompt: string,
   userPrompt: string,
-  max_tokens?: number
+  max_tokens?: number,
+  conversationMessages?: Array<{ role: string; content: string }>
 ) {
+  // Build messages array: conversation history + current user prompt
+  // Anthropic uses a separate 'system' param, so messages only contain user/assistant turns
+  const messages = conversationMessages
+    ? [
+        ...conversationMessages,
+        { role: 'user', content: userPrompt }
+      ]
+    : [
+        { role: 'user', content: userPrompt }
+      ]
+
+  console.log('[Chat API] Anthropic request:', {
+    model,
+    messageCount: messages.length,
+    hasConversation: !!conversationMessages
+  })
+
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -189,9 +207,7 @@ async function callAnthropic(
     body: JSON.stringify({
       model,
       system: systemPrompt,
-      messages: [
-        { role: 'user', content: userPrompt }
-      ],
+      messages,
       max_tokens: max_tokens || 800,
       temperature: 0.7
     })
@@ -223,8 +239,29 @@ async function callGoogle(
   model: string,
   systemPrompt: string,
   userPrompt: string,
-  max_tokens?: number
+  max_tokens?: number,
+  conversationMessages?: Array<{ role: string; content: string }>
 ) {
+  // Build contents array: conversation history + current user prompt
+  // Google uses a different format: contents[].role + contents[].parts[].text
+  const contents = conversationMessages
+    ? [
+        ...conversationMessages.map(msg => ({
+          role: msg.role === 'assistant' ? 'model' : msg.role,
+          parts: [{ text: msg.content }]
+        })),
+        { role: 'user', parts: [{ text: userPrompt }] }
+      ]
+    : [
+        { role: 'user', parts: [{ text: userPrompt }] }
+      ]
+
+  console.log('[Chat API] Google request:', {
+    model,
+    contentsCount: contents.length,
+    hasConversation: !!conversationMessages
+  })
+
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     {
@@ -233,11 +270,10 @@ async function callGoogle(
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${systemPrompt}\n\n${userPrompt}`
-          }]
-        }],
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        contents,
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: max_tokens || 800
@@ -271,8 +307,27 @@ async function callOllama(
   model: string,
   systemPrompt: string,
   userPrompt: string,
-  max_tokens?: number
+  max_tokens?: number,
+  conversationMessages?: Array<{ role: string; content: string }>
 ) {
+  // Build messages array: system + conversation history + current user prompt
+  const messages = conversationMessages
+    ? [
+        { role: 'system', content: systemPrompt },
+        ...conversationMessages,
+        { role: 'user', content: userPrompt }
+      ]
+    : [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]
+
+  console.log('[Chat API] Ollama request:', {
+    model,
+    messageCount: messages.length,
+    hasConversation: !!conversationMessages
+  })
+
   const response = await fetch('http://localhost:11434/api/chat', {
     method: 'POST',
     headers: {
@@ -280,10 +335,7 @@ async function callOllama(
     },
     body: JSON.stringify({
       model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
+      messages,
       stream: false,
       options: {
         temperature: 0.7,

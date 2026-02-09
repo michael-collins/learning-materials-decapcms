@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText, MoreVertical, X, Copy } from 'lucide-vue-next'
+import { Bot, Send, Sparkles, Trash2, Maximize2, Minimize2, Settings, Download, ChevronDown, Check, FileText, MoreVertical, X, Copy, RefreshCw } from 'lucide-vue-next'
 import { Dialog, DialogContentFullscreen, DialogContentPopover, DialogTitle, DialogDescription, DialogClose } from '~/components/ui/dialog'
 import Popover from '~/components/ui/popover/Popover.vue'
 import PopoverContent from '~/components/ui/popover/PopoverContent.vue'
@@ -70,7 +70,7 @@ const isOpen = computed({
 
 const { loadIndex, search, hybridSearch, detectIntent, isLoading: searchIndexLoading, isLoaded } = useSchemaEnhancedSearch()
 const { exportToWord, exportConceptToWord } = useLearningPlanExport()
-const { currentMode, modeConfig, allModes, setMode, loadMode } = useChatModes()
+const { currentMode, modeConfig, allModes, setMode, loadMode, getModeConfig } = useChatModes()
 
 // Mode dropdown state
 const isModeDropdownOpen = ref(false)
@@ -137,11 +137,17 @@ const saveChatHistory = () => {
 
 // Clear chat history
 const clearChatHistory = () => {
+  const modeLabel = getModeConfig(currentMode.value).label
+  const modelName = currentModel.value?.name || 'No model selected'
+  const statusMessage = `Chat history cleared.\n**${modeLabel}** mode active.\nUsing **${modelName}**.`
+  
+  const enhancedTip = "\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses."
+  
   messages.value = [
     {
       id: Date.now().toString(),
       role: 'assistant',
-      content: "Chat history cleared. How can I help you today?\n\n💡 **Tip:** Enable **Enhanced Mode** in settings for AI-powered conversational responses.",
+      content: settings.value.enhancedMode ? statusMessage : statusMessage + enhancedTip,
       timestamp: new Date()
     }
   ]
@@ -152,11 +158,30 @@ const clearChatHistory = () => {
 watch(messages, () => {
   saveChatHistory()
 }, { deep: true })
+
+// Watch for mode changes and add a status message
+watch(currentMode, (newMode, oldMode) => {
+  // Only add message if there was a previous mode (not initial load)
+  // and there are already messages (user has started chatting)
+  if (oldMode && messages.value.length > 0) {
+    const modeLabel = getModeConfig(newMode).label
+    const modelName = currentModel.value?.name || 'No model selected'
+    const statusMessage = `**${modeLabel}** mode active.\nUsing **${modelName}**.`
+    
+    messages.value.push({
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: statusMessage,
+      timestamp: new Date()
+    })
+  }
+})
+
 const inputText = ref('')
 const isLoading = ref(false)
 const abortController = ref<AbortController | null>(null)
 const messagesEndRef = ref<HTMLElement | null>(null)
-const textareaRef = ref<HTMLElement | null>(null)
+const textareaRef = ref<any>(null)
 const isFullscreen = ref(false)
 const settingsOpen = ref(false)
 const moreMenuOpen = ref(false)
@@ -205,6 +230,68 @@ async function generateConceptSummary() {
   inputText.value = '__GENERATE_CONCEPT_SUMMARY__'
   await sendMessage()
 }
+
+// Critique mode: selected focus area
+const critiqueFocus = ref<string | null>(null)
+
+// Whether to show critique focus buttons (only before first user message)
+const showCritiqueFocusButtons = computed(() => {
+  if (currentMode.value !== 'critique') return false
+  // Only show if user hasn't sent a message yet
+  const userMessages = messages.value.filter(m => m.role === 'user')
+  return userMessages.length === 0 && !critiqueFocus.value
+})
+
+// Get focus options from mode config
+const critiqueFocusOptions = computed(() => {
+  const config = modeConfig.value
+  return config.focusOptions || []
+})
+
+// Starter action buttons for welcome screen
+const starterActions = [
+  { mode: 'plan' as ChatMode, prompt: 'Create a beginner 3D modeling lesson plan', label: 'Create Learning Plan', icon: 'lucide:list-tree' },
+  { mode: 'concept' as ChatMode, prompt: 'Help me develop a UX design project concept', label: 'Develop Project Brief', icon: 'lucide:lightbulb' },
+  { mode: 'career' as ChatMode, prompt: 'Help me build a digital art portfolio', label: 'Build Portfolio Strategy', icon: 'lucide:briefcase' },
+  { mode: 'pathway' as ChatMode, prompt: 'What specialization should I pursue based on my interests?', label: 'Find Your Path', icon: 'lucide:compass' },
+  { mode: 'explain' as ChatMode, prompt: 'Explain subdivision surface modeling', label: 'Explain a Concept', icon: 'lucide:book-open-text' },
+  { mode: 'ask' as ChatMode, prompt: 'Show me materials about texture mapping', label: 'Find Materials', icon: 'lucide:message-circle' }
+]
+
+const handleStarterAction = (action: typeof starterActions[0]) => {
+  setMode(action.mode)
+  inputText.value = action.prompt
+  sendMessage()
+}
+
+// Mode descriptions for welcome screen
+const getModeDescription = (mode: ChatMode): string => {
+  const descriptions: Record<ChatMode, string> = {
+    auto: 'I automatically detect what you need and respond accordingly. Try the suggestions below to explore different modes.',
+    ask: 'Ask me about learning materials, topics, or concepts. I\'ll search our curriculum and provide relevant resources.',
+    plan: 'I\'ll create structured learning plans with materials, timelines, and progression steps tailored to your goals.',
+    concept: 'We\'ll have a conversation about your project idea, then I\'ll generate a formatted project brief document you can download.',
+    critique: 'Choose a focus area to prepare for critiques, practice giving feedback, or evaluate your work using rubric criteria.',
+    pathway: 'I\'ll recommend specializations, learning sequences, and prerequisites based on your interests and goals.',
+    explain: 'I break down concepts into simple explanations with analogies, examples, and practical applications.',
+    career: 'I\'ll guide you through career planning, portfolio building, and skill development for creative industries.'
+  }
+  return descriptions[mode] || descriptions.auto
+}
+
+function selectCritiqueFocus(focusId: string) {
+  const option = critiqueFocusOptions.value.find(o => o.id === focusId)
+  if (!option) return
+  critiqueFocus.value = focusId
+  // Send the focus as the first message
+  inputText.value = `I'd like to focus on: ${option.label} — ${option.description}`
+  sendMessage()
+}
+
+// Reset critique focus when mode changes
+watch(currentMode, () => {
+  critiqueFocus.value = null
+})
 
 // Load search index when component mounts
 onMounted(async () => {
@@ -461,8 +548,8 @@ async function sendMessage() {
       messagesEndRef.value?.scrollIntoView({ behavior: 'smooth' })
       
       try {
-        // Concept mode needs full conversation history; other modes use last 4 messages
-        const contextLimit = currentMode.value === 'concept' ? 20 : 4
+        // Concept and critique modes need full conversation history; other modes use last 4 messages
+        const contextLimit = (currentMode.value === 'concept' || currentMode.value === 'critique') ? 20 : 4
         const conversationContext = buildConversationContext(contextLimit)
         
         // Callback to update thinking in real-time
@@ -620,6 +707,9 @@ async function copyMessageContent(message: Message) {
 function parseMarkdown(text: string): string {
   let html = text
   
+  // Normalize bullet points: convert • to standard markdown format with consistent spacing
+  html = html.replace(/^•\s*(.+)$/gm, '- $1')
+  
   // Headings (must come before bold to avoid conflicts)
   html = html.replace(/^### (.+)$/gm, '<h3 class="text-sm font-semibold mt-3 mb-1">$1</h3>')
   html = html.replace(/^## (.+)$/gm, '<h2 class="text-base font-semibold mt-4 mb-2">$1</h2>')
@@ -634,8 +724,8 @@ function parseMarkdown(text: string): string {
   // Horizontal rules
   html = html.replace(/^---$/gm, '<hr class="my-3 border-border">')
   
-  // Numbered lists
-  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<li class="ml-4">$2</li>')
+  // Numbered lists - handle flexible whitespace
+  html = html.replace(/^(\d+)\.\s*(.+)$/gm, '<li class="ml-4">$2</li>')
   html = html.replace(/(<li class="ml-4">.*?<\/li>\n?)+/g, (match) => {
     // Check if it's part of a bullet list by looking for • in context
     if (!match.includes('•')) {
@@ -644,8 +734,8 @@ function parseMarkdown(text: string): string {
     return match
   })
   
-  // Bullet lists - handle them before line break conversion
-  html = html.replace(/^[•\-]\s+(.+)$/gm, '<li class="ml-4">$1</li>')
+  // Bullet lists - handle flexible whitespace (zero or more spaces after bullet)
+  html = html.replace(/^[\-\*]\s*(.+)$/gm, '<li class="ml-4">$1</li>')
   html = html.replace(/(<li class="ml-4">.*<\/li>\n?)+/g, '<ul class="list-disc list-outside space-y-0.5 my-2">$&</ul>')
   
   // Line breaks - convert double newlines to paragraph breaks, single to br
@@ -665,7 +755,7 @@ function parseMarkdown(text: string): string {
     <DialogContentPopover 
       v-if="!isFullscreen" 
       class="flex flex-col p-0 gap-0"
-      @open-auto-focus="(e) => { e.preventDefault(); textareaRef?.focus() }"
+      @open-auto-focus="(e) => { e.preventDefault(); const el = textareaRef?.$el ?? textareaRef; el?.focus?.() }"
     >
       <DialogTitle class="sr-only">Learning Assistant Chat</DialogTitle>
       <DialogDescription class="sr-only">Chat with the AI learning assistant to find educational materials and get help with your learning journey.</DialogDescription>
@@ -792,14 +882,63 @@ function parseMarkdown(text: string): string {
       <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto px-4">
         <div class="py-4 space-y-4">
-          <!-- Welcome Message -->
-          <div v-if="messages.length === 1" class="text-center py-8 space-y-3">
-            <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
-              <Sparkles class="h-6 w-6 text-primary" />
+          <!-- Mode Description Banner (Always Visible) -->
+          <div class="sticky top-0 bg-background/95 backdrop-blur-sm border-b pb-3 mb-2 -mt-4 pt-4 z-10">
+            <div class="flex items-start gap-2">
+              <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 mt-0.5">
+                <Icon :name="modeConfig.icon" class="h-4 w-4 text-primary" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-xs font-semibold text-foreground">{{ modeConfig.label }}</h4>
+                <p class="text-[11px] text-muted-foreground leading-relaxed mt-0.5">{{ getModeDescription(currentMode) }}</p>
+              </div>
             </div>
-            <div class="space-y-1">
-              <h3 class="text-lg font-bold">How Can I Help?</h3>
-              <p class="text-xs text-muted-foreground">Ask about our learning materials</p>
+          </div>
+
+          <!-- Welcome Message -->
+          <div v-if="messages.length === 1" class="py-6 space-y-4">
+            <!-- Mode Description -->
+            <div class="text-center space-y-2">
+              <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
+                <Icon :name="modeConfig.icon" class="h-5 w-5 text-primary" />
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-sm font-semibold">{{ modeConfig.label }} Mode</h3>
+                <p class="text-xs text-muted-foreground leading-relaxed px-4">{{ getModeDescription(currentMode) }}</p>
+              </div>
+            </div>
+
+            <!-- Critique Mode Focus Buttons -->
+            <div v-if="showCritiqueFocusButtons" class="space-y-2">
+              <p class="text-xs font-medium text-muted-foreground text-center">Choose your focus:</p>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  v-for="option in critiqueFocusOptions"
+                  :key="option.id"
+                  @click="selectCritiqueFocus(option.id)"
+                  class="flex flex-col items-center gap-1.5 p-3 rounded-lg border bg-card hover:bg-accent hover:border-primary/50 transition-all cursor-pointer text-center"
+                >
+                  <Icon :name="option.icon" class="h-5 w-5 text-primary" />
+                  <span class="text-xs font-medium">{{ option.label }}</span>
+                  <span class="text-[10px] text-muted-foreground leading-tight">{{ option.description }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Starter Action Buttons (for non-critique modes) -->
+            <div v-else class="space-y-2">
+              <p class="text-xs font-medium text-muted-foreground text-center">Try these:</p>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  v-for="action in starterActions.slice(0, 4)"
+                  :key="action.label"
+                  @click="handleStarterAction(action)"
+                  class="flex flex-col items-center gap-1.5 p-3 rounded-lg border bg-card hover:bg-accent hover:border-primary/50 transition-all cursor-pointer text-center"
+                >
+                  <Icon :name="action.icon" class="h-5 w-5 text-primary" />
+                  <span class="text-xs font-medium leading-tight">{{ action.label }}</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -845,15 +984,24 @@ function parseMarkdown(text: string): string {
 
                 <div class="text-xs leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
 
-                <!-- Concept Summary Export Button -->
-                <div v-if="message.role === 'assistant' && (message.content.includes('# PROJECT CONCEPT') || message.content.includes('# 🎯 PROJECT CONCEPT'))" class="mt-4 flex justify-center">
+                <!-- Concept Summary Export Buttons -->
+                <div v-if="message.role === 'assistant' && (message.content.includes('# PROJECT CONCEPT') || message.content.includes('# 🎯 PROJECT CONCEPT'))" class="mt-4 flex justify-between gap-2">
+                  <Button
+                    size="sm"
+                    @click="generateConceptSummary"
+                    class="h-7 text-xs gap-1 bg-foreground text-background hover:bg-foreground/90"
+                    :disabled="isLoading"
+                  >
+                    <RefreshCw class="h-3 w-3" />
+                    Regenerate
+                  </Button>
                   <Button
                     size="sm"
                     @click="downloadConcept(message)"
                     class="h-7 text-xs gap-1"
                   >
                     <Download class="h-3 w-3" />
-                    Download Project Brief (.docx)
+                    Download (.docx)
                   </Button>
                 </div>
 
@@ -1176,14 +1324,63 @@ function parseMarkdown(text: string): string {
       <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto px-6">
         <div class="py-6 space-y-6 max-w-3xl mx-auto">
-          <!-- Welcome Message -->
-          <div v-if="messages.length === 1" class="text-center py-12 space-y-4">
-            <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
-              <Sparkles class="h-8 w-8 text-primary" />
+          <!-- Mode Description Banner (Always Visible) -->
+          <div class="sticky top-0 bg-background/95 backdrop-blur-sm border-b pb-4 mb-4 -mt-6 pt-6 z-10">
+            <div class="flex items-start gap-3">
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 mt-0.5">
+                <Icon :name="modeConfig.icon" class="h-5 w-5 text-primary" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-semibold text-foreground">{{ modeConfig.label }} Mode</h4>
+                <p class="text-xs text-muted-foreground leading-relaxed mt-1">{{ getModeDescription(currentMode) }}</p>
+              </div>
             </div>
-            <div class="space-y-2">
-              <h3 class="text-2xl font-bold">How Can I Assist You Today?</h3>
-              <p class="text-muted-foreground">Ask me anything about our learning materials</p>
+          </div>
+
+          <!-- Welcome Message -->
+          <div v-if="messages.length === 1" class="py-12 space-y-6 max-w-2xl mx-auto">
+            <!-- Mode Description -->
+            <div class="text-center space-y-3">
+              <div class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
+                <Icon :name="modeConfig.icon" class="h-7 w-7 text-primary" />
+              </div>
+              <div class="space-y-2">
+                <h3 class="text-xl font-semibold">{{ modeConfig.label }} Mode</h3>
+                <p class="text-sm text-muted-foreground leading-relaxed max-w-lg mx-auto">{{ getModeDescription(currentMode) }}</p>
+              </div>
+            </div>
+
+            <!-- Critique Mode Focus Buttons -->
+            <div v-if="showCritiqueFocusButtons" class="space-y-3">
+              <p class="text-sm font-medium text-muted-foreground text-center">Choose your focus:</p>
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  v-for="option in critiqueFocusOptions"
+                  :key="option.id"
+                  @click="selectCritiqueFocus(option.id)"
+                  class="flex flex-col items-center gap-2 p-4 rounded-lg border bg-card hover:bg-accent hover:border-primary/50 transition-all cursor-pointer text-center"
+                >
+                  <Icon :name="option.icon" class="h-6 w-6 text-primary" />
+                  <span class="text-sm font-medium">{{ option.label }}</span>
+                  <span class="text-xs text-muted-foreground leading-tight">{{ option.description }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Starter Action Buttons (for non-critique modes) -->
+            <div v-else class="space-y-3">
+              <p class="text-sm font-medium text-muted-foreground text-center">Try these:</p>
+              <div class="grid grid-cols-3 gap-3">
+                <button
+                  v-for="action in starterActions.slice(0, 6)"
+                  :key="action.label"
+                  @click="handleStarterAction(action)"
+                  class="flex flex-col items-center gap-2 p-4 rounded-lg border bg-card hover:bg-accent hover:border-primary/50 transition-all cursor-pointer text-center"
+                >
+                  <Icon :name="action.icon" class="h-6 w-6 text-primary" />
+                  <span class="text-sm font-medium leading-tight">{{ action.label }}</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1233,15 +1430,24 @@ function parseMarkdown(text: string): string {
 
                 <div class="text-sm leading-relaxed [&_strong]:font-semibold [&_ul]:my-2 [&_li]:leading-snug" v-html="parseMarkdown(message.content)"></div>
 
-                <!-- Concept Summary Export Button (Fullscreen) -->
-                <div v-if="message.role === 'assistant' && (message.content.includes('# PROJECT CONCEPT') || message.content.includes('# 🎯 PROJECT CONCEPT'))" class="mt-4 flex justify-center">
+                <!-- Concept Summary Export Buttons (Fullscreen) -->
+                <div v-if="message.role === 'assistant' && (message.content.includes('# PROJECT CONCEPT') || message.content.includes('# 🎯 PROJECT CONCEPT'))" class="mt-4 flex justify-between gap-2">
+                  <Button
+                    size="sm"
+                    @click="generateConceptSummary"
+                    class="gap-2 bg-foreground text-background hover:bg-foreground/90"
+                    :disabled="isLoading"
+                  >
+                    <RefreshCw class="h-4 w-4" />
+                    Regenerate
+                  </Button>
                   <Button
                     size="sm"
                     @click="downloadConcept(message)"
                     class="gap-2"
                   >
                     <Download class="h-4 w-4" />
-                    Download Project Brief (.docx)
+                    Download (.docx)
                   </Button>
                 </div>
 

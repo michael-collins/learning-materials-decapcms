@@ -20,7 +20,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.1",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/animation-principles",
@@ -43,7 +44,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/ar-vr-development",
@@ -67,7 +69,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/camera-composition",
@@ -89,7 +92,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/character-rigging",
@@ -112,7 +116,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/constraints-animation-controls",
@@ -135,7 +140,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/deformers-shape-keys",
@@ -158,7 +164,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/digital-sculpting",
@@ -181,7 +188,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/drawing-for-3d-design",
@@ -204,7 +212,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/environment-design-realtime",
@@ -227,7 +236,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/exporting-delivery",
@@ -250,7 +260,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/hard-surface-modeling",
@@ -275,7 +286,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/history-of-cgi",
@@ -297,7 +309,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/lighting-principles",
@@ -320,7 +333,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/match-moving-camera-tracking",
@@ -343,7 +357,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/particle-simulation",
@@ -366,7 +381,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/physics-simulation-fundamentals",
@@ -389,7 +405,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/post-effects-color-grading",
@@ -412,7 +429,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/procedural-compositing-workflows",
@@ -435,7 +453,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/realtime-engines",
@@ -459,7 +478,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/render-layers-passes",
@@ -482,7 +502,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/rendering-techniques",
@@ -505,7 +526,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/texturing-uv-mapping",
@@ -528,7 +550,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lessons/vfx-compositing-integration",
@@ -551,7 +574,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/3d-viewer-test",
@@ -568,7 +592,8 @@
       "prerequisites": [],
       "published": true,
       "version": "4.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/animated-procedural-textures",
@@ -589,7 +614,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/animated-textures",
@@ -610,7 +636,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/animating-a-bouncing-ball",
@@ -629,7 +656,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/animating-tetris",
@@ -648,7 +676,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/animating-virtual-creatures",
@@ -667,7 +696,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/applying-textures-to-3-unique-chess-sets",
@@ -686,7 +716,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/introduction-to-animation",
@@ -705,7 +736,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/introduction-to-rigging",
@@ -724,7 +756,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/lighting-and-rendering-the-airline-chair",
@@ -744,7 +777,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/low-poly-non-photorealistic-rendering",
@@ -763,7 +797,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/model-a-gem",
@@ -782,7 +817,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/model-a-snowflake",
@@ -801,7 +837,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-basic-knight",
@@ -820,7 +857,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-bishop",
@@ -839,7 +877,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-chavet-121-series-no-6-knight",
@@ -858,7 +897,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-chessboard",
@@ -877,7 +917,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-diamond",
@@ -896,7 +937,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-figurative-knight",
@@ -915,7 +957,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-king",
@@ -934,7 +977,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-low-poly-animal-and-introduction-to-particles",
@@ -953,7 +997,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-metal-horse-head",
@@ -972,7 +1017,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-pawn",
@@ -991,7 +1037,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-queen",
@@ -1010,7 +1057,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-rook",
@@ -1029,7 +1077,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-a-room",
@@ -1048,7 +1097,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-and-sculpting-a-sea-creature",
@@ -1067,7 +1117,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-random-objects",
@@ -1086,7 +1137,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/modeling-the-airline-chair",
@@ -1106,7 +1158,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/rendering-a-room",
@@ -1125,7 +1178,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/rendering-random-objects",
@@ -1144,7 +1198,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/rigging-a-human",
@@ -1163,7 +1218,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/rigging-a-quadruped",
@@ -1182,7 +1238,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/rigging-a-robot-arm",
@@ -1201,7 +1258,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/sculpting-retopo-and-texturing",
@@ -1220,7 +1278,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/sculpture-garden",
@@ -1239,7 +1298,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/sea-creature-lighting-and-rendering",
@@ -1258,7 +1318,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/sea-creature-non-photorealistic-rendering",
@@ -1277,7 +1338,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/sea-creature-texturing",
@@ -1297,7 +1359,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/share-one-completed-set",
@@ -1316,7 +1379,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/texturing-a-room",
@@ -1335,7 +1399,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/texturing-random-objects",
@@ -1354,7 +1419,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/exercises/texturing-the-airline-chair",
@@ -1374,7 +1440,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/projects/ideas-in-motion",
@@ -1394,7 +1461,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": "project"
     },
     {
       "id": "/projects/you-dont-see-that-everyday-objects",
@@ -1413,7 +1481,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": "project"
     },
     {
       "id": "/lectures/introduction-to-animation",
@@ -1430,7 +1499,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lectures/introduction-to-cameras-lighting-and-rendering",
@@ -1447,7 +1517,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lectures/introduction-to-modeling",
@@ -1464,7 +1535,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/lectures/introduction-to-texturing",
@@ -1481,7 +1553,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/articles/3d-career-development",
@@ -1498,7 +1571,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/articles/3d-communities",
@@ -1515,7 +1589,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/articles/getting-started-in-3d-animation",
@@ -1532,7 +1607,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/tutorials/building-your-first-nuxt-app",
@@ -1549,7 +1625,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/tutorials/working-with-decapcms",
@@ -1566,7 +1643,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/compositor",
@@ -1600,7 +1678,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/digital-fabrication",
@@ -1617,7 +1696,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/fundamentals",
@@ -1634,7 +1714,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/game-artist",
@@ -1668,7 +1749,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/game-design-and-development",
@@ -1685,7 +1767,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/illustration-and-visualization",
@@ -1702,7 +1785,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/lighting-and-cinematography",
@@ -1719,7 +1803,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/motion-graphics",
@@ -1736,7 +1821,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/product-design",
@@ -1753,7 +1839,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/production-management",
@@ -1770,7 +1857,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/short-film",
@@ -1801,7 +1889,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/short-film-and-vfx",
@@ -1833,7 +1922,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/pathways/visual-effects-vfx",
@@ -1850,7 +1940,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/3d-design",
@@ -1876,7 +1967,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/3d-illustration",
@@ -1893,7 +1985,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/3d-printing",
@@ -1910,7 +2003,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/animation-for-film-production",
@@ -1937,7 +2031,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/archviz",
@@ -1954,7 +2049,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/cgi-foundations",
@@ -1978,7 +2074,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/character-animation",
@@ -1995,7 +2092,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/character-design-for-games-or-film",
@@ -2012,7 +2110,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/comic-illustration",
@@ -2029,7 +2128,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/compositing",
@@ -2055,7 +2155,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/environment-design",
@@ -2072,7 +2173,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/fundamentals",
@@ -2089,7 +2191,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/generalist",
@@ -2106,7 +2209,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/introductory-animation",
@@ -2132,7 +2236,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/lighting-and-cinematography",
@@ -2149,7 +2254,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/modeler",
@@ -2166,7 +2272,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/modeling-and-texturing",
@@ -2183,7 +2290,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/previz-art",
@@ -2200,7 +2308,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/product-id-design",
@@ -2217,7 +2326,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/production-management",
@@ -2234,7 +2344,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/projection-mapping",
@@ -2251,7 +2362,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/realistic-sculpting",
@@ -2268,7 +2380,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/realtime-for-immersive-environments",
@@ -2294,7 +2407,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/rigging",
@@ -2311,7 +2425,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/rigging-artist",
@@ -2328,7 +2443,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/scientific-visualization",
@@ -2345,7 +2461,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/shader-writing",
@@ -2362,7 +2479,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/short-film",
@@ -2379,7 +2497,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/simulation-and-character-effects",
@@ -2396,7 +2515,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/storyboarding-and-animatics",
@@ -2413,7 +2533,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/texture-artist",
@@ -2430,7 +2551,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/tool-building",
@@ -2447,7 +2569,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/transportation-design",
@@ -2464,7 +2587,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/vfx-and-simulation",
@@ -2491,7 +2615,8 @@
       ],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     },
     {
       "id": "/specializations/vj-loops",
@@ -2508,7 +2633,8 @@
       "prerequisites": [],
       "published": true,
       "version": "1.0.0",
-      "versionStatus": "latest"
+      "versionStatus": "latest",
+      "rubric": ""
     }
   ],
   "conceptGraph": {
@@ -3237,6 +3363,6 @@
       "oer:Course": 13,
       "oer:InstructionalPattern": 7
     },
-    "buildDate": "2026-02-06T21:45:37.227Z"
+    "buildDate": "2026-02-08T02:50:02.308Z"
   }
 }

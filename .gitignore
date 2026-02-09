@@ -32,3 +32,6 @@ logs
 *.njsproj
 *.sln
 *.sw?
+
+# Netlify build outputs
+.netlify/

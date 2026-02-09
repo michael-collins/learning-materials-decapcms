@@ -130,6 +130,15 @@ if (typeof window !== 'undefined') {
       console.error('Failed to save chatbot settings:', error)
     }
   }, { deep: true })
+
+  // Eagerly load Ollama models when it's the active provider,
+  // so currentModel resolves to the actual installed model (e.g. gemma3:4b)
+  // instead of falling back to the hardcoded list
+  if (settings.value.provider === 'ollama') {
+    fetchModels('ollama', '').then(models => {
+      dynamicModels.value.ollama = models
+    }).catch(() => { /* Ollama may not be running */ })
+  }
 }
 
 function loadSettings(): ChatbotSettings {
@@ -141,11 +150,14 @@ function loadSettings(): ChatbotSettings {
     const stored = localStorage.getItem(SETTINGS_KEY)
     if (stored) {
       const parsed = JSON.parse(stored)
-      // Validate that the stored model exists for the provider
-      const availableForProvider = AVAILABLE_MODELS[parsed.provider as Provider]
-      if (!availableForProvider || !availableForProvider.some(m => m.id === parsed.model)) {
-        // Invalid model, use first available for provider
-        parsed.model = availableForProvider?.[0]?.id || defaultSettings.model
+      // Skip model validation for Ollama - dynamic models will be loaded separately
+      // For other providers, validate that the stored model exists
+      if (parsed.provider !== 'ollama') {
+        const availableForProvider = AVAILABLE_MODELS[parsed.provider as Provider]
+        if (!availableForProvider || !availableForProvider.some(m => m.id === parsed.model)) {
+          // Invalid model, use first available for provider
+          parsed.model = availableForProvider?.[0]?.id || defaultSettings.model
+        }
       }
       return { ...defaultSettings, ...parsed }
     }
@@ -256,13 +268,21 @@ async function fetchModels(provider: Provider, apiKey: string): Promise<ModelOpt
 
 export function useChatbotSettings() {
   const availableModels = computed(() => {
-    // If showing all models and we have dynamic models, use those
-    if (showAllModels.value) {
-      const dynamic = dynamicModels.value[settings.value.provider]
-      if (dynamic && dynamic.length > 0) return dynamic
+    const provider = settings.value.provider
+    const dynamic = dynamicModels.value[provider]
+
+    // For Ollama, always prefer dynamically loaded models (actual installed models)
+    if (provider === 'ollama' && dynamic && dynamic.length > 0) {
+      return dynamic
     }
+
+    // For cloud providers, show dynamic models only when "Show All" is toggled
+    if (showAllModels.value && dynamic && dynamic.length > 0) {
+      return dynamic
+    }
+
     // Otherwise show curated hardcoded list
-    return AVAILABLE_MODELS[settings.value.provider]
+    return AVAILABLE_MODELS[provider]
   })
   
   const currentModel = computed(() => {
@@ -337,6 +357,7 @@ export function useChatbotSettings() {
     settings,
     availableModels,
     currentModel,
+    dynamicModels,
     isConfigured,
     canUseEnhancedMode,
     loadingModels,

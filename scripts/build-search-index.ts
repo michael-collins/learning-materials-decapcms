@@ -24,6 +24,7 @@ interface ContentItem {
   published?: boolean
   version?: string
   versionStatus?: string
+  rubric?: string
   body?: string
 }
 
@@ -43,6 +44,7 @@ interface SearchIndexItem {
   published: boolean
   version: string
   versionStatus: string
+  rubric: string
 }
 
 interface ConceptData {
@@ -340,7 +342,8 @@ async function buildSemanticIndex(): Promise<void> {
         prerequisites: item.prerequisites || [],
         published: item.published !== false,
         version: item.version || '',
-        versionStatus: item.versionStatus || 'latest'
+        versionStatus: item.versionStatus || 'latest',
+        rubric: item.rubric || ''
       }
     })
   
