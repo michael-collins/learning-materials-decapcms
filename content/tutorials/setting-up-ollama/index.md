@@ -10,10 +10,6 @@ version: '1.0.0'
 versionStatus: latest
 ---
 
-# Setting Up Ollama for Local AI
-
-This tutorial walks you through installing Ollama and using its built-in chat app to download a model and start chatting. Most of this guide is no-terminal.
-
 ::iframe-component{src="https://www.youtube.com/watch?v=8amsyT4NUrM" title="Setting up Ollama for running AI models locally"}
 ::
 
