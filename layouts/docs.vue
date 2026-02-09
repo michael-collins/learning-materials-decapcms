@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library, AlertCircle, Info } from 'lucide-vue-next'
+import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library, AlertCircle, Info, Wrench } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 import Button from '~/components/ui/button/Button.vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
@@ -211,6 +211,14 @@ const navigationGroups = [
     items: [
       { title: 'Exercises', path: '/exercises' },
       { title: 'Projects', path: '/projects' },
+    ]
+  },
+  {
+    label: 'Tools',
+    icon: Wrench,
+    items: [
+      { title: 'Outline Builder', path: '/tools/outline-builder' },
+      { title: 'Guides', path: '/tools/guides' },
     ]
   }
 ]

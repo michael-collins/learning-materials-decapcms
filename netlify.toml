@@ -1,11 +1,10 @@
 [build]
-  command = "npm run generate"
-  publish = ".output/public"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  command = "npm run build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
+
+# No API keys needed as environment variables
+# Users provide their own API keys through the UI
+# which are stored in browser localStorage

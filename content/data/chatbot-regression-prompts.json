@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-02-05",
+  "prompts": {
+    "student": [
+      "Where is the airline chair modeling exercise?",
+      "I'm new to Blender—what should I start with?",
+      "Give me a modeling + texturing practice sequence.",
+      "I have 3 hours this weekend for texturing.",
+      "My render is noisy—what should I check?",
+      "Show me materials on UV unwrapping."
+    ],
+    "teacher": [
+      "Build a 2-week sequence on modeling + texturing using existing materials.",
+      "Find exercises that practice edge flow.",
+      "What should students complete before rendering?",
+      "Which exercises have rubrics and AI licenses?",
+      "Do we have content on procedural materials?",
+      "Give me 5 items for a furniture modeling week."
+    ]
+  }
+}
