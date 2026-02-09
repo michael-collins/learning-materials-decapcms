@@ -143,6 +143,6 @@ Remove a model:
 ollama rm phi3
 ```
 
-*Note:* You may be asked to enter your password. Just be careful with the `rm` command, this permanently deletes files from your computer.
+**Note:** You may be asked to enter your password. Just be careful with the `rm` command, this permanently deletes files from your computer.
 
 If a model will not remove, make sure it is not currently selected or running in the Ollama app, then try again. You may also need to restart your computer.
