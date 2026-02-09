@@ -201,6 +201,17 @@ watch(isMobile, (newIsMobile) => {
   }
 })
 
+// Focus textarea when entering fullscreen mode
+watch(isFullscreen, async (newValue) => {
+  if (newValue) {
+    // Wait for DOM update
+    await nextTick()
+    // Focus the textarea
+    const el = textareaRef.value?.$el ?? textareaRef.value
+    el?.focus?.()
+  }
+})
+
 const { settings, canUseEnhancedMode, isConfigured, currentModel } = useChatbotSettings()
 const { generateResponse, generateQueryExpansion, rerankResults, generateRetrievalHints } = useLLMChat()
 
@@ -312,8 +323,26 @@ onMounted(async () => {
     
     // Close dropdown on Escape key
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isModeDropdownOpen.value) {
-        isModeDropdownOpen.value = false
+      if (event.key === 'Escape') {
+        // First priority: close settings dialog if open
+        if (settingsOpen.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          settingsOpen.value = false
+        }
+        // Second priority: close mode dropdown if open
+        else if (isModeDropdownOpen.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          isModeDropdownOpen.value = false
+        }
+        // Third priority: exit fullscreen if in fullscreen mode
+        else if (isFullscreen.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          isFullscreen.value = false
+        }
+        // Otherwise, allow default behavior (close entire dialog)
       }
     }
     
@@ -664,6 +693,14 @@ function formatTime(date: Date) {
 function buildConversationContext(limit = 4) {
   return messages.value
     .filter(m => m.role === 'user' || m.role === 'assistant')
+    // Filter out previous concept summaries when in concept mode
+    // This prevents regeneration from being influenced by old summaries
+    .filter(m => {
+      if (currentMode.value === 'concept' && m.role === 'assistant') {
+        return !(m.content.includes('# PROJECT CONCEPT') || m.content.includes('# 🎯 PROJECT CONCEPT'))
+      }
+      return true
+    })
     .slice(-limit)
     .map(m => ({
       role: m.role,
