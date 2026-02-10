@@ -1629,6 +1629,24 @@
       "rubric": ""
     },
     {
+      "id": "/tutorials/setting-up-ollama",
+      "title": "Setting Up Ollama for Local AI",
+      "type": "tutorials",
+      "description": "A step-by-step tutorial on installing and running Ollama to use large language models locally on your machine.",
+      "searchText": "setting up ollama for local ai a step-by-step tutorial on installing and running ollama to use large language models locally on your machine. \n::iframe-component{src=\"https://www.youtube.com/watch?v=8amsyt4nurm\" title=\"setting up ollama for running ai models locally\"}\n::\n\n## what is ollama?\n\nollama is a free tool that runs ai models locally. it includes a desktop app where you can download a model and chat with it, similar to other ai chat products.\n\n**why run models locally?**\n\n- **privacy** — your data never leaves your machine\n- **no usage costs** — once downloaded, models run for free\n- **offline access** — works without an intern",
+      "tags": [],
+      "difficulty": "Beginner",
+      "duration": "",
+      "author": "Michael Collins",
+      "course": "",
+      "learningObjectives": [],
+      "prerequisites": [],
+      "published": true,
+      "version": "1.0.0",
+      "versionStatus": "latest",
+      "rubric": ""
+    },
+    {
       "id": "/tutorials/working-with-decapcms",
       "title": "Working with DecapCMS",
       "type": "tutorials",
@@ -3351,7 +3369,7 @@
     ]
   },
   "stats": {
-    "totalItems": 126,
+    "totalItems": 127,
     "contentTypes": {
       "oer:LearningComponent": 52,
       "exercises": 43,
@@ -3359,10 +3377,10 @@
       "lectures": 3,
       "oer:SupportingMaterial": 1,
       "articles": 3,
-      "tutorials": 2,
+      "tutorials": 3,
       "oer:Course": 13,
       "oer:InstructionalPattern": 7
     },
-    "buildDate": "2026-02-08T02:50:02.308Z"
+    "buildDate": "2026-02-10T16:46:09.990Z"
   }
 }

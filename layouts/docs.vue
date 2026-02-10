@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library, AlertCircle, Info, Wrench } from 'lucide-vue-next'
+import { BookOpen, GraduationCap, PanelLeft, ChevronRight, Menu, X, ClipboardCheck, Compass, Library, AlertCircle, Info, Wrench, Search } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 import Button from '~/components/ui/button/Button.vue'
+import SidebarFooter from '~/components/ui/sidebar/SidebarFooter.vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
@@ -26,6 +27,21 @@ const isMobile = computed(() => width.value < 768)
 
 // Desktop sidebar collapsed state (ignored on mobile)
 const isDesktopCollapsed = ref(false)
+
+// Detect operating system for keyboard shortcuts
+const isMac = ref(false)
+onMounted(() => {
+  isMac.value = typeof window !== 'undefined' && 
+    (navigator.platform.toUpperCase().indexOf('MAC') >= 0 || 
+     navigator.platform.toUpperCase().indexOf('IPHONE') >= 0 ||
+     navigator.platform.toUpperCase().indexOf('IPAD') >= 0)
+})
+
+// Open command palette
+const openCommandPalette = () => {
+  const { open } = useCommandPalette()
+  open()
+}
 
 // Version comparison logic
 const latestVersion = ref<string | null>(null)
@@ -316,6 +332,28 @@ onUnmounted(() => {
 
 <template>
   <div class="flex min-h-screen bg-background">
+    <!-- Skip Links for Accessibility -->
+    <div class="sr-only focus-within:not-sr-only">
+      <div class="fixed top-2 left-2 z-[100] flex gap-2 bg-background/95 backdrop-blur-sm border rounded-2xl p-2 shadow-lg">
+        <Button
+          asChild
+          size="sm"
+          class="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <a href="#main-content">
+            Skip to main content
+          </a>
+        </Button>
+        <Button
+          @click="openCommandPalette"
+          size="sm"
+          class="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          Open search ({{ isMac ? '⌘' : 'Ctrl' }}+K)
+        </Button>
+      </div>
+    </div>
+
     <!-- Mobile backdrop overlay -->
     <Transition
       enter-active-class="transition-opacity duration-200"
@@ -336,20 +374,20 @@ onUnmounted(() => {
     <aside 
       ref="sidebarRef"
       :class="[
-        'bg-card transition-all duration-200 ease-in-out flex-shrink-0',
+        'bg-card transition-all duration-200 ease-in-out flex flex-col',
         // Mobile styles: fixed overlay (default hidden)
         'fixed inset-y-0 left-0 z-50 w-64 border-r shadow-lg -translate-x-full',
-        // Desktop styles: relative positioning, always visible
-        'md:relative md:translate-x-0 md:shadow-none',
+        // Desktop styles: fixed positioning, always visible, full viewport height
+        'md:fixed md:inset-y-0 md:left-0 md:translate-x-0 md:shadow-none md:z-30',
         // Mobile open state
         isMobile && isMobileMenuOpen && 'translate-x-0',
         // Desktop collapsed state
         !isMobile && (isDesktopCollapsed ? 'md:w-0 md:border-r-0' : 'md:w-64')
       ]"
     >
-      <div :class="['h-full flex flex-col', !isMobile && isDesktopCollapsed && 'invisible']">
+      <div :class="['flex flex-col h-full', !isMobile && isDesktopCollapsed && 'invisible']">
         <!-- Header -->
-        <div class="flex h-14 items-center justify-between px-4 border-b md:justify-center md:border-b-0">
+        <div class="flex h-14 items-center justify-between px-4 border-b md:justify-center md:border-b-0 shrink-0">
           <NuxtLink 
             to="/" 
             class="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
@@ -370,7 +408,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Content -->
-        <nav class="flex-1 overflow-auto py-2 px-3">
+        <nav class="flex-1 overflow-y-auto overflow-x-hidden py-2 px-3 min-h-0">
           <div v-for="group in navigationGroups" :key="group.label" class="mb-6">
             <h3 class="mb-2 px-3 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60 flex items-center gap-2">
               <component :is="group.icon" class="h-3.5 w-3.5" />
@@ -393,11 +431,35 @@ onUnmounted(() => {
             </div>
           </div>
         </nav>
+
+        <!-- Footer with Keyboard Shortcut -->
+        <SidebarFooter class="shrink-0 border-t">
+          <button
+            @click="openCommandPalette"
+            class="w-full flex items-center justify-between gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors group"
+            aria-label="Open command palette"
+          >
+            <Search class="h-4 w-4" />
+            <div class="flex items-center gap-1 text-xs">
+              <kbd class="pointer-events-none select-none rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground group-hover:border-foreground/20">
+                {{ isMac ? '⌘' : 'Ctrl' }}
+              </kbd>
+              <span class="text-muted-foreground">+</span>
+              <kbd class="pointer-events-none select-none rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground group-hover:border-foreground/20">
+                K
+              </kbd>
+            </div>
+          </button>
+        </SidebarFooter>
       </div>
     </aside>
 
     <!-- Main content -->
-    <div class="flex-1 overflow-auto flex flex-col">
+    <div :class="[
+      'flex-1 overflow-auto flex flex-col',
+      // Add left margin on desktop when sidebar is visible
+      !isMobile && !isDesktopCollapsed && 'md:ml-64'
+    ]">
       <header class="sticky top-0 z-10 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div class="flex h-14 items-center gap-2 px-4">
           <Button
@@ -463,7 +525,7 @@ onUnmounted(() => {
           </div>
         </div>
       </header>
-      <main class="flex-1">
+      <main id="main-content" class="flex-1">
         <slot />
       </main>
       
