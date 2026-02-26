@@ -3,7 +3,7 @@
  * CMS New Item — Create a new content item.
  * Auto-generates form from the collection's config.yml field definitions.
  */
-import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle } from 'lucide-vue-next'
+import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Pencil } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'cms',
@@ -19,8 +19,18 @@ const { save, saving, error: saveError, lastResult, isLocalBackend } = useCmsSav
 
 const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
-const slugInput = ref('')
+const slugOverride = ref('')
+const slugFromTitle = ref('')
+const slugManualMode = ref(false)
 const showSuccess = ref(false)
+
+// The effective slug: manual override if set, otherwise auto-generated from title
+const effectiveSlug = computed(() => {
+  if (slugManualMode.value && slugOverride.value.trim()) {
+    return slugOverride.value.trim()
+  }
+  return slugFromTitle.value
+})
 
 // Generate a slug from the title
 function generateSlug(title: string): string {
@@ -32,12 +42,13 @@ function generateSlug(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
+// Called when CollectionForm emits a title change
+function onTitleUpdate(title: string) {
+  slugFromTitle.value = generateSlug(title)
+}
+
 async function handleSubmit(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }) {
-  // Determine slug from input, title, or generate
-  let slug = slugInput.value.trim()
-  if (!slug) {
-    slug = generateSlug(data.frontmatter.title || 'untitled')
-  }
+  const slug = effectiveSlug.value || generateSlug(data.frontmatter.title || 'untitled')
 
   if (!slug) {
     return
@@ -134,19 +145,40 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
 
     <!-- Form -->
     <template v-if="collection?.fields && !showSuccess">
-      <!-- Slug field -->
+      <!-- Slug display / override -->
       <div class="mb-6 space-y-1.5">
-        <label for="slug-input" class="text-sm font-medium">
+        <label class="text-sm font-medium">
           Slug
-          <span class="text-xs font-normal text-muted-foreground">(URL-friendly name, auto-generated from title if blank)</span>
         </label>
-        <input
-          id="slug-input"
-          v-model="slugInput"
-          type="text"
-          placeholder="auto-generated-from-title"
-          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        />
+        <div class="flex items-center gap-2">
+          <div
+            v-if="!slugManualMode"
+            class="flex h-10 flex-1 items-center rounded-md border border-input bg-muted/50 px-3 text-sm font-mono text-muted-foreground"
+          >
+            {{ effectiveSlug || 'auto-generated-from-title' }}
+          </div>
+          <input
+            v-else
+            v-model="slugOverride"
+            type="text"
+            :placeholder="slugFromTitle || 'custom-slug'"
+            class="flex h-10 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+          <button
+            type="button"
+            @click="slugManualMode = !slugManualMode"
+            :class="[
+              'flex h-10 items-center gap-1.5 rounded-md border px-3 text-xs font-medium transition-colors',
+              slugManualMode ? 'border-primary bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent'
+            ]"
+          >
+            <Pencil class="h-3.5 w-3.5" />
+            {{ slugManualMode ? 'Auto' : 'Override' }}
+          </button>
+        </div>
+        <p class="text-xs text-muted-foreground">
+          {{ slugManualMode ? 'Enter a custom slug or switch back to auto-generate from title' : 'Auto-generated from title. Click Override to customize.' }}
+        </p>
       </div>
 
       <CmsCollectionForm
@@ -155,6 +187,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
         :saving="saving"
         :editorial-workflow="isEditorial"
         @submit="handleSubmit"
+        @update:title="onTitleUpdate"
       />
     </template>
 

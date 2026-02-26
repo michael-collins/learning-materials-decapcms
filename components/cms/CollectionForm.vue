@@ -7,7 +7,8 @@
  */
 import type { DecapField, DecapCollection } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
-import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown } from 'lucide-vue-next'
+import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff } from 'lucide-vue-next'
+import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
   /** The collection config from config.yml */
@@ -24,6 +25,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   submit: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
+  'update:title': [title: string]
 }>()
 
 // ─── Derive fields from collection config ──────────────
@@ -76,6 +78,11 @@ function getEmptyValue(field: DecapField): any {
 // Initialize on mount and when initial data changes
 initializeForm()
 watch(() => props.initialData, initializeForm, { deep: true })
+
+// Emit title changes for slug auto-generation
+watch(() => formData.title, (newTitle) => {
+  if (newTitle) emit('update:title', newTitle)
+})
 
 // ─── Validation ─────────────────────────────────────────
 function validate(): boolean {
@@ -142,14 +149,20 @@ const isDirty = computed(() => {
   }
   return false
 })
+
+// ─── Layout state ───────────────────────────────────────
+const { width } = useWindowSize()
+const isDesktop = computed(() => width.value >= 1024)
+const configExpanded = ref(true)
+const showPreview = ref(true)
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-6">
+  <form @submit.prevent="handleSubmit" class="flex flex-col">
     <!-- Validation error summary -->
     <div
       v-if="Object.keys(validationErrors).length > 0"
-      class="flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/5 p-4"
+      class="mb-4 flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/5 p-4"
     >
       <AlertCircle class="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
       <div>
@@ -168,36 +181,93 @@ const isDirty = computed(() => {
       v-model="formData[field.name]"
     />
 
-    <!-- Frontmatter Fields -->
-    <div class="space-y-5">
-      <div
-        v-for="field in frontmatterFields"
-        :key="field.name"
-        :class="{ 'ring-2 ring-destructive/20 rounded-md p-2 -mx-2': hasError(field.name) }"
-      >
-        <CmsDynamicField
-          :field="field"
-          v-model="formData[field.name]"
-        />
-        <p
-          v-if="hasError(field.name)"
-          class="mt-1 text-xs text-destructive"
-        >
-          {{ validationErrors[field.name] }}
-        </p>
+    <!-- Two-column layout: Editor (left) + Preview (right) -->
+    <div :class="isDesktop && showPreview ? 'grid grid-cols-2 gap-6' : ''">
+      <!-- Left Column: Config Fields + Body Editor -->
+      <div class="min-w-0 space-y-4">
+        <!-- Collapsible Config Settings -->
+        <div class="rounded-lg border bg-card">
+          <button
+            type="button"
+            @click="configExpanded = !configExpanded"
+            class="flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-accent/50 transition-colors"
+          >
+            <span class="flex items-center gap-2">
+              <Settings2 class="h-4 w-4 text-muted-foreground" />
+              Settings &amp; Metadata
+              <span class="text-xs text-muted-foreground">({{ frontmatterFields.length }} fields)</span>
+            </span>
+            <component :is="configExpanded ? ChevronUp : ChevronDown" class="h-4 w-4 text-muted-foreground" />
+          </button>
+
+          <div v-show="configExpanded" class="border-t px-4 py-4 space-y-5">
+            <div
+              v-for="field in frontmatterFields"
+              :key="field.name"
+              :class="{ 'ring-2 ring-destructive/20 rounded-md p-2 -mx-2': hasError(field.name) }"
+            >
+              <CmsDynamicField
+                :field="field"
+                v-model="formData[field.name]"
+              />
+              <p
+                v-if="hasError(field.name)"
+                class="mt-1 text-xs text-destructive"
+              >
+                {{ validationErrors[field.name] }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body / Markdown Editor -->
+        <div v-if="bodyField">
+          <CmsDynamicField
+            :field="bodyField"
+            v-model="bodyContent"
+          />
+        </div>
+      </div>
+
+      <!-- Right Column: Live Preview (desktop only) -->
+      <div v-if="isDesktop && showPreview" class="min-w-0">
+        <div class="sticky top-0 h-[calc(100vh-12rem)] rounded-lg border bg-card">
+          <div class="flex items-center justify-between border-b px-4 py-2">
+            <span class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Eye class="h-4 w-4" />
+              Preview
+            </span>
+            <button
+              type="button"
+              @click="showPreview = false"
+              class="rounded p-1 text-muted-foreground transition-colors hover:bg-accent"
+              title="Hide preview"
+            >
+              <EyeOff class="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <CmsContentPreview
+            :frontmatter="formData"
+            :body="bodyContent"
+            :collection="collection.label"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- Body / Markdown Editor -->
-    <div v-if="bodyField" class="border-t pt-6">
-      <CmsDynamicField
-        :field="bodyField"
-        v-model="bodyContent"
-      />
-    </div>
+    <!-- Show preview toggle (when hidden) -->
+    <button
+      v-if="isDesktop && !showPreview"
+      type="button"
+      @click="showPreview = true"
+      class="fixed right-4 top-16 z-20 flex items-center gap-1.5 rounded-md border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm transition-colors hover:bg-accent"
+    >
+      <Eye class="h-3.5 w-3.5" />
+      Show Preview
+    </button>
 
     <!-- Submit Toolbar -->
-    <div class="sticky bottom-0 z-10 -mx-6 border-t bg-background px-6 py-4 md:-mx-8 md:px-8">
+    <div class="sticky bottom-0 z-10 -mx-6 mt-6 border-t bg-background px-6 py-4 md:-mx-8 md:px-8">
       <div class="flex items-center justify-between">
         <div class="text-sm text-muted-foreground">
           <span v-if="isDirty" class="flex items-center gap-1.5">

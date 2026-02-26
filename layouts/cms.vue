@@ -26,15 +26,24 @@ const isMobile = computed(() => width.value < 768)
 const isSidebarOpen = ref(true)
 const isMobileMenuOpen = ref(false)
 
+// Auto-collapse sidebar on form pages (new/edit)
+const isFormPage = computed(() => {
+  const path = route.path
+  return path.match(/\/cms\/[^/]+\/new$/) || path.match(/\/cms\/[^/]+\/edit\//)
+})
+
 // Restore session on mount
 onMounted(async () => {
   await restoreSession()
 })
 
-// Close mobile menu on route change
+// Close mobile menu on route change, auto-collapse sidebar on form pages
 watch(() => route.path, () => {
   isMobileMenuOpen.value = false
-})
+  if (isFormPage.value) {
+    isSidebarOpen.value = false
+  }
+}, { immediate: true })
 
 // Map group labels to icons
 const groupIcons: Record<string, any> = {
