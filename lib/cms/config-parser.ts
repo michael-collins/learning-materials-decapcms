@@ -1,0 +1,202 @@
+/**
+ * Decap CMS config.yml parser
+ *
+ * Reads the existing config.yml and transforms it into typed
+ * collection/field definitions used by the custom CMS UI.
+ */
+import { parse as parseYaml } from 'yaml'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import type {
+  DecapConfig,
+  DecapCollection,
+  DecapField,
+  CmsCollection,
+} from './config-types'
+
+// ─── Default config path ────────────────────────────────────────
+const DEFAULT_CONFIG_PATH = 'public/admin/config.yml'
+
+// ─── Parse raw YAML ─────────────────────────────────────────────
+
+/**
+ * Parse a Decap CMS config.yml file and return the typed config.
+ * Works on the server side (Node.js) — reads from filesystem.
+ */
+export function parseDecapConfigFromFile(configPath?: string): DecapConfig {
+  const resolvedPath = resolve(process.cwd(), configPath || DEFAULT_CONFIG_PATH)
+  const raw = readFileSync(resolvedPath, 'utf-8')
+  return parseDecapConfigYaml(raw)
+}
+
+/**
+ * Parse a Decap config from a raw YAML string.
+ * Can be used client-side when the config is fetched via API.
+ */
+export function parseDecapConfigYaml(yamlContent: string): DecapConfig {
+  const parsed = parseYaml(yamlContent) as DecapConfig
+
+  if (!parsed || !parsed.backend || !parsed.collections) {
+    throw new Error('Invalid Decap CMS config: missing required fields (backend, collections)')
+  }
+
+  return parsed
+}
+
+// ─── Resolve collections for CMS UI ─────────────────────────────
+
+/**
+ * Enhance raw Decap collections with computed metadata
+ * useful for the CMS UI (URLs, content paths, etc.)
+ */
+export function resolveCollections(config: DecapConfig): CmsCollection[] {
+  return config.collections.map((col) => resolveCollection(col))
+}
+
+function resolveCollection(col: DecapCollection): CmsCollection {
+  const isFolderCollection = !!col.folder
+  const isFileCollection = !!col.files && col.files.length > 0
+
+  // Derive the content path for Nuxt Content queries
+  // e.g., folder: "content/articles" → contentPath: "articles"
+  const contentPath = col.folder
+    ? col.folder.replace(/^content\//, '')
+    : col.name
+
+  return {
+    ...col,
+    isFolderCollection,
+    isFileCollection,
+    contentPath,
+    cmsUrl: `/cms/${col.name}`,
+    decapUrl: `/admin/#/collections/${col.name}`,
+  }
+}
+
+// ─── Field utilities ────────────────────────────────────────────
+
+/**
+ * Get frontmatter fields (everything except the body/markdown field)
+ */
+export function getFrontmatterFields(fields: DecapField[]): DecapField[] {
+  return fields.filter((f) => f.widget !== 'markdown' && f.name !== 'body')
+}
+
+/**
+ * Get the body field (markdown widget named 'body')
+ */
+export function getBodyField(fields: DecapField[]): DecapField | undefined {
+  return fields.find((f) => f.widget === 'markdown' || f.name === 'body')
+}
+
+/**
+ * Get visible fields (not hidden widgets)
+ */
+export function getVisibleFields(fields: DecapField[]): DecapField[] {
+  return fields.filter((f) => f.widget !== 'hidden')
+}
+
+/**
+ * Get all widget types used across all collections
+ */
+export function getUsedWidgetTypes(config: DecapConfig): Set<string> {
+  const types = new Set<string>()
+
+  function walkFields(fields: DecapField[]) {
+    for (const field of fields) {
+      types.add(field.widget)
+      if (field.fields) walkFields(field.fields)
+      if (field.field) types.add(field.field.widget)
+      if (field.types) {
+        for (const type of field.types) {
+          if (type.fields) walkFields(type.fields)
+        }
+      }
+    }
+  }
+
+  for (const col of config.collections) {
+    if (col.fields) walkFields(col.fields)
+    if (col.files) {
+      for (const file of col.files) {
+        if (file.fields) walkFields(file.fields)
+      }
+    }
+  }
+
+  return types
+}
+
+/**
+ * Find a collection by name
+ */
+export function findCollection(
+  config: DecapConfig,
+  name: string
+): DecapCollection | undefined {
+  return config.collections.find((c) => c.name === name)
+}
+
+/**
+ * Get the slug pattern for a collection.
+ * Returns the slug template string (e.g., '{{slug}}')
+ */
+export function getSlugPattern(col: DecapCollection): string {
+  return col.slug || '{{slug}}'
+}
+
+/**
+ * Get the file path pattern for a collection.
+ * Returns the path template (e.g., '{{slug}}/index')
+ */
+export function getPathPattern(col: DecapCollection): string | undefined {
+  return col.path
+}
+
+/**
+ * Get the identifier field name for a collection.
+ * Defaults to 'title' if not specified.
+ */
+export function getIdentifierField(col: DecapCollection): string {
+  return col.identifier_field || 'title'
+}
+
+// ─── Collection grouping for navigation ─────────────────────────
+
+export interface CollectionGroup {
+  label: string
+  collections: CmsCollection[]
+}
+
+/**
+ * Group collections into logical categories for sidebar nav.
+ * Uses a predefined grouping based on the OER content model.
+ */
+export function groupCollections(collections: CmsCollection[]): CollectionGroup[] {
+  const groups: CollectionGroup[] = []
+
+  const contentTypes = ['articles', 'tutorials', 'lectures', 'exercises', 'projects']
+  const curriculum = ['lessons', 'specializations', 'pathways']
+  const assessment = ['rubrics']
+  const other = ['docs', 'resources']
+
+  const contentGroup = collections.filter((c) => contentTypes.includes(c.name))
+  const curriculumGroup = collections.filter((c) => curriculum.includes(c.name))
+  const assessmentGroup = collections.filter((c) => assessment.includes(c.name))
+  const otherGroup = collections.filter((c) => other.includes(c.name))
+  const ungrouped = collections.filter(
+    (c) =>
+      !contentTypes.includes(c.name) &&
+      !curriculum.includes(c.name) &&
+      !assessment.includes(c.name) &&
+      !other.includes(c.name)
+  )
+
+  if (contentGroup.length) groups.push({ label: 'Content', collections: contentGroup })
+  if (curriculumGroup.length) groups.push({ label: 'Curriculum', collections: curriculumGroup })
+  if (assessmentGroup.length) groups.push({ label: 'Assessment', collections: assessmentGroup })
+  if (otherGroup.length) groups.push({ label: 'Other', collections: otherGroup })
+  if (ungrouped.length) groups.push({ label: 'Uncategorized', collections: ungrouped })
+
+  return groups
+}
