@@ -1,30 +1,26 @@
-feat: Phase 1 - Form engine, basic widgets, and save operations
+feat: Phase 2 - Complex widgets (list, typed list, relation, object, image, file)
 
-Form Engine:
-- DynamicField router maps widget types to Vue components
-- CollectionForm auto-generates forms from config.yml field definitions
-- Validation for required fields and pattern constraints
-- Dirty state tracking and sticky save toolbar
+Complex Widget Components (6):
+- CmsList: repeatable field group with simple/single/structured modes
+  Handles tags, skills, tools, learningObjectives, attachments, criteria
+- CmsTypedList: polymorphic list for typed items
+  Handles prerequisites (8 content types) and lesson items (5 types)
+  Type selector per item, color-coded type badges, collapsible sections
+- CmsRelation: content reference picker via Nuxt Content queries
+  Searchable combobox, single and multiple selection modes
+  Reorderable tags for multi-select (specializations, pathways)
+- CmsObject: nested field group with recursive DynamicField rendering
+  Collapsible sections, hidden field defaults
+- CmsImage: image upload with drag-and-drop, preview thumbnail, URL fallback
+- CmsFile: generic file upload with drag-and-drop, filename display, URL fallback
 
-Widget Components (8):
-- CmsString: text input with pattern validation
-- CmsText: textarea
-- CmsBoolean: switch/toggle
-- CmsSelect: dropdown with single/multiple select
-- CmsDatetime: date/time picker
-- CmsHidden: hidden field with default value
-- CmsNumber: number input with min/max/step
-- CmsMarkdown: plain textarea (Tiptap in Phase 3)
+Media Upload API:
+- server/api/cms/media/upload.post.ts: handles multipart file uploads
+  Writes to public/uploads in dev mode, sanitized filenames with timestamps
 
-Save Operations:
-- Local filesystem save API (dev mode)
-- GitHub API save with editorial workflow (branch + commit + PR)
-- Direct commit mode for trusted authors
-- Content read API for loading raw markdown
-- useCmsSave composable with loading/error/success states
+DynamicField Router Updates:
+- Registered all Phase 2 components in widget map
+- Smart list routing: list with types -> CmsTypedList, otherwise -> CmsList
+- All 13 Decap widget types now supported
 
-Editor Pages:
-- New item page with slug generation
-- Edit item page with gray-matter frontmatter parsing
-- Updated item viewer with Edit button linking to CMS editor
-- Updated collection browser with native New button
+Milestone: All 10 collections fully editable via custom CMS.
