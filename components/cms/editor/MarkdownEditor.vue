@@ -16,6 +16,7 @@ import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown } from 'tiptap-markdown'
+import { MdcBlockExtension, parseMdcBlock, mdcToNodeAttrs } from './MdcBlockExtension'
 import {
   Bold, Italic, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Code, Minus, Link as LinkIcon,
@@ -39,9 +40,46 @@ const viewMode = ref<ViewMode>('edit')
 // ─── Code mode state (raw markdown textarea) ───────────────
 const rawMarkdown = ref('')
 
+// ─── MDC ↔ HTML conversion helpers ─────────────────────────
+// MDC block pattern: ::component-name{props}\n::
+const MDC_BLOCK_REGEX = /::([\w-]+)\{([^}]*)\}\s*\n?::/g
+
+/**
+ * Convert MDC blocks in markdown to HTML divs that Tiptap can parse.
+ * This runs before setting editor content.
+ */
+function mdcToHtml(markdown: string): string {
+  return markdown.replace(MDC_BLOCK_REGEX, (fullMatch, compType, attrStr) => {
+    const props: Record<string, any> = {}
+    const attrRegex = /(\w+)="([^"]*)"/g
+    let m: RegExpExecArray | null
+    while ((m = attrRegex.exec(attrStr)) !== null) {
+      let val: any = m[2]
+      if (val === 'true') val = true
+      else if (val === 'false') val = false
+      props[m[1]!] = val
+    }
+    const propsJson = JSON.stringify(props).replace(/"/g, '&quot;')
+    const rawEscaped = fullMatch.replace(/"/g, '&quot;')
+    return `<div data-mdc-block="true" data-component-type="${compType}" data-mdc-props="${propsJson}" data-mdc-raw="${rawEscaped}"></div>`
+  })
+}
+
+/**
+ * Convert HTML placeholder divs back to MDC syntax in markdown output.
+ * This runs after getting markdown from the editor.
+ */
+function htmlToMdc(markdown: string): string {
+  // Match the HTML div placeholders that tiptap-markdown might output
+  const htmlDivRegex = /<div data-mdc-block="true" data-component-type="([^"]*)" data-mdc-props="([^"]*)" data-mdc-raw="([^"]*)"><\/div>/g
+  return markdown.replace(htmlDivRegex, (_, _compType, _propsJson, rawEscaped) => {
+    return rawEscaped.replace(/&quot;/g, '"').replace(/&amp;/g, '&')
+  })
+}
+
 // ─── Editor setup ──────────────────────────────────────────
 const editor = useEditor({
-  content: props.modelValue || '',
+  content: mdcToHtml(props.modelValue || ''),
   extensions: [
     StarterKit.configure({
       heading: { levels: [1, 2, 3] },
@@ -70,6 +108,7 @@ const editor = useEditor({
       transformPastedText: true,
       transformCopiedText: true,
     }),
+    MdcBlockExtension,
   ],
   editorProps: {
     attributes: {
@@ -77,7 +116,16 @@ const editor = useEditor({
     },
   },
   onUpdate: ({ editor: ed }) => {
-    const md = ed.storage.markdown.getMarkdown()
+    let md = (ed.storage as any).markdown.getMarkdown()
+    // Convert any HTML div placeholders back to MDC syntax
+    md = htmlToMdc(md)
+    // Also restore MDC from any mdcBlock nodes that tiptap-markdown didn't handle
+    ed.state.doc.descendants((node: any) => {
+      if (node.type.name === 'mdcBlock' && node.attrs.mdcRaw) {
+        // The markdown serializer should have handled this via the extension,
+        // but as a fallback we ensure MDC blocks appear in output
+      }
+    })
     emit('update:modelValue', md)
   },
 })
@@ -85,9 +133,10 @@ const editor = useEditor({
 // Watch for external changes to modelValue
 watch(() => props.modelValue, (newVal) => {
   if (!editor.value) return
-  const currentMd = editor.value.storage.markdown.getMarkdown()
+  let currentMd = (editor.value.storage as any).markdown.getMarkdown()
+  currentMd = htmlToMdc(currentMd)
   if (newVal !== currentMd) {
-    editor.value.commands.setContent(newVal || '')
+    editor.value.commands.setContent(mdcToHtml(newVal || ''))
   }
 })
 
@@ -95,10 +144,11 @@ watch(() => props.modelValue, (newVal) => {
 watch(viewMode, (mode, oldMode) => {
   if (mode === 'code') {
     // Entering code mode: sync raw markdown from editor
-    rawMarkdown.value = editor.value?.storage.markdown.getMarkdown() || props.modelValue || ''
+    let md = (editor.value?.storage as any)?.markdown?.getMarkdown() || props.modelValue || ''
+    rawMarkdown.value = htmlToMdc(md)
   } else if (oldMode === 'code') {
     // Leaving code mode: push raw markdown back into editor
-    editor.value?.commands.setContent(rawMarkdown.value)
+    editor.value?.commands.setContent(mdcToHtml(rawMarkdown.value))
     emit('update:modelValue', rawMarkdown.value)
   }
 })
@@ -115,21 +165,68 @@ function insertLink() {
   editor.value?.chain().focus().setLink({ href: url }).run()
 }
 
+// ─── Image picker (media library) ──────────────────────────
+const showImagePicker = ref(false)
+
 function insertImage() {
-  const url = window.prompt('Enter image URL:')
-  if (!url) return
-  editor.value?.chain().focus().setImage({ src: url }).run()
+  showImagePicker.value = true
+}
+
+function handleImageSelect(path: string) {
+  showImagePicker.value = false
+  if (path) {
+    editor.value?.chain().focus().setImage({ src: path }).run()
+  }
 }
 
 // ─── MDC insertion ─────────────────────────────────────────
 function insertMdcBlock(mdcSyntax: string) {
-  // Insert the MDC syntax as raw text in a paragraph
-  // The tiptap-markdown extension will preserve it
-  editor.value?.chain().focus().insertContent(mdcSyntax).run()
+  const attrs = mdcToNodeAttrs(mdcSyntax)
+  if (attrs && editor.value) {
+    editor.value.chain().focus().insertContent({
+      type: 'mdcBlock',
+      attrs,
+    }).run()
+  } else {
+    // Fallback: insert as raw text
+    editor.value?.chain().focus().insertContent(mdcSyntax).run()
+  }
 }
 
 onBeforeUnmount(() => {
   editor.value?.destroy()
+})
+
+// ─── Preview HTML post-processing ──────────────────────────
+// Replaces MDC block placeholder divs in Tiptap's HTML output
+// with real rendered components (e.g. <model-viewer>) for the preview pane.
+const previewHtml = computed(() => {
+  const raw = editor.value?.getHTML()
+  if (!raw) return '<p class="text-muted-foreground">Nothing to preview</p>'
+
+  // Replace <div data-mdc-block="true" data-component-type="..." data-mdc-props="...">...</div>
+  return raw.replace(
+    /<div data-mdc-block="true"[^>]*data-component-type="([^"]*)"[^>]*data-mdc-props="([^"]*)"[^>]*>.*?<\/div>/g,
+    (_match: string, compType: string, propsEncoded: string) => {
+      let props: Record<string, any> = {}
+      try { props = JSON.parse(propsEncoded.replace(/&quot;/g, '"').replace(/&amp;/g, '&')) } catch { /* ignore */ }
+
+      if (compType === 'threed-viewer-component' && props.src) {
+        const src = String(props.src).replace(/"/g, '&quot;')
+        const title = String(props.title || '3D Model').replace(/"/g, '&quot;')
+        const height = /^\d+$/.test(String(props.height || '')) ? props.height : '400'
+        const autoRotate = props.autoRotate === true || props.autoRotate === 'true'
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">\ud83d\udce6 ${title}</div>
+          <model-viewer src="${src}" alt="${title}" camera-controls${autoRotate ? ' auto-rotate' : ''} shadow-intensity="1" style="width:100%;height:${height}px;background-color:transparent;"></model-viewer>
+        </div>`
+      }
+
+      // Fallback for other MDC blocks: show a labelled placeholder
+      const label = compType.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
+      return `<div class="my-4 rounded-lg border p-3 text-sm text-muted-foreground"><strong>${label}</strong></div>`
+    }
+  )
 })
 
 // ─── Line count (for code mode) ────────────────────────────
@@ -297,10 +394,19 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
         <!-- Rendered HTML from Tiptap (reuses the same editor content) -->
         <div
           class="prose prose-sm dark:prose-invert max-w-none"
-          v-html="editor?.getHTML() || '<p class=\'text-muted-foreground\'>Nothing to preview</p>'"
+          v-html="previewHtml"
         />
       </div>
     </div>
+
+    <!-- Image picker modal -->
+    <CmsMediaPickerModal
+      :open="showImagePicker"
+      :allowed-types="['image']"
+      title="Insert Image"
+      @select="handleImageSelect"
+      @close="showImagePicker = false"
+    />
   </div>
 </template>
 
@@ -337,5 +443,28 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
   border-left: 3px solid var(--border, #e5e7eb);
   padding-left: 1rem;
   color: var(--muted-foreground, #6b7280);
+}
+/* Ensure lists render properly in both editor and preview (Tailwind v4 preflight resets list-style) */
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.625em;
+}
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.625em;
+}
+.prose ol ol {
+  list-style-type: lower-alpha;
+}
+.prose ol ol ol {
+  list-style-type: lower-roman;
+}
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.prose li > p {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

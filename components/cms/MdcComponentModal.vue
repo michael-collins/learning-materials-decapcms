@@ -6,7 +6,7 @@
  * Receives a component definition (label, fields[]) via props.
  * Auto-generates form fields, then emits the values object on confirm.
  */
-import { X } from 'lucide-vue-next'
+import { X, FolderOpen } from 'lucide-vue-next'
 
 interface MdcFieldDef {
   name: string
@@ -16,6 +16,7 @@ interface MdcFieldDef {
   required?: boolean
   hint?: string
   options?: string[]
+  fileTypes?: string[]  // For file widget: allowed media types (e.g. ['3d'], ['image'])
 }
 
 interface MdcComponentDef {
@@ -48,6 +49,24 @@ const hasRequiredEmpty = computed(() => {
     return isRequired && !values[f.name]
   })
 })
+
+// File picker state
+const showFilePicker = ref(false)
+const filePickerField = ref('')
+const filePickerTypes = ref<string[]>([])
+const filePickerTitle = ref('Select a file')
+
+function openFilePicker(field: MdcFieldDef) {
+  filePickerField.value = field.name
+  filePickerTypes.value = field.fileTypes || []
+  filePickerTitle.value = `Select ${field.label}`
+  showFilePicker.value = true
+}
+
+function handleFileSelected(path: string) {
+  values[filePickerField.value] = path
+  showFilePicker.value = false
+}
 
 function handleSubmit() {
   emit('insert', { ...values })
@@ -128,14 +147,24 @@ onUnmounted(() => {
               Enable
             </label>
 
-            <!-- File path (simple string for now) -->
-            <input
-              v-else-if="field.widget === 'file'"
-              v-model="values[field.name]"
-              type="text"
-              class="w-full rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              :placeholder="field.hint || 'File path…'"
-            />
+            <!-- File path with browse button -->
+            <div v-else-if="field.widget === 'file'" class="flex gap-1.5">
+              <input
+                v-model="values[field.name]"
+                type="text"
+                class="flex-1 rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                :placeholder="field.hint || 'File path…'"
+              />
+              <button
+                type="button"
+                @click="openFilePicker(field)"
+                class="shrink-0 flex items-center gap-1.5 rounded-md border px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+                title="Browse media library"
+              >
+                <FolderOpen class="h-4 w-4" />
+                Browse
+              </button>
+            </div>
 
             <p v-if="field.hint && field.widget !== 'string' && field.widget !== 'file'" class="mt-1 text-xs text-muted-foreground">
               {{ field.hint }}
@@ -160,6 +189,15 @@ onUnmounted(() => {
             </button>
           </div>
         </form>
+
+        <!-- Media picker modal -->
+        <CmsMediaPickerModal
+          :open="showFilePicker"
+          :allowed-types="filePickerTypes"
+          :title="filePickerTitle"
+          @select="handleFileSelected"
+          @close="showFilePicker = false"
+        />
       </div>
     </div>
   </Teleport>

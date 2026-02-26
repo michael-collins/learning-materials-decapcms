@@ -8,9 +8,10 @@
  *  - folder: subdirectory within public/ (default: 'uploads')
  *  - type: filter by file type ('image' | 'document' | '3d' | 'video' | 'all')
  *  - search: filename search query
+ *  - recursive: if 'true', search recursively in all subfolders
  */
 import { readdirSync, statSync, existsSync } from 'node:fs'
-import { resolve, join, extname } from 'node:path'
+import { resolve, join, extname, relative } from 'node:path'
 
 interface MediaFile {
   name: string
@@ -57,49 +58,60 @@ export default defineEventHandler(async (event) => {
   const folder = (query.folder as string) || 'uploads'
   const typeFilter = (query.type as string) || 'all'
   const searchQuery = ((query.search as string) || '').toLowerCase()
+  const recursive = query.recursive === 'true'
 
-  const targetDir = resolve(process.cwd(), 'public', folder)
+  // Security: prevent traversal outside public/
+  const normalizedFolder = folder.replace(/\.\./g, '').replace(/^\//, '')
+  const targetDir = resolve(process.cwd(), 'public', normalizedFolder)
 
   if (!existsSync(targetDir)) {
-    return { files: [], folder, total: 0 }
+    return { files: [], folders: [], folder: normalizedFolder, total: 0 }
   }
 
-  const entries = readdirSync(targetDir, { withFileTypes: true })
   const files: MediaFile[] = []
   const folders: string[] = []
+  const publicRoot = resolve(process.cwd(), 'public')
 
-  for (const entry of entries) {
-    if (entry.name.startsWith('.')) continue
+  function scanDir(dir: string, isRoot: boolean) {
+    const entries = readdirSync(dir, { withFileTypes: true })
 
-    if (entry.isDirectory()) {
-      folders.push(entry.name)
-      continue
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue
+
+      if (entry.isDirectory()) {
+        if (isRoot) folders.push(entry.name)
+        if (recursive) scanDir(join(dir, entry.name), false)
+        continue
+      }
+
+      if (!entry.isFile()) continue
+
+      const ext = extname(entry.name)
+      const fileType = getFileType(ext)
+
+      // Apply type filter
+      if (typeFilter !== 'all' && fileType !== typeFilter) continue
+
+      // Apply search filter
+      if (searchQuery && !entry.name.toLowerCase().includes(searchQuery)) continue
+
+      const fullPath = join(dir, entry.name)
+      const stats = statSync(fullPath)
+      const relativePath = '/' + relative(publicRoot, fullPath).replace(/\\/g, '/')
+
+      files.push({
+        name: entry.name,
+        path: relativePath,
+        size: stats.size,
+        type: fileType,
+        ext,
+        modified: stats.mtime.toISOString(),
+        contentType: getMimeType(ext),
+      })
     }
-
-    if (!entry.isFile()) continue
-
-    const ext = extname(entry.name)
-    const fileType = getFileType(ext)
-
-    // Apply type filter
-    if (typeFilter !== 'all' && fileType !== typeFilter) continue
-
-    // Apply search filter
-    if (searchQuery && !entry.name.toLowerCase().includes(searchQuery)) continue
-
-    const fullPath = join(targetDir, entry.name)
-    const stats = statSync(fullPath)
-
-    files.push({
-      name: entry.name,
-      path: `/${folder}/${entry.name}`,
-      size: stats.size,
-      type: fileType,
-      ext,
-      modified: stats.mtime.toISOString(),
-      contentType: getMimeType(ext),
-    })
   }
+
+  scanDir(targetDir, true)
 
   // Sort by modified date (newest first)
   files.sort((a, b) => new Date(b.modified).getTime() - new Date(a.modified).getTime())
@@ -107,7 +119,7 @@ export default defineEventHandler(async (event) => {
   return {
     files,
     folders,
-    folder,
+    folder: normalizedFolder,
     total: files.length,
   }
 })

@@ -6,7 +6,7 @@
  * Clicking one opens the MdcComponentModal for configuring props,
  * then emits the generated MDC syntax string.
  */
-import { Blocks, Youtube, Video, Presentation, ClipboardList, Box, Package } from 'lucide-vue-next'
+import { Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package } from 'lucide-vue-next'
 
 const emit = defineEmits<{
   insert: [mdcSyntax: string]
@@ -24,6 +24,7 @@ export interface MdcFieldDef {
   required?: boolean
   hint?: string
   options?: string[]
+  fileTypes?: string[]  // For file widget: allowed media types (e.g. ['3d'], ['image'])
 }
 
 export interface MdcComponentDef {
@@ -37,26 +38,50 @@ export interface MdcComponentDef {
 
 const mdcComponents: MdcComponentDef[] = [
   {
-    id: 'youtube-video',
-    label: 'YouTube Video',
-    icon: Youtube,
+    id: 'video-component',
+    label: 'Video',
+    icon: Play,
     color: 'text-red-500',
     fields: [
-      { name: 'id', label: 'YouTube Video ID', widget: 'string', hint: 'e.g., dQw4w9WgXcQ or full URL' },
-      { name: 'title', label: 'Video Title', widget: 'string', default: 'Video Tutorial', required: false },
+      { name: 'src', label: 'Video URL', widget: 'string', hint: 'YouTube, Vimeo, Kaltura, or other video URL' },
+      { name: 'title', label: 'Title', widget: 'string', default: 'Video', required: false },
     ],
-    toBlock: (v) => `::youtube-video{id="${v.id}" title="${v.title || 'Video Tutorial'}"}\n::`,
+    toBlock: (v) => `::video-component{src="${v.src}" title="${v.title || 'Video'}"}\n::`,
   },
   {
     id: 'iframe-component',
-    label: 'Video Embed (iframe)',
-    icon: Video,
+    label: 'Embed (iframe)',
+    icon: Globe,
     color: 'text-blue-500',
     fields: [
-      { name: 'src', label: 'Video URL', widget: 'string', hint: 'Full YouTube, Vimeo, or other URL' },
-      { name: 'title', label: 'Video Title', widget: 'string', default: 'Video', required: false },
+      { name: 'src', label: 'URL', widget: 'string', hint: 'Any embeddable HTTPS URL' },
+      { name: 'title', label: 'Title', widget: 'string', default: 'Embed', required: false },
+      { name: 'height', label: 'Height (px)', widget: 'string', default: '500', required: false },
     ],
-    toBlock: (v) => `::iframe-component{src="${v.src}" title="${v.title || 'Video'}"}\n::`,
+    toBlock: (v) => {
+      const h = v.height && v.height !== '500' ? ` height="${v.height}"` : ''
+      return `::iframe-component{src="${v.src}" title="${v.title || 'Embed'}"${h}}\n::`
+    },
+  },
+  {
+    id: 'code-embed-component',
+    label: 'Code Embed',
+    icon: CodeXml,
+    color: 'text-orange-500',
+    fields: [
+      {
+        name: 'provider', label: 'Provider', widget: 'select',
+        options: ['codepen', 'jsfiddle', 'codesandbox', 'stackblitz', 'replit', 'glitch'],
+        hint: 'Select the code playground provider',
+      },
+      { name: 'src', label: 'URL or Pen ID', widget: 'string', hint: 'Full URL or slug/ID from the provider' },
+      { name: 'title', label: 'Title', widget: 'string', default: 'Code Example', required: false },
+      { name: 'height', label: 'Height (px)', widget: 'string', default: '400', required: false },
+    ],
+    toBlock: (v) => {
+      const h = v.height && v.height !== '400' ? ` height="${v.height}"` : ''
+      return `::code-embed-component{provider="${v.provider}" src="${v.src}" title="${v.title || 'Code Example'}"${h}}\n::`
+    },
   },
   {
     id: 'google-slides',
@@ -64,7 +89,7 @@ const mdcComponents: MdcComponentDef[] = [
     icon: Presentation,
     color: 'text-green-500',
     fields: [
-      { name: 'id', label: 'Presentation ID', widget: 'string', hint: 'ID from the Google Slides URL' },
+      { name: 'id', label: 'Presentation ID or URL', widget: 'string', hint: 'ID or full URL from Google Slides' },
       { name: 'title', label: 'Presentation Title', widget: 'string', default: 'Presentation', required: false },
     ],
     toBlock: (v) => `::google-slides-component{id="${v.id}" title="${v.title || 'Presentation'}"}\n::`,
@@ -101,7 +126,7 @@ const mdcComponents: MdcComponentDef[] = [
     icon: Package,
     color: 'text-purple-500',
     fields: [
-      { name: 'src', label: '3D File Path', widget: 'string', hint: 'Path to .gltf or .glb file in uploads' },
+      { name: 'src', label: '3D File Path', widget: 'file', hint: 'Path to .gltf or .glb file in uploads', fileTypes: ['3d'] },
       { name: 'title', label: 'Model Title', widget: 'string', default: '3D Model', required: false },
       { name: 'height', label: 'Viewer Height', widget: 'string', default: '600px', required: false },
       { name: 'autoRotate', label: 'Auto-rotate', widget: 'boolean', default: true, required: false },
