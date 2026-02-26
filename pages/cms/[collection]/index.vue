@@ -103,14 +103,13 @@ function formatDate(date: string | undefined): string {
           <ExternalLink class="h-4 w-4" />
           <span class="hidden sm:inline">Decap</span>
         </a>
-        <a
-          :href="getDecapUrl(collectionName) + '/new'"
-          target="_blank"
+        <NuxtLink
+          :to="`/cms/${collectionName}/new`"
           class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
           <Plus class="h-4 w-4" />
           <span class="hidden sm:inline">New</span>
-        </a>
+        </NuxtLink>
       </div>
     </div>
 
@@ -159,15 +158,14 @@ function formatDate(date: string | undefined): string {
       <p class="text-sm text-muted-foreground">
         {{ search ? 'No items match your search.' : 'No items in this collection yet.' }}
       </p>
-      <a
+      <NuxtLink
         v-if="!search"
-        :href="getDecapUrl(collectionName) + '/new'"
-        target="_blank"
+        :to="`/cms/${collectionName}/new`"
         class="mt-3 flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
       >
         <Plus class="h-4 w-4" />
         Create First Item
-      </a>
+      </NuxtLink>
     </div>
 
     <!-- Item List -->

@@ -21,7 +21,8 @@ const route = useRoute()
 const collectionName = computed(() => route.params.collection as string)
 const slug = computed(() => {
   const s = route.params.slug
-  return Array.isArray(s) ? s.join('/') : s
+  if (Array.isArray(s)) return s.join('/')
+  return s ?? ''
 })
 
 const { getCollection, getDecapUrl } = useCmsConfig()
@@ -131,11 +132,19 @@ function isObject(value: any): boolean {
           <a
             :href="getDecapUrl(collectionName, slug)"
             target="_blank"
+            class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent"
+            title="Edit in Decap CMS"
+          >
+            <ExternalLink class="h-4 w-4" />
+            <span class="hidden sm:inline">Decap</span>
+          </a>
+          <NuxtLink
+            :to="`/cms/${collectionName}/edit/${slug}`"
             class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Pencil class="h-4 w-4" />
-            <span class="hidden sm:inline">Edit in Decap</span>
-          </a>
+            <span class="hidden sm:inline">Edit</span>
+          </NuxtLink>
         </div>
       </div>
 
@@ -189,18 +198,16 @@ function isObject(value: any): boolean {
         </div>
       </div>
 
-      <!-- Phase 1 placeholder: Body editor will go here -->
+      <!-- Quick Edit Link -->
       <div class="mt-6 rounded-lg border border-dashed bg-muted/30 p-8 text-center">
         <Pencil class="mx-auto mb-2 h-6 w-6 text-muted-foreground/50" />
         <p class="text-sm text-muted-foreground">
-          Inline editing coming in Phase 1.
-          <a
-            :href="getDecapUrl(collectionName, slug)"
-            target="_blank"
+          <NuxtLink
+            :to="`/cms/${collectionName}/edit/${slug}`"
             class="text-primary hover:underline"
           >
-            Edit in Decap CMS →
-          </a>
+            Edit this item →
+          </NuxtLink>
         </p>
       </div>
     </template>

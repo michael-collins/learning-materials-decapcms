@@ -1,0 +1,30 @@
+feat: Phase 1 - Form engine, basic widgets, and save operations
+
+Form Engine:
+- DynamicField router maps widget types to Vue components
+- CollectionForm auto-generates forms from config.yml field definitions
+- Validation for required fields and pattern constraints
+- Dirty state tracking and sticky save toolbar
+
+Widget Components (8):
+- CmsString: text input with pattern validation
+- CmsText: textarea
+- CmsBoolean: switch/toggle
+- CmsSelect: dropdown with single/multiple select
+- CmsDatetime: date/time picker
+- CmsHidden: hidden field with default value
+- CmsNumber: number input with min/max/step
+- CmsMarkdown: plain textarea (Tiptap in Phase 3)
+
+Save Operations:
+- Local filesystem save API (dev mode)
+- GitHub API save with editorial workflow (branch + commit + PR)
+- Direct commit mode for trusted authors
+- Content read API for loading raw markdown
+- useCmsSave composable with loading/error/success states
+
+Editor Pages:
+- New item page with slug generation
+- Edit item page with gray-matter frontmatter parsing
+- Updated item viewer with Edit button linking to CMS editor
+- Updated collection browser with native New button
