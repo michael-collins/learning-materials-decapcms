@@ -23,7 +23,7 @@ useHead({ title: 'Media Manager – CMS' })
     </div>
 
     <div class="flex-1 overflow-hidden">
-      <CmsMediaMediaBrowser />
+      <CmsMediaBrowser />
     </div>
   </div>
 </template>
