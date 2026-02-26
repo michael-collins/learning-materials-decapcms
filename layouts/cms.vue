@@ -12,6 +12,8 @@ import {
   PanelLeft,
   Menu,
   X,
+  ImageIcon,
+  FileEdit,
 } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 
@@ -105,6 +107,32 @@ function handleLogout() {
         >
           <LayoutDashboard class="h-4 w-4" />
           Dashboard
+        </NuxtLink>
+
+        <!-- Media Manager -->
+        <NuxtLink
+          to="/cms/media"
+          :class="[
+            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+            'hover:bg-accent hover:text-accent-foreground',
+            route.path === '/cms/media' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+          ]"
+        >
+          <ImageIcon class="h-4 w-4" />
+          Media
+        </NuxtLink>
+
+        <!-- Drafts -->
+        <NuxtLink
+          to="/cms/drafts"
+          :class="[
+            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+            'hover:bg-accent hover:text-accent-foreground',
+            route.path === '/cms/drafts' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+          ]"
+        >
+          <FileEdit class="h-4 w-4" />
+          Drafts
         </NuxtLink>
 
         <!-- Collection Groups -->
