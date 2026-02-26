@@ -2,8 +2,10 @@
  * POST /api/cms/content/save
  *
  * Save content to GitHub via the GitHub API.
- * Creates a branch, commits the file, and opens a PR (editorial workflow).
- * Falls back to direct commit on main if editorial workflow is disabled.
+ *
+ * In editorial workflow mode:
+ * - Default: creates branch + commit + PR (draft)
+ * - publishMode: 'direct' commits straight to main (bypasses editorial)
  *
  * Body:
  * - collection: collection name
@@ -13,6 +15,7 @@
  * - isNew: boolean
  * - token: GitHub PAT
  * - message: optional commit message
+ * - publishMode: 'draft' | 'direct' (default: uses config publish_mode)
  */
 import matter from 'gray-matter'
 import {
@@ -31,6 +34,7 @@ export default defineEventHandler(async (event) => {
     isNew,
     token,
     message: commitMessage,
+    publishMode,
   } = body
 
   if (!collectionName || !slug || !token) {
@@ -68,7 +72,11 @@ export default defineEventHandler(async (event) => {
 
   const { repo, branch: mainBranch } = config.backend
   const [owner, repoName] = repo.split('/')
-  const useEditorialWorkflow = config.publish_mode === 'editorial_workflow'
+  const useEditorialWorkflow = publishMode === 'direct'
+    ? false
+    : publishMode === 'draft'
+      ? true
+      : config.publish_mode === 'editorial_workflow'
 
   const headers = {
     Authorization: `Bearer ${token}`,

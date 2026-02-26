@@ -43,6 +43,8 @@ export function useCmsSave() {
     body: string
     isNew?: boolean
     commitMessage?: string
+    /** Override publish mode: 'draft' (branch+PR) or 'direct' (commit to main) */
+    publishMode?: 'draft' | 'direct'
   }): Promise<SaveResult> {
     saving.value = true
     error.value = null
@@ -88,6 +90,7 @@ export function useCmsSave() {
             isNew: options.isNew ?? false,
             token,
             message: options.commitMessage,
+            publishMode: options.publishMode,
           },
         })
 

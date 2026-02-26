@@ -13,9 +13,11 @@ definePageMeta({
 const route = useRoute()
 const collectionName = computed(() => route.params.collection as string)
 
-const { getCollection } = useCmsConfig()
+const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
-const { save, saving, error: saveError, lastResult } = useCmsSave()
+const { save, saving, error: saveError, lastResult, isLocalBackend } = useCmsSave()
+
+const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
 const slugInput = ref('')
 const showSuccess = ref(false)
@@ -30,7 +32,7 @@ function generateSlug(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
-async function handleSubmit(data: { frontmatter: Record<string, any>; body: string }) {
+async function handleSubmit(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }) {
   // Determine slug from input, title, or generate
   let slug = slugInput.value.trim()
   if (!slug) {
@@ -48,6 +50,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
       frontmatter: data.frontmatter,
       body: data.body,
       isNew: true,
+      publishMode: data.publishMode,
     })
     showSuccess.value = true
   } catch {
@@ -150,6 +153,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
         :collection="collection"
         :is-new="true"
         :saving="saving"
+        :editorial-workflow="isEditorial"
         @submit="handleSubmit"
       />
     </template>

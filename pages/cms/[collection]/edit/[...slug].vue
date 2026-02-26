@@ -20,9 +20,11 @@ const slug = computed(() => {
   return s ?? ''
 })
 
-const { getCollection } = useCmsConfig()
+const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
-const { save, loadRaw, saving, error: saveError, lastResult } = useCmsSave()
+const { save, loadRaw, saving, error: saveError, lastResult, isLocalBackend } = useCmsSave()
+
+const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
 const showSuccess = ref(false)
 const loadError = ref<string | null>(null)
@@ -46,7 +48,7 @@ onMounted(async () => {
   }
 })
 
-async function handleSubmit(data: { frontmatter: Record<string, any>; body: string }) {
+async function handleSubmit(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }) {
   try {
     await save({
       collection: collectionName.value,
@@ -54,6 +56,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
       frontmatter: data.frontmatter,
       body: data.body,
       isNew: false,
+      publishMode: data.publishMode,
     })
     showSuccess.value = true
   } catch {
@@ -168,6 +171,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
       :initial-data="initialData"
       :is-new="false"
       :saving="saving"
+      :editorial-workflow="isEditorial"
       @submit="handleSubmit"
     />
   </div>

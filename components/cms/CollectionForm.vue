@@ -7,7 +7,7 @@
  */
 import type { DecapField, DecapCollection } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
-import { Save, Loader2, AlertCircle } from 'lucide-vue-next'
+import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps<{
   /** The collection config from config.yml */
@@ -18,10 +18,12 @@ const props = defineProps<{
   isNew?: boolean
   /** Whether save is in progress */
   saving?: boolean
+  /** Whether editorial workflow is enabled */
+  editorialWorkflow?: boolean
 }>()
 
 const emit = defineEmits<{
-  submit: [data: { frontmatter: Record<string, any>; body: string }]
+  submit: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
 }>()
 
 // ─── Derive fields from collection config ──────────────
@@ -103,8 +105,11 @@ function validate(): boolean {
 }
 
 // ─── Submit ─────────────────────────────────────────────
-function handleSubmit() {
+const showSaveDropdown = ref(false)
+
+function handleSubmit(publishMode?: 'draft' | 'direct') {
   if (!validate()) return
+  showSaveDropdown.value = false
 
   // Merge form data with hidden field values
   const frontmatter = { ...formData }
@@ -112,6 +117,7 @@ function handleSubmit() {
   emit('submit', {
     frontmatter,
     body: bodyContent.value,
+    publishMode,
   })
 }
 
@@ -203,7 +209,61 @@ const isDirty = computed(() => {
             No changes
           </span>
         </div>
+
+        <!-- Editorial workflow: split button (Save Draft + Publish) -->
+        <div v-if="editorialWorkflow" class="flex items-center">
+          <!-- Primary: Save as Draft -->
+          <button
+            type="button"
+            @click="handleSubmit('draft')"
+            :disabled="saving || !isDirty"
+            class="flex items-center gap-2 rounded-l-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+          >
+            <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
+            <GitPullRequest v-else class="h-4 w-4" />
+            {{ saving ? 'Saving...' : isNew ? 'Save as Draft' : 'Save Draft' }}
+          </button>
+
+          <!-- Dropdown toggle -->
+          <div class="relative">
+            <button
+              type="button"
+              @click="showSaveDropdown = !showSaveDropdown"
+              :disabled="saving || !isDirty"
+              class="rounded-r-md border-l border-primary-foreground/20 bg-primary px-2 py-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+            >
+              <ChevronDown class="h-4 w-4" />
+            </button>
+
+            <!-- Dropdown: Publish Directly -->
+            <div
+              v-if="showSaveDropdown"
+              class="absolute bottom-full right-0 mb-2 w-48 rounded-md border bg-popover p-1 shadow-lg"
+            >
+              <button
+                type="button"
+                @click="handleSubmit('direct')"
+                class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+              >
+                <Save class="h-4 w-4" />
+                Publish Directly
+              </button>
+            </div>
+          </div>
+
+          <!-- Click-outside -->
+          <Teleport to="body">
+            <div
+              v-if="showSaveDropdown"
+              class="fixed inset-0 z-9"
+              @click="showSaveDropdown = false"
+            />
+          </Teleport>
+        </div>
+
+        <!-- Non-editorial: simple save button -->
         <button
+          v-else
           type="submit"
           :disabled="saving || !isDirty"
           class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
