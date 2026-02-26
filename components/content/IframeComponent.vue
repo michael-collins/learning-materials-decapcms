@@ -4,6 +4,9 @@ interface Props {
   title?: string
   width?: string
   height?: string
+  caption?: string
+  credit?: string
+  creditUrl?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,6 +56,13 @@ const embedUrl = computed(() => {
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
+    />
+    <ContentMediaCaption
+      :title="title"
+      :caption="caption"
+      :credit="credit"
+      :credit-url="creditUrl"
+      component-type="iframe"
     />
   </div>
 </template>

@@ -79,17 +79,88 @@ const invalidMsg = (text: string) =>
     ${text}
   </div>`
 
+// ─── Preview-time reference tracker ──────────────────────
+interface PreviewRef {
+  num: number
+  label: string
+  text: string
+  url?: string
+  refId: string
+  citeId: string
+}
+
+function createPreviewRefTracker() {
+  const refs: PreviewRef[] = []
+  const seen = new Map<string, PreviewRef>()
+
+  function add(label: string, text?: string, url?: string): PreviewRef {
+    const key = `${label}||${url || ''}`
+    const existing = seen.get(key)
+    if (existing) return existing
+    const num = refs.length + 1
+    const r: PreviewRef = { num, label, text: text || label, url, refId: `ref-${num}`, citeId: `cite-${num}` }
+    seen.set(key, r)
+    refs.push(r)
+    return r
+  }
+
+  return { refs, add }
+}
+
+/** Build the caption / credit HTML rendered beneath a media embed in the preview */
+function renderCaptionHtml(p: Record<string, string>, tracker: ReturnType<typeof createPreviewRefTracker>): string {
+  const caption = p.caption?.trim()
+  const credit = p.credit?.trim()
+  if (!caption && !credit) return ''
+
+  let inner = ''
+  if (caption) inner += esc(caption)
+  if (credit) {
+    if (caption) inner += ' &mdash; '
+    const ref = tracker.add(credit, credit, p.creditUrl?.trim() || undefined)
+    const creditText = p.creditUrl
+      ? `<a href="${esc(p.creditUrl)}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${esc(credit)}</a>`
+      : esc(credit)
+    inner += `${creditText}<sup id="${ref.citeId}" class="ml-0.5"><a href="#${ref.refId}" class="inline-flex items-center justify-center rounded bg-primary/10 px-1 py-0.5 text-[0.65rem] font-semibold leading-none text-primary no-underline" title="${esc(credit)}">[${ref.num}]</a></sup>`
+  }
+  return `<figcaption class="mt-2 text-center text-sm text-muted-foreground">${inner}</figcaption>`
+}
+
+/** Render a references footer HTML block from collected references */
+function renderReferencesFooterHtml(refs: PreviewRef[]): string {
+  if (refs.length === 0) return ''
+  const items = refs.map(r => {
+    const srcLink = r.url
+      ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-primary hover:underline text-xs"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Source</a>`
+      : ''
+    const backLink = `<a href="#${r.citeId}" class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground text-xs"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>Back to text</a>`
+    return `<li id="${r.refId}" class="flex gap-3 rounded-md p-2 text-sm">
+      <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">${r.num}</span>
+      <div class="min-w-0 flex-1">
+        <p class="text-foreground/90">${esc(r.text)}</p>
+        <div class="mt-1 flex flex-wrap items-center gap-3">${srcLink}${backLink}</div>
+      </div>
+    </li>`
+  }).join('')
+  return `<section class="mt-12 border-t pt-8" role="doc-endnotes" aria-label="References">
+    <h2 class="mb-4 flex items-center gap-2 text-lg font-semibold tracking-tight">References <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">${refs.length}</span></h2>
+    <ol class="list-none space-y-3 pl-0">${items}</ol>
+  </section>`
+}
+
 /**
  * Render a parsed MDC block to HTML for the preview panel.
  * Mirrors the actual content components in components/content/.
  * All user-supplied values are escaped / validated before interpolation.
  */
-function renderMdcBlock(parsed: MdcParsed): string {
+function renderMdcBlock(parsed: MdcParsed, refTracker: ReturnType<typeof createPreviewRefTracker>): string {
   const { componentType, props: p } = parsed
+  const captionHtml = renderCaptionHtml(p, refTracker)
   const wrapper = (inner: string, label: string) =>
     `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
       <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">${esc(label)}</div>
       <div>${inner}</div>
+      ${captionHtml}
     </div>`
 
   switch (componentType) {
@@ -332,6 +403,14 @@ function renderMdcBlock(parsed: MdcParsed): string {
       )
     }
 
+    case 'cite-reference': {
+      const label = esc(p.label || 'Citation')
+      const text = p.text || p.label || 'Citation'
+      const url = p.url?.trim()
+      const ref = refTracker.add(label, text, url || undefined)
+      return `<sup id="${ref.citeId}" class="cite-ref"><a href="#${ref.refId}" class="inline-flex items-center justify-center rounded bg-primary/10 px-1 py-0.5 text-[0.65rem] font-semibold leading-none text-primary no-underline" title="${esc(text)}">[${ref.num}]</a></sup>`
+    }
+
     default:
       return wrapper(
         `<div class="p-4 text-sm text-muted-foreground italic">Unknown component: ${esc(componentType)}</div>`,
@@ -344,13 +423,15 @@ function renderMdcBlock(parsed: MdcParsed): string {
 const renderedBody = computed(() => {
   if (!props.body) return '<p class="text-muted-foreground italic">No content yet...</p>'
 
+  const refTracker = createPreviewRefTracker()
+
   // First pass: extract and replace MDC blocks with placeholders
   const MDC_BLOCK_REGEX = /::([\w-]+)\{([^}]*)\}\s*\n?::/g
   const mdcBlocks: string[] = []
   let bodyWithPlaceholders = props.body.replace(MDC_BLOCK_REGEX, (_, compType, attrStr) => {
     const parsed: MdcParsed = { componentType: compType, props: parseMdcProps(attrStr) }
     const idx = mdcBlocks.length
-    mdcBlocks.push(renderMdcBlock(parsed))
+    mdcBlocks.push(renderMdcBlock(parsed, refTracker))
     return `\n<!--MDC_PLACEHOLDER_${idx}-->\n`
   })
 
@@ -391,6 +472,9 @@ const renderedBody = computed(() => {
   mdcBlocks.forEach((blockHtml, idx) => {
     html = html.replace(`<!--MDC_PLACEHOLDER_${idx}-->`, blockHtml)
   })
+
+  // Append references footer if any references were collected
+  html += renderReferencesFooterHtml(refTracker.refs)
 
   return html
 })

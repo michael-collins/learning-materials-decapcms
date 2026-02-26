@@ -8,7 +8,7 @@
 import { ref } from 'vue'
 import { NodeViewWrapper } from '@tiptap/vue-3'
 import {
-  Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package,
+  Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote,
   Pencil, Trash2, GripVertical, FolderOpen,
 } from 'lucide-vue-next'
 
@@ -54,6 +54,9 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
     fields: [
       { name: 'src', label: 'Video URL', type: 'string' },
       { name: 'title', label: 'Title', type: 'string' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
     ],
   },
   // Legacy alias — existing content still uses ::youtube-video
@@ -74,6 +77,9 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'src', label: 'URL', type: 'string' },
       { name: 'title', label: 'Title', type: 'string' },
       { name: 'height', label: 'Height (px)', type: 'string' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
     ],
   },
   'code-embed-component': {
@@ -85,6 +91,9 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'src', label: 'URL or ID', type: 'string' },
       { name: 'title', label: 'Title', type: 'string' },
       { name: 'height', label: 'Height (px)', type: 'string' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
     ],
   },
   'google-slides-component': {
@@ -94,6 +103,9 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
     fields: [
       { name: 'id', label: 'Presentation ID', type: 'string' },
       { name: 'title', label: 'Title', type: 'string' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
     ],
   },
   'rubric-component': {
@@ -112,6 +124,9 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'src', label: 'Sketchfab URL', type: 'string' },
       { name: 'title', label: 'Title', type: 'string' },
       { name: 'height', label: 'Height', type: 'string' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
     ],
   },
   'threed-viewer-component': {
@@ -123,6 +138,19 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'title', label: 'Title', type: 'string' },
       { name: 'height', label: 'Height', type: 'string' },
       { name: 'autoRotate', label: 'Auto Rotate', type: 'boolean' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
+    ],
+  },
+  'cite-reference': {
+    label: 'Citation',
+    icon: Quote,
+    color: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/30',
+    fields: [
+      { name: 'label', label: 'Short Label', type: 'string' },
+      { name: 'text', label: 'Full Citation', type: 'string' },
+      { name: 'url', label: 'Source URL', type: 'string' },
     ],
   },
 }

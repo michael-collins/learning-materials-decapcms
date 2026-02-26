@@ -204,12 +204,45 @@ const previewHtml = computed(() => {
   const raw = editor.value?.getHTML()
   if (!raw) return '<p class="text-muted-foreground">Nothing to preview</p>'
 
+  // Simple in-editor reference tracker for preview pane
+  const previewRefs: { num: number; label: string; text: string; url?: string; refId: string; citeId: string }[] = []
+  const previewRefSeen = new Map<string, (typeof previewRefs)[0]>()
+  function addPreviewRef(label: string, text?: string, url?: string) {
+    const key = `${label}||${url || ''}`
+    const existing = previewRefSeen.get(key)
+    if (existing) return existing
+    const num = previewRefs.length + 1
+    const r = { num, label, text: text || label, url, refId: `ref-${num}`, citeId: `cite-${num}` }
+    previewRefSeen.set(key, r)
+    previewRefs.push(r)
+    return r
+  }
+
+  function buildCaptionHtml(props: Record<string, any>): string {
+    const caption = String(props.caption || '').trim()
+    const credit = String(props.credit || '').trim()
+    if (!caption && !credit) return ''
+    let inner = ''
+    if (caption) inner += caption.replace(/</g, '&lt;')
+    if (credit) {
+      if (caption) inner += ' &mdash; '
+      const ref = addPreviewRef(credit, credit, props.creditUrl?.trim() || undefined)
+      const creditText = props.creditUrl
+        ? `<a href="${String(props.creditUrl).replace(/"/g, '&quot;')}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${credit.replace(/</g, '&lt;')}</a>`
+        : credit.replace(/</g, '&lt;')
+      inner += `${creditText}<sup id="${ref.citeId}" class="ml-0.5"><a href="#${ref.refId}" class="inline-flex items-center justify-center rounded bg-primary/10 px-1 py-0.5 text-[0.65rem] font-semibold leading-none text-primary no-underline">[${ref.num}]</a></sup>`
+    }
+    return `<figcaption class="mt-2 text-center text-sm text-muted-foreground">${inner}</figcaption>`
+  }
+
   // Replace <div data-mdc-block="true" data-component-type="..." data-mdc-props="...">...</div>
-  return raw.replace(
+  let result = raw.replace(
     /<div data-mdc-block="true"[^>]*data-component-type="([^"]*)"[^>]*data-mdc-props="([^"]*)"[^>]*>.*?<\/div>/g,
     (_match: string, compType: string, propsEncoded: string) => {
       let props: Record<string, any> = {}
       try { props = JSON.parse(propsEncoded.replace(/&quot;/g, '"').replace(/&amp;/g, '&')) } catch { /* ignore */ }
+
+      const captionHtml = buildCaptionHtml(props)
 
       if (compType === 'threed-viewer-component' && props.src) {
         const src = String(props.src).replace(/"/g, '&quot;')
@@ -219,14 +252,39 @@ const previewHtml = computed(() => {
         return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
           <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">\ud83d\udce6 ${title}</div>
           <model-viewer src="${src}" alt="${title}" camera-controls${autoRotate ? ' auto-rotate' : ''} shadow-intensity="1" style="width:100%;height:${height}px;background-color:transparent;"></model-viewer>
+          ${captionHtml}
         </div>`
       }
 
-      // Fallback for other MDC blocks: show a labelled placeholder
+      if (compType === 'cite-reference') {
+        const label = String(props.label || 'Citation').replace(/</g, '&lt;')
+        const text = String(props.text || props.label || 'Citation')
+        const url = props.url?.trim()
+        const ref = addPreviewRef(label, text, url || undefined)
+        return `<sup id="${ref.citeId}" class="cite-ref"><a href="#${ref.refId}" class="inline-flex items-center justify-center rounded bg-primary/10 px-1 py-0.5 text-[0.65rem] font-semibold leading-none text-primary no-underline">[${ref.num}]</a></sup>`
+      }
+
+      // Fallback for other MDC blocks: show a labelled placeholder with caption
       const label = compType.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
-      return `<div class="my-4 rounded-lg border p-3 text-sm text-muted-foreground"><strong>${label}</strong></div>`
+      return `<div class="my-4 rounded-lg border p-3 text-sm text-muted-foreground"><strong>${label}</strong>${captionHtml}</div>`
     }
   )
+
+  // Append references footer if any refs collected
+  if (previewRefs.length > 0) {
+    const items = previewRefs.map(r => {
+      const srcLink = r.url
+        ? `<a href="${r.url.replace(/"/g, '&quot;')}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline text-xs">Source</a>`
+        : ''
+      return `<li id="${r.refId}" class="flex gap-3 rounded-md p-2 text-sm">
+        <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">${r.num}</span>
+        <div><p>${r.text.replace(/</g, '&lt;')}</p><div class="mt-1 flex gap-3 text-xs">${srcLink}<a href="#${r.citeId}" class="text-muted-foreground hover:text-foreground text-xs">Back to text</a></div></div>
+      </li>`
+    }).join('')
+    result += `<section class="mt-8 border-t pt-6"><h2 class="mb-3 text-base font-semibold">References <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">${previewRefs.length}</span></h2><ol class="list-none space-y-2 pl-0">${items}</ol></section>`
+  }
+
+  return result
 })
 
 // ─── Line count (for code mode) ────────────────────────────

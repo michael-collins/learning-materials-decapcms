@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onUnmounted, nextTick, provide } from 'vue'
 import Breadcrumb from '~/components/ui/breadcrumb/Breadcrumb.vue'
 import BreadcrumbItem from '~/components/ui/breadcrumb/BreadcrumbItem.vue'
 import BreadcrumbLink from '~/components/ui/breadcrumb/BreadcrumbLink.vue'
@@ -12,6 +12,7 @@ import CardHeader from '~/components/ui/card/CardHeader.vue'
 import CardTitle from '~/components/ui/card/CardTitle.vue'
 import CitationDropdown from '~/components/CitationDropdown.vue'
 import { useBodyOverflow } from '~/composables/useBodyOverflow'
+import { useContentReferences } from '~/composables/useContentReferences'
 
 interface BreadcrumbSegment {
   label: string
@@ -64,6 +65,10 @@ console.log('[CollectionItem] Author prop:', props.author)
 console.log('[CollectionItem] Prerequisites prop:', props.prerequisites)
 
 const { toggle: toggleBodyOverflow } = useBodyOverflow()
+
+// Content references / citations system
+const { references: contentRefs, hasReferences, addReference, clearReferences } = useContentReferences()
+provide('contentReferences', { references: contentRefs, hasReferences, addReference, clearReferences })
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -551,6 +556,9 @@ const copyCitation = async () => {
       <div class="prose dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-foreground prose-p:text-base prose-p:leading-7 prose-li:text-foreground prose-li:text-base prose-code:text-foreground prose-code:text-sm prose-code:bg-muted/50 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-border/50 prose-pre:bg-muted dark:prose-pre:bg-[#0a0a0a] prose-pre:text-foreground prose-pre:border prose-pre:border-border/50 prose-a:text-primary prose-a:font-medium prose-a:no-underline prose-strong:text-foreground prose-blockquote:text-foreground prose-blockquote:border-l-primary">
         <slot />
       </div>
+
+      <!-- Content References / Citations Footer -->
+      <ContentReferencesFooter />
     </article>
 
     <!-- AI Usage License (AIUL) -->

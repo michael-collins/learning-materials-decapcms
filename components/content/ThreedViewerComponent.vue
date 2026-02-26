@@ -6,6 +6,9 @@ interface Props {
   height?: string
   autoRotate?: boolean
   cameraControls?: boolean
+  caption?: string
+  credit?: string
+  creditUrl?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,10 +60,14 @@ const modelViewerAttrs = computed(() => ({
       </p>
     </div>
     
-    <!-- Title caption -->
-    <p v-if="title && hasValidSrc" class="text-sm text-muted-foreground mt-2 text-center">
-      {{ title }}
-    </p>
+    <ContentMediaCaption
+      v-if="hasValidSrc"
+      :title="title"
+      :caption="caption"
+      :credit="credit"
+      :credit-url="creditUrl"
+      component-type="3d-viewer"
+    />
   </div>
 </template>
 

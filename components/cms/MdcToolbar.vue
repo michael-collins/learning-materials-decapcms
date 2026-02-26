@@ -6,7 +6,7 @@
  * Clicking one opens the MdcComponentModal for configuring props,
  * then emits the generated MDC syntax string.
  */
-import { Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package } from 'lucide-vue-next'
+import { Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote } from 'lucide-vue-next'
 
 const emit = defineEmits<{
   insert: [mdcSyntax: string]
@@ -45,8 +45,17 @@ const mdcComponents: MdcComponentDef[] = [
     fields: [
       { name: 'src', label: 'Video URL', widget: 'string', hint: 'YouTube, Vimeo, Kaltura, or other video URL' },
       { name: 'title', label: 'Title', widget: 'string', default: 'Video', required: false },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the embed' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution (author, publisher, etc.)' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
     ],
-    toBlock: (v) => `::video-component{src="${v.src}" title="${v.title || 'Video'}"}\n::`,
+    toBlock: (v) => {
+      const parts = [`src="${v.src}"`, `title="${v.title || 'Video'}"`]
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::video-component{${parts.join(' ')}}\n::`
+    },
   },
   {
     id: 'iframe-component',
@@ -57,10 +66,17 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'src', label: 'URL', widget: 'string', hint: 'Any embeddable HTTPS URL' },
       { name: 'title', label: 'Title', widget: 'string', default: 'Embed', required: false },
       { name: 'height', label: 'Height (px)', widget: 'string', default: '500', required: false },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the embed' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
     ],
     toBlock: (v) => {
-      const h = v.height && v.height !== '500' ? ` height="${v.height}"` : ''
-      return `::iframe-component{src="${v.src}" title="${v.title || 'Embed'}"${h}}\n::`
+      const parts = [`src="${v.src}"`, `title="${v.title || 'Embed'}"`]
+      if (v.height && v.height !== '500') parts.push(`height="${v.height}"`)
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::iframe-component{${parts.join(' ')}}\n::`
     },
   },
   {
@@ -77,10 +93,17 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'src', label: 'URL or Pen ID', widget: 'string', hint: 'Full URL or slug/ID from the provider' },
       { name: 'title', label: 'Title', widget: 'string', default: 'Code Example', required: false },
       { name: 'height', label: 'Height (px)', widget: 'string', default: '400', required: false },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the embed' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
     ],
     toBlock: (v) => {
-      const h = v.height && v.height !== '400' ? ` height="${v.height}"` : ''
-      return `::code-embed-component{provider="${v.provider}" src="${v.src}" title="${v.title || 'Code Example'}"${h}}\n::`
+      const parts = [`provider="${v.provider}"`, `src="${v.src}"`, `title="${v.title || 'Code Example'}"`]
+      if (v.height && v.height !== '400') parts.push(`height="${v.height}"`)
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::code-embed-component{${parts.join(' ')}}\n::`
     },
   },
   {
@@ -91,8 +114,17 @@ const mdcComponents: MdcComponentDef[] = [
     fields: [
       { name: 'id', label: 'Presentation ID or URL', widget: 'string', hint: 'ID or full URL from Google Slides' },
       { name: 'title', label: 'Presentation Title', widget: 'string', default: 'Presentation', required: false },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the embed' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
     ],
-    toBlock: (v) => `::google-slides-component{id="${v.id}" title="${v.title || 'Presentation'}"}\n::`,
+    toBlock: (v) => {
+      const parts = [`id="${v.id}"`, `title="${v.title || 'Presentation'}"`]
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::google-slides-component{${parts.join(' ')}}\n::`
+    },
   },
   {
     id: 'rubric-component',
@@ -117,8 +149,17 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'src', label: 'Sketchfab URL', widget: 'string', hint: 'Paste the Sketchfab model URL' },
       { name: 'title', label: 'Model Title', widget: 'string', default: 'Sketchfab Model', required: false },
       { name: 'height', label: 'Viewer Height', widget: 'string', default: '600px', required: false, hint: 'CSS height value' },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the viewer' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Model creator / source attribution' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
     ],
-    toBlock: (v) => `::sketchfab-component{src="${v.src}" title="${v.title || 'Sketchfab Model'}" height="${v.height || '600px'}"}\n::`,
+    toBlock: (v) => {
+      const parts = [`src="${v.src}"`, `title="${v.title || 'Sketchfab Model'}"`, `height="${v.height || '600px'}"`]
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::sketchfab-component{${parts.join(' ')}}\n::`
+    },
   },
   {
     id: 'threed-viewer',
@@ -130,10 +171,33 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'title', label: 'Model Title', widget: 'string', default: '3D Model', required: false },
       { name: 'height', label: 'Viewer Height', widget: 'string', default: '600px', required: false },
       { name: 'autoRotate', label: 'Auto-rotate', widget: 'boolean', default: true, required: false },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the viewer' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Model creator / source attribution' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
     ],
     toBlock: (v) => {
-      const auto = v.autoRotate === false ? ' autoRotate="false"' : ''
-      return `::threed-viewer-component{src="${v.src}" title="${v.title || '3D Model'}" height="${v.height || '600px'}"${auto}}\n::`
+      const parts = [`src="${v.src}"`, `title="${v.title || '3D Model'}"`, `height="${v.height || '600px'}"`]
+      if (v.autoRotate === false) parts.push('autoRotate="false"')
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::threed-viewer-component{${parts.join(' ')}}\n::`
+    },
+  },
+  {
+    id: 'cite-reference',
+    label: 'Citation / Reference',
+    icon: Quote,
+    color: 'text-indigo-500',
+    fields: [
+      { name: 'label', label: 'Short Label', widget: 'string', hint: 'Brief identifier (e.g. author last name, "Figure 1")' },
+      { name: 'text', label: 'Full Citation', widget: 'string', hint: 'Complete citation text (author, title, year, publisher, etc.)' },
+      { name: 'url', label: 'Source URL', widget: 'string', required: false, hint: 'Link to the source' },
+    ],
+    toBlock: (v) => {
+      const parts = [`label="${v.label}"`, `text="${v.text}"`]
+      if (v.url) parts.push(`url="${v.url}"`)
+      return `::cite-reference{${parts.join(' ')}}::`
     },
   },
 ]

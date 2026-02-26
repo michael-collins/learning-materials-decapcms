@@ -47,6 +47,7 @@ const MDC_COMPONENT_NAMES = [
   'rubric-component',
   'sketchfab-component',
   'threed-viewer-component',
+  'cite-reference',
   // Legacy — still parsed for backwards compatibility
   'youtube-video',
 ]

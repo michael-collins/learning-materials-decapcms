@@ -6,6 +6,9 @@
 interface Props {
   src: string
   title?: string
+  caption?: string
+  credit?: string
+  creditUrl?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -88,9 +91,14 @@ const embedUrl = computed(() => {
     <div v-else class="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-center text-sm text-destructive">
       Invalid or missing video URL
     </div>
-    <p v-if="title && embedUrl" class="text-sm text-muted-foreground mt-2 text-center">
-      {{ title }}
-    </p>
+    <ContentMediaCaption
+      v-if="embedUrl"
+      :title="title"
+      :caption="caption"
+      :credit="credit"
+      :credit-url="creditUrl"
+      component-type="video"
+    />
   </div>
 </template>
 

@@ -3,6 +3,9 @@ interface Props {
   id: string
   title?: string
   height?: string
+  caption?: string
+  credit?: string
+  creditUrl?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -41,6 +44,13 @@ const embedUrl = computed(() => {
       allowfullscreen="true"
       mozallowfullscreen="true"
       webkitallowfullscreen="true"
+    />
+    <ContentMediaCaption
+      :title="title"
+      :caption="caption"
+      :credit="credit"
+      :credit-url="creditUrl"
+      component-type="google-slides"
     />
   </div>
 </template>
