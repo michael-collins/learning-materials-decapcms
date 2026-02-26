@@ -15,11 +15,11 @@
  *  - display_fields: fields to show in the picker (e.g., ["title"])
  *  - multiple: whether to allow selecting multiple items
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { Search, X, ChevronDown, ChevronUp, Loader2, Link } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
 }>()
 

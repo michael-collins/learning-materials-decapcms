@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
  * CmsText — Textarea field.
- * Maps to Decap's `text` widget.
+ * Maps to the CMS `text` widget.
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: string
 }>()
 

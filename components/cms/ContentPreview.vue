@@ -164,6 +164,16 @@ function renderMdcBlock(parsed: MdcParsed, refTracker: ReturnType<typeof createP
     </div>`
 
   switch (componentType) {
+    case 'image-component': {
+      const src = esc((p.src || '').trim())
+      const alt = esc(p.alt || '')
+      if (!p.src?.trim()) return wrapper('<div class="p-4 text-sm text-muted-foreground italic">No image source specified</div>', '🖼 Image')
+      return wrapper(
+        `<img src="${src}" alt="${alt}" class="rounded-md max-w-full mx-auto" loading="lazy" />`,
+        `🖼 ${alt || 'Image'}`
+      )
+    }
+
     case 'video-component':
     case 'youtube-video': {
       // Unified video component — accepts URL (YouTube, Vimeo, Kaltura, Dailymotion, etc.) or bare YouTube ID

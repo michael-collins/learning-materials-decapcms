@@ -104,8 +104,6 @@ async function handleLogin() {
         Your token is stored locally and never sent to our servers.
         <br />
         <NuxtLink to="/" class="text-primary hover:underline">← Back to site</NuxtLink>
-        ·
-        <a href="/admin/" class="text-primary hover:underline">Decap CMS</a>
       </p>
     </div>
   </div>

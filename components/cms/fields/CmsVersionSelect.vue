@@ -11,11 +11,11 @@
  *
  * modelValue stores: "latest" (default) or a specific version string like "0.9.0"
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { GitBranch, Loader2 } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
   /** The parent object data — used to read the sibling relation field */
   parentData?: Record<string, any>

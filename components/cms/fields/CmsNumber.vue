@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
  * CmsNumber — Number input field.
- * Maps to Decap's `number` widget.
+ * Maps to the CMS `number` widget.
  * Supports min, max, step, and value_type (int/float).
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: number | string
 }>()
 

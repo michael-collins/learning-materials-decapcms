@@ -73,7 +73,7 @@ definePageMeta({
             <div>
               <h3 class="text-xl font-semibold mb-3">Git-Based Content Workflow</h3>
               <p class="text-muted-foreground leading-relaxed">
-                Content is stored as Markdown files in Git, providing version control, collaboration through pull requests, and the ability to work offline. DecapCMS provides a user-friendly interface while maintaining the benefits of Git-based workflows.
+                Content is stored as Markdown files in Git, providing version control, collaboration through pull requests, and the ability to work offline. A custom CMS provides a user-friendly interface while maintaining the benefits of Git-based workflows.
               </p>
             </div>
           </div>
@@ -172,8 +172,8 @@ definePageMeta({
             <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
           </div>
           <div>
-            <strong class="block text-foreground text-lg mb-2">DecapCMS</strong>
-            <span class="text-sm text-muted-foreground leading-relaxed">Open-source content management with Git-based workflow and customizable content modeling</span>
+            <strong class="block text-foreground text-lg mb-2">Custom CMS</strong>
+            <span class="text-sm text-muted-foreground leading-relaxed">Built-in content management with Git-based workflow and customizable content modeling</span>
           </div>
         </div>
         <div class="flex items-start gap-4">

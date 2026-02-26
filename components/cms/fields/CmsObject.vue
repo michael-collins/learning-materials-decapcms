@@ -8,11 +8,11 @@
  * Object values are stored as a flat key-value record:
  * { fieldName1: value1, fieldName2: value2, ... }
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
 }>()
 

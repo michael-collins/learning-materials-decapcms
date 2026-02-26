@@ -1,28 +1,28 @@
 /**
- * Decap CMS config.yml parser
+ * CMS config.yml parser
  *
  * Reads the existing config.yml and transforms it into typed
  * collection/field definitions used by the custom CMS UI.
  */
 import { parse as parseYaml } from 'yaml'
 import type {
-  DecapConfig,
-  DecapCollection,
-  DecapField,
+  CmsConfig,
+  CmsCollectionDef,
+  CmsFieldDef,
   CmsCollection,
 } from './config-types'
 
 // ─── Parse raw YAML ─────────────────────────────────────────────
 
 /**
- * Parse a Decap config from a raw YAML string.
+ * Parse a CMS config from a raw YAML string.
  * Can be used client-side when the config is fetched via API.
  */
-export function parseDecapConfigYaml(yamlContent: string): DecapConfig {
-  const parsed = parseYaml(yamlContent) as DecapConfig
+export function parseCmsConfigYaml(yamlContent: string): CmsConfig {
+  const parsed = parseYaml(yamlContent) as CmsConfig
 
   if (!parsed || !parsed.backend || !parsed.collections) {
-    throw new Error('Invalid Decap CMS config: missing required fields (backend, collections)')
+    throw new Error('Invalid CMS config: missing required fields (backend, collections)')
   }
 
   return parsed
@@ -31,14 +31,14 @@ export function parseDecapConfigYaml(yamlContent: string): DecapConfig {
 // ─── Resolve collections for CMS UI ─────────────────────────────
 
 /**
- * Enhance raw Decap collections with computed metadata
+ * Enhance raw CMS collections with computed metadata
  * useful for the CMS UI (URLs, content paths, etc.)
  */
-export function resolveCollections(config: DecapConfig): CmsCollection[] {
+export function resolveCollections(config: CmsConfig): CmsCollection[] {
   return config.collections.map((col) => resolveCollection(col))
 }
 
-function resolveCollection(col: DecapCollection): CmsCollection {
+function resolveCollection(col: CmsCollectionDef): CmsCollection {
   const isFolderCollection = !!col.folder
   const isFileCollection = !!col.files && col.files.length > 0
 
@@ -54,7 +54,6 @@ function resolveCollection(col: DecapCollection): CmsCollection {
     isFileCollection,
     contentPath,
     cmsUrl: `/cms/${col.name}`,
-    decapUrl: `/admin/#/collections/${col.name}`,
   }
 }
 
@@ -63,31 +62,31 @@ function resolveCollection(col: DecapCollection): CmsCollection {
 /**
  * Get frontmatter fields (everything except the body/markdown field)
  */
-export function getFrontmatterFields(fields: DecapField[]): DecapField[] {
+export function getFrontmatterFields(fields: CmsFieldDef[]): CmsFieldDef[] {
   return fields.filter((f) => f.widget !== 'markdown' && f.name !== 'body')
 }
 
 /**
  * Get the body field (markdown widget named 'body')
  */
-export function getBodyField(fields: DecapField[]): DecapField | undefined {
+export function getBodyField(fields: CmsFieldDef[]): CmsFieldDef | undefined {
   return fields.find((f) => f.widget === 'markdown' || f.name === 'body')
 }
 
 /**
  * Get visible fields (not hidden widgets)
  */
-export function getVisibleFields(fields: DecapField[]): DecapField[] {
+export function getVisibleFields(fields: CmsFieldDef[]): CmsFieldDef[] {
   return fields.filter((f) => f.widget !== 'hidden')
 }
 
 /**
  * Get all widget types used across all collections
  */
-export function getUsedWidgetTypes(config: DecapConfig): Set<string> {
+export function getUsedWidgetTypes(config: CmsConfig): Set<string> {
   const types = new Set<string>()
 
-  function walkFields(fields: DecapField[]) {
+  function walkFields(fields: CmsFieldDef[]) {
     for (const field of fields) {
       types.add(field.widget)
       if (field.fields) walkFields(field.fields)
@@ -116,9 +115,9 @@ export function getUsedWidgetTypes(config: DecapConfig): Set<string> {
  * Find a collection by name
  */
 export function findCollection(
-  config: DecapConfig,
+  config: CmsConfig,
   name: string
-): DecapCollection | undefined {
+): CmsCollectionDef | undefined {
   return config.collections.find((c) => c.name === name)
 }
 
@@ -126,7 +125,7 @@ export function findCollection(
  * Get the slug pattern for a collection.
  * Returns the slug template string (e.g., '{{slug}}')
  */
-export function getSlugPattern(col: DecapCollection): string {
+export function getSlugPattern(col: CmsCollectionDef): string {
   return col.slug || '{{slug}}'
 }
 
@@ -134,7 +133,7 @@ export function getSlugPattern(col: DecapCollection): string {
  * Get the file path pattern for a collection.
  * Returns the path template (e.g., '{{slug}}/index')
  */
-export function getPathPattern(col: DecapCollection): string | undefined {
+export function getPathPattern(col: CmsCollectionDef): string | undefined {
   return col.path
 }
 
@@ -142,7 +141,7 @@ export function getPathPattern(col: DecapCollection): string | undefined {
  * Get the identifier field name for a collection.
  * Defaults to 'title' if not specified.
  */
-export function getIdentifierField(col: DecapCollection): string {
+export function getIdentifierField(col: CmsCollectionDef): string {
   return col.identifier_field || 'title'
 }
 

@@ -18,7 +18,7 @@ import {
   findCollection,
   getPathPattern,
 } from '~/lib/cms/config-parser'
-import { parseDecapConfigFromFile } from '~/server/utils/config-parser-server'
+import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const config = parseDecapConfigFromFile()
+  const config = parseCmsConfigFromFile()
   const collection = findCollection(config, collectionName)
 
   if (!collection) {

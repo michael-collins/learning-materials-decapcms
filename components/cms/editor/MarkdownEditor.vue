@@ -13,14 +13,13 @@
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
-import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown } from 'tiptap-markdown'
 import { MdcBlockExtension, parseMdcBlock, mdcToNodeAttrs } from './MdcBlockExtension'
 import {
   Bold, Italic, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Code, Minus, Link as LinkIcon,
-  ImagePlus, Eye, EyeOff, SplitSquareHorizontal, FileCode,
+  Eye, EyeOff, SplitSquareHorizontal, FileCode,
   Undo2, Redo2,
 } from 'lucide-vue-next'
 
@@ -90,10 +89,6 @@ const editor = useEditor({
     Link.configure({
       openOnClick: false,
       HTMLAttributes: { class: 'editor-link' },
-    }),
-    Image.configure({
-      inline: false,
-      allowBase64: true,
     }),
     Placeholder.configure({
       placeholder: props.placeholder || 'Start writing your content...',
@@ -165,20 +160,6 @@ function insertLink() {
   editor.value?.chain().focus().setLink({ href: url }).run()
 }
 
-// ─── Image picker (media library) ──────────────────────────
-const showImagePicker = ref(false)
-
-function insertImage() {
-  showImagePicker.value = true
-}
-
-function handleImageSelect(path: string) {
-  showImagePicker.value = false
-  if (path) {
-    editor.value?.chain().focus().setImage({ src: path }).run()
-  }
-}
-
 // ─── MDC insertion ─────────────────────────────────────────
 function insertMdcBlock(mdcSyntax: string) {
   const attrs = mdcToNodeAttrs(mdcSyntax)
@@ -243,6 +224,16 @@ const previewHtml = computed(() => {
       try { props = JSON.parse(propsEncoded.replace(/&quot;/g, '"').replace(/&amp;/g, '&')) } catch { /* ignore */ }
 
       const captionHtml = buildCaptionHtml(props)
+
+      if (compType === 'image-component' && props.src) {
+        const src = String(props.src).replace(/"/g, '&quot;')
+        const alt = String(props.alt || '').replace(/"/g, '&quot;')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">🖼 ${alt || 'Image'}</div>
+          <img src="${src}" alt="${alt}" class="rounded-md max-w-full mx-auto" loading="lazy" />
+          ${captionHtml}
+        </div>`
+      }
 
       if (compType === 'threed-viewer-component' && props.src) {
         const src = String(props.src).replace(/"/g, '&quot;')
@@ -313,7 +304,6 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
     { icon: Code, label: 'Code Block', action: () => e.chain().focus().toggleCodeBlock().run(), isActive: () => e.isActive('codeBlock') },
     { icon: Minus, label: 'Horizontal Rule', action: () => e.chain().focus().setHorizontalRule().run() },
     { icon: LinkIcon, label: 'Link', action: insertLink, isActive: () => e.isActive('link') },
-    { icon: ImagePlus, label: 'Image', action: insertImage },
   ]
 })
 </script>
@@ -457,14 +447,6 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
       </div>
     </div>
 
-    <!-- Image picker modal -->
-    <CmsMediaPickerModal
-      :open="showImagePicker"
-      :allowed-types="['image']"
-      title="Insert Image"
-      @select="handleImageSelect"
-      @close="showImagePicker = false"
-    />
   </div>
 </template>
 

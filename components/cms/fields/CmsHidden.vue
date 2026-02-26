@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
  * CmsHidden — Hidden field with default value.
- * Maps to Decap's `hidden` widget.
+ * Maps to the CMS `hidden` widget.
  * Not rendered visually; ensures a default value is present in form data.
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: unknown
 }>()
 

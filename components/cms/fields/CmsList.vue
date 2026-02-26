@@ -2,7 +2,7 @@
 /**
  * CmsList — Repeatable field group widget.
  *
- * Handles three Decap list patterns:
+ * Handles three CMS list patterns:
  * 1. Simple string list (no field/fields) — e.g., tags
  * 2. Single field list (field: {...}) — e.g., skills, tools, learningObjectives
  * 3. Structured list (fields: [...]) — e.g., attachments, criteria
@@ -11,11 +11,11 @@
  *
  * Supports add/remove/reorder operations.
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { Plus, Trash2, GripVertical, ChevronUp, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
 }>()
 
@@ -97,7 +97,7 @@ function createEmptyItem(): any {
   return obj
 }
 
-function getEmptyFieldValue(f: DecapField): any {
+function getEmptyFieldValue(f: CmsFieldDef): any {
   if (f.default !== undefined) return f.default
   switch (f.widget) {
     case 'boolean': return false

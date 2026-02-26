@@ -179,16 +179,6 @@ function handleLogout() {
 
       <!-- Sidebar Footer -->
       <div class="border-t p-3">
-        <!-- Decap Fallback Link -->
-        <a
-          href="/admin/"
-          target="_blank"
-          class="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-        >
-          <ExternalLink class="h-3.5 w-3.5" />
-          Open Decap CMS
-        </a>
-
         <!-- User Info & Logout -->
         <div v-if="isAuthenticated" class="mt-2 flex items-center gap-2 rounded-md px-3 py-1.5">
           <img

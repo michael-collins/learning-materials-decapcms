@@ -1,7 +1,7 @@
 /**
  * Composable for accessing the CMS configuration.
  *
- * Fetches the parsed Decap config from the server API and provides
+ * Fetches the parsed CMS config from the server API and provides
  * reactive access to collections, groups, and config metadata.
  */
 import type { CmsCollection } from '~/lib/cms/config-types'
@@ -49,13 +49,13 @@ export function useCmsConfig() {
   }
 
   /**
-   * Get the Decap admin URL for a collection (fallback editing)
+   * Get the CMS edit URL for a collection or entry
    */
-  function getDecapUrl(collectionName: string, slug?: string): string {
+  function getCmsEditUrl(collectionName: string, slug?: string): string {
     if (slug) {
-      return `/admin/#/collections/${collectionName}/entries/${slug}/index`
+      return `/cms/${collectionName}/edit/${slug}`
     }
-    return `/admin/#/collections/${collectionName}`
+    return `/cms/${collectionName}`
   }
 
   return {
@@ -67,6 +67,6 @@ export function useCmsConfig() {
     groups,
     getCollection,
     getContentPath,
-    getDecapUrl,
+    getCmsEditUrl,
   }
 }

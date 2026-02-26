@@ -1,8 +1,6 @@
 <script setup lang="ts">
 /**
  * CMS Item Viewer — displays a single content item's frontmatter and body.
- * Phase 0: Read-only view with "Edit in Decap" fallback.
- * Phase 1: Will add inline editing with the form engine.
  */
 import {
   ChevronLeft,
@@ -25,7 +23,7 @@ const slug = computed(() => {
   return s ?? ''
 })
 
-const { getCollection, getDecapUrl } = useCmsConfig()
+const { getCollection } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
 
 // Fetch the specific item
@@ -129,15 +127,6 @@ function isObject(value: any): boolean {
             <Eye class="h-4 w-4" />
             <span class="hidden sm:inline">View</span>
           </NuxtLink>
-          <a
-            :href="getDecapUrl(collectionName, slug)"
-            target="_blank"
-            class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent"
-            title="Edit in Decap CMS"
-          >
-            <ExternalLink class="h-4 w-4" />
-            <span class="hidden sm:inline">Decap</span>
-          </a>
           <NuxtLink
             :to="`/cms/${collectionName}/edit/${slug}`"
             class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"

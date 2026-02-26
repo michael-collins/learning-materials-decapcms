@@ -1,10 +1,10 @@
 /**
- * TypeScript type definitions for Decap CMS config.yml
- * These types map 1:1 to the Decap config specification.
+ * TypeScript type definitions for CMS config.yml
+ * These types map 1:1 to the CMS config specification.
  */
 
 // ─── Widget Types ──────────────────────────────────────────────
-export type DecapWidgetType =
+export type CmsWidgetType =
   | 'string'
   | 'text'
   | 'markdown'
@@ -25,14 +25,14 @@ export type DecapWidgetType =
   | 'code'
 
 // ─── Field Definition ──────────────────────────────────────────
-export interface DecapField {
+export interface CmsFieldDef {
   /** Display label in the editor */
   label: string
   /** Field key in frontmatter */
   name: string
   /** Widget type that determines the editor component */
-  widget: DecapWidgetType
-  /** Whether the field is required (defaults to true in Decap) */
+  widget: CmsWidgetType
+  /** Whether the field is required (defaults to true in the CMS) */
   required?: boolean
   /** Default value */
   default?: unknown
@@ -49,11 +49,11 @@ export interface DecapField {
 
   // ─── List widget ───────────────────────────────────
   /** Single field definition for simple lists (e.g., tags) */
-  field?: DecapField
+  field?: CmsFieldDef
   /** Fixed field definitions per list item */
-  fields?: DecapField[]
+  fields?: CmsFieldDef[]
   /** Polymorphic type definitions for typed lists (e.g., prerequisites) */
-  types?: DecapListType[]
+  types?: CmsListTypeDef[]
   /** Allow adding new items to list */
   allow_add?: boolean
 
@@ -79,7 +79,7 @@ export interface DecapField {
 }
 
 // ─── Typed List Entry ──────────────────────────────────────────
-export interface DecapListType {
+export interface CmsListTypeDef {
   /** Display label for this type option */
   label: string
   /** Type identifier (used as discriminator) */
@@ -87,32 +87,32 @@ export interface DecapListType {
   /** Widget type (usually 'object') */
   widget: string
   /** Fields for this type */
-  fields: DecapField[]
+  fields: CmsFieldDef[]
 }
 
 // ─── View Filter ───────────────────────────────────────────────
-export interface DecapViewFilter {
+export interface CmsViewFilter {
   label: string
   field: string
   pattern: string | boolean
 }
 
 // ─── Sort Config ───────────────────────────────────────────────
-export interface DecapSortConfig {
+export interface CmsSortConfig {
   field: string
   direction: 'asc' | 'desc'
 }
 
 // ─── File Collection Entry ─────────────────────────────────────
-export interface DecapFileEntry {
+export interface CmsFileEntry {
   name: string
   label: string
   file: string
-  fields: DecapField[]
+  fields: CmsFieldDef[]
 }
 
 // ─── Collection Definition ─────────────────────────────────────
-export interface DecapCollection {
+export interface CmsCollectionDef {
   /** Internal name used in routes */
   name: string
   /** Display label */
@@ -134,23 +134,23 @@ export interface DecapCollection {
   /** File format (e.g., 'frontmatter') */
   format?: string
   /** Fields for folder collections */
-  fields?: DecapField[]
+  fields?: CmsFieldDef[]
 
   // ─── File collection ──────────────────────────────
   /** File entries (file collections) */
-  files?: DecapFileEntry[]
+  files?: CmsFileEntry[]
 
   // ─── Display & Filtering ──────────────────────────
   /** Predefined filter options */
-  view_filters?: DecapViewFilter[]
+  view_filters?: CmsViewFilter[]
   /** Fields that can be used for sorting */
   sortable_fields?: string[]
   /** Default sort */
-  sort?: DecapSortConfig
+  sort?: CmsSortConfig
 }
 
 // ─── Backend Configuration ─────────────────────────────────────
-export interface DecapBackend {
+export interface CmsBackendConfig {
   /** Backend type (e.g., 'github', 'git-gateway') */
   name: string
   /** Repository in 'owner/repo' format */
@@ -160,8 +160,8 @@ export interface DecapBackend {
 }
 
 // ─── Top-Level Config ──────────────────────────────────────────
-export interface DecapConfig {
-  backend: DecapBackend
+export interface CmsConfig {
+  backend: CmsBackendConfig
   /** Enable local filesystem backend for development */
   local_backend?: boolean
   /** Publish mode (e.g., 'editorial_workflow') */
@@ -171,7 +171,7 @@ export interface DecapConfig {
   /** Public URL prefix for media */
   public_folder: string
   /** Content collections */
-  collections: DecapCollection[]
+  collections: CmsCollectionDef[]
   /** Editor config */
   editor?: {
     preview?: boolean
@@ -181,7 +181,7 @@ export interface DecapConfig {
 // ─── Resolved Types (for CMS UI) ──────────────────────────────
 
 /** A collection with computed metadata for the CMS UI */
-export interface CmsCollection extends DecapCollection {
+export interface CmsCollection extends CmsCollectionDef {
   /** Whether this is a folder collection (vs. file collection) */
   isFolderCollection: boolean
   /** Whether this is a file collection */
@@ -190,12 +190,10 @@ export interface CmsCollection extends DecapCollection {
   contentPath: string
   /** URL to the collection in the CMS */
   cmsUrl: string
-  /** URL to the collection in Decap (fallback) */
-  decapUrl: string
 }
 
 /** Resolved field with computed display information */
-export interface CmsField extends DecapField {
+export interface CmsField extends CmsFieldDef {
   /** Unique key path (e.g., 'prerequisites.0.lesson') */
   keyPath: string
   /** Whether the field is the body/content field */

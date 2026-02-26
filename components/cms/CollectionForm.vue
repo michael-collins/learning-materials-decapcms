@@ -5,14 +5,14 @@
  * Separates frontmatter fields from the body field, manages reactive form state,
  * and validates required fields before submission.
  */
-import type { DecapField, DecapCollection } from '~/lib/cms/config-types'
+import type { CmsFieldDef, CmsCollectionDef } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
 import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
   /** The collection config from config.yml */
-  collection: DecapCollection
+  collection: CmsCollectionDef
   /** Initial form data (for editing existing items) */
   initialData?: Record<string, any>
   /** Whether this is a new item (vs editing existing) */
@@ -64,7 +64,7 @@ function initializeForm() {
   }
 }
 
-function getEmptyValue(field: DecapField): any {
+function getEmptyValue(field: CmsFieldDef): any {
   switch (field.widget) {
     case 'boolean': return false
     case 'number': return ''

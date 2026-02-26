@@ -339,13 +339,11 @@ const getItemPath = (type: string, slug: string) => {
   return `/${type}/${slug}`
 }
 
-const getDecapEditUrl = () => {
+const getCmsEditUrl = () => {
   if (isOverviewMode.value && selectedLesson.value) {
-    // Always link to the latest version (index), not archived versions
-    return `/admin/#/collections/lessons/entries/${selectedLesson.value.slug}/index`
+    return `/cms/lessons/edit/${selectedLesson.value.slug}`
   } else if (!isOverviewMode.value && selectedItem.value) {
-    // Always link to the latest version (index), not archived versions
-    return `/admin/#/collections/${selectedItem.value.type}/entries/${selectedItem.value.slug}/index`
+    return `/cms/${selectedItem.value.type}/edit/${selectedItem.value.slug}`
   }
   return null
 }
@@ -751,18 +749,16 @@ onBeforeUnmount(() => {
                         </Button>
                         <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                           <!-- Edit button -->
-                          <a
-                            v-if="getDecapEditUrl()"
-                            :href="getDecapEditUrl()"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <NuxtLink
+                            v-if="getCmsEditUrl()"
+                            :to="getCmsEditUrl()"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
                             @click.stop
                           >
                             <Pencil class="w-4 h-4" />
                             Edit page
-                          </a>
-                          <div v-if="getDecapEditUrl()" class="h-px bg-border" />
+                          </NuxtLink>
+                          <div v-if="getCmsEditUrl()" class="h-px bg-border" />
                           
                           <!-- Versions dropdown -->
                           <VersionsDropdown 
@@ -778,7 +774,7 @@ onBeforeUnmount(() => {
                             v-if="isOverviewMode && selectedLesson"
                             :to="`/lessons/${selectedLesson.slug}`"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                            :class="getDecapEditUrl() ? '' : 'rounded-t-lg'"
+                            :class="getCmsEditUrl() ? '' : 'rounded-t-lg'"
                             @click.stop
                           >
                             <Eye class="w-4 h-4" />
@@ -788,7 +784,7 @@ onBeforeUnmount(() => {
                             v-else-if="!isOverviewMode && selectedItem"
                             :to="getItemPath(selectedItem.type, selectedItem.slug)"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                            :class="getDecapEditUrl() ? '' : 'rounded-t-lg'"
+                            :class="getCmsEditUrl() ? '' : 'rounded-t-lg'"
                             @click.stop
                           >
                             <Eye class="w-4 h-4" />

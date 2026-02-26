@@ -5,7 +5,6 @@
  * and renders the auto-generated form.
  */
 import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2 } from 'lucide-vue-next'
-import matter from 'gray-matter'
 
 definePageMeta({
   layout: 'cms',
@@ -31,18 +30,20 @@ const loadError = ref<string | null>(null)
 const initialData = ref<Record<string, any> | null>(null)
 const loading = ref(true)
 
-// Load the existing content
+// Load the existing content (frontmatter is parsed server-side to avoid
+// gray-matter's Node.js Buffer dependency in the browser)
 onMounted(async () => {
   try {
-    const raw = await loadRaw(collectionName.value, slug.value)
-    const parsed = matter(raw)
+    const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
+      params: { collection: collectionName.value, slug: slug.value },
+    })
 
     initialData.value = {
-      ...parsed.data,
-      body: parsed.content.trim(),
+      ...res.frontmatter,
+      body: res.body,
     }
   } catch (err: any) {
-    loadError.value = err.message || 'Failed to load content'
+    loadError.value = err.data?.message || err.message || 'Failed to load content'
   } finally {
     loading.value = false
   }

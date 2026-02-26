@@ -9,11 +9,11 @@
  *
  * Stores the public path (e.g., "/uploads/document.pdf").
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { FileUp, Upload, X, Loader2, Link, File as FileIcon } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
 }>()
 

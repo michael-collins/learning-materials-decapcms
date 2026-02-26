@@ -40,6 +40,7 @@ export function parseMdcBlock(mdcRaw: string): { componentType: string; props: R
 
 // Known MDC component names
 const MDC_COMPONENT_NAMES = [
+  'image-component',
   'video-component',
   'iframe-component',
   'code-embed-component',

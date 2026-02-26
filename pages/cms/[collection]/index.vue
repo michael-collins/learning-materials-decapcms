@@ -25,7 +25,7 @@ definePageMeta({
 const route = useRoute()
 const collectionName = computed(() => route.params.collection as string)
 
-const { getCollection, getDecapUrl } = useCmsConfig()
+const { getCollection } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
 
 const {
@@ -94,15 +94,6 @@ function formatDate(date: string | undefined): string {
         >
           <RefreshCw class="h-4 w-4" />
         </button>
-        <a
-          :href="getDecapUrl(collectionName)"
-          target="_blank"
-          class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent"
-          title="Open in Decap CMS"
-        >
-          <ExternalLink class="h-4 w-4" />
-          <span class="hidden sm:inline">Decap</span>
-        </a>
         <NuxtLink
           :to="`/cms/${collectionName}/new`"
           class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"

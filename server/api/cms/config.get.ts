@@ -1,16 +1,16 @@
 /**
  * GET /api/cms/config
  *
- * Returns the parsed Decap CMS configuration.
+ * Returns the parsed CMS configuration.
  * Cached per request — the config.yml is read once and reused.
  */
 import { resolveCollections, groupCollections } from '~/lib/cms/config-parser'
-import { parseDecapConfigFromFile } from '~/server/utils/config-parser-server'
+import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
 
 let _cachedConfig: ReturnType<typeof buildResponse> | null = null
 
 function buildResponse() {
-  const config = parseDecapConfigFromFile()
+  const config = parseCmsConfigFromFile()
   const collections = resolveCollections(config)
   const groups = groupCollections(collections)
 

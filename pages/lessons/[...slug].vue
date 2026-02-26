@@ -62,7 +62,7 @@ const { data: relatedContent } = await useAsyncData(
       // New format: items array with type-specific keys
       lesson.value.items.forEach((item: any) => {
         console.log('[Lesson Page] Processing item:', item)
-        // Check both __typename (from DecapCMS) and type fields
+        // Check both __typename and type fields
         const itemType = item.__typename || item.type
         if ((itemType === 'lectures' || item.lecture) && item.lecture) {
           lectureSlugs.push(item.lecture)

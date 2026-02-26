@@ -141,7 +141,7 @@ const shouldShowAILicense = computed(() => {
   return route.query.hideAILicense !== 'true'
 })
 
-const getDecapEditUrl = computed(() => {
+const getCmsEditUrl = computed(() => {
   // Don't show edit link in embed mode
   if (isEmbed.value) return null
   
@@ -150,8 +150,7 @@ const getDecapEditUrl = computed(() => {
   if (pathParts.length >= 2) {
     const collection = pathParts[0] // e.g., 'exercises', 'lectures', 'tutorials'
     const slug = pathParts.slice(1).join('/') // e.g., 'some-exercise'
-    // Always link to the latest version (index), not archived versions
-    return `/admin/#/collections/${collection}/entries/${slug}/index`
+    return `/cms/${collection}/edit/${slug}`
   }
   return null
 })
@@ -403,18 +402,16 @@ const copyCitation = async () => {
               aria-orientation="vertical"
             >
               <!-- Edit button -->
-              <a
-                v-if="getDecapEditUrl"
-                :href="getDecapEditUrl"
-                target="_blank"
-                rel="noopener noreferrer"
+              <NuxtLink
+                v-if="getCmsEditUrl"
+                :to="getCmsEditUrl"
                 class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
                 @click.stop
               >
                 <Pencil class="w-4 h-4" />
                 Edit page
-              </a>
-              <div v-if="getDecapEditUrl" class="h-px bg-border" />
+              </NuxtLink>
+              <div v-if="getCmsEditUrl" class="h-px bg-border" />
               
               <!-- Versions submenu -->
               <VersionsDropdown 

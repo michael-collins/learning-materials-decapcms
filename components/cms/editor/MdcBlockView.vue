@@ -47,6 +47,18 @@ interface FieldDef {
 }
 
 const componentMeta: Record<string, { label: string; icon: any; color: string; fields: FieldDef[] }> = {
+  'image-component': {
+    label: 'Image',
+    icon: FolderOpen,
+    color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30',
+    fields: [
+      { name: 'src', label: 'Image File', type: 'string', browse: ['image'] },
+      { name: 'alt', label: 'Alt Text', type: 'string' },
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'credit', label: 'Credit / Attribution', type: 'string' },
+      { name: 'creditUrl', label: 'Credit URL', type: 'string' },
+    ],
+  },
   'video-component': {
     label: 'Video',
     icon: Play,

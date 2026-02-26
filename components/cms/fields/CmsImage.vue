@@ -10,11 +10,11 @@
  *
  * Stores the public path (e.g., "/uploads/photo.jpg").
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { ImagePlus, Upload, X, Loader2, Link } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
 }>()
 

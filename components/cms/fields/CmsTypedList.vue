@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * CmsTypedList — Polymorphic list widget for Decap CMS typed lists.
+ * CmsTypedList — Polymorphic list widget for CMS typed lists.
  *
  * Used for fields with `types` (e.g., prerequisites, lesson items).
  * Each item has a type selector that determines which fields to render.
@@ -9,11 +9,11 @@
  * This is the most complex widget — prerequisites span 8 content types,
  * each with a relation field to a different collection.
  */
-import type { DecapField, DecapListType } from '~/lib/cms/config-types'
+import type { CmsFieldDef, CmsListTypeDef } from '~/lib/cms/config-types'
 import { Plus, Trash2, GripVertical, ChevronUp, ChevronDown, ChevronRight, Layers } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
 }>()
 
@@ -32,7 +32,7 @@ const typeDefinitions = computed(() => props.field.types ?? [])
 
 /** Map of type name → type definition for quick lookup */
 const typeMap = computed(() => {
-  const map = new Map<string, DecapListType>()
+  const map = new Map<string, CmsListTypeDef>()
   for (const t of typeDefinitions.value) {
     map.set(t.name, t)
   }
@@ -43,14 +43,14 @@ const typeMap = computed(() => {
 
 /**
  * Get the type name for an item.
- * Decap stores typed list items as: { type: "typeName", ...fields }
+ * The config stores typed list items as: { type: "typeName", ...fields }
  * OR within the item's fields as __typename.
  * We check both patterns.
  */
 function getItemTypeName(item: any): string | null {
   if (!item || typeof item !== 'object') return null
 
-  // Pattern 1: Decap stores type under `type` key at the item level
+  // Pattern 1: The config stores type under `type` key at the item level
   if (item.type && typeMap.value.has(item.type)) return item.type
 
   // Pattern 2: __typename hidden field
@@ -67,7 +67,7 @@ function getItemTypeName(item: any): string | null {
   return null
 }
 
-function getItemType(item: any): DecapListType | null {
+function getItemType(item: any): CmsListTypeDef | null {
   const name = getItemTypeName(item)
   return name ? typeMap.value.get(name) ?? null : null
 }
@@ -76,7 +76,7 @@ function getItemType(item: any): DecapListType | null {
  * Get the visible (non-hidden) fields for a type definition.
  * Hidden fields like __typename are applied automatically.
  */
-function getVisibleFields(typeDef: DecapListType): DecapField[] {
+function getVisibleFields(typeDef: CmsListTypeDef): CmsFieldDef[] {
   return typeDef.fields.filter((f) => f.widget !== 'hidden')
 }
 
@@ -149,7 +149,7 @@ function changeItemType(index: number, newTypeName: string) {
   items.value = copy
 }
 
-function getEmptyFieldValue(f: DecapField): any {
+function getEmptyFieldValue(f: CmsFieldDef): any {
   if (f.default !== undefined) return f.default
   switch (f.widget) {
     case 'boolean': return false

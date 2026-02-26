@@ -10,8 +10,9 @@
  */
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
+import matter from 'gray-matter'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
-import { parseDecapConfigFromFile } from '~/server/utils/config-parser-server'
+import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler((event) => {
   const query = getQuery(event)
@@ -25,7 +26,7 @@ export default defineEventHandler((event) => {
     })
   }
 
-  const config = parseDecapConfigFromFile()
+  const config = parseCmsConfigFromFile()
   const collection = findCollection(config, collectionName)
 
   if (!collection) {
@@ -64,8 +65,14 @@ export default defineEventHandler((event) => {
 
   const raw = readFileSync(filePath, 'utf-8')
 
+  // Parse frontmatter server-side so the client doesn't need gray-matter
+  // (gray-matter uses Node.js Buffer which is not available in the browser)
+  const parsed = matter(raw)
+
   return {
     raw,
+    frontmatter: parsed.data,
+    body: parsed.content.trim(),
     path: filePath,
     collection: collectionName,
     slug,

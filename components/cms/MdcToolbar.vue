@@ -6,7 +6,7 @@
  * Clicking one opens the MdcComponentModal for configuring props,
  * then emits the generated MDC syntax string.
  */
-import { Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote } from 'lucide-vue-next'
+import { Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote, ImagePlus } from 'lucide-vue-next'
 
 const emit = defineEmits<{
   insert: [mdcSyntax: string]
@@ -37,6 +37,26 @@ export interface MdcComponentDef {
 }
 
 const mdcComponents: MdcComponentDef[] = [
+  {
+    id: 'image-component',
+    label: 'Image',
+    icon: ImagePlus,
+    color: 'text-emerald-500',
+    fields: [
+      { name: 'src', label: 'Image File', widget: 'file', hint: 'Choose an image from the media library', fileTypes: ['image'] },
+      { name: 'alt', label: 'Alt Text', widget: 'string', required: true, hint: 'Describe the image for accessibility (required)' },
+      { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the image' },
+      { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution (photographer, publisher, etc.)' },
+      { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
+    ],
+    toBlock: (v) => {
+      const parts = [`src="${v.src}"`, `alt="${v.alt || ''}"`]
+      if (v.caption) parts.push(`caption="${v.caption}"`)
+      if (v.credit) parts.push(`credit="${v.credit}"`)
+      if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      return `::image-component{${parts.join(' ')}}\n::`
+    },
+  },
   {
     id: 'video-component',
     label: 'Video',

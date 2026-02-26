@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /**
  * CmsSelect — Dropdown select field.
- * Maps to Decap's `select` widget.
+ * Maps to the CMS `select` widget.
  * Supports both single and multiple selection.
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 import { ChevronDown, X } from 'lucide-vue-next'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: string | string[]
 }>()
 

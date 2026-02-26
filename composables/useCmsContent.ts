@@ -2,7 +2,7 @@
  * Composable for querying and managing CMS content.
  *
  * Wraps Nuxt Content's queryCollection with CMS-specific utilities
- * like sorting, filtering, and search that align with Decap config.
+ * like sorting, filtering, and search that align with CMS config.
  */
 import type { CmsCollection } from '~/lib/cms/config-types'
 

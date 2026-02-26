@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
  * CmsDatetime — Date/time picker field.
- * Maps to Decap's `datetime` and `date` widgets.
+ * Maps to the CMS `datetime` and `date` widgets.
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: string
 }>()
 

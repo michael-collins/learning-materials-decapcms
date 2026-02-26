@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**
- * DynamicField — Routes a Decap field config to the correct widget component.
+ * DynamicField — Routes a CMS field config to the correct widget component.
  *
  * This is the core of the form engine. It receives a field definition
  * from config.yml and renders the appropriate CMS field component with v-model.
  */
-import type { DecapField, DecapWidgetType } from '~/lib/cms/config-types'
+import type { CmsFieldDef, CmsWidgetType } from '~/lib/cms/config-types'
 
 // Phase 1: Basic widgets
 import CmsString from './fields/CmsString.vue'
@@ -27,7 +27,7 @@ import CmsFile from './fields/CmsFile.vue'
 import CmsVersionSelect from './fields/CmsVersionSelect.vue'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: any
   /** Parent object data — passed to widgets that need sibling field values */
   parentData?: Record<string, any>
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 
 /**
  * Widget type → component mapping.
- * All Decap widget types are now supported.
+ * All CMS widget types are now supported.
  */
 const widgetMap: Record<string, any> = {
   // Phase 1: Basic

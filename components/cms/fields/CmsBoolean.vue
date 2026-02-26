@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
  * CmsBoolean — Switch/toggle field.
- * Maps to Decap's `boolean` widget.
+ * Maps to the CMS `boolean` widget.
  */
-import type { DecapField } from '~/lib/cms/config-types'
+import type { CmsFieldDef } from '~/lib/cms/config-types'
 
 const props = defineProps<{
-  field: DecapField
+  field: CmsFieldDef
   modelValue: boolean
 }>()
 
