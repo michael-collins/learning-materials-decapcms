@@ -247,8 +247,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
       })
     }),
     docs: defineCollection({

@@ -6,7 +6,7 @@
  * Clicking one opens the MdcComponentModal for configuring props,
  * then emits the generated MDC syntax string.
  */
-import { Blocks, Youtube, Video, Presentation, ClipboardList, Box, Cube } from 'lucide-vue-next'
+import { Blocks, Youtube, Video, Presentation, ClipboardList, Box, Package } from 'lucide-vue-next'
 
 const emit = defineEmits<{
   insert: [mdcSyntax: string]
@@ -98,7 +98,7 @@ const mdcComponents: MdcComponentDef[] = [
   {
     id: 'threed-viewer',
     label: '3D Model (Upload)',
-    icon: Cube,
+    icon: Package,
     color: 'text-purple-500',
     fields: [
       { name: 'src', label: '3D File Path', widget: 'string', hint: 'Path to .gltf or .glb file in uploads' },

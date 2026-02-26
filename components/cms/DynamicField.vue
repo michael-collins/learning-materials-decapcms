@@ -24,10 +24,13 @@ import CmsRelation from './fields/CmsRelation.vue'
 import CmsObject from './fields/CmsObject.vue'
 import CmsImage from './fields/CmsImage.vue'
 import CmsFile from './fields/CmsFile.vue'
+import CmsVersionSelect from './fields/CmsVersionSelect.vue'
 
 const props = defineProps<{
   field: DecapField
   modelValue: any
+  /** Parent object data — passed to widgets that need sibling field values */
+  parentData?: Record<string, any>
 }>()
 
 const emit = defineEmits<{
@@ -54,6 +57,8 @@ const widgetMap: Record<string, any> = {
   object: CmsObject,
   image: CmsImage,
   file: CmsFile,
+  // Custom widgets
+  version_select: CmsVersionSelect,
   // list is special — routed below based on whether it has `types`
 }
 
@@ -76,6 +81,7 @@ const widgetName = computed(() => props.field.widget)
     v-if="component"
     :field="field"
     :model-value="modelValue"
+    :parent-data="parentData"
     @update:model-value="emit('update:modelValue', $event)"
   />
 

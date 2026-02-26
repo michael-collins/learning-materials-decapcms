@@ -19,6 +19,7 @@ export type DecapWidgetType =
   | 'object'
   | 'relation'
   | 'hidden'
+  | 'version_select'
   | 'color'
   | 'map'
   | 'code'
@@ -65,6 +66,10 @@ export interface DecapField {
   search_fields?: string[]
   /** Fields to display in the picker */
   display_fields?: string[]
+
+  // ─── Version select widget ─────────────────────────
+  /** Name of the sibling relation field to read the selected slug from */
+  relation_field?: string
 
   // ─── Number widget ────────────────────────────────
   min?: number

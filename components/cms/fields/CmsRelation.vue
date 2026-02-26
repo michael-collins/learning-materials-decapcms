@@ -67,26 +67,39 @@ async function fetchItems() {
 
   loading.value = true
   try {
-    // Use queryCollection to get all items from the referenced collection
-    // We need basic fields: the value field + display fields + search fields
+    // Use queryCollection to get all items from the referenced collection.
+    // Nuxt Content v3 items have: id, stem, path, title, description (no "slug").
+    // The slug is derived from the stem (last segment of the path).
     const result = await queryCollection(collectionName.value as any)
-      .select(['title', 'slug', 'description', 'stem', 'path'] as any)
       .order('title' as any, 'ASC')
       .all()
 
-    allItems.value = (result as any[]).map((item: any) => {
-      // Normalize: extract slug from the path/stem if not available directly
-      const slug = item[valueField.value]
-        ?? item.slug
-        ?? item.stem?.split('/').pop()
-        ?? ''
+    allItems.value = (result as any[])
+      .filter((item: any) => {
+        // Only show latest versions: items whose stem ends with /index
+        // (archived versions live under /v/<version>).
+        // If no /index or /v/ pattern found, include the item (no versioning).
+        const stem: string = item.stem ?? ''
+        const hasVersioning = stem.includes('/index') || stem.includes('/v/')
+        return !hasVersioning || stem.endsWith('/index')
+      })
+      .map((item: any) => {
+        // Derive slug from stem — stem is like "my-tutorial/index" or "my-tutorial"
+        const stemSlug = item.stem?.replace(/\/index$/, '').split('/').pop() ?? ''
 
-      return {
-        ...item,
-        _resolvedValue: slug,
-        _displayLabel: getDisplayLabel(item),
-      }
-    })
+        // Resolve the value field: check explicit field first, then fall back to derived slug
+        const resolvedValue = (valueField.value !== 'slug' && item[valueField.value])
+          || stemSlug
+          || item.id
+          || ''
+
+        return {
+          ...item,
+          slug: stemSlug,
+          _resolvedValue: resolvedValue,
+          _displayLabel: getDisplayLabel(item),
+        }
+      })
   } catch (e) {
     console.warn(`[CmsRelation] Failed to fetch items from collection "${collectionName.value}":`, e)
     allItems.value = []

@@ -4,7 +4,8 @@
  * Returns the parsed Decap CMS configuration.
  * Cached per request — the config.yml is read once and reused.
  */
-import { parseDecapConfigFromFile, resolveCollections, groupCollections } from '~/lib/cms/config-parser'
+import { resolveCollections, groupCollections } from '~/lib/cms/config-parser'
+import { parseDecapConfigFromFile } from '~/server/utils/config-parser-server'
 
 let _cachedConfig: ReturnType<typeof buildResponse> | null = null
 

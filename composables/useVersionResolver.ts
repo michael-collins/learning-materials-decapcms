@@ -3,8 +3,6 @@ import type { ParsedContent } from '@nuxt/content'
 export interface VersionedContent extends ParsedContent {
   version?: string
   versionStatus?: 'latest' | 'archived' | 'deprecated'
-  changelog?: string
-  breakingChanges?: string[]
 }
 
 /**

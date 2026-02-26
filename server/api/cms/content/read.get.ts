@@ -10,7 +10,8 @@
  */
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
-import { parseDecapConfigFromFile, findCollection, getPathPattern } from '~/lib/cms/config-parser'
+import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
+import { parseDecapConfigFromFile } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler((event) => {
   const query = getQuery(event)

@@ -221,7 +221,7 @@ function getTypeColor(typeName: string): string {
       <div
         v-for="(item, index) in items"
         :key="index"
-        class="rounded-md border bg-card overflow-hidden"
+        class="rounded-md border bg-card"
       >
         <!-- Item header -->
         <div class="flex items-center gap-2 px-3 py-2 bg-muted/30">
@@ -310,6 +310,7 @@ function getTypeColor(typeName: string): string {
               :key="subField.name"
               :field="subField"
               :model-value="item?.[subField.name]"
+              :parent-data="item"
               @update:model-value="updateItemField(index, subField.name, $event)"
             />
           </template>

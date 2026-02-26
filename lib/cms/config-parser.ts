@@ -5,8 +5,6 @@
  * collection/field definitions used by the custom CMS UI.
  */
 import { parse as parseYaml } from 'yaml'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import type {
   DecapConfig,
   DecapCollection,
@@ -14,20 +12,7 @@ import type {
   CmsCollection,
 } from './config-types'
 
-// ─── Default config path ────────────────────────────────────────
-const DEFAULT_CONFIG_PATH = 'public/admin/config.yml'
-
 // ─── Parse raw YAML ─────────────────────────────────────────────
-
-/**
- * Parse a Decap CMS config.yml file and return the typed config.
- * Works on the server side (Node.js) — reads from filesystem.
- */
-export function parseDecapConfigFromFile(configPath?: string): DecapConfig {
-  const resolvedPath = resolve(process.cwd(), configPath || DEFAULT_CONFIG_PATH)
-  const raw = readFileSync(resolvedPath, 'utf-8')
-  return parseDecapConfigYaml(raw)
-}
 
 /**
  * Parse a Decap config from a raw YAML string.

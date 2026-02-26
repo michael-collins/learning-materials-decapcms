@@ -19,10 +19,10 @@
  */
 import matter from 'gray-matter'
 import {
-  parseDecapConfigFromFile,
   findCollection,
   getPathPattern,
 } from '~/lib/cms/config-parser'
+import { parseDecapConfigFromFile } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
