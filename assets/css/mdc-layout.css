@@ -1,0 +1,234 @@
+/**
+ * MDC Layout Utilities
+ *
+ * Shared CSS for MDC component alignment, sizing, floating, and breakout.
+ * Used by all media & container MDC components in components/content/.
+ */
+
+/* ─── Alignment ────────────────────────────────────────── */
+.mdc-align-center { margin-left: auto; margin-right: auto; }
+.mdc-align-left   { margin-right: auto; }
+.mdc-align-right  { margin-left: auto; }
+.mdc-align-full   {
+  /* Breakout of the max-w-4xl container */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* ─── Sizing (max-width) ───────────────────────────────── */
+.mdc-size-small  { max-width: 25%; }
+.mdc-size-medium { max-width: 50%; }
+.mdc-size-large  { max-width: 75%; }
+.mdc-size-full   { max-width: 100%; }
+
+/* ─── Float ────────────────────────────────────────────── */
+.mdc-float-left  { float: left;  margin-right: 1.5rem; margin-bottom: 1rem; }
+.mdc-float-right { float: right; margin-left: 1.5rem;  margin-bottom: 1rem; }
+.mdc-float-none  { float: none; }
+
+/* Clear float after floated media */
+.mdc-float-left + *,
+.mdc-float-right + * {
+  /* Allow content to wrap naturally */
+}
+
+/* ─── Responsive overrides ─────────────────────────────── */
+@media (max-width: 640px) {
+  .mdc-size-small,
+  .mdc-size-medium {
+    max-width: 100%;
+  }
+  .mdc-float-left,
+  .mdc-float-right {
+    float: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* ─── Callout Container ────────────────────────────────── */
+.callout {
+  display: flex;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+.callout-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.callout-content {
+  flex: 1;
+  min-width: 0;
+}
+.callout-content :first-child { margin-top: 0; }
+.callout-content :last-child  { margin-bottom: 0; }
+
+/* Callout types */
+.callout-info       { background: oklch(0.95 0.02 240);  border-color: oklch(0.75 0.12 240);  }
+.callout-tip        { background: oklch(0.96 0.02 150);  border-color: oklch(0.72 0.14 150);  }
+.callout-warning    { background: oklch(0.96 0.04 80);   border-color: oklch(0.78 0.12 80);   }
+.callout-danger     { background: oklch(0.95 0.03 25);   border-color: oklch(0.68 0.18 25);   }
+.callout-definition { background: oklch(0.95 0.02 300);  border-color: oklch(0.72 0.12 300);  }
+.callout-objective  { background: oklch(0.95 0.02 185);  border-color: oklch(0.72 0.12 185);  }
+
+.dark .callout-info       { background: oklch(0.22 0.02 240);  border-color: oklch(0.40 0.08 240);  }
+.dark .callout-tip        { background: oklch(0.22 0.02 150);  border-color: oklch(0.40 0.08 150);  }
+.dark .callout-warning    { background: oklch(0.22 0.03 80);   border-color: oklch(0.42 0.08 80);   }
+.dark .callout-danger     { background: oklch(0.22 0.02 25);   border-color: oklch(0.40 0.10 25);   }
+.dark .callout-definition { background: oklch(0.22 0.02 300);  border-color: oklch(0.40 0.08 300);  }
+.dark .callout-objective  { background: oklch(0.22 0.02 185);  border-color: oklch(0.40 0.08 185);  }
+
+/* ─── Accordion ────────────────────────────────────────── */
+.mdc-accordion {
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--color-border);
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+.mdc-accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: var(--color-card);
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  color: var(--color-foreground);
+}
+.mdc-accordion-trigger:hover {
+  background: var(--color-accent);
+}
+.mdc-accordion-chevron {
+  transition: transform 200ms ease;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+.mdc-accordion[data-open="true"] .mdc-accordion-chevron {
+  transform: rotate(180deg);
+}
+.mdc-accordion-body {
+  padding: 0 1rem 1rem;
+  background: var(--color-card);
+}
+.mdc-accordion-body :first-child { margin-top: 0; }
+.mdc-accordion-body :last-child  { margin-bottom: 0; }
+
+/* ─── Card Block ───────────────────────────────────────── */
+.mdc-card {
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: var(--color-border);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  background: var(--color-card);
+}
+.mdc-card-header {
+  padding: 1rem 1.25rem 0;
+}
+.mdc-card-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-foreground);
+  margin: 0;
+}
+.mdc-card-body {
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+.mdc-card-body :first-child { margin-top: 0; }
+.mdc-card-body :last-child  { margin-bottom: 0; }
+
+/* Card variants */
+.mdc-card-filled {
+  background: var(--color-muted);
+  border-color: transparent;
+}
+.mdc-card-elevated {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border-color: transparent;
+}
+
+/* ─── Figure ───────────────────────────────────────────── */
+.mdc-figure {
+  margin: 1.5rem 0;
+}
+.mdc-figure > :first-child {
+  margin-top: 0;
+}
+.mdc-figure-caption {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+}
+
+/* ─── Columns ──────────────────────────────────────────── */
+.mdc-columns {
+  display: grid;
+  margin: 1.5rem 0;
+}
+.mdc-columns-2 { grid-template-columns: repeat(2, 1fr); }
+.mdc-columns-3 { grid-template-columns: repeat(3, 1fr); }
+.mdc-columns-4 { grid-template-columns: repeat(4, 1fr); }
+
+.mdc-columns-gap-sm { gap: 0.75rem; }
+.mdc-columns-gap-md { gap: 1.5rem; }
+.mdc-columns-gap-lg { gap: 2.5rem; }
+
+.mdc-columns > .mdc-col :first-child { margin-top: 0; }
+.mdc-columns > .mdc-col :last-child  { margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .mdc-columns-2,
+  .mdc-columns-3,
+  .mdc-columns-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Content Divider ──────────────────────────────────── */
+.mdc-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  color: var(--color-muted-foreground);
+}
+.mdc-divider::before,
+.mdc-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.mdc-divider:empty::after {
+  display: none;
+}
+.mdc-divider-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ─── Spacer ───────────────────────────────────────────── */
+.mdc-spacer-sm { height: 1rem; }
+.mdc-spacer-md { height: 2rem; }
+.mdc-spacer-lg { height: 4rem; }
+.mdc-spacer-xl { height: 6rem; }

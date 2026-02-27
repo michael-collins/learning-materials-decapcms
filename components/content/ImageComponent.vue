@@ -12,20 +12,25 @@ interface Props {
   caption?: string
   credit?: string
   creditUrl?: string
+  align?: 'left' | 'center' | 'right' | 'full'
+  size?: 'small' | 'medium' | 'large' | 'full'
+  float?: 'left' | 'right' | 'none'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   alt: '',
 })
+
+const { layoutClasses } = useMdcLayout(props)
 </script>
 
 <template>
-  <figure class="image-component my-8">
+  <figure class="image-component my-8" :class="layoutClasses">
     <img
       v-if="src"
       :src="src"
       :alt="alt"
-      class="rounded-lg max-w-full mx-auto"
+      class="rounded-lg w-full"
       loading="lazy"
     />
     <div

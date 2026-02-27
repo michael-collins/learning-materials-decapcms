@@ -19,6 +19,7 @@ const props = defineProps<{
 interface MdcParsed {
   componentType: string
   props: Record<string, string>
+  body?: string
 }
 
 function parseMdcProps(attrStr: string): Record<string, string> {
@@ -105,6 +106,26 @@ function createPreviewRefTracker() {
   }
 
   return { refs, add }
+}
+
+/** Apply inline markdown formatting to a body text block, returning HTML */
+function inlineFormatBody(body: string): string {
+  return body
+    .split('\n')
+    .map(line => {
+      const trimmed = line.trim()
+      if (!trimmed) return ''
+      return trimmed
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="rounded-md max-w-full" />')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+    })
+    .filter(Boolean)
+    .map(l => `<p>${l}</p>`)
+    .join('\n')
 }
 
 /** Build the caption / credit HTML rendered beneath a media embed in the preview */
@@ -429,6 +450,93 @@ function renderMdcBlock(parsed: MdcParsed, refTracker: ReturnType<typeof createP
       return `<sup id="${ref.citeId}" class="cite-ref"><a href="#${ref.refId}" class="inline-flex items-center justify-center rounded bg-primary/10 px-1 py-0.5 text-[0.65rem] font-semibold leading-none text-primary no-underline" title="${esc(text)}">[${ref.num}]</a></sup>`
     }
 
+    // ─── Container components (:::triple-colon syntax) ──────
+    case 'accordion': {
+      const title = esc(p.title || 'Accordion')
+      const bodyHtml = parsed.body ? inlineFormatBody(parsed.body) : '<em class="text-muted-foreground">No content</em>'
+      return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+        <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">▸ Accordion</div>
+        <details class="group">
+          <summary class="flex cursor-pointer items-center justify-between gap-2 px-4 py-3 font-medium hover:bg-muted/30 transition-colors">
+            <span>${title}</span>
+            <svg class="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="border-t px-4 py-3 prose prose-sm max-w-none">${bodyHtml}</div>
+        </details>
+      </div>`
+    }
+
+    case 'callout': {
+      const type = p.type || 'info'
+      const title = p.title ? esc(p.title) : ''
+      const bodyHtml = parsed.body ? inlineFormatBody(parsed.body) : ''
+      const iconMap: Record<string, string> = { info: 'ℹ️', tip: '💡', warning: '⚠️', danger: '🚫', definition: '📖', objective: '🎯' }
+      const colorMap: Record<string, string> = {
+        info: 'border-blue-500/40 bg-blue-500/5',
+        tip: 'border-green-500/40 bg-green-500/5',
+        warning: 'border-yellow-500/40 bg-yellow-500/5',
+        danger: 'border-red-500/40 bg-red-500/5',
+        definition: 'border-purple-500/40 bg-purple-500/5',
+        objective: 'border-teal-500/40 bg-teal-500/5',
+      }
+      const icon = iconMap[type] || iconMap.info
+      const color = colorMap[type] || colorMap.info
+      return `<div class="mdc-preview-block my-4 rounded-lg border-l-4 ${color} overflow-hidden">
+        <div class="px-4 py-3">
+          <div class="flex items-center gap-2 font-medium mb-1"><span>${icon}</span>${title ? `<span>${title}</span>` : `<span class="capitalize">${esc(type)}</span>`}</div>
+          <div class="prose prose-sm max-w-none text-foreground/80">${bodyHtml}</div>
+        </div>
+      </div>`
+    }
+
+    case 'card-block': {
+      const title = p.title ? esc(p.title) : ''
+      const variant = p.variant || 'outlined'
+      const bodyHtml = parsed.body ? inlineFormatBody(parsed.body) : ''
+      const variantClass = variant === 'filled' ? 'bg-muted/50' : variant === 'elevated' ? 'shadow-md' : ''
+      return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden ${variantClass}">
+        ${title ? `<div class="px-4 pt-4 pb-1 font-semibold">${title}</div>` : ''}
+        <div class="px-4 py-3 prose prose-sm max-w-none">${bodyHtml}</div>
+      </div>`
+    }
+
+    case 'figure': {
+      const caption = p.caption ? esc(p.caption) : ''
+      const bodyHtml = parsed.body ? inlineFormatBody(parsed.body) : ''
+      const align = p.align || 'center'
+      const alignClass = align === 'left' ? 'text-left' : align === 'right' ? 'text-right' : 'text-center'
+      return `<figure class="mdc-preview-block my-4 ${alignClass}">
+        <div>${bodyHtml}</div>
+        ${caption ? `<figcaption class="mt-2 text-sm text-muted-foreground">${caption}</figcaption>` : ''}
+      </figure>`
+    }
+
+    case 'columns': {
+      const count = p.count || '2'
+      const bodyHtml = parsed.body ? esc(parsed.body) : ''
+      return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+        <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">⬜ Columns (${count})</div>
+        <div class="p-4 grid gap-4" style="grid-template-columns: repeat(${esc(count)}, 1fr)">
+          <div class="border rounded p-3 text-sm text-muted-foreground italic">Column content (preview renders in published view)</div>
+          ${'<div class="border rounded p-3 text-sm text-muted-foreground italic">Column content</div>'.repeat(Number(count) - 1)}
+        </div>
+      </div>`
+    }
+
+    case 'content-divider': {
+      const label = p.label ? esc(p.label) : ''
+      if (label) {
+        return `<div class="my-6 flex items-center gap-4"><hr class="flex-1"/><span class="text-xs font-medium text-muted-foreground uppercase tracking-wide">${label}</span><hr class="flex-1"/></div>`
+      }
+      return '<hr class="my-6" />'
+    }
+
+    case 'spacer': {
+      const sizeMap: Record<string, string> = { sm: '1rem', md: '2rem', lg: '4rem', xl: '6rem' }
+      const size = sizeMap[p.size || 'md'] || '2rem'
+      return `<div style="height:${size}" aria-hidden="true" class="mdc-preview-block"></div>`
+    }
+
     default:
       return wrapper(
         `<div class="p-4 text-sm text-muted-foreground italic">Unknown component: ${esc(componentType)}</div>`,
@@ -443,10 +551,19 @@ const renderedBody = computed(() => {
 
   const refTracker = createPreviewRefTracker()
 
-  // First pass: extract and replace MDC blocks with placeholders
-  const MDC_BLOCK_REGEX = /::([\w-]+)\{([^}]*)\}\s*\n?::/g
+  // First pass: extract and replace container MDC blocks (:::triple-colon) with placeholders
+  const MDC_CONTAINER_REGEX = /:::(\w[\w-]*)(?:\{([^}]*)\})?\s*\n([\s\S]*?)\n?:::/g
   const mdcBlocks: string[] = []
-  let bodyWithPlaceholders = props.body.replace(MDC_BLOCK_REGEX, (_, compType, attrStr) => {
+  let bodyWithPlaceholders = props.body.replace(MDC_CONTAINER_REGEX, (_, compType, attrStr, body) => {
+    const parsed: MdcParsed = { componentType: compType, props: parseMdcProps(attrStr || ''), body: (body || '').trim() }
+    const idx = mdcBlocks.length
+    mdcBlocks.push(renderMdcBlock(parsed, refTracker))
+    return `\n<!--MDC_PLACEHOLDER_${idx}-->\n`
+  })
+
+  // Second pass: extract atom MDC blocks (::double-colon)
+  const MDC_BLOCK_REGEX = /::([\/\w-]+)\{([^}]*)\}\s*\n?::/g
+  bodyWithPlaceholders = bodyWithPlaceholders.replace(MDC_BLOCK_REGEX, (_, compType, attrStr) => {
     const parsed: MdcParsed = { componentType: compType, props: parseMdcProps(attrStr) }
     const idx = mdcBlocks.length
     mdcBlocks.push(renderMdcBlock(parsed, refTracker))

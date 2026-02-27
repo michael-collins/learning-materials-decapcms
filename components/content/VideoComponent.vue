@@ -9,6 +9,9 @@ interface Props {
   caption?: string
   credit?: string
   creditUrl?: string
+  align?: 'left' | 'center' | 'right' | 'full'
+  size?: 'small' | 'medium' | 'large' | 'full'
+  float?: 'left' | 'right' | 'none'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -75,10 +78,11 @@ const embedUrl = computed(() => {
   // Fallback: return as-is (may be a direct embed URL already)
   return url
 })
+const { layoutClasses } = useMdcLayout(props)
 </script>
 
 <template>
-  <div class="video-wrapper my-8">
+  <div class="video-wrapper my-8" :class="layoutClasses">
     <div v-if="embedUrl" class="relative w-full overflow-hidden rounded-lg" style="padding-top: 56.25%;">
       <iframe
         :src="embedUrl"
@@ -101,9 +105,3 @@ const embedUrl = computed(() => {
     />
   </div>
 </template>
-
-<style scoped>
-.video-wrapper {
-  max-width: 100%;
-}
-</style>

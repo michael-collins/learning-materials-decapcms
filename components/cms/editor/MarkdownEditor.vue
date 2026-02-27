@@ -40,28 +40,53 @@ const viewMode = ref<ViewMode>('edit')
 const rawMarkdown = ref('')
 
 // ─── MDC ↔ HTML conversion helpers ─────────────────────────
-// MDC block pattern: ::component-name{props}\n::
-const MDC_BLOCK_REGEX = /::([\w-]+)\{([^}]*)\}\s*\n?::/g
+// Atom MDC block pattern: ::component-name{props}\n::
+const MDC_BLOCK_REGEX = /(?<!:)::((?!:)[\w-]+)\{([^}]*)\}\s*\n?::(?!:)/g
+// Container MDC block pattern: :::component-name{props}\nbody\n:::
+const MDC_CONTAINER_REGEX = /:::([\w-]+)\{([^}]*)\}\s*\n([\s\S]*?):::/g
+
+/** Parse key="value" attribute pairs */
+function parseAttrStr(attrStr: string): Record<string, any> {
+  const props: Record<string, any> = {}
+  const attrRegex = /(\w+)="([^"]*)"/g
+  let m: RegExpExecArray | null
+  while ((m = attrRegex.exec(attrStr)) !== null) {
+    let val: any = m[2]
+    if (val === 'true') val = true
+    else if (val === 'false') val = false
+    props[m[1]!] = val
+  }
+  return props
+}
+
+/** Build an HTML placeholder div for an MDC block */
+function buildMdcDiv(compType: string, props: Record<string, any>, rawMdc: string): string {
+  const propsJson = JSON.stringify(props).replace(/"/g, '&quot;')
+  const rawEscaped = rawMdc.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  return `<div data-mdc-block="true" data-component-type="${compType}" data-mdc-props="${propsJson}" data-mdc-raw="${rawEscaped}"></div>`
+}
 
 /**
  * Convert MDC blocks in markdown to HTML divs that Tiptap can parse.
- * This runs before setting editor content.
+ * Handles both container (:::) and atom (::) blocks.
+ *
+ * IMPORTANT: Each div replacement is followed by a blank line so that
+ * markdown-it treats the next block (e.g. a heading) as a separate
+ * markdown block rather than absorbing it into the HTML block.
  */
 function mdcToHtml(markdown: string): string {
-  return markdown.replace(MDC_BLOCK_REGEX, (fullMatch, compType, attrStr) => {
-    const props: Record<string, any> = {}
-    const attrRegex = /(\w+)="([^"]*)"/g
-    let m: RegExpExecArray | null
-    while ((m = attrRegex.exec(attrStr)) !== null) {
-      let val: any = m[2]
-      if (val === 'true') val = true
-      else if (val === 'false') val = false
-      props[m[1]!] = val
-    }
-    const propsJson = JSON.stringify(props).replace(/"/g, '&quot;')
-    const rawEscaped = fullMatch.replace(/"/g, '&quot;')
-    return `<div data-mdc-block="true" data-component-type="${compType}" data-mdc-props="${propsJson}" data-mdc-raw="${rawEscaped}"></div>`
+  // First: convert container blocks (:::)
+  let result = markdown.replace(MDC_CONTAINER_REGEX, (fullMatch, compType, attrStr, body) => {
+    const props = parseAttrStr(attrStr)
+    props._body = (body || '').trim()
+    return buildMdcDiv(compType, props, fullMatch) + '\n'
   })
+  // Then: convert atom blocks (::)
+  result = result.replace(MDC_BLOCK_REGEX, (fullMatch, compType, attrStr) => {
+    const props = parseAttrStr(attrStr)
+    return buildMdcDiv(compType, props, fullMatch) + '\n'
+  })
+  return result
 }
 
 /**
@@ -69,11 +94,22 @@ function mdcToHtml(markdown: string): string {
  * This runs after getting markdown from the editor.
  */
 function htmlToMdc(markdown: string): string {
-  // Match the HTML div placeholders that tiptap-markdown might output
   const htmlDivRegex = /<div data-mdc-block="true" data-component-type="([^"]*)" data-mdc-props="([^"]*)" data-mdc-raw="([^"]*)"><\/div>/g
   return markdown.replace(htmlDivRegex, (_, _compType, _propsJson, rawEscaped) => {
     return rawEscaped.replace(/&quot;/g, '"').replace(/&amp;/g, '&')
   })
+}
+
+/**
+ * Repair headings that were accidentally escaped during a previous
+ * round-trip.  When a heading line like `## Title` loses its heading
+ * status (e.g. absorbed into an HTML block), prosemirror-markdown's
+ * `esc()` escapes the leading `#` chars (`\## Title`).  This helper
+ * converts those escaped headings back to proper ATX headings.
+ */
+function fixEscapedHeadings(md: string): string {
+  // Match lines that start with `\` immediately followed by 1-6 `#` and a space
+  return md.replace(/^\\(#{1,6}\s)/gm, '$1')
 }
 
 // ─── Editor setup ──────────────────────────────────────────
@@ -114,6 +150,8 @@ const editor = useEditor({
     let md = (ed.storage as any).markdown.getMarkdown()
     // Convert any HTML div placeholders back to MDC syntax
     md = htmlToMdc(md)
+    // Repair headings that were accidentally escaped during round-trip
+    md = fixEscapedHeadings(md)
     // Also restore MDC from any mdcBlock nodes that tiptap-markdown didn't handle
     ed.state.doc.descendants((node: any) => {
       if (node.type.name === 'mdcBlock' && node.attrs.mdcRaw) {
@@ -140,7 +178,7 @@ watch(viewMode, (mode, oldMode) => {
   if (mode === 'code') {
     // Entering code mode: sync raw markdown from editor
     let md = (editor.value?.storage as any)?.markdown?.getMarkdown() || props.modelValue || ''
-    rawMarkdown.value = htmlToMdc(md)
+    rawMarkdown.value = fixEscapedHeadings(htmlToMdc(md))
   } else if (oldMode === 'code') {
     // Leaving code mode: push raw markdown back into editor
     editor.value?.commands.setContent(mdcToHtml(rawMarkdown.value))
@@ -165,18 +203,34 @@ function insertLink() {
   editor.value?.chain().focus().setLink({ href: url }).run()
 }
 
+// ─── CodeEditor ref (for inserting snippets in code mode) ──
+const codeEditorRef = ref<{ insertAtCursor: (text: string) => void } | null>(null)
+
 // ─── MDC insertion ─────────────────────────────────────────
 function insertMdcBlock(mdcSyntax: string) {
+  // Code mode: insert directly into CodeMirror
+  if (viewMode.value === 'code') {
+    if (codeEditorRef.value?.insertAtCursor) {
+      codeEditorRef.value.insertAtCursor(mdcSyntax)
+    } else {
+      rawMarkdown.value += '\n' + mdcSyntax
+      emit('update:modelValue', rawMarkdown.value)
+    }
+    return
+  }
+
+  // Rich-text mode: parse both atom and container MDC → Tiptap node
   const attrs = mdcToNodeAttrs(mdcSyntax)
   if (attrs && editor.value) {
     editor.value.chain().focus().insertContent({
       type: 'mdcBlock',
       attrs,
     }).run()
-  } else {
-    // Fallback: insert as raw text
-    editor.value?.chain().focus().insertContent(mdcSyntax).run()
+    return
   }
+
+  // Fallback: insert as raw text into Tiptap
+  editor.value?.chain().focus().insertContent(mdcSyntax).run()
 }
 
 onBeforeUnmount(() => {
@@ -187,8 +241,30 @@ onBeforeUnmount(() => {
 // Replaces MDC block placeholder divs in Tiptap's HTML output
 // with real rendered components (e.g. <model-viewer>) for the preview pane.
 const previewHtml = computed(() => {
-  const raw = editor.value?.getHTML()
+  let raw = editor.value?.getHTML()
   if (!raw) return '<p class="text-muted-foreground">Nothing to preview</p>'
+
+  // ─── Pre-process: catch raw MDC syntax that leaked through as plain text ─
+  // Tiptap collapses newlines to spaces in paragraphs, so container blocks
+  // like :::callout{...} body ::: appear as flat text. Convert them to div
+  // placeholders so the renderer below can handle them.
+  // Container blocks (:::)
+  raw = raw.replace(
+    /:::([\w-]+)\{([^}]*)\}\s*([\s\S]*?)\s*:::/g,
+    (fullMatch, compType, attrStr, bodyText) => {
+      const props = parseAttrStr(attrStr)
+      props._body = bodyText.trim().replace(/<br\s*\/?>/g, '\n')
+      return buildMdcDiv(compType, props, fullMatch)
+    }
+  )
+  // Atom blocks (::)
+  raw = raw.replace(
+    /::([\w-]+)\{([^}]*)\}\s*::/g,
+    (fullMatch, compType, attrStr) => {
+      const props = parseAttrStr(attrStr)
+      return buildMdcDiv(compType, props, fullMatch)
+    }
+  )
 
   // Simple in-editor reference tracker for preview pane
   const previewRefs: { num: number; label: string; text: string; url?: string; refId: string; citeId: string }[] = []
@@ -258,6 +334,138 @@ const previewHtml = computed(() => {
         const url = props.url?.trim()
         const ref = addPreviewRef(label, text, url || undefined)
         return `<sup id="${ref.citeId}" class="cite-ref"><a href="#${ref.refId}" class="inline-flex items-center justify-center rounded bg-primary/10 px-1 py-0.5 text-[0.65rem] font-semibold leading-none text-primary no-underline">[${ref.num}]</a></sup>`
+      }
+
+      // ─── Embed previews (video, iframe, code-embed, slides, sketchfab) ───
+      if (compType === 'video-component' && props.src) {
+        const src = String(props.src).replace(/"/g, '&quot;')
+        const title = String(props.title || 'Video').replace(/</g, '&lt;')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">▶ ${title}</div>
+          <div class="aspect-video bg-muted/20 flex items-center justify-center text-sm text-muted-foreground"><a href="${src}" target="_blank" rel="noopener" class="text-primary hover:underline">${src}</a></div>
+          ${captionHtml}
+        </div>`
+      }
+
+      if (compType === 'iframe-component' && props.src) {
+        const src = String(props.src).replace(/"/g, '&quot;')
+        const title = String(props.title || 'Embed').replace(/</g, '&lt;')
+        const height = String(props.height || '300')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">🌐 ${title}</div>
+          <iframe src="${src}" title="${title}" style="width:100%;height:${height}px;border:none;" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+          ${captionHtml}
+        </div>`
+      }
+
+      if (compType === 'code-embed-component' && props.src) {
+        const provider = String(props.provider || 'embed').replace(/</g, '&lt;')
+        const title = String(props.title || 'Code Example').replace(/</g, '&lt;')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">💻 ${title} (${provider})</div>
+          <div class="p-4 text-sm text-muted-foreground">Code embed will render on published page</div>
+          ${captionHtml}
+        </div>`
+      }
+
+      if (compType === 'google-slides-component') {
+        const title = String(props.title || 'Presentation').replace(/</g, '&lt;')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">📊 ${title}</div>
+          <div class="p-4 text-sm text-muted-foreground">Google Slides presentation</div>
+          ${captionHtml}
+        </div>`
+      }
+
+      if (compType === 'sketchfab-component' && props.src) {
+        const title = String(props.title || 'Sketchfab Model').replace(/</g, '&lt;')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">🧊 ${title}</div>
+          <div class="aspect-video bg-muted/20 flex items-center justify-center text-sm text-muted-foreground">3D model preview</div>
+          ${captionHtml}
+        </div>`
+      }
+
+      if (compType === 'rubric-component') {
+        const id = String(props.id || 'rubric').replace(/</g, '&lt;')
+        return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
+          <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">📋 Assessment Rubric</div>
+          <div class="p-4 text-sm text-muted-foreground">Rubric: <strong>${id}</strong></div>
+        </div>`
+      }
+
+      // ─── Container component previews ────────────────────────
+      const body = String(props._body || '').replace(/</g, '&lt;').replace(/\n/g, '<br/>')
+
+      if (compType === 'callout') {
+        const type = String(props.type || 'info')
+        const title = String(props.title || '').replace(/</g, '&lt;')
+        const iconMap: Record<string, string> = { info: 'ℹ️', tip: '💡', warning: '⚠️', danger: '🚫', definition: '📖', objective: '🎯' }
+        const icon = iconMap[type] || 'ℹ️'
+        const colorMap: Record<string, string> = {
+          info: 'border-blue-400 bg-blue-50 dark:bg-blue-950/30',
+          tip: 'border-green-400 bg-green-50 dark:bg-green-950/30',
+          warning: 'border-amber-400 bg-amber-50 dark:bg-amber-950/30',
+          danger: 'border-red-400 bg-red-50 dark:bg-red-950/30',
+          definition: 'border-purple-400 bg-purple-50 dark:bg-purple-950/30',
+          objective: 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950/30',
+        }
+        const colors = colorMap[type] || colorMap.info
+        return `<div class="my-4 rounded-lg border-l-4 p-4 ${colors}" role="note">
+          <div class="flex items-center gap-2 mb-1 font-semibold text-sm">${icon} ${title || type.charAt(0).toUpperCase() + type.slice(1)}</div>
+          <div class="text-sm">${body}</div>
+        </div>`
+      }
+
+      if (compType === 'accordion') {
+        const title = String(props.title || 'Accordion').replace(/</g, '&lt;')
+        return `<div class="my-4 rounded-lg border overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-2.5 bg-muted/30 font-medium text-sm cursor-pointer">
+            <span>${title}</span>
+            <span class="text-xs text-muted-foreground">▼</span>
+          </div>
+          <div class="px-4 py-3 text-sm border-t">${body}</div>
+        </div>`
+      }
+
+      if (compType === 'card-block') {
+        const title = String(props.title || 'Card').replace(/</g, '&lt;')
+        const variant = String(props.variant || 'outlined')
+        const variantClass = variant === 'filled' ? 'bg-muted/40' : variant === 'elevated' ? 'shadow-md' : ''
+        return `<div class="my-4 rounded-lg border p-4 ${variantClass}">
+          ${title ? `<div class="font-semibold text-sm mb-2">${title}</div>` : ''}
+          <div class="text-sm">${body}</div>
+        </div>`
+      }
+
+      if (compType === 'figure') {
+        const caption = String(props.caption || '').replace(/</g, '&lt;')
+        return `<figure class="my-4">
+          <div class="text-sm">${body}</div>
+          ${caption ? `<figcaption class="mt-2 text-center text-sm text-muted-foreground">${caption}</figcaption>` : ''}
+        </figure>`
+      }
+
+      if (compType === 'columns') {
+        const count = String(props.count || '2')
+        return `<div class="my-4 rounded-lg border p-4">
+          <div class="text-xs font-medium text-muted-foreground mb-2">📐 ${count}-Column Layout</div>
+          <div class="text-sm" style="column-count:${count};column-gap:1rem;">${body}</div>
+        </div>`
+      }
+
+      if (compType === 'content-divider') {
+        const label = String(props.label || '').replace(/</g, '&lt;')
+        if (label) {
+          return `<div class="my-6 flex items-center gap-3"><div class="flex-1 border-t"></div><span class="text-xs text-muted-foreground">${label}</span><div class="flex-1 border-t"></div></div>`
+        }
+        return `<hr class="my-6 border-t" />`
+      }
+
+      if (compType === 'spacer') {
+        const sizeMap: Record<string, string> = { sm: '1rem', md: '2rem', lg: '3rem', xl: '4rem' }
+        const size = sizeMap[String(props.size || 'md')] || '2rem'
+        return `<div style="height:${size}" class="my-2"></div>`
       }
 
       // Fallback for other MDC blocks: show a labelled placeholder with caption
@@ -360,7 +568,12 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
 
         <div class="mx-1 h-5 w-px bg-border" />
 
-        <!-- MDC Component Toolbar -->
+        <!-- MDC Component Toolbar (rich-text modes) -->
+        <CmsMdcToolbar @insert="insertMdcBlock" />
+      </template>
+
+      <!-- MDC Component Toolbar (code mode — outside the format buttons guard) -->
+      <template v-if="viewMode === 'code'">
         <CmsMdcToolbar @insert="insertMdcBlock" />
       </template>
 
@@ -414,6 +627,7 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
       <!-- Raw code editor (code mode) — CodeMirror with syntax highlighting -->
       <div v-if="viewMode === 'code'" class="relative min-h-[300px]">
         <CmsEditorCodeEditor
+          ref="codeEditorRef"
           v-model="rawMarkdown"
           placeholder="Write raw markdown..."
           @update:model-value="handleCodeEditorUpdate"

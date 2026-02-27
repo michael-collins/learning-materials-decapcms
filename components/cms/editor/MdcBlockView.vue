@@ -10,7 +10,9 @@ import { NodeViewWrapper } from '@tiptap/vue-3'
 import {
   Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote,
   Pencil, Trash2, GripVertical, FolderOpen,
+  AlertTriangle, ChevronsUpDown, LayoutGrid, RectangleHorizontal, Minus as MinusIcon, ArrowUpDown, ImagePlus,
 } from 'lucide-vue-next'
+import { CONTAINER_COMPONENT_NAMES } from './MdcBlockExtension'
 
 const props = defineProps<{
   node: any
@@ -42,9 +44,17 @@ const filePickerTitle = ref('Select a file')
 interface FieldDef {
   name: string
   label: string
-  type: string
+  type: string  // 'string' | 'boolean' | 'select'
   browse?: string[]  // allowed media types for picker (e.g. ['image'], ['3d'])
+  options?: string[]  // for select type
 }
+
+// Shared layout fields for media components
+const layoutFieldDefs: FieldDef[] = [
+  { name: 'align', label: 'Alignment', type: 'select', options: ['center', 'left', 'right', 'full'] },
+  { name: 'size', label: 'Size', type: 'select', options: ['full', 'large', 'medium', 'small'] },
+  { name: 'float', label: 'Text Wrap', type: 'select', options: ['none', 'left', 'right'] },
+]
 
 const componentMeta: Record<string, { label: string; icon: any; color: string; fields: FieldDef[] }> = {
   'image-component': {
@@ -57,6 +67,7 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'caption', label: 'Caption', type: 'string' },
       { name: 'credit', label: 'Credit / Attribution', type: 'string' },
       { name: 'creditUrl', label: 'Credit URL', type: 'string' },
+      ...layoutFieldDefs,
     ],
   },
   'video-component': {
@@ -69,6 +80,7 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'caption', label: 'Caption', type: 'string' },
       { name: 'credit', label: 'Credit / Attribution', type: 'string' },
       { name: 'creditUrl', label: 'Credit URL', type: 'string' },
+      ...layoutFieldDefs,
     ],
   },
   // Legacy alias — existing content still uses ::youtube-video
@@ -92,6 +104,7 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'caption', label: 'Caption', type: 'string' },
       { name: 'credit', label: 'Credit / Attribution', type: 'string' },
       { name: 'creditUrl', label: 'Credit URL', type: 'string' },
+      ...layoutFieldDefs,
     ],
   },
   'code-embed-component': {
@@ -165,6 +178,67 @@ const componentMeta: Record<string, { label: string; icon: any; color: string; f
       { name: 'url', label: 'Source URL', type: 'string' },
     ],
   },
+  // ─── Container components ─────────────────────────────────
+  'callout': {
+    label: 'Callout',
+    icon: AlertTriangle,
+    color: 'text-blue-500 bg-blue-500/10 border-blue-500/30',
+    fields: [
+      { name: 'type', label: 'Type', type: 'select', options: ['info', 'tip', 'warning', 'danger', 'definition', 'objective'] },
+      { name: 'title', label: 'Title', type: 'string' },
+    ],
+  },
+  'accordion': {
+    label: 'Accordion',
+    icon: ChevronsUpDown,
+    color: 'text-teal-500 bg-teal-500/10 border-teal-500/30',
+    fields: [
+      { name: 'title', label: 'Title', type: 'string' },
+    ],
+  },
+  'card-block': {
+    label: 'Card',
+    icon: RectangleHorizontal,
+    color: 'text-violet-500 bg-violet-500/10 border-violet-500/30',
+    fields: [
+      { name: 'title', label: 'Title', type: 'string' },
+      { name: 'variant', label: 'Variant', type: 'select', options: ['outlined', 'filled', 'elevated'] },
+    ],
+  },
+  'figure': {
+    label: 'Figure',
+    icon: ImagePlus,
+    color: 'text-emerald-600 bg-emerald-600/10 border-emerald-600/30',
+    fields: [
+      { name: 'caption', label: 'Caption', type: 'string' },
+      { name: 'align', label: 'Alignment', type: 'select', options: ['center', 'left', 'right'] },
+    ],
+  },
+  'columns': {
+    label: 'Columns',
+    icon: LayoutGrid,
+    color: 'text-orange-600 bg-orange-600/10 border-orange-600/30',
+    fields: [
+      { name: 'count', label: 'Column Count', type: 'select', options: ['2', '3', '4'] },
+      { name: 'gap', label: 'Gap', type: 'select', options: ['sm', 'md', 'lg'] },
+    ],
+  },
+  'content-divider': {
+    label: 'Divider',
+    icon: MinusIcon,
+    color: 'text-gray-500 bg-gray-500/10 border-gray-500/30',
+    fields: [
+      { name: 'label', label: 'Label', type: 'string' },
+    ],
+  },
+  'spacer': {
+    label: 'Spacer',
+    icon: ArrowUpDown,
+    color: 'text-gray-400 bg-gray-400/10 border-gray-400/30',
+    fields: [
+      { name: 'size', label: 'Size', type: 'select', options: ['sm', 'md', 'lg', 'xl'] },
+    ],
+  },
 }
 
 const meta = computed(() => componentMeta[componentType.value] || {
@@ -173,6 +247,8 @@ const meta = computed(() => componentMeta[componentType.value] || {
   color: 'text-gray-500 bg-gray-500/10 border-gray-500/30',
   fields: [],
 })
+
+const isContainer = computed(() => CONTAINER_COMPONENT_NAMES.includes(componentType.value))
 
 // Summary line showing key props
 const summary = computed(() => {
@@ -193,7 +269,9 @@ function startEdit() {
 
 function saveEdit() {
   const newProps = { ...editValues.value }
-  const propEntries = Object.entries(newProps).filter(([_, v]) => v !== '' && v !== undefined && v !== null)
+  const body = newProps._body ?? ''
+  const propEntries = Object.entries(newProps)
+    .filter(([k, v]) => k !== '_body' && v !== '' && v !== undefined && v !== null)
   const attrStr = propEntries
     .map(([k, v]) => {
       if (typeof v === 'boolean') return v ? `${k}="true"` : `${k}="false"`
@@ -201,7 +279,12 @@ function saveEdit() {
     })
     .join(' ')
 
-  const newMdcRaw = `::${componentType.value}{${attrStr}}\n::`
+  let newMdcRaw: string
+  if (isContainer.value) {
+    newMdcRaw = `:::${componentType.value}{${attrStr}}\n${body}\n:::`
+  } else {
+    newMdcRaw = `::${componentType.value}{${attrStr}}\n::`
+  }
 
   props.updateAttributes({
     mdcProps: JSON.stringify(newProps),
@@ -273,6 +356,14 @@ function handleFilePickerSelect(path: string) {
             Enabled
           </label>
         </template>
+        <template v-else-if="field.type === 'select' && field.options">
+          <select
+            v-model="editValues[field.name]"
+            class="w-full rounded-md border bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option v-for="opt in field.options" :key="opt" :value="opt">{{ opt }}</option>
+          </select>
+        </template>
         <template v-else>
           <div class="flex gap-1.5">
             <input
@@ -292,6 +383,17 @@ function handleFilePickerSelect(path: string) {
             </button>
           </div>
         </template>
+      </div>
+
+      <!-- Body content textarea for container components -->
+      <div v-if="isContainer" class="space-y-1">
+        <label class="text-xs font-medium text-foreground/70">Content (Markdown)</label>
+        <textarea
+          v-model="editValues._body"
+          rows="4"
+          class="w-full rounded-md border bg-background px-2.5 py-1.5 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          placeholder="Write markdown content here..."
+        />
       </div>
 
       <div class="flex justify-end gap-2">

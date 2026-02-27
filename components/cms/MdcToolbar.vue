@@ -6,7 +6,10 @@
  * Clicking one opens the MdcComponentModal for configuring props,
  * then emits the generated MDC syntax string.
  */
-import { Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote, ImagePlus } from 'lucide-vue-next'
+import {
+  Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote, ImagePlus,
+  AlertTriangle, ChevronsUpDown, LayoutGrid, RectangleHorizontal, Minus, ArrowUpDown,
+} from 'lucide-vue-next'
 
 const emit = defineEmits<{
   insert: [mdcSyntax: string]
@@ -14,6 +17,26 @@ const emit = defineEmits<{
 
 const showDropdown = ref(false)
 const activeComponent = ref<MdcComponentDef | null>(null)
+const triggerRef = ref<HTMLElement | null>(null)
+const dropdownStyle = ref<Record<string, string>>({})
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+  if (showDropdown.value) {
+    nextTick(() => positionDropdown())
+  }
+}
+
+function positionDropdown() {
+  if (!triggerRef.value) return
+  const rect = triggerRef.value.getBoundingClientRect()
+  dropdownStyle.value = {
+    position: 'fixed',
+    left: `${rect.left}px`,
+    top: `${rect.bottom + 4}px`,
+    zIndex: '50',
+  }
+}
 
 // ─── MDC component definitions ─────────────────────────────
 export interface MdcFieldDef {
@@ -36,6 +59,32 @@ export interface MdcComponentDef {
   toBlock: (values: Record<string, any>) => string
 }
 
+// ─── Shared layout fields for media components ─────────
+const layoutFields: MdcFieldDef[] = [
+  {
+    name: 'align', label: 'Alignment', widget: 'select',
+    options: ['center', 'left', 'right', 'full'],
+    default: 'center', required: false, hint: 'Horizontal alignment within the content column',
+  },
+  {
+    name: 'size', label: 'Size', widget: 'select',
+    options: ['full', 'large', 'medium', 'small'],
+    default: 'full', required: false, hint: 'Width relative to the content column',
+  },
+  {
+    name: 'float', label: 'Text Wrap', widget: 'select',
+    options: ['none', 'left', 'right'],
+    default: 'none', required: false, hint: 'Float the media so text wraps around it',
+  },
+]
+
+/** Append non-default layout props to a parts array */
+function appendLayoutProps(parts: string[], v: Record<string, any>) {
+  if (v.align && v.align !== 'center') parts.push(`align="${v.align}"`)
+  if (v.size && v.size !== 'full') parts.push(`size="${v.size}"`)
+  if (v.float && v.float !== 'none') parts.push(`float="${v.float}"`)
+}
+
 const mdcComponents: MdcComponentDef[] = [
   {
     id: 'image-component',
@@ -48,12 +97,14 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the image' },
       { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution (photographer, publisher, etc.)' },
       { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
+      ...layoutFields,
     ],
     toBlock: (v) => {
       const parts = [`src="${v.src}"`, `alt="${v.alt || ''}"`]
       if (v.caption) parts.push(`caption="${v.caption}"`)
       if (v.credit) parts.push(`credit="${v.credit}"`)
       if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      appendLayoutProps(parts, v)
       return `::image-component{${parts.join(' ')}}\n::`
     },
   },
@@ -68,12 +119,14 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the embed' },
       { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution (author, publisher, etc.)' },
       { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
+      ...layoutFields,
     ],
     toBlock: (v) => {
       const parts = [`src="${v.src}"`, `title="${v.title || 'Video'}"`]
       if (v.caption) parts.push(`caption="${v.caption}"`)
       if (v.credit) parts.push(`credit="${v.credit}"`)
       if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      appendLayoutProps(parts, v)
       return `::video-component{${parts.join(' ')}}\n::`
     },
   },
@@ -89,6 +142,7 @@ const mdcComponents: MdcComponentDef[] = [
       { name: 'caption', label: 'Caption', widget: 'string', required: false, hint: 'Optional caption shown below the embed' },
       { name: 'credit', label: 'Credit / Attribution', widget: 'string', required: false, hint: 'Source attribution' },
       { name: 'creditUrl', label: 'Credit URL', widget: 'string', required: false, hint: 'Link to original source' },
+      ...layoutFields,
     ],
     toBlock: (v) => {
       const parts = [`src="${v.src}"`, `title="${v.title || 'Embed'}"`]
@@ -96,6 +150,7 @@ const mdcComponents: MdcComponentDef[] = [
       if (v.caption) parts.push(`caption="${v.caption}"`)
       if (v.credit) parts.push(`credit="${v.credit}"`)
       if (v.creditUrl) parts.push(`creditUrl="${v.creditUrl}"`)
+      appendLayoutProps(parts, v)
       return `::iframe-component{${parts.join(' ')}}\n::`
     },
   },
@@ -222,8 +277,74 @@ const mdcComponents: MdcComponentDef[] = [
   },
 ]
 
+// ─── Container / layout component snippets (code-mode) ────
+interface MdcSnippetDef {
+  id: string
+  label: string
+  icon: any
+  color: string
+  snippet: string
+}
+
+const mdcSnippets: MdcSnippetDef[] = [
+  {
+    id: 'callout',
+    label: 'Callout',
+    icon: AlertTriangle,
+    color: 'text-blue-500',
+    snippet: ':::callout{type="info" title="Note"}\nYour content here.\n:::\n',
+  },
+  {
+    id: 'accordion',
+    label: 'Accordion',
+    icon: ChevronsUpDown,
+    color: 'text-teal-500',
+    snippet: ':::accordion{title="Click to expand"}\nHidden content here.\n:::\n',
+  },
+  {
+    id: 'card-block',
+    label: 'Card',
+    icon: RectangleHorizontal,
+    color: 'text-violet-500',
+    snippet: ':::card-block{title="Card Title"}\nCard content here.\n:::\n',
+  },
+  {
+    id: 'figure',
+    label: 'Figure',
+    icon: ImagePlus,
+    color: 'text-emerald-600',
+    snippet: ':::figure{caption="Figure 1: Description"}\n::image-component{src="/uploads/photo.jpg" alt="Description"}\n::\n:::\n',
+  },
+  {
+    id: 'columns',
+    label: 'Columns',
+    icon: LayoutGrid,
+    color: 'text-orange-600',
+    snippet: ':::columns{count="2" gap="md"}\n#left\nLeft column content.\n\n#right\nRight column content.\n:::\n',
+  },
+  {
+    id: 'content-divider',
+    label: 'Divider',
+    icon: Minus,
+    color: 'text-gray-500',
+    snippet: ':::content-divider{label="Section"}\n:::\n',
+  },
+  {
+    id: 'spacer',
+    label: 'Spacer',
+    icon: ArrowUpDown,
+    color: 'text-gray-400',
+    snippet: '::spacer{size="md"}\n::\n',
+  },
+]
+
 function openComponentModal(comp: MdcComponentDef) {
   activeComponent.value = comp
+  showDropdown.value = false
+}
+
+function insertSnippet(snippet: MdcSnippetDef) {
+  emit('insert', snippet.snippet)
   showDropdown.value = false
 }
 
@@ -243,20 +364,33 @@ function handleCancel() {
   <!-- Insert Component button -->
   <div class="relative">
     <button
+      ref="triggerRef"
       type="button"
-      @click="showDropdown = !showDropdown"
+      @click="toggleDropdown()"
       class="flex items-center gap-1 rounded px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
       title="Insert MDC Component"
     >
       <Blocks class="h-4 w-4" />
       <span class="hidden sm:inline">Insert</span>
     </button>
+  </div>
 
-    <!-- Component dropdown -->
+  <!-- Click-outside to close dropdown -->
+  <Teleport to="body">
     <div
       v-if="showDropdown"
-      class="absolute left-0 top-full z-30 mt-1 w-56 rounded-md border bg-popover p-1 shadow-lg"
+      class="fixed inset-0 z-40"
+      @click="showDropdown = false"
+    />
+
+    <!-- Component dropdown (teleported to escape overflow-hidden) -->
+    <div
+      v-if="showDropdown"
+      :style="dropdownStyle"
+      class="w-56 max-h-[28rem] overflow-y-auto rounded-md border bg-popover p-1 shadow-lg"
     >
+      <!-- Media components (open modal for props) -->
+      <div class="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Media</div>
       <button
         v-for="comp in mdcComponents"
         :key="comp.id"
@@ -267,16 +401,21 @@ function handleCancel() {
         <component :is="comp.icon" class="h-4 w-4" :class="comp.color" />
         {{ comp.label }}
       </button>
-    </div>
-  </div>
 
-  <!-- Click-outside to close dropdown -->
-  <Teleport to="body">
-    <div
-      v-if="showDropdown"
-      class="fixed inset-0 z-20"
-      @click="showDropdown = false"
-    />
+      <!-- Layout snippets (insert directly into code view) -->
+      <div class="my-1 border-t border-border" />
+      <div class="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Layout</div>
+      <button
+        v-for="snippet in mdcSnippets"
+        :key="snippet.id"
+        type="button"
+        @click="insertSnippet(snippet)"
+        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+      >
+        <component :is="snippet.icon" class="h-4 w-4" :class="snippet.color" />
+        {{ snippet.label }}
+      </button>
+    </div>
   </Teleport>
 
   <!-- Component modal -->

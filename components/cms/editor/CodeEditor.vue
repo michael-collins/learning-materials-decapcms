@@ -179,6 +179,20 @@ onMounted(() => {
   }
 })
 
+// ─── Public API ────────────────────────────────────────────
+function insertAtCursor(text: string) {
+  if (!editorView) return
+  const cursor = editorView.state.selection.main.head
+  editorView.dispatch({
+    changes: { from: cursor, insert: text },
+    selection: { anchor: cursor + text.length },
+  })
+  // Sync the model
+  emit('update:modelValue', editorView.state.doc.toString())
+}
+
+defineExpose({ insertAtCursor })
+
 onBeforeUnmount(() => {
   darkModeObserver?.disconnect()
   editorView?.destroy()
