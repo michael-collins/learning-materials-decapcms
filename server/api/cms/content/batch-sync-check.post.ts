@@ -69,6 +69,14 @@ export default defineEventHandler(async (event) => {
         .filter((c: any) => c.folder) // Only folder collections
         .map((c: any) => c.name)
 
+  // Pre-fetch the full repo tree once (recursive) — shared across all collections
+  let fullTree: Array<{ path: string; sha: string }> = []
+  try {
+    fullTree = await git.listTree('')  // empty prefix = root
+  } catch {
+    // If tree can't be fetched, everything will show as "added"
+  }
+
   const changes: BatchChangeEntry[] = []
 
   for (const collectionName of collectionNames) {
@@ -84,14 +92,13 @@ export default defineEventHandler(async (event) => {
       extensions: [`.${ext}`],
     }).filter(f => !f.isDirectory)
 
-    // List remote files (one API call per collection)
-    let remoteEntries: Array<{ name: string; path: string; sha: string; type: string }> = []
-    try {
-      remoteEntries = (await git.listDirectory(collection.folder))
-        .filter(e => e.type === 'file' && e.name.endsWith(`.${ext}`))
-    } catch {
-      // If directory doesn't exist remotely, all local files are "added"
-    }
+    // Filter the pre-fetched tree to this collection's folder
+    const prefix = collection.folder.endsWith('/')
+      ? collection.folder
+      : `${collection.folder}/`
+    const remoteEntries = fullTree.filter(
+      e => e.path.startsWith(prefix) && e.path.endsWith(`.${ext}`)
+    )
 
     // Build maps for comparison
     const remoteByPath = new Map(remoteEntries.map(e => [e.path, e.sha]))

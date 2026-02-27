@@ -307,6 +307,41 @@ export function createGitBackend(config: GitBackendConfig) {
   }
 
   /**
+   * Recursively list all files under a directory using the Git Trees API.
+   * Makes a single API call regardless of directory depth.
+   * Returns blob entries filtered to the requested prefix.
+   */
+  async function listTree(dirPath: string, branch: string = mainBranch): Promise<Array<{
+    path: string
+    sha: string
+    size: number
+    type: 'blob' | 'tree'
+  }>> {
+    try {
+      // Get the branch SHA
+      const branchSha = await getBranchSha(branch)
+      // Fetch the full tree recursively (single API call)
+      const res = await $fetch<any>(`${apiBase}/git/trees/${branchSha}?recursive=1`, { headers })
+      const blobs = (res.tree || []).filter((entry: any) => entry.type === 'blob')
+      const filtered = dirPath
+        ? blobs.filter((entry: any) => {
+            const prefix = dirPath.endsWith('/') ? dirPath : `${dirPath}/`
+            return entry.path.startsWith(prefix)
+          })
+        : blobs
+      return filtered.map((entry: any) => ({
+          path: entry.path,
+          sha: entry.sha,
+          size: entry.size || 0,
+          type: entry.type,
+        }))
+    } catch (err: any) {
+      if (err.statusCode === 404 || err.status === 404) return []
+      throw err
+    }
+  }
+
+  /**
    * Commit multiple files in a single atomic commit using the Git Data API.
    *
    * Uses the tree/commit API to batch all changes into one commit:
@@ -398,6 +433,7 @@ export function createGitBackend(config: GitBackendConfig) {
     commitEditorial,
     uploadFile,
     listDirectory,
+    listTree,
     commitMultiple,
   }
 }
