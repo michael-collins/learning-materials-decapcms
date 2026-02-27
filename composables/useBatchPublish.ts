@@ -33,8 +33,10 @@ export function useBatchPublish() {
   const changes = ref<ChangeEntry[]>([])
   const scanning = ref(false)
   const publishing = ref(false)
+  const discarding = ref(false)
   const scanError = ref<string | null>(null)
   const publishError = ref<string | null>(null)
+  const discardError = ref<string | null>(null)
   const lastResult = ref<BatchPublishResult | null>(null)
 
   const summary = computed(() => ({
@@ -147,12 +149,53 @@ export function useBatchPublish() {
     }
   }
 
+  /**
+   * Discard a single change by reverting it to the committed state.
+   * For modified/deleted files: git checkout HEAD -- <path>
+   * For added files: delete from disk
+   */
+  async function discardChange(path: string): Promise<boolean> {
+    const entry = changes.value.find(c => c.path === path)
+    if (!entry) return false
+
+    discarding.value = true
+    discardError.value = null
+
+    try {
+      const res = await $fetch<{
+        discarded: number
+        errors: Array<{ path: string; message: string }>
+      }>('/api/cms/content/discard', {
+        method: 'POST',
+        body: {
+          files: [{ path: entry.path, status: entry.status }],
+        },
+      })
+
+      if (res.errors.length > 0) {
+        discardError.value = res.errors[0]?.message ?? 'Unknown error'
+        return false
+      }
+
+      // Remove the discarded entry from the changes list
+      changes.value = changes.value.filter(c => c.path !== path)
+      return true
+    } catch (err: any) {
+      discardError.value = err.data?.message || err.message || 'Failed to discard change'
+      return false
+    } finally {
+      discarding.value = false
+    }
+  }
+
   return {
     changes: readonly(changes),
     scanning: readonly(scanning),
     publishing: readonly(publishing),
+    discarding: readonly(discarding),
     scanError: readonly(scanError),
     publishError: readonly(publishError),
+    discardError: readonly(discardError),
     lastResult: readonly(lastResult),
     summary,
     hasChanges,
@@ -161,5 +204,6 @@ export function useBatchPublish() {
     publishSelected,
     toggleSelection,
     selectAll,
+    discardChange,
   }
 }

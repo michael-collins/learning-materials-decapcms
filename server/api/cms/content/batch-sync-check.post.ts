@@ -7,8 +7,10 @@
  * Works in two modes:
  *
  * **Development (local files available):**
- * Uses git blob SHA comparison — computes the git-compatible SHA-1 hash
- * of each local file and compares it to the SHA from the GitHub Trees API.
+ * Compares working-tree files against the locally committed HEAD using
+ * git blob SHA-1 hashes. Only flags truly uncommitted changes — not
+ * branch-vs-branch differences when config.backend.branch differs
+ * from the checked-out branch.
  *
  * **Production / Netlify (no local files):**
  * Compares the tree at the deploy commit (COMMIT_REF) against the
@@ -24,6 +26,7 @@
  * - mode: 'local' | 'deployed'   — which comparison mode was used
  */
 import { createHash } from 'node:crypto'
+import { execSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import matter from 'gray-matter'
@@ -121,7 +124,26 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-// ─── Development mode: compare local files against GitHub tree ───
+// ─── Development mode: compare working tree against local git HEAD ───
+
+/**
+ * Parse the output of `git ls-tree -r HEAD` into an array of {path, sha}.
+ * Each line is formatted as: <mode> <type> <sha>\t<path>
+ */
+function parseGitLsTree(output: string): Array<{ path: string; sha: string }> {
+  return output
+    .split('\n')
+    .filter(Boolean)
+    .map(line => {
+      const tabIndex = line.indexOf('\t')
+      if (tabIndex === -1) return null
+      const meta = line.slice(0, tabIndex)
+      const path = line.slice(tabIndex + 1)
+      const sha = meta.split(/\s+/)[2]
+      return sha ? { path, sha } : null
+    })
+    .filter((e): e is { path: string; sha: string } => e !== null)
+}
 
 async function scanLocalVsRemote(
   git: ReturnType<typeof createGitBackend>,
@@ -130,11 +152,22 @@ async function scanLocalVsRemote(
 ) {
   const local = createLocalBackend({ rootDir: process.cwd() })
 
-  let fullTree: Array<{ path: string; sha: string }> = []
+  // Use the local git repo HEAD tree instead of fetching from GitHub.
+  // This ensures we only flag working-tree changes (uncommitted edits),
+  // not branch-vs-branch differences caused by config.backend.branch
+  // pointing to a different branch than what's checked out locally.
+  let headTree: Array<{ path: string; sha: string }> = []
   try {
-    fullTree = await git.listTree('')
+    const cwd = process.cwd()
+    const output = execSync('git ls-tree -r HEAD', { cwd, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 })
+    headTree = parseGitLsTree(output)
   } catch {
-    // If tree can't be fetched, everything will show as "added"
+    // If local git isn't available, fall back to GitHub tree
+    try {
+      headTree = await git.listTree('')
+    } catch {
+      // If tree can't be fetched, everything will show as "added"
+    }
   }
 
   const changes: BatchChangeEntry[] = []
@@ -154,11 +187,11 @@ async function scanLocalVsRemote(
     const prefix = collection.folder.endsWith('/')
       ? collection.folder
       : `${collection.folder}/`
-    const remoteEntries = fullTree.filter(
+    const committedEntries = headTree.filter(
       e => e.path.startsWith(prefix) && e.path.endsWith(`.${ext}`)
     )
 
-    const remoteByPath = new Map(remoteEntries.map(e => [e.path, e.sha]))
+    const committedByPath = new Map(committedEntries.map(e => [e.path, e.sha]))
     const localByPath = new Map<string, { content: string; path: string }>()
 
     for (const file of localFiles) {
@@ -170,7 +203,7 @@ async function scanLocalVsRemote(
 
     for (const [filePath, fileData] of localByPath) {
       const localSha = gitBlobSha(fileData.content)
-      const remoteSha = remoteByPath.get(filePath)
+      const committedSha = committedByPath.get(filePath)
       const slug = extractSlug(filePath, collection.folder, ext, pathPattern)
 
       let title: string | undefined
@@ -179,14 +212,14 @@ async function scanLocalVsRemote(
         title = parsed.data?.title
       } catch { /* ignore */ }
 
-      if (!remoteSha) {
+      if (!committedSha) {
         changes.push({ collection: collectionName, slug, path: filePath, status: 'added', title })
-      } else if (localSha !== remoteSha) {
+      } else if (localSha !== committedSha) {
         changes.push({ collection: collectionName, slug, path: filePath, status: 'modified', title })
       }
     }
 
-    for (const [filePath] of remoteByPath) {
+    for (const [filePath] of committedByPath) {
       if (!localByPath.has(filePath)) {
         const slug = extractSlug(filePath, collection.folder, ext, pathPattern)
         changes.push({ collection: collectionName, slug, path: filePath, status: 'deleted' })

@@ -7,7 +7,7 @@
  * Publish-to-GitHub flow includes a sync check to prevent
  * accidental overwrites when local and remote diverge.
  */
-import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2 } from 'lucide-vue-next'
+import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, GitBranch } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'cms',
@@ -25,7 +25,7 @@ const slug = computed(() => {
 const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
 const { save, publishToGitHub, loadRaw, saving, publishing, error: saveError, lastResult, isLocalBackend } = useCmsSave()
-const { prePublishCheck, pullFromGitHub, syncStatus, syncMessage, pulling, localVersion, remoteVersion } = useCmsSync()
+const { checkSync, prePublishCheck, pullFromGitHub, syncStatus, syncMessage, pulling, localVersion, remoteVersion } = useCmsSync()
 const { getToken, restoreSession } = useCmsAuth()
 
 const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
@@ -35,11 +35,64 @@ const loadError = ref<string | null>(null)
 const initialData = ref<Record<string, any> | null>(null)
 const loading = ref(true)
 
+/** Whether local content differs from what's on GitHub */
+const unpublishedChanges = ref(false)
+
 // ─── Sync conflict dialog state ─────────────────────────
 const showSyncDialog = ref(false)
 const showResolver = ref(false)
 /** The pending publish data (held while conflict dialog is open) */
 const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' } | null>(null)
+
+// ─── Version creation dialog state ──────────────────────
+const showVersionDialog = ref(false)
+
+/** Whether this collection has a version field (used to show/hide the Create Version button) */
+const hasVersionField = computed(() => {
+  return collection.value?.fields?.some((f: any) => f.name === 'version') ?? false
+})
+
+/** The current version from the loaded content (or form data) */
+const currentVersion = computed(() => {
+  return initialData.value?.version || '1.0.0'
+})
+
+/**
+ * Handle version creation — reload the content from disk since
+ * the server endpoint updated both index.md and created the snapshot.
+ */
+async function handleVersionCreated(data: { previousVersion: string; newVersion: string }) {
+  try {
+    const token = getToken()
+    const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
+      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+    })
+    initialData.value = {
+      ...res.frontmatter,
+      body: res.body,
+    }
+    // The file on disk changed, so mark as unpublished
+    unpublishedChanges.value = true
+  } catch (err: any) {
+    loadError.value = err.data?.message || err.message || 'Failed to reload content after version creation'
+  }
+}
+
+/**
+ * Background sync check — determines whether the locally saved
+ * content differs from GitHub so the Publish button stays active
+ * even when the form itself has no unsaved edits.
+ */
+async function checkUnpublishedChanges() {
+  try {
+    const result = await checkSync(collectionName.value, slug.value)
+    // Any status other than 'in-sync' means there are unpublished changes
+    unpublishedChanges.value = result.status !== 'in-sync'
+  } catch {
+    // If the check fails (e.g. no token), don't block the user
+    unpublishedChanges.value = false
+  }
+}
 
 // Load the existing content (frontmatter is parsed server-side to avoid
 // gray-matter's Node.js Buffer dependency in the browser)
@@ -55,6 +108,12 @@ onMounted(async () => {
     initialData.value = {
       ...res.frontmatter,
       body: res.body,
+    }
+
+    // Run a background sync check so the Publish button reflects
+    // whether saved-but-unpublished changes exist.
+    if (isLocalBackend.value) {
+      checkUnpublishedChanges()
     }
   } catch (err: any) {
     loadError.value = err.data?.message || err.message || 'Failed to load content'
@@ -74,6 +133,19 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
       publishMode: data.publishMode,
     })
     showSuccess.value = true
+
+    // Update initialData so the form's isDirty resets to false after
+    // "Continue Editing" — the form data now matches what's on disk.
+    initialData.value = {
+      ...data.frontmatter,
+      body: data.body,
+    }
+
+    // After a local save, the file now differs from GitHub,
+    // so the Publish button should stay active.
+    if (isLocalBackend.value) {
+      unpublishedChanges.value = true
+    }
   } catch {
     // Error is captured in the composable
   }
@@ -117,6 +189,8 @@ async function doPublish(data: { frontmatter: Record<string, any>; body: string;
     showSuccess.value = true
     showSyncDialog.value = false
     pendingPublish.value = null
+    // Content is now on GitHub — clear the unpublished flag
+    unpublishedChanges.value = false
   } catch {
     // Error is captured in the composable
   }
@@ -227,9 +301,23 @@ function handleResolverCancel() {
           {{ collection?.label || collectionName }}
         </span>
       </div>
-      <h1 class="text-2xl font-bold tracking-tight">
-        Edit: {{ initialData?.title || slug }}
-      </h1>
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold tracking-tight">
+          Edit: {{ initialData?.title || slug }}
+        </h1>
+
+        <!-- Create Version button (only for collections with version field) -->
+        <button
+          v-if="hasVersionField && initialData && !loading && !showSuccess"
+          type="button"
+          @click="showVersionDialog = true"
+          class="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent"
+          title="Create a new version of this content"
+        >
+          <GitBranch class="h-4 w-4" />
+          <span class="hidden sm:inline">v{{ currentVersion }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -321,6 +409,7 @@ function handleResolverCancel() {
       :publishing="publishing"
       :editorial-workflow="isEditorial"
       :local-backend="isLocalBackend"
+      :unpublished-changes="unpublishedChanges"
       @submit="handleSubmit"
       @publish="handlePublish"
     />
@@ -353,5 +442,15 @@ function handleResolverCancel() {
         />
       </div>
     </Teleport>
+
+    <!-- Create Version Dialog -->
+    <CmsCreateVersionDialog
+      v-if="hasVersionField"
+      v-model:open="showVersionDialog"
+      :collection="collectionName"
+      :slug="slug"
+      :current-version="currentVersion"
+      @version-created="handleVersionCreated"
+    />
   </div>
 </template>

@@ -25,6 +25,8 @@ const props = defineProps<{
   editorialWorkflow?: boolean
   /** Whether local backend is active (shows Publish to GitHub button) */
   localBackend?: boolean
+  /** Whether local content differs from GitHub (set by parent after sync-check) */
+  unpublishedChanges?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -169,6 +171,10 @@ const isDirty = computed(() => {
   return false
 })
 
+// Publish button should be active when the form has unsaved edits OR the
+// saved local content differs from what's on GitHub.
+const canPublish = computed(() => isDirty.value || !!props.unpublishedChanges)
+
 // ─── Layout state ───────────────────────────────────────
 const { width } = useWindowSize()
 const isDesktop = computed(() => width.value >= 1024)
@@ -293,6 +299,10 @@ const showPreview = ref(true)
             <span class="h-2 w-2 rounded-full bg-yellow-500" />
             Unsaved changes
           </span>
+          <span v-else-if="unpublishedChanges" class="flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-full bg-orange-500" />
+            Unpublished changes
+          </span>
           <span v-else class="flex items-center gap-1.5">
             <span class="h-2 w-2 rounded-full bg-green-500" />
             No changes
@@ -365,7 +375,7 @@ const showPreview = ref(true)
             <button
               type="button"
               @click="handlePublish('direct')"
-              :disabled="publishing || saving || !isDirty"
+              :disabled="publishing || saving || !canPublish"
               class="flex items-center gap-2 rounded-l-md border border-foreground/20 bg-background px-3 py-2 text-sm font-medium transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
             >
               <Loader2 v-if="publishing" class="h-4 w-4 animate-spin" />
@@ -374,7 +384,7 @@ const showPreview = ref(true)
             </button>
             <!-- Orange notification badge when there are unpublished changes -->
             <span
-              v-if="isDirty && !publishing"
+              v-if="canPublish && !publishing"
               class="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center"
             >
               <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
@@ -386,7 +396,7 @@ const showPreview = ref(true)
               <button
                 type="button"
                 @click="showPublishDropdown = !showPublishDropdown"
-                :disabled="publishing || saving || !isDirty"
+                :disabled="publishing || saving || !canPublish"
                 class="rounded-r-md border border-l-0 border-foreground/20 bg-background px-2 py-2 transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
               >
                 <ChevronDown class="h-4 w-4" />

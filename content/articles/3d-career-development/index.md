@@ -1,6 +1,6 @@
 ---
 title: 3D Career Development
-description: An overview of opportunities in 3D fields.
+description: An overview of opportunities available in 3D fields.
 author: Michael Collins
 date: '2026-01-21T21:27:00.000Z'
 license: CC BY 4.0

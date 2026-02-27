@@ -14,9 +14,7 @@
     "migrate:dry-run": "node scripts/migrate-content.js --dry-run",
     "migrate:verbose": "node scripts/migrate-content.js --verbose",
     "migrate:test": "node scripts/migrate-test.js",
-    "version:check": "node scripts/check-version-edits.js",
     "version:validate": "node scripts/validate-version-integrity.js",
-    "version:snapshot": "node scripts/create-version-snapshot.js",
     "prepare": "husky"
   },
   "dependencies": {

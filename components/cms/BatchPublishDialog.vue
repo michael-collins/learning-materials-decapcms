@@ -10,8 +10,9 @@ import {
   Upload, Loader2, RefreshCw, Check, X,
   FilePlus, FileDiff, FileX, GitPullRequest,
   ChevronDown, CheckCircle, ExternalLink,
-  AlertCircle, Package,
+  AlertCircle, Package, Eye, Undo2,
 } from 'lucide-vue-next'
+import type { VersionFileEntry } from './VersionProtectionDialog.vue'
 
 const props = defineProps<{
   open: boolean
@@ -27,8 +28,10 @@ const {
   changes,
   scanning,
   publishing,
+  discarding,
   scanError,
   publishError,
+  discardError,
   lastResult,
   summary,
   hasChanges,
@@ -37,10 +40,36 @@ const {
   publishSelected,
   toggleSelection,
   selectAll,
+  discardChange,
 } = useBatchPublish()
 
 // Dropdown for publish mode
 const showModeDropdown = ref(false)
+
+// Discard confirmation state — stores the path of the item awaiting confirmation
+const confirmDiscardPath = ref<string | null>(null)
+
+// ═══ Version protection state ═══
+const VERSION_FILE_PATTERN = /\/v\/\d+\.\d+\.\d+\.md$/
+const showVersionProtection = ref(false)
+const pendingPublishMode = ref<'direct' | 'draft'>('direct')
+
+/** Detect selected version snapshot files that are being modified */
+const selectedVersionFiles = computed<VersionFileEntry[]>(() => {
+  return changes.value
+    .filter(c => c.selected && c.status === 'modified' && VERSION_FILE_PATTERN.test(c.path))
+    .map(c => ({
+      path: c.path,
+      title: c.title,
+      collection: c.collection,
+      slug: c.slug,
+    }))
+})
+
+async function handleDiscard(path: string) {
+  confirmDiscardPath.value = null
+  await discardChange(path)
+}
 
 // Start scanning when dialog opens
 watch(
@@ -58,12 +87,34 @@ function close() {
 
 async function handlePublishDirect() {
   showModeDropdown.value = false
+  // Check for version file modifications before publishing
+  if (selectedVersionFiles.value.length > 0) {
+    pendingPublishMode.value = 'direct'
+    showVersionProtection.value = true
+    return
+  }
   await publishSelected({ publishMode: 'direct' })
 }
 
 async function handlePublishPR() {
   showModeDropdown.value = false
+  // Check for version file modifications before publishing
+  if (selectedVersionFiles.value.length > 0) {
+    pendingPublishMode.value = 'draft'
+    showVersionProtection.value = true
+    return
+  }
   await publishSelected({ publishMode: 'draft' })
+}
+
+/** Called when user confirms the version protection override */
+async function handleVersionOverride() {
+  showVersionProtection.value = false
+  await publishSelected({ publishMode: pendingPublishMode.value })
+}
+
+function handleVersionCancel() {
+  showVersionProtection.value = false
 }
 
 function statusIcon(status: string) {
@@ -256,20 +307,22 @@ function statusBadgeClass(status: string) {
         <!-- Scrollable file list -->
         <UiScrollArea class="flex-1 -mx-6 max-h-[45vh]">
           <div class="divide-y px-6">
-            <label
+            <div
               v-for="change in changes"
               :key="change.path"
-              class="flex cursor-pointer items-center gap-3 py-3 transition-colors hover:bg-muted/20"
+              class="group flex items-center gap-3 py-3 transition-colors hover:bg-muted/20"
               :class="{ 'opacity-50': change.status === 'deleted' }"
             >
               <!-- Checkbox -->
-              <input
-                type="checkbox"
-                :checked="change.selected"
-                :disabled="change.status === 'deleted'"
-                @change="toggleSelection(change.path)"
-                class="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-              />
+              <label class="flex cursor-pointer items-center">
+                <input
+                  type="checkbox"
+                  :checked="change.selected"
+                  :disabled="change.status === 'deleted'"
+                  @change="toggleSelection(change.path)"
+                  class="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                />
+              </label>
 
               <!-- Status icon -->
               <component
@@ -295,7 +348,53 @@ function statusBadgeClass(status: string) {
                   {{ change.collection }} / {{ change.slug }}
                 </p>
               </div>
-            </label>
+
+              <!-- View button (appears on hover) -->
+              <NuxtLink
+                v-if="change.status !== 'deleted'"
+                :to="`/cms/${change.collection}/edit/${change.slug}`"
+                @click.stop
+                class="shrink-0 rounded-md border p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
+                title="View / Edit"
+              >
+                <Eye class="h-3.5 w-3.5" />
+              </NuxtLink>
+
+              <!-- Discard button (appears on hover) -->
+              <button
+                v-if="confirmDiscardPath !== change.path"
+                type="button"
+                @click.stop="confirmDiscardPath = change.path"
+                :disabled="discarding"
+                class="shrink-0 rounded-md border p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 disabled:opacity-50"
+                title="Discard changes"
+              >
+                <Undo2 class="h-3.5 w-3.5" />
+              </button>
+
+              <!-- Discard confirmation inline -->
+              <div
+                v-if="confirmDiscardPath === change.path"
+                class="flex shrink-0 items-center gap-1"
+              >
+                <button
+                  type="button"
+                  @click.stop="handleDiscard(change.path)"
+                  :disabled="discarding"
+                  class="rounded-md bg-destructive px-2 py-1 text-[11px] font-medium text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+                >
+                  <Loader2 v-if="discarding" class="h-3 w-3 animate-spin" />
+                  <span v-else>Discard</span>
+                </button>
+                <button
+                  type="button"
+                  @click.stop="confirmDiscardPath = null"
+                  class="rounded-md border px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </UiScrollArea>
 
@@ -306,6 +405,15 @@ function statusBadgeClass(status: string) {
         >
           <AlertCircle class="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
           <p class="text-xs text-destructive">{{ publishError }}</p>
+        </div>
+
+        <!-- Discard error -->
+        <div
+          v-if="discardError"
+          class="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+          <p class="text-xs text-destructive">{{ discardError }}</p>
         </div>
 
         <!-- Action bar -->
@@ -387,4 +495,12 @@ function statusBadgeClass(status: string) {
       </template>
     </UiDialogContent>
   </UiDialog>
+
+  <!-- Version Protection Warning -->
+  <CmsVersionProtectionDialog
+    v-model:open="showVersionProtection"
+    :version-files="selectedVersionFiles"
+    @confirm="handleVersionOverride"
+    @cancel="handleVersionCancel"
+  />
 </template>
