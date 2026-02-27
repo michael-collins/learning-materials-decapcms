@@ -7,7 +7,7 @@
  * Publish-to-GitHub flow includes a sync check to prevent
  * accidental overwrites when local and remote diverge.
  */
-import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, Archive } from 'lucide-vue-next'
+import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, Archive, GitBranch, ChevronDown } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'cms',
@@ -53,6 +53,43 @@ const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; pub
 
 // ─── Version creation dialog state ──────────────────────
 const showVersionDialog = ref(false)
+
+// ─── Version switcher state ─────────────────────────────
+const showVersionSwitcher = ref(false)
+const versionList = ref<Array<{ version: string; versionStatus: string }>>([]) 
+const loadingVersions = ref(false)
+
+async function toggleVersionSwitcher() {
+  if (showVersionSwitcher.value) {
+    showVersionSwitcher.value = false
+    return
+  }
+  loadingVersions.value = true
+  try {
+    const token = getToken()
+    const data = await $fetch<{
+      currentVersion: string
+      versions: Array<{ version: string; versionStatus: string }>
+    }>('/api/cms/content/versions', {
+      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+    })
+    versionList.value = data.versions
+    showVersionSwitcher.value = true
+  } catch {
+    // Silently fail — button just won't open
+  } finally {
+    loadingVersions.value = false
+  }
+}
+
+function switchToVersion(version?: string) {
+  showVersionSwitcher.value = false
+  if (version) {
+    navigateTo(`/cms/${collectionName.value}/edit/${slug.value}?version=${version}`)
+  } else {
+    navigateTo(`/cms/${collectionName.value}/edit/${slug.value}`)
+  }
+}
 
 /** Whether this collection has a version field */
 const hasVersionField = computed(() => {
@@ -137,8 +174,10 @@ async function handleVersionCreated(data: { previousVersion: string; newVersion:
 async function checkUnpublishedChanges() {
   try {
     const result = await checkSync(collectionName.value, slug.value, editVersion.value)
-    // Any status other than 'in-sync' means there are unpublished changes
-    unpublishedChanges.value = result.status !== 'in-sync'
+    // Only 'diverged' means the user has local changes that differ from
+    // what's on GitHub. 'local-only' means the file was never on the
+    // remote branch (e.g. added on a feature branch) — not a CMS publish issue.
+    unpublishedChanges.value = result.status === 'diverged'
   } catch {
     // If the check fails (e.g. no token), don't block the user
     unpublishedChanges.value = false
@@ -421,6 +460,71 @@ async function handleDiscard() {
         <h1 class="text-2xl font-bold tracking-tight">
           Edit: {{ initialData?.title || slug }}
         </h1>
+
+        <!-- Version switcher (only for collections with a version field) -->
+        <div v-if="hasVersionField && initialData && !loading && !showSuccess" class="relative">
+          <button
+            type="button"
+            @click="toggleVersionSwitcher"
+            :disabled="loadingVersions"
+            class="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent disabled:opacity-50"
+          >
+            <Loader2 v-if="loadingVersions" class="h-3.5 w-3.5 animate-spin" />
+            <GitBranch v-else class="h-3.5 w-3.5" />
+            v{{ editVersion || currentVersion }}
+            <ChevronDown class="h-3 w-3 text-muted-foreground" />
+          </button>
+
+          <!-- Dropdown -->
+          <div
+            v-if="showVersionSwitcher"
+            class="absolute right-0 top-full z-30 mt-1 w-56 rounded-md border bg-popover p-1 shadow-lg"
+          >
+            <!-- Latest version -->
+            <button
+              type="button"
+              @click="switchToVersion()"
+              class="flex w-full items-center justify-between rounded-sm px-3 py-2 text-sm hover:bg-accent"
+              :class="{ 'bg-accent/50 font-medium': !editVersion }"
+            >
+              <span class="flex items-center gap-2">
+                <GitBranch class="h-3.5 w-3.5" />
+                v{{ currentVersion }}
+              </span>
+              <span class="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                latest
+              </span>
+            </button>
+
+            <!-- Archived versions -->
+            <template v-if="versionList.filter(v => v.versionStatus === 'archived').length">
+              <div class="my-1 border-t" />
+              <p class="px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Archived versions
+              </p>
+              <button
+                v-for="v in versionList.filter(v => v.versionStatus === 'archived').sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }))"
+                :key="v.version"
+                type="button"
+                @click="switchToVersion(v.version)"
+                class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                :class="{ 'bg-accent/50 font-medium': editVersion === v.version }"
+              >
+                <Archive class="h-3.5 w-3.5 text-muted-foreground" />
+                v{{ v.version }}
+              </button>
+            </template>
+          </div>
+
+          <!-- Click-outside -->
+          <Teleport to="body">
+            <div
+              v-if="showVersionSwitcher"
+              class="fixed inset-0 z-20"
+              @click="showVersionSwitcher = false"
+            />
+          </Teleport>
+        </div>
       </div>
     </div>
 
