@@ -153,6 +153,11 @@ function handleRawInput(e: Event) {
   emit('update:modelValue', rawMarkdown.value)
 }
 
+function handleCodeEditorUpdate(value: string) {
+  rawMarkdown.value = value
+  emit('update:modelValue', value)
+}
+
 // ─── Toolbar actions ───────────────────────────────────────
 function insertLink() {
   const url = window.prompt('Enter URL:')
@@ -406,16 +411,14 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
         <EditorContent :editor="editor" class="h-full" />
       </div>
 
-      <!-- Raw code editor (code mode) -->
+      <!-- Raw code editor (code mode) — CodeMirror with syntax highlighting -->
       <div v-if="viewMode === 'code'" class="relative min-h-[300px]">
-        <textarea
-          :value="rawMarkdown"
-          @input="handleRawInput"
-          class="h-full min-h-[400px] w-full resize-y bg-background px-4 py-3 font-mono text-sm outline-none"
+        <CmsEditorCodeEditor
+          v-model="rawMarkdown"
           placeholder="Write raw markdown..."
-          spellcheck="false"
+          @update:model-value="handleCodeEditorUpdate"
         />
-        <div class="absolute bottom-2 right-3 text-xs text-muted-foreground">
+        <div class="absolute bottom-2 right-3 z-10 rounded bg-background/80 px-1.5 py-0.5 text-xs text-muted-foreground backdrop-blur-sm">
           {{ lineCount }} lines · Raw Markdown
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   RefreshCw,
+  Upload,
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -25,8 +26,10 @@ definePageMeta({
 const route = useRoute()
 const collectionName = computed(() => route.params.collection as string)
 
-const { getCollection } = useCmsConfig()
+const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
+const isLocalBackend = computed(() => config.value?.localBackend ?? false)
+const showBatchPublish = ref(false)
 
 const {
   items,
@@ -88,6 +91,14 @@ function formatDate(date: string | undefined): string {
       </div>
 
       <div class="flex items-center gap-2">
+        <button
+          v-if="isLocalBackend"
+          class="flex items-center gap-2 rounded-md border border-foreground/20 bg-background px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+          @click="showBatchPublish = true"
+        >
+          <Upload class="h-4 w-4" />
+          <span class="hidden sm:inline">Publish Changes</span>
+        </button>
         <button
           class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent"
           @click="refresh()"
@@ -165,47 +176,56 @@ function formatDate(date: string | undefined): string {
         v-for="item in items"
         :key="item.id"
         :to="`/cms/${collectionName}/${item.slug}`"
-        class="group flex items-center gap-3 rounded-md border bg-card px-4 py-3 transition-colors hover:border-primary/50 hover:bg-accent/50"
+        custom
+        v-slot="{ navigate }"
       >
-        <!-- Icon -->
-        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
-          <FileText class="h-4 w-4 text-muted-foreground" />
-        </div>
-
-        <!-- Content -->
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-2">
-            <span class="truncate font-medium">{{ item.title }}</span>
-            <span
-              v-if="item.draft"
-              class="shrink-0 rounded bg-yellow-500/10 px-1.5 py-0.5 text-[10px] font-medium text-yellow-600 dark:text-yellow-400"
-            >
-              Draft
-            </span>
-            <span
-              v-if="item.version"
-              class="shrink-0 rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400"
-            >
-              v{{ item.version }}
-            </span>
+        <div
+          role="link"
+          tabindex="0"
+          class="cursor-pointer group flex items-center gap-3 rounded-md border bg-card px-4 py-3 transition-colors hover:border-primary/50 hover:bg-accent/50"
+          @click="navigate"
+          @keydown.enter="navigate"
+        >
+          <!-- Icon -->
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
+            <FileText class="h-4 w-4 text-muted-foreground" />
           </div>
-          <p v-if="item.description" class="mt-0.5 truncate text-xs text-muted-foreground">
-            {{ item.description }}
-          </p>
-        </div>
 
-        <!-- Meta -->
-        <div class="hidden shrink-0 items-center gap-4 text-xs text-muted-foreground sm:flex">
-          <span v-if="item.date">{{ formatDate(item.date) }}</span>
-          <!-- View on site -->
-          <NuxtLink
-            :to="item.path"
-            class="rounded p-1 opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
-            title="View on site"
-            @click.stop
-          >
-            <Eye class="h-3.5 w-3.5" />
-          </NuxtLink>
+          <!-- Content -->
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="truncate font-medium">{{ item.title }}</span>
+              <span
+                v-if="item.draft"
+                class="shrink-0 rounded bg-yellow-500/10 px-1.5 py-0.5 text-[10px] font-medium text-yellow-600 dark:text-yellow-400"
+              >
+                Draft
+              </span>
+              <span
+                v-if="item.version"
+                class="shrink-0 rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400"
+              >
+                v{{ item.version }}
+              </span>
+            </div>
+            <p v-if="item.description" class="mt-0.5 truncate text-xs text-muted-foreground">
+              {{ item.description }}
+            </p>
+          </div>
+
+          <!-- Meta -->
+          <div class="hidden shrink-0 items-center gap-4 text-xs text-muted-foreground sm:flex">
+            <span v-if="item.date">{{ formatDate(item.date) }}</span>
+            <!-- View on site -->
+            <NuxtLink
+              :to="item.path"
+              class="rounded p-1 opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
+              title="View on site"
+              @click.stop
+            >
+              <Eye class="h-3.5 w-3.5" />
+            </NuxtLink>
+          </div>
         </div>
       </NuxtLink>
     </div>
@@ -232,5 +252,11 @@ function formatDate(date: string | undefined): string {
         </button>
       </div>
     </div>
+
+    <!-- Batch Publish Dialog -->
+    <CmsBatchPublishDialog
+      v-model:open="showBatchPublish"
+      :collections="[collectionName]"
+    />
   </div>
 </template>

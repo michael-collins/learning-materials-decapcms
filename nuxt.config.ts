@@ -12,6 +12,17 @@ export default defineNuxtConfig({
     '@nuxt/icon'
   ],
 
+  // Runtime config — server-only secrets + public client keys
+  runtimeConfig: {
+    // Server-only (never exposed to client)
+    githubClientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+    // Public (available on client)
+    public: {
+      githubClientId: process.env.GITHUB_CLIENT_ID || '',
+      siteUrl: process.env.SITE_URL || 'http://localhost:3000',
+    },
+  },
+
   vue: {
     compilerOptions: {
       isCustomElement: (tag) => tag === 'model-viewer'

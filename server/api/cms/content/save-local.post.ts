@@ -11,13 +11,12 @@
  * - body: markdown body content
  * - isNew: boolean indicating new content creation
  */
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
-import { resolve, dirname } from 'node:path'
 import matter from 'gray-matter'
 import {
   findCollection,
   getPathPattern,
 } from '~/lib/cms/config-parser'
+import { createLocalBackend } from '~/lib/cms/local-backend'
 import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
@@ -48,41 +47,37 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Build the file path
+  // Build the relative file path
   const pathPattern = getPathPattern(collection)
   const ext = collection.extension || 'md'
 
-  let filePath: string
+  let relativePath: string
   if (pathPattern) {
     const resolvedPath = pathPattern.replace('{{slug}}', slug)
-    filePath = resolve(process.cwd(), collection.folder, `${resolvedPath}.${ext}`)
+    relativePath = `${collection.folder}/${resolvedPath}.${ext}`
   } else {
-    filePath = resolve(process.cwd(), collection.folder, `${slug}.${ext}`)
+    relativePath = `${collection.folder}/${slug}.${ext}`
   }
 
+  const local = createLocalBackend({ rootDir: process.cwd() })
+
   // Prevent overwriting existing files when creating new content
-  if (isNew && existsSync(filePath)) {
+  if (isNew && local.fileExists(relativePath)) {
     throw createError({
       statusCode: 409,
-      message: `A file already exists at "${filePath}". Choose a different slug.`,
+      message: `A file already exists at "${relativePath}". Choose a different slug.`,
     })
   }
 
   // Build the markdown file content using gray-matter
   const fileContent = matter.stringify(content || '', frontmatter || {})
 
-  // Ensure the directory exists
-  const dir = dirname(filePath)
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true })
-  }
-
   // Write the file
-  writeFileSync(filePath, fileContent, 'utf-8')
+  const result = local.writeFile(relativePath, fileContent)
 
   return {
     success: true,
-    path: filePath,
+    path: result.fullPath,
     collection: collectionName,
     slug,
   }

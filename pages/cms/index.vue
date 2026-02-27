@@ -9,6 +9,7 @@ import {
   FolderOpen,
   ArrowRight,
   RefreshCw,
+  Upload,
 } from 'lucide-vue-next'
 import type { CmsCollection } from '~/lib/cms/config-types'
 
@@ -64,6 +65,10 @@ const groupIcons: Record<string, any> = {
 const totalItems = computed(() =>
   Object.values(collectionCounts.value).reduce((sum, n) => sum + n, 0)
 )
+
+// Batch publish dialog
+const showBatchPublish = ref(false)
+const isLocalBackend = computed(() => config.value?.localBackend ?? false)
 </script>
 
 <template>
@@ -76,13 +81,23 @@ const totalItems = computed(() =>
           Manage your learning materials content
         </p>
       </div>
-      <button
-        class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent"
-        @click="refresh(); fetchCounts()"
-      >
-        <RefreshCw class="h-4 w-4" />
-        Refresh
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="isLocalBackend"
+          class="flex items-center gap-2 rounded-md border border-foreground/20 bg-background px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+          @click="showBatchPublish = true"
+        >
+          <Upload class="h-4 w-4" />
+          Publish Changes
+        </button>
+        <button
+          class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent"
+          @click="refresh(); fetchCounts()"
+        >
+          <RefreshCw class="h-4 w-4" />
+          Refresh
+        </button>
+      </div>
     </div>
 
     <!-- Stats Row -->
@@ -159,5 +174,10 @@ const totalItems = computed(() =>
         <div v-for="i in 6" :key="i" class="h-28 animate-pulse rounded-lg bg-muted" />
       </div>
     </div>
+
+    <!-- Batch Publish Dialog -->
+    <CmsBatchPublishDialog
+      v-model:open="showBatchPublish"
+    />
   </div>
 </template>

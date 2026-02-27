@@ -15,7 +15,8 @@ const collectionName = computed(() => route.params.collection as string)
 
 const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
-const { save, saving, error: saveError, lastResult, isLocalBackend } = useCmsSave()
+const { save, publishToGitHub, saving, publishing, error: saveError, lastResult, isLocalBackend } = useCmsSave()
+const { prePublishCheck, syncStatus, syncMessage, pulling, pullFromGitHub, localVersion, remoteVersion } = useCmsSync()
 
 const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
@@ -23,6 +24,9 @@ const slugOverride = ref('')
 const slugFromTitle = ref('')
 const slugManualMode = ref(false)
 const showSuccess = ref(false)
+const showSyncDialog = ref(false)
+const showResolver = ref(false)
+const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' } | null>(null)
 
 // The effective slug: manual override if set, otherwise auto-generated from title
 const effectiveSlug = computed(() => {
@@ -68,6 +72,91 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
     // Error is captured in the composable
   }
 }
+
+async function handlePublish(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }) {
+  const slug = effectiveSlug.value || generateSlug(data.frontmatter.title || 'untitled')
+
+  if (!slug) {
+    return
+  }
+
+  pendingPublish.value = { ...data }
+
+  try {
+    const check = await prePublishCheck(collectionName.value, slug)
+
+    if (check.safe) {
+      await doPublish(data, slug)
+    } else {
+      showSyncDialog.value = true
+    }
+  } catch {
+    showSyncDialog.value = true
+  }
+}
+
+async function doPublish(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }, slug?: string) {
+  const resolvedSlug = slug || effectiveSlug.value || generateSlug(data.frontmatter.title || 'untitled')
+  if (!resolvedSlug) return
+
+  try {
+    await publishToGitHub({
+      collection: collectionName.value,
+      slug: resolvedSlug,
+      frontmatter: data.frontmatter,
+      body: data.body,
+      isNew: true,
+      publishMode: data.publishMode,
+    })
+    showSuccess.value = true
+    showSyncDialog.value = false
+    pendingPublish.value = null
+  } catch {
+    // Error captured in composable
+  }
+}
+
+function handleForcePublish() {
+  if (pendingPublish.value) {
+    doPublish(pendingPublish.value)
+  }
+}
+
+function handleSyncCancel() {
+  showSyncDialog.value = false
+  pendingPublish.value = null
+}
+
+function handleResolveOpen() {
+  showSyncDialog.value = false
+  showResolver.value = true
+}
+
+async function handleResolved(merged: { frontmatter: Record<string, any>; body: string }) {
+  showResolver.value = false
+  const slug = effectiveSlug.value || generateSlug(merged.frontmatter.title || 'untitled')
+  if (!slug) return
+
+  try {
+    await publishToGitHub({
+      collection: collectionName.value,
+      slug,
+      frontmatter: merged.frontmatter,
+      body: merged.body,
+      isNew: true,
+      publishMode: pendingPublish.value?.publishMode,
+    })
+    showSuccess.value = true
+    pendingPublish.value = null
+  } catch {
+    // Error captured in composable
+  }
+}
+
+function handleResolverCancel() {
+  showResolver.value = false
+  showSyncDialog.value = true
+}
 </script>
 
 <template>
@@ -109,7 +198,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
               Content has been committed directly to {{ lastResult.branch }}.
             </template>
             <template v-else>
-              Content has been saved locally.
+              Content has been saved locally. Use the <strong>Publish to GitHub</strong> button to push changes to the repository.
             </template>
           </p>
 
@@ -185,8 +274,11 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
         :collection="collection"
         :is-new="true"
         :saving="saving"
+        :publishing="publishing"
         :editorial-workflow="isEditorial"
+        :local-backend="isLocalBackend"
         @submit="handleSubmit"
+        @publish="handlePublish"
         @update:title="onTitleUpdate"
       />
     </template>
@@ -195,5 +287,34 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
     <div v-if="!collection" class="py-8 text-center">
       <p class="text-muted-foreground">Collection "{{ collectionName }}" not found.</p>
     </div>
+
+    <!-- Sync Conflict Dialog -->
+    <CmsSyncConflictDialog
+      v-model:open="showSyncDialog"
+      :sync-status="String(syncStatus)"
+      :sync-message="String(syncMessage)"
+      :pulling="pulling"
+      :publishing="publishing"
+      :can-resolve="!!(localVersion && remoteVersion)"
+      @force-publish="handleForcePublish"
+      @pull="handleSyncCancel"
+      @resolve="handleResolveOpen"
+      @cancel="handleSyncCancel"
+    />
+
+    <!-- Conflict Resolver (full-screen overlay) -->
+    <Teleport to="body">
+      <div
+        v-if="showResolver && localVersion && remoteVersion"
+        class="fixed inset-0 z-50 flex flex-col bg-background"
+      >
+        <CmsConflictResolver
+          :local-version="localVersion"
+          :remote-version="remoteVersion"
+          @resolve="handleResolved"
+          @cancel="handleResolverCancel"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>

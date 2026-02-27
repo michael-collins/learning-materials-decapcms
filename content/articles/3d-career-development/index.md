@@ -2,12 +2,11 @@
 title: 3D Career Development
 description: An overview of opportunities in 3D fields.
 author: Michael Collins
-authorUrl: https://michaelcollins.xyz
-date: 2026-01-21T16:27:00.000-05:00
+date: '2026-01-21T21:27:00.000Z'
 license: CC BY 4.0
 allowEmbed: true
-version: '1.0.0'
-versionStatus: latest
+prerequisites: []
+attachments: []
 ---
 ## Animation, VFX, and Game Industry
 

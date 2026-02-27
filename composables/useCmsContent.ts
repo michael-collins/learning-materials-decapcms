@@ -94,6 +94,9 @@ export function useCmsContent(
   const filteredItems = computed(() => {
     let items = allItems.value ?? []
 
+    // Exclude version files (e.g. /tutorials/foo/v/0.9.0)
+    items = items.filter((item) => !/\/v\/[^/]+$/.test(item.path))
+
     // Search filter
     if (search.value) {
       const q = search.value.toLowerCase()

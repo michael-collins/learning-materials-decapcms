@@ -4,6 +4,7 @@
  * Handles the full save flow:
  * - In dev mode (local_backend): saves directly to filesystem
  * - In production: saves via GitHub API (branch + PR in editorial workflow)
+ * - "Publish to GitHub" — always pushes to GitHub, even in local backend mode
  *
  * Provides loading/error/success states and result metadata (PR URL, etc.).
  */
@@ -25,6 +26,7 @@ export function useCmsSave() {
   const { getToken } = useCmsAuth()
 
   const saving = ref(false)
+  const publishing = ref(false)
   const error = ref<string | null>(null)
   const lastResult = ref<SaveResult | null>(null)
 
@@ -34,7 +36,8 @@ export function useCmsSave() {
   })
 
   /**
-   * Save content (create or update)
+   * Save content (create or update).
+   * Routes to local filesystem in dev mode, GitHub API in production.
    */
   async function save(options: {
     collection: string
@@ -75,34 +78,7 @@ export function useCmsSave() {
         }
       } else {
         // ─── GitHub API save ───
-        const token = getToken()
-        if (!token) {
-          throw new Error('Not authenticated. Please log in first.')
-        }
-
-        const res = await $fetch<any>('/api/cms/content/save', {
-          method: 'POST',
-          body: {
-            collection: options.collection,
-            slug: options.slug,
-            frontmatter: options.frontmatter,
-            body: options.body,
-            isNew: options.isNew ?? false,
-            token,
-            message: options.commitMessage,
-            publishMode: options.publishMode,
-          },
-        })
-
-        result = {
-          success: true,
-          mode: res.mode,
-          collection: options.collection,
-          slug: options.slug,
-          branch: res.branch,
-          prUrl: res.prUrl,
-          prNumber: res.prNumber,
-        }
+        result = await _saveToGitHub(options)
       }
 
       lastResult.value = result
@@ -113,6 +89,78 @@ export function useCmsSave() {
       throw new Error(msg)
     } finally {
       saving.value = false
+    }
+  }
+
+  /**
+   * Publish content to GitHub — always uses the GitHub API,
+   * even when running with local backend in dev mode.
+   *
+   * This lets developers save locally (fast iteration) and then
+   * push to the repo when ready.
+   */
+  async function publishToGitHub(options: {
+    collection: string
+    slug: string
+    frontmatter: Record<string, any>
+    body: string
+    isNew?: boolean
+    commitMessage?: string
+    publishMode?: 'draft' | 'direct'
+  }): Promise<SaveResult> {
+    publishing.value = true
+    error.value = null
+
+    try {
+      const result = await _saveToGitHub(options)
+      lastResult.value = result
+      return result
+    } catch (err: any) {
+      const msg = err.data?.message || err.message || 'Publish to GitHub failed'
+      error.value = msg
+      throw new Error(msg)
+    } finally {
+      publishing.value = false
+    }
+  }
+
+  /**
+   * Internal: saves content via the GitHub API endpoint.
+   */
+  async function _saveToGitHub(options: {
+    collection: string
+    slug: string
+    frontmatter: Record<string, any>
+    body: string
+    isNew?: boolean
+    commitMessage?: string
+    publishMode?: 'draft' | 'direct'
+  }): Promise<SaveResult> {
+    const token = getToken()
+    // token may be null for OAuth (server reads from cookie)
+
+    const res = await $fetch<any>('/api/cms/content/save', {
+      method: 'POST',
+      body: {
+        collection: options.collection,
+        slug: options.slug,
+        frontmatter: options.frontmatter,
+        body: options.body,
+        isNew: options.isNew ?? false,
+        token,
+        message: options.commitMessage,
+        publishMode: options.publishMode,
+      },
+    })
+
+    return {
+      success: true,
+      mode: res.mode,
+      collection: options.collection,
+      slug: options.slug,
+      branch: res.branch,
+      prUrl: res.prUrl,
+      prNumber: res.prNumber,
     }
   }
 
@@ -132,8 +180,10 @@ export function useCmsSave() {
 
   return {
     save,
+    publishToGitHub,
     loadRaw,
     saving: readonly(saving),
+    publishing: readonly(publishing),
     error: readonly(error),
     lastResult: readonly(lastResult),
     isLocalBackend,

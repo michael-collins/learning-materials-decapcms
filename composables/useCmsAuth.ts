@@ -1,19 +1,24 @@
 /**
  * CMS Authentication composable.
  *
- * Phase 0: Simple token-based auth supporting:
- *   - GitHub Personal Access Token (stored in localStorage)
- *   - Environment variable token (for server-side operations)
+ * Supports two authentication methods:
+ *   1. GitHub OAuth — "Login with GitHub" button → server-side OAuth flow
+ *      - Token stored in httpOnly session cookie (server-side)
+ *      - Client only sees user profile, never the token
+ *   2. GitHub Personal Access Token — manual PAT entry
+ *      - Token stored in localStorage (client-side)
+ *      - Used as fallback / development mode
  *
- * Phase 2+ will add full GitHub OAuth flow.
+ * The composable exposes a unified interface regardless of auth method.
  */
 import { ref, computed, readonly } from 'vue'
 
-interface CmsUser {
+export interface CmsUser {
   login: string
   name: string
   avatarUrl: string
-  token: string
+  /** Auth method used */
+  authMethod: 'oauth' | 'pat'
 }
 
 const TOKEN_KEY = 'cms-github-token'
@@ -22,12 +27,29 @@ const TOKEN_KEY = 'cms-github-token'
 const user = ref<CmsUser | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const _patToken = ref<string | null>(null)
 
 export function useCmsAuth() {
   const isAuthenticated = computed(() => !!user.value)
 
   /**
-   * Validate a GitHub token and fetch user info
+   * Check if GitHub OAuth is configured (client ID available)
+   */
+  const isOAuthAvailable = computed(() => {
+    const config = useRuntimeConfig()
+    return !!config.public.githubClientId
+  })
+
+  /**
+   * Initiate GitHub OAuth login.
+   * Redirects the browser to the OAuth endpoint which then redirects to GitHub.
+   */
+  function loginWithOAuth() {
+    window.location.href = '/api/cms/auth/github'
+  }
+
+  /**
+   * Validate a GitHub PAT and fetch user info
    */
   async function validateToken(token: string): Promise<CmsUser> {
     const res = await $fetch<{ login: string; name: string; avatar_url: string }>(
@@ -44,7 +66,7 @@ export function useCmsAuth() {
       login: res.login,
       name: res.name || res.login,
       avatarUrl: res.avatar_url,
-      token,
+      authMethod: 'pat',
     }
   }
 
@@ -57,6 +79,7 @@ export function useCmsAuth() {
 
     try {
       user.value = await validateToken(token)
+      _patToken.value = token
       if (import.meta.client) {
         localStorage.setItem(TOKEN_KEY, token)
       }
@@ -71,20 +94,40 @@ export function useCmsAuth() {
   }
 
   /**
-   * Restore session from localStorage
+   * Restore session from either OAuth cookie or localStorage PAT.
+   * Called on app mount and CMS page navigation.
    */
   async function restoreSession() {
     if (import.meta.server || user.value) return
 
-    const savedToken = localStorage.getItem(TOKEN_KEY)
-    if (!savedToken) return
-
     isLoading.value = true
     try {
+      // 1. Check for OAuth session (server-side cookie)
+      const session = await $fetch<{
+        authenticated: boolean
+        user: { login: string; name: string; avatarUrl: string; githubId: number } | null
+      }>('/api/cms/auth/session')
+
+      if (session.authenticated && session.user) {
+        user.value = {
+          login: session.user.login,
+          name: session.user.name,
+          avatarUrl: session.user.avatarUrl,
+          authMethod: 'oauth',
+        }
+        return
+      }
+
+      // 2. Fallback: check localStorage for PAT
+      const savedToken = localStorage.getItem(TOKEN_KEY)
+      if (!savedToken) return
+
       user.value = await validateToken(savedToken)
+      _patToken.value = savedToken
     } catch {
       // Token expired or revoked — clear it
       localStorage.removeItem(TOKEN_KEY)
+      _patToken.value = null
       user.value = null
     } finally {
       isLoading.value = false
@@ -92,28 +135,46 @@ export function useCmsAuth() {
   }
 
   /**
-   * Log out and clear stored token
+   * Log out — clears both OAuth session and PAT
    */
-  function logout() {
-    user.value = null
-    error.value = null
+  async function logout() {
+    // Clear OAuth session cookie via server
+    try {
+      await $fetch('/api/cms/auth/logout', { method: 'POST' })
+    } catch {
+      // Ignore errors (e.g., no session to clear)
+    }
+
+    // Clear PAT from localStorage
     if (import.meta.client) {
       localStorage.removeItem(TOKEN_KEY)
     }
+
+    user.value = null
+    _patToken.value = null
+    error.value = null
   }
 
   /**
-   * Get the current auth token (for API calls)
+   * Get the current auth token for API calls.
+   *
+   * - OAuth mode: returns null (token is in httpOnly cookie, server reads it directly)
+   * - PAT mode: returns the PAT string
+   *
+   * API endpoints should use `extractAuthToken()` server-side to get the token
+   * from either the cookie or the request body.
    */
   function getToken(): string | null {
-    return user.value?.token ?? null
+    return _patToken.value ?? null
   }
 
   return {
     user: readonly(user),
     isAuthenticated,
+    isOAuthAvailable,
     isLoading: readonly(isLoading),
     error: readonly(error),
+    loginWithOAuth,
     loginWithToken,
     restoreSession,
     logout,

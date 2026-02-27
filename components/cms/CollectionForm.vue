@@ -7,7 +7,7 @@
  */
 import type { CmsFieldDef, CmsCollectionDef } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
-import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff } from 'lucide-vue-next'
+import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -19,12 +19,17 @@ const props = defineProps<{
   isNew?: boolean
   /** Whether save is in progress */
   saving?: boolean
+  /** Whether GitHub publish is in progress */
+  publishing?: boolean
   /** Whether editorial workflow is enabled */
   editorialWorkflow?: boolean
+  /** Whether local backend is active (shows Publish to GitHub button) */
+  localBackend?: boolean
 }>()
 
 const emit = defineEmits<{
   submit: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
+  publish: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
   'update:title': [title: string]
 }>()
 
@@ -113,6 +118,7 @@ function validate(): boolean {
 
 // ─── Submit ─────────────────────────────────────────────
 const showSaveDropdown = ref(false)
+const showPublishDropdown = ref(false)
 
 function handleSubmit(publishMode?: 'draft' | 'direct') {
   if (!validate()) return
@@ -122,6 +128,19 @@ function handleSubmit(publishMode?: 'draft' | 'direct') {
   const frontmatter = { ...formData }
 
   emit('submit', {
+    frontmatter,
+    body: bodyContent.value,
+    publishMode,
+  })
+}
+
+function handlePublish(publishMode?: 'draft' | 'direct') {
+  if (!validate()) return
+  showPublishDropdown.value = false
+
+  const frontmatter = { ...formData }
+
+  emit('publish', {
     frontmatter,
     body: bodyContent.value,
     publishMode,
@@ -331,17 +350,75 @@ const showPreview = ref(true)
           </Teleport>
         </div>
 
-        <!-- Non-editorial: simple save button -->
-        <button
-          v-else
-          type="submit"
-          :disabled="saving || !isDirty"
-          class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
-        >
-          <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
-          <Save v-else class="h-4 w-4" />
-          {{ saving ? 'Saving...' : isNew ? 'Create' : 'Save' }}
-        </button>
+        <!-- Non-editorial: save button + optional Publish to GitHub -->
+        <div v-else class="flex items-center gap-3">
+          <!-- Publish to GitHub (only in local backend mode) -->
+          <div v-if="localBackend" class="flex items-center">
+            <button
+              type="button"
+              @click="handlePublish('direct')"
+              :disabled="publishing || saving"
+              class="flex items-center gap-2 rounded-l-md border border-foreground/20 bg-background px-3 py-2 text-sm font-medium transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
+            >
+              <Loader2 v-if="publishing" class="h-4 w-4 animate-spin" />
+              <Upload v-else class="h-4 w-4" />
+              {{ publishing ? 'Publishing...' : 'Publish to GitHub' }}
+            </button>
+
+            <!-- Dropdown for editorial option -->
+            <div class="relative">
+              <button
+                type="button"
+                @click="showPublishDropdown = !showPublishDropdown"
+                :disabled="publishing || saving"
+                class="rounded-r-md border border-l-0 border-foreground/20 bg-background px-2 py-2 transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
+              >
+                <ChevronDown class="h-4 w-4" />
+              </button>
+
+              <div
+                v-if="showPublishDropdown"
+                class="absolute bottom-full right-0 mb-2 w-52 rounded-md border bg-popover p-1 shadow-lg"
+              >
+                <button
+                  type="button"
+                  @click="handlePublish('direct')"
+                  class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                >
+                  <Upload class="h-4 w-4" />
+                  Commit to main
+                </button>
+                <button
+                  type="button"
+                  @click="handlePublish('draft')"
+                  class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                >
+                  <GitPullRequest class="h-4 w-4" />
+                  Create Pull Request
+                </button>
+              </div>
+            </div>
+
+            <Teleport to="body">
+              <div
+                v-if="showPublishDropdown"
+                class="fixed inset-0 z-9"
+                @click="showPublishDropdown = false"
+              />
+            </Teleport>
+          </div>
+
+          <!-- Save button -->
+          <button
+            type="submit"
+            :disabled="saving || publishing || !isDirty"
+            class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+          >
+            <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
+            <Save v-else class="h-4 w-4" />
+            {{ saving ? 'Saving...' : isNew ? 'Create' : 'Save' }}
+          </button>
+        </div>
       </div>
     </div>
   </form>

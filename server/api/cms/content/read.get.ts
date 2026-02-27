@@ -8,10 +8,9 @@
  * - collection: collection name
  * - slug: content item slug
  */
-import { readFileSync, existsSync } from 'node:fs'
-import { resolve, join } from 'node:path'
 import matter from 'gray-matter'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
+import { createLocalBackend } from '~/lib/cms/local-backend'
 import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler((event) => {
@@ -43,27 +42,27 @@ export default defineEventHandler((event) => {
     })
   }
 
-  // Build the file path using the path pattern from config
+  // Build the relative file path using the path pattern from config
   const pathPattern = getPathPattern(collection)
   const ext = collection.extension || 'md'
 
-  let filePath: string
+  let relativePath: string
   if (pathPattern) {
-    // e.g., "{{slug}}/index" → "{slug}/index.md"
     const resolvedPath = pathPattern.replace('{{slug}}', slug)
-    filePath = resolve(process.cwd(), collection.folder, `${resolvedPath}.${ext}`)
+    relativePath = `${collection.folder}/${resolvedPath}.${ext}`
   } else {
-    filePath = resolve(process.cwd(), collection.folder, `${slug}.${ext}`)
+    relativePath = `${collection.folder}/${slug}.${ext}`
   }
 
-  if (!existsSync(filePath)) {
+  const local = createLocalBackend({ rootDir: process.cwd() })
+  const raw = local.readFile(relativePath)
+
+  if (raw === null) {
     throw createError({
       statusCode: 404,
-      message: `File not found: ${filePath}`,
+      message: `File not found: ${relativePath}`,
     })
   }
-
-  const raw = readFileSync(filePath, 'utf-8')
 
   // Parse frontmatter server-side so the client doesn't need gray-matter
   // (gray-matter uses Node.js Buffer which is not available in the browser)
@@ -73,7 +72,7 @@ export default defineEventHandler((event) => {
     raw,
     frontmatter: parsed.data,
     body: parsed.content.trim(),
-    path: filePath,
+    path: local.resolvePath(relativePath),
     collection: collectionName,
     slug,
   }

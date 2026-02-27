@@ -7,13 +7,16 @@
  * - Default: creates branch + commit + PR (draft)
  * - publishMode: 'direct' commits straight to main (bypasses editorial)
  *
+ * Auth: Token is resolved from either the OAuth session cookie
+ * or the `token` field in the request body (PAT mode).
+ *
  * Body:
  * - collection: collection name
  * - slug: content item slug
  * - frontmatter: object of frontmatter fields
  * - body: markdown body content
  * - isNew: boolean
- * - token: GitHub PAT
+ * - token: GitHub PAT (optional — used as fallback if no OAuth session)
  * - message: optional commit message
  * - publishMode: 'draft' | 'direct' (default: uses config publish_mode)
  */
@@ -22,7 +25,9 @@ import {
   findCollection,
   getPathPattern,
 } from '~/lib/cms/config-parser'
+import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -32,17 +37,20 @@ export default defineEventHandler(async (event) => {
     frontmatter,
     body: content,
     isNew,
-    token,
+    token: bodyToken,
     message: commitMessage,
     publishMode,
   } = body
 
-  if (!collectionName || !slug || !token) {
+  if (!collectionName || !slug) {
     throw createError({
       statusCode: 400,
-      message: 'Missing required fields: collection, slug, token',
+      message: 'Missing required fields: collection, slug',
     })
   }
+
+  // Resolve token from OAuth session cookie or request body
+  const token = extractAuthToken(event, bodyToken)
 
   const config = parseCmsConfigFromFile()
   const collection = findCollection(config, collectionName)
@@ -70,131 +78,69 @@ export default defineEventHandler(async (event) => {
   const fileContent = matter.stringify(content || '', frontmatter || {})
   const encodedContent = Buffer.from(fileContent).toString('base64')
 
-  const { repo, branch: mainBranch } = config.backend
-  const [owner, repoName] = repo.split('/')
+  const { owner, repo } = parseRepo(config.backend.repo)
+  const mainBranch = config.backend.branch
+
   const useEditorialWorkflow = publishMode === 'direct'
     ? false
     : publishMode === 'draft'
       ? true
       : config.publish_mode === 'editorial_workflow'
 
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json',
-  }
-
-  const apiBase = `https://api.github.com/repos/${owner}/${repoName}`
+  // Create git backend instance
+  const git = createGitBackend({ owner, repo, branch: mainBranch, token })
 
   try {
     if (useEditorialWorkflow) {
       // ─── Editorial Workflow: branch → commit → PR ───
-
-      // 1. Get the latest commit SHA on main
-      const refRes = await $fetch<any>(`${apiBase}/git/ref/heads/${mainBranch}`, { headers })
-      const mainSha = refRes.object.sha
-
-      // 2. Create a new branch
       const branchName = `cms/${collectionName}/${slug}-${Date.now()}`
-      await $fetch(`${apiBase}/git/refs`, {
-        method: 'POST',
-        headers,
-        body: { ref: `refs/heads/${branchName}`, sha: mainSha },
-      })
-
-      // 3. Get existing file SHA (if editing)
-      let existingFileSha: string | undefined
-      if (!isNew) {
-        try {
-          const fileRes = await $fetch<any>(
-            `${apiBase}/contents/${repoFilePath}?ref=${mainBranch}`,
-            { headers }
-          )
-          existingFileSha = fileRes.sha
-        } catch {
-          // File doesn't exist yet, that's ok
-        }
-      }
-
-      // 4. Commit the file to the branch
       const defaultMessage = isNew
         ? `feat: create ${collectionName}/${slug}`
         : `feat: update ${collectionName}/${slug}`
 
-      await $fetch(`${apiBase}/contents/${repoFilePath}`, {
-        method: 'PUT',
-        headers,
-        body: {
-          message: commitMessage || defaultMessage,
-          content: encodedContent,
-          branch: branchName,
-          ...(existingFileSha ? { sha: existingFileSha } : {}),
-        },
-      })
-
-      // 5. Create a Pull Request
       const prTitle = isNew
         ? `Create ${collection.label}: ${frontmatter?.title || slug}`
         : `Update ${collection.label}: ${frontmatter?.title || slug}`
 
-      const prRes = await $fetch<any>(`${apiBase}/pulls`, {
-        method: 'POST',
-        headers,
-        body: {
-          title: prTitle,
-          head: branchName,
-          base: mainBranch,
-          body: `Submitted via Custom CMS\n\n**Collection:** ${collection.label}\n**Slug:** ${slug}\n**Action:** ${isNew ? 'Created' : 'Updated'}`,
-        },
+      const result = await git.commitEditorial({
+        path: repoFilePath,
+        content: encodedContent,
+        message: commitMessage || defaultMessage,
+        branchName,
+        prTitle,
+        prBody: `Submitted via Custom CMS\n\n**Collection:** ${collection.label}\n**Slug:** ${slug}\n**Action:** ${isNew ? 'Created' : 'Updated'}`,
+        isNew: isNew ?? false,
+        labels: ['cms', 'draft', collectionName],
       })
 
       return {
         success: true,
-        mode: 'editorial',
+        mode: result.mode,
         collection: collectionName,
         slug,
-        branch: branchName,
-        prUrl: prRes.html_url,
-        prNumber: prRes.number,
+        branch: result.branch,
+        prUrl: result.prUrl,
+        prNumber: result.prNumber,
       }
     } else {
       // ─── Direct Commit to main ───
-
-      // Get existing file SHA (if editing)
-      let existingFileSha: string | undefined
-      if (!isNew) {
-        try {
-          const fileRes = await $fetch<any>(
-            `${apiBase}/contents/${repoFilePath}?ref=${mainBranch}`,
-            { headers }
-          )
-          existingFileSha = fileRes.sha
-        } catch {
-          // File doesn't exist
-        }
-      }
-
       const defaultMessage = isNew
         ? `feat: create ${collectionName}/${slug}`
         : `feat: update ${collectionName}/${slug}`
 
-      await $fetch(`${apiBase}/contents/${repoFilePath}`, {
-        method: 'PUT',
-        headers,
-        body: {
-          message: commitMessage || defaultMessage,
-          content: encodedContent,
-          branch: mainBranch,
-          ...(existingFileSha ? { sha: existingFileSha } : {}),
-        },
+      const result = await git.commitDirect({
+        path: repoFilePath,
+        content: encodedContent,
+        message: commitMessage || defaultMessage,
+        isNew: isNew ?? false,
       })
 
       return {
         success: true,
-        mode: 'direct',
+        mode: result.mode,
         collection: collectionName,
         slug,
-        branch: mainBranch,
+        branch: result.branch,
       }
     }
   } catch (err: any) {

@@ -3,6 +3,9 @@
  * CMS Edit Item — Edit an existing content item.
  * Loads raw markdown from the content API, parses frontmatter,
  * and renders the auto-generated form.
+ *
+ * Publish-to-GitHub flow includes a sync check to prevent
+ * accidental overwrites when local and remote diverge.
  */
 import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2 } from 'lucide-vue-next'
 
@@ -21,7 +24,8 @@ const slug = computed(() => {
 
 const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
-const { save, loadRaw, saving, error: saveError, lastResult, isLocalBackend } = useCmsSave()
+const { save, publishToGitHub, loadRaw, saving, publishing, error: saveError, lastResult, isLocalBackend } = useCmsSave()
+const { prePublishCheck, pullFromGitHub, syncStatus, syncMessage, pulling, localVersion, remoteVersion } = useCmsSync()
 
 const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
@@ -29,6 +33,12 @@ const showSuccess = ref(false)
 const loadError = ref<string | null>(null)
 const initialData = ref<Record<string, any> | null>(null)
 const loading = ref(true)
+
+// ─── Sync conflict dialog state ─────────────────────────
+const showSyncDialog = ref(false)
+const showResolver = ref(false)
+/** The pending publish data (held while conflict dialog is open) */
+const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' } | null>(null)
 
 // Load the existing content (frontmatter is parsed server-side to avoid
 // gray-matter's Node.js Buffer dependency in the browser)
@@ -63,6 +73,137 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
   } catch {
     // Error is captured in the composable
   }
+}
+
+/**
+ * Publish handler — runs a sync check first, then either
+ * publishes directly or shows a conflict dialog.
+ */
+async function handlePublish(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }) {
+  // Save the data in case we need it after the conflict dialog
+  pendingPublish.value = data
+
+  try {
+    const check = await prePublishCheck(collectionName.value, slug.value)
+
+    if (check.safe) {
+      // No conflict — publish immediately
+      await doPublish(data)
+    } else {
+      // Conflict detected — show dialog
+      showSyncDialog.value = true
+    }
+  } catch {
+    // Sync check failed — show dialog so user can decide
+    showSyncDialog.value = true
+  }
+}
+
+/** Actually push to GitHub (called directly or after force-publish) */
+async function doPublish(data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }) {
+  try {
+    await publishToGitHub({
+      collection: collectionName.value,
+      slug: slug.value,
+      frontmatter: data.frontmatter,
+      body: data.body,
+      isNew: false,
+      publishMode: data.publishMode,
+    })
+    showSuccess.value = true
+    showSyncDialog.value = false
+    pendingPublish.value = null
+  } catch {
+    // Error is captured in the composable
+  }
+}
+
+/** Force publish — user chose to overwrite despite conflict */
+async function handleForcePublish() {
+  if (pendingPublish.value) {
+    await doPublish(pendingPublish.value)
+  }
+}
+
+/** Pull from GitHub — discard local, reload with remote content */
+async function handlePull() {
+  const success = await pullFromGitHub(collectionName.value, slug.value)
+  if (success) {
+    showSyncDialog.value = false
+    pendingPublish.value = null
+
+    // Reload the content from the (now-updated) local file
+    try {
+      const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
+        params: { collection: collectionName.value, slug: slug.value },
+      })
+      initialData.value = {
+        ...res.frontmatter,
+        body: res.body,
+      }
+    } catch (err: any) {
+      loadError.value = err.data?.message || err.message || 'Failed to reload content after pull'
+    }
+  }
+}
+
+function handleSyncCancel() {
+  showSyncDialog.value = false
+  pendingPublish.value = null
+}
+
+/** Open the conflict resolver UI */
+function handleResolveOpen() {
+  showSyncDialog.value = false
+  showResolver.value = true
+}
+
+/** Handle the merged result from the conflict resolver */
+async function handleResolved(merged: { frontmatter: Record<string, any>; body: string }) {
+  showResolver.value = false
+
+  // Update the form with the merged content
+  initialData.value = {
+    ...merged.frontmatter,
+    body: merged.body,
+  }
+
+  // Save merged version locally first
+  try {
+    await save({
+      collection: collectionName.value,
+      slug: slug.value,
+      frontmatter: merged.frontmatter,
+      body: merged.body,
+      isNew: false,
+    })
+  } catch {
+    // Error captured in composable — the form data is already updated
+    // so the user can still manually retry
+    return
+  }
+
+  // Now publish the resolved version to GitHub
+  try {
+    await publishToGitHub({
+      collection: collectionName.value,
+      slug: slug.value,
+      frontmatter: merged.frontmatter,
+      body: merged.body,
+      isNew: false,
+      publishMode: pendingPublish.value?.publishMode,
+    })
+    showSuccess.value = true
+    pendingPublish.value = null
+  } catch {
+    // Error captured in composable
+  }
+}
+
+function handleResolverCancel() {
+  showResolver.value = false
+  // Re-open the sync dialog so the user can choose another option
+  showSyncDialog.value = true
 }
 </script>
 
@@ -126,7 +267,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
               Changes have been committed directly to {{ lastResult.branch }}.
             </template>
             <template v-else>
-              Changes have been saved locally.
+              Changes have been saved locally. Use the <strong>Publish to GitHub</strong> button to push changes to the repository.
             </template>
           </p>
           <div class="mt-4 flex gap-3">
@@ -172,8 +313,40 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
       :initial-data="initialData"
       :is-new="false"
       :saving="saving"
+      :publishing="publishing"
       :editorial-workflow="isEditorial"
+      :local-backend="isLocalBackend"
       @submit="handleSubmit"
+      @publish="handlePublish"
     />
+
+    <!-- Sync Conflict Dialog -->
+    <CmsSyncConflictDialog
+      v-model:open="showSyncDialog"
+      :sync-status="String(syncStatus)"
+      :sync-message="String(syncMessage)"
+      :pulling="pulling"
+      :publishing="publishing"
+      :can-resolve="!!(localVersion && remoteVersion)"
+      @force-publish="handleForcePublish"
+      @pull="handlePull"
+      @resolve="handleResolveOpen"
+      @cancel="handleSyncCancel"
+    />
+
+    <!-- Conflict Resolver (full-screen overlay) -->
+    <Teleport to="body">
+      <div
+        v-if="showResolver && localVersion && remoteVersion"
+        class="fixed inset-0 z-50 flex flex-col bg-background"
+      >
+        <CmsConflictResolver
+          :local-version="localVersion"
+          :remote-version="remoteVersion"
+          @resolve="handleResolved"
+          @cancel="handleResolverCancel"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>
