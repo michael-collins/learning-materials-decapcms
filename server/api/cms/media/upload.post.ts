@@ -73,40 +73,42 @@ export default defineEventHandler(async (event) => {
   // ── Production: commit to GitHub via API ──
   const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
   if (!hasLocalFiles) {
-    // Extract token from the form data or session cookie
-    const tokenEntry = formData.find((entry) => entry.name === 'token')
-    const bodyToken = tokenEntry?.data?.toString()
-    const token = extractAuthToken(event, bodyToken)
-
-    const config = await getCmsConfig()
-    const backend = config.backend || {}
-    const { owner, repo } = parseRepo(backend.repo || '')
-    const branch = backend.branch || 'main'
-
-    const git = createGitBackend({ owner, repo, branch, token })
-
-    // Repo path: public/<folder>/<filename>
-    const repoPath = `public/${normalizedFolder}/${safeFilename}`
-
     try {
+      // Extract token from the form data or session cookie
+      const tokenEntry = formData.find((entry) => entry.name === 'token')
+      const bodyToken = tokenEntry?.data?.toString()
+      const token = extractAuthToken(event, bodyToken)
+
+      const config = await getCmsConfig()
+      const backend = config.backend || {}
+      const { owner, repo } = parseRepo(backend.repo || '')
+      const branch = backend.branch || 'main'
+
+      const git = createGitBackend({ owner, repo, branch, token })
+
+      // Repo path: public/<folder>/<filename>
+      const repoPath = `public/${normalizedFolder}/${safeFilename}`
+
       await git.uploadFile({
         path: repoPath,
         content: fileEntry.data,
         message: `media: upload ${safeFilename}`,
       })
-    } catch (err: any) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: `Failed to upload file to GitHub: ${err.message}`,
-      })
-    }
 
-    return {
-      path: publicPath,
-      filename: safeFilename,
-      originalFilename,
-      size: fileEntry.data.length,
-      contentType: fileEntry.type || 'application/octet-stream',
+      return {
+        path: publicPath,
+        filename: safeFilename,
+        originalFilename,
+        size: fileEntry.data.length,
+        contentType: fileEntry.type || 'application/octet-stream',
+      }
+    } catch (err: any) {
+      // Return a detailed JSON error body the client can display
+      throw createError({
+        statusCode: err.statusCode || 500,
+        message: `Upload failed: ${err.message || err}`,
+        data: { detail: String(err.data || err.statusMessage || err.message || err) },
+      })
     }
   }
 

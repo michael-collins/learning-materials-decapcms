@@ -80,7 +80,8 @@ async function handleFileSelect(event: Event) {
 
     imagePath.value = response.path
   } catch (e: any) {
-    uploadError.value = e?.data?.message || e?.message || 'Upload failed'
+    uploadError.value = e?.data?.message || e?.data?.data?.detail || e?.message || 'Upload failed'
+    console.error('Upload error:', JSON.stringify(e?.data || e?.message || e))
   } finally {
     uploading.value = false
     // Reset file input
