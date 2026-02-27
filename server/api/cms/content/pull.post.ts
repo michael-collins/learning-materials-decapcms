@@ -12,6 +12,8 @@
  * - slug: content item slug
  * - token?: PAT (optional, falls back to OAuth cookie)
  */
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { createLocalBackend } from '~/lib/cms/local-backend'
@@ -19,6 +21,15 @@ import { getCmsConfig } from '~/server/utils/config-parser-server'
 import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
+  // Pull writes to local filesystem — only available in dev mode
+  const hasLocalFiles = existsSync(join(process.cwd(), 'content'))
+  if (!hasLocalFiles) {
+    throw createError({
+      statusCode: 400,
+      message: 'Pull is only available in local development mode.',
+    })
+  }
+
   const body = await readBody(event)
   const { collection: collectionName, slug, token: bodyToken } = body
 

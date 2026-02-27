@@ -1,17 +1,23 @@
 /**
  * GET /api/cms/content/read
  *
- * Read a raw content file (markdown with frontmatter) from the filesystem.
- * Used in development mode (local_backend) to load existing content for editing.
+ * Read a raw content file (markdown with frontmatter).
+ * - In development: reads from the local filesystem via local-backend
+ * - In production (Netlify): reads from GitHub API via git-backend
  *
  * Query params:
  * - collection: collection name
  * - slug: content item slug
+ * - token: (optional) GitHub PAT for auth in production
  */
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import matter from 'gray-matter'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
 import { createLocalBackend } from '~/lib/cms/local-backend'
+import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { getCmsConfig } from '~/server/utils/config-parser-server'
+import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -54,14 +60,41 @@ export default defineEventHandler(async (event) => {
     relativePath = `${collection.folder}/${slug}.${ext}`
   }
 
-  const local = createLocalBackend({ rootDir: process.cwd() })
-  const raw = local.readFile(relativePath)
+  // Determine if we have local content files (dev mode) or need GitHub API (production)
+  const hasLocalFiles = existsSync(join(process.cwd(), 'content'))
 
-  if (raw === null) {
-    throw createError({
-      statusCode: 404,
-      message: `File not found: ${relativePath}`,
-    })
+  let raw: string
+
+  if (hasLocalFiles) {
+    // Dev mode: read from local filesystem
+    const local = createLocalBackend({ rootDir: process.cwd() })
+    const localContent = local.readFile(relativePath)
+    if (localContent === null) {
+      throw createError({
+        statusCode: 404,
+        message: `File not found locally: ${relativePath}`,
+      })
+    }
+    raw = localContent
+  } else {
+    // Production mode: read from GitHub API
+    const token = extractAuthToken(event, query.token as string | undefined)
+    const backend = config.backend || {}
+    const { owner, repo } = parseRepo(backend.repo || '')
+    const branch = backend.branch || 'main'
+
+    const git = createGitBackend({ owner, repo, branch, token })
+    const file = await git.getFile(relativePath)
+
+    if (!file) {
+      throw createError({
+        statusCode: 404,
+        message: `File not found on GitHub: ${relativePath}`,
+      })
+    }
+
+    // Decode base64 content from GitHub API
+    raw = Buffer.from(file.content, 'base64').toString('utf-8')
   }
 
   // Parse frontmatter server-side so the client doesn't need gray-matter
@@ -72,7 +105,7 @@ export default defineEventHandler(async (event) => {
     raw,
     frontmatter: parsed.data,
     body: parsed.content.trim(),
-    path: local.resolvePath(relativePath),
+    path: relativePath,
     collection: collectionName,
     slug,
   }
