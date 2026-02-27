@@ -26,6 +26,7 @@ const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
 const { save, publishToGitHub, loadRaw, saving, publishing, error: saveError, lastResult, isLocalBackend } = useCmsSave()
 const { prePublishCheck, pullFromGitHub, syncStatus, syncMessage, pulling, localVersion, remoteVersion } = useCmsSync()
+const { getToken } = useCmsAuth()
 
 const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
@@ -44,8 +45,9 @@ const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; pub
 // gray-matter's Node.js Buffer dependency in the browser)
 onMounted(async () => {
   try {
+    const token = getToken()
     const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
-      params: { collection: collectionName.value, slug: slug.value },
+      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
     })
 
     initialData.value = {
@@ -134,8 +136,9 @@ async function handlePull() {
 
     // Reload the content from the (now-updated) local file
     try {
+      const token = getToken()
       const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
-        params: { collection: collectionName.value, slug: slug.value },
+        params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
       })
       initialData.value = {
         ...res.frontmatter,

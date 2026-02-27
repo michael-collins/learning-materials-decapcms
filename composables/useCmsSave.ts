@@ -169,8 +169,9 @@ export function useCmsSave() {
    */
   async function loadRaw(collection: string, slug: string) {
     try {
+      const token = getToken()
       const res = await $fetch<{ raw: string }>('/api/cms/content/read', {
-        params: { collection, slug },
+        params: { collection, slug, ...(token ? { token } : {}) },
       })
       return res.raw
     } catch (err: any) {

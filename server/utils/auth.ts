@@ -24,8 +24,12 @@ export function extractAuthToken(event: H3Event, bodyToken?: string): string {
     }
   }
 
-  // 2. Check for PAT in request body
+  // 2. Check for PAT in request body or query param
   if (bodyToken) return bodyToken
+
+  // 3. Check for token in query params (used by GET endpoints)
+  const query = getQuery(event)
+  if (query.token && typeof query.token === 'string') return query.token
 
   throw createError({
     statusCode: 401,
