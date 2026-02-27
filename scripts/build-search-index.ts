@@ -6,6 +6,13 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+/** Safely coerce tags (or any field expected to be string[]) into an array of strings */
+function safeStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter(v => typeof v === 'string')
+  if (typeof value === 'string') return value ? [value] : []
+  return []
+}
+
 interface ContentItem {
   _path: string
   title: string
@@ -265,8 +272,8 @@ async function buildSemanticIndex(): Promise<void> {
     const textForConcepts = [
       item.title,
       item.description,
-      ...(item.learningObjectives || []),
-      ...(item.tags || [])
+      ...safeStringArray(item.learningObjectives),
+      ...safeStringArray(item.tags)
     ].join(' ')
     
     const concepts = extractConcepts(textForConcepts)
@@ -301,8 +308,9 @@ async function buildSemanticIndex(): Promise<void> {
       }
       
       // Add tags as related concepts
-      if (item.tags) {
-        for (const tag of item.tags) {
+      const safeTags = safeStringArray(item.tags)
+      if (safeTags.length > 0) {
+        for (const tag of safeTags) {
           const tagLower = tag.toLowerCase()
           if (!conceptGraph[concept].relatedConcepts.includes(tagLower)) {
             conceptGraph[concept].relatedConcepts.push(tagLower)
@@ -329,11 +337,11 @@ async function buildSemanticIndex(): Promise<void> {
         searchText: [
           item.title,
           item.description,
-          item.tags?.join(' '),
-          item.learningObjectives?.join(' '),
+          safeStringArray(item.tags).join(' '),
+          safeStringArray(item.learningObjectives).join(' '),
           item.body?.substring(0, 500)
         ].filter(Boolean).join(' ').toLowerCase(),
-        tags: item.tags || [],
+        tags: safeStringArray(item.tags),
         difficulty: item.difficulty || '',
         duration: item.estimatedDuration || item.duration || '',
         author: item.author || '',
