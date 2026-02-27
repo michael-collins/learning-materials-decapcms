@@ -32,6 +32,8 @@ export default defineEventHandler(async (event) => {
   const ct = getHeader(event, 'content-type') || ''
   const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
 
+  console.log('[upload] content-type:', ct, 'hasLocalFiles:', hasLocalFiles)
+
   // ── JSON body path (production on Netlify) ──
   if (ct.includes('application/json') || !hasLocalFiles) {
     // If someone sends multipart to the JSON path (stale client), give a clear error
@@ -42,12 +44,23 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const body = await readBody(event)
+    let body: any
+    try {
+      body = await readBody(event)
+    } catch (parseErr: any) {
+      console.error('[upload] readBody failed:', parseErr.message)
+      throw createError({
+        statusCode: 400,
+        message: `Failed to parse request body: ${parseErr.message}`,
+      })
+    }
+
+    console.log('[upload] body type:', typeof body, 'keys:', body ? Object.keys(body) : 'null', 'has filename:', !!body?.filename, 'has content:', !!body?.content)
 
     if (!body?.filename || !body?.content) {
       throw createError({
         statusCode: 400,
-        message: `Missing required fields: filename, content (base64). Received keys: ${body ? Object.keys(body).join(', ') : 'null body'}`,
+        message: `Missing required fields: filename, content (base64). Received keys: ${body ? Object.keys(body).join(', ') : 'null body'}. Body type: ${typeof body}`,
       })
     }
 

@@ -30,8 +30,17 @@ export function useCmsUpload() {
     const base64 = await fileToBase64(file)
     const token = getToken()
 
+    console.log('[useCmsUpload] uploading:', {
+      filename: file.name,
+      contentLength: base64?.length,
+      contentType: file.type,
+      folder,
+      hasToken: !!token,
+    })
+
     const res = await $fetch<{ path: string; filename: string }>('/api/cms/media/upload', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: {
         filename: file.name,
         content: base64,
@@ -41,6 +50,7 @@ export function useCmsUpload() {
       },
     })
 
+    console.log('[useCmsUpload] response:', res)
     return res
   }
 
