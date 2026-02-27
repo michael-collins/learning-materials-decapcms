@@ -13,6 +13,7 @@ import { mkdirSync, existsSync } from 'node:fs'
 import { resolve, normalize } from 'node:path'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { extractAuthToken } from '~/server/utils/auth'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -42,11 +43,13 @@ export default defineEventHandler(async (event) => {
   const folderPath = `${normalizedParent}/${safeName}`
 
   // ── Production: commit a .gitkeep to GitHub via API ──
-  if (!import.meta.dev) {
+  const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
+  if (!hasLocalFiles) {
     const token = extractAuthToken(event, body?.token)
-    const config = useRuntimeConfig()
-    const { owner, repo } = parseRepo(config.public.cmsRepo as string)
-    const branch = (config.public.cmsBranch as string) || 'main'
+    const config = await getCmsConfig()
+    const backend = config.backend || {}
+    const { owner, repo } = parseRepo(backend.repo || '')
+    const branch = backend.branch || 'main'
 
     const git = createGitBackend({ owner, repo, branch, token })
 

@@ -17,6 +17,7 @@ import { existsSync, renameSync, mkdirSync, readFileSync, writeFileSync, readdir
 import { resolve, normalize, dirname, join, relative } from 'node:path'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { extractAuthToken } from '~/server/utils/auth'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 interface UpdatedFile {
   file: string
@@ -155,7 +156,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // ─── Local dev mode ─────────────────────────────────────
-  if (import.meta.dev) {
+  const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
+  if (hasLocalFiles) {
     const projectRoot = process.cwd()
     const srcFull = resolve(projectRoot, 'public', normSrc)
     const dstFull = resolve(projectRoot, 'public', normDst)
@@ -194,10 +196,10 @@ export default defineEventHandler(async (event) => {
 
   // ─── Production mode (GitHub API) ──────────────────────
   const token = extractAuthToken(event, body?.token)
-  const config = useRuntimeConfig()
-  const repoStr = (config.public as any).cmsRepo || 'michael-collins/learning-materials-decapcms'
-  const { owner, repo } = parseRepo(repoStr)
-  const branch = (config.public as any).cmsBranch || 'main'
+  const config = await getCmsConfig()
+  const backend = config.backend || {}
+  const { owner, repo } = parseRepo(backend.repo || '')
+  const branch = backend.branch || 'main'
 
   const git = createGitBackend({ owner, repo, branch, token })
 

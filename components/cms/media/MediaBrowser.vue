@@ -166,6 +166,8 @@ async function fetchFiles() {
     if (recursiveSearch.value && searchQuery.value) {
       params.set('recursive', 'true')
     }
+    const token = getToken()
+    if (token) params.set('token', token)
     const res = await $fetch<{ files: MediaFile[]; folders: string[] }>(`/api/cms/media/list?${params}`)
     files.value = res.files
     folders.value = res.folders || []
@@ -241,7 +243,7 @@ async function createFolder() {
   try {
     await $fetch('/api/cms/media/create-folder', {
       method: 'POST',
-      body: { folder: currentFolder.value, name: newFolderName.value.trim() },
+      body: { folder: currentFolder.value, name: newFolderName.value.trim(), token: getToken() },
     })
     newFolderName.value = ''
     showNewFolder.value = false
@@ -261,7 +263,7 @@ async function confirmDelete() {
   try {
     await $fetch('/api/cms/media/delete', {
       method: 'POST',
-      body: { path: targetPath },
+      body: { path: targetPath, token: getToken() },
     })
     selectedFiles.value.delete(targetPath)
     deleteTarget.value = null
@@ -279,7 +281,7 @@ async function bulkDelete() {
   let deleted = 0
   for (const path of selectedFiles.value) {
     try {
-      await $fetch('/api/cms/media/delete', { method: 'POST', body: { path } })
+      await $fetch('/api/cms/media/delete', { method: 'POST', body: { path, token: getToken() } })
       deleted++
     } catch { /* continue */ }
   }
@@ -302,7 +304,7 @@ async function scanAndRename() {
   try {
     const res = await $fetch<{ references: ContentReference[] }>('/api/cms/media/find-references', {
       method: 'POST',
-      body: { path: renameTarget.value.path },
+      body: { path: renameTarget.value.path, token: getToken() },
     })
     pendingReferences.value = res.references
     pendingSource.value = oldPath
@@ -328,7 +330,7 @@ async function executeRename(source: string, destination: string) {
   try {
     const res = await $fetch<{ success: boolean; updatedReferences: UpdatedFile[] }>('/api/cms/media/move', {
       method: 'POST',
-      body: { source, destination, updateReferences: true },
+      body: { source, destination, updateReferences: true, token: getToken() },
     })
     if (res.updatedReferences?.length > 0) {
       operationResult.value = {
@@ -380,7 +382,7 @@ async function scanAndMove() {
     for (const op of moveOps) {
       const res = await $fetch<{ references: ContentReference[] }>('/api/cms/media/find-references', {
         method: 'POST',
-        body: { path: `/${op.source}` },
+        body: { path: `/${op.source}`, token: getToken() },
       })
       allRefs.push(...res.references)
     }
@@ -417,7 +419,7 @@ async function executeMove() {
     try {
       const res = await $fetch<{ success: boolean; updatedReferences: UpdatedFile[] }>('/api/cms/media/move', {
         method: 'POST',
-        body: { source: op.source, destination: op.destination, updateReferences: true },
+        body: { source: op.source, destination: op.destination, updateReferences: true, token: getToken() },
       })
       moved++
       if (res.updatedReferences?.length > 0) {
@@ -458,7 +460,11 @@ const availableFolders = ref<string[]>([])
 async function fetchFolderTree() {
   // Fetch top-level folders, then let user type/navigate
   try {
-    const res = await $fetch<{ folders: string[] }>('/api/cms/media/list?folder=uploads&type=all')
+    const token = getToken()
+    const listUrl = token
+      ? '/api/cms/media/list?folder=uploads&type=all&token=' + encodeURIComponent(token)
+      : '/api/cms/media/list?folder=uploads&type=all'
+    const res = await $fetch<{ folders: string[] }>(listUrl)
     availableFolders.value = ['uploads', ...(res.folders || []).map(f => `uploads/${f}`)]
   } catch { /* ignore */ }
 }

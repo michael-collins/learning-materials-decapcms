@@ -17,6 +17,7 @@ import { readdirSync, statSync, existsSync } from 'node:fs'
 import { resolve, join, extname, relative, basename, posix } from 'node:path'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { extractAuthToken } from '~/server/utils/auth'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 interface MediaFile {
   name: string
@@ -69,11 +70,13 @@ export default defineEventHandler(async (event) => {
   const normalizedFolder = folder.replace(/\.\./g, '').replace(/^\//, '')
 
   // ── Production: list from GitHub via Git Trees API ──
-  if (!import.meta.dev) {
+  const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
+  if (!hasLocalFiles) {
     const token = extractAuthToken(event)
-    const config = useRuntimeConfig()
-    const { owner, repo } = parseRepo(config.public.cmsRepo as string)
-    const branch = (config.public.cmsBranch as string) || 'main'
+    const config = await getCmsConfig()
+    const backend = config.backend || {}
+    const { owner, repo } = parseRepo(backend.repo || '')
+    const branch = backend.branch || 'main'
 
     const git = createGitBackend({ owner, repo, branch, token })
 

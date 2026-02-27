@@ -10,10 +10,11 @@
  * In dev mode, scans local filesystem.
  * In production, fetches content files from GitHub via the Git Trees + Blobs API.
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { resolve, join, relative } from 'node:path'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { extractAuthToken } from '~/server/utils/auth'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 interface Reference {
   /** Content file path relative to project root (e.g. "content/exercises/foo/index.md") */
@@ -37,7 +38,8 @@ export default defineEventHandler(async (event) => {
   const withoutSlash = withSlash.slice(1)
 
   // ─── Local dev mode ─────────────────────────────────────
-  if (import.meta.dev) {
+  const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
+  if (hasLocalFiles) {
     const projectRoot = process.cwd()
     const contentDir = resolve(projectRoot, 'content')
     const references: Reference[] = []
@@ -92,10 +94,10 @@ export default defineEventHandler(async (event) => {
 
   // ─── Production mode (GitHub API) ──────────────────────
   const token = extractAuthToken(event, body?.token)
-  const config = useRuntimeConfig()
-  const repoStr = (config.public as any).cmsRepo || 'michael-collins/learning-materials-decapcms'
-  const { owner, repo } = parseRepo(repoStr)
-  const branch = (config.public as any).cmsBranch || 'main'
+  const config = await getCmsConfig()
+  const backend = config.backend || {}
+  const { owner, repo } = parseRepo(backend.repo || '')
+  const branch = backend.branch || 'main'
 
   const git = createGitBackend({ owner, repo, branch, token })
 
