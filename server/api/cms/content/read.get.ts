@@ -11,9 +11,9 @@
 import matter from 'gray-matter'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
 import { createLocalBackend } from '~/lib/cms/local-backend'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const collectionName = query.collection as string
   const slug = query.slug as string
@@ -25,7 +25,7 @@ export default defineEventHandler((event) => {
     })
   }
 
-  const config = parseCmsConfigFromFile()
+  const config = await getCmsConfig()
   const collection = findCollection(config, collectionName)
 
   if (!collection) {

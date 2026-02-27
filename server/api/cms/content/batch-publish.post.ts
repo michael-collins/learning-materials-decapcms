@@ -19,10 +19,12 @@
  * - prNumber?: number
  * - fileCount: number
  */
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { createLocalBackend } from '~/lib/cms/local-backend'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -42,11 +44,25 @@ export default defineEventHandler(async (event) => {
   }
 
   const token = extractAuthToken(event, bodyToken)
-  const config = parseCmsConfigFromFile()
+  const config = await getCmsConfig()
   const { owner, repo } = parseRepo(config.backend.repo)
   const mainBranch = config.backend.branch
 
   const git = createGitBackend({ owner, repo, branch: mainBranch, token })
+
+  // Check if local content files are available
+  const firstCollection = findCollection(config, files[0]?.collection)
+  const hasLocalFiles = firstCollection?.folder
+    ? existsSync(resolve(process.cwd(), firstCollection.folder))
+    : false
+
+  if (!hasLocalFiles) {
+    throw createError({
+      statusCode: 400,
+      message: 'Batch publish is not available in production. Content is saved directly to GitHub via the editor.',
+    })
+  }
+
   const local = createLocalBackend({ rootDir: process.cwd() })
 
   // Resolve file paths and read content

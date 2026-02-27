@@ -311,17 +311,20 @@ export function createGitBackend(config: GitBackendConfig) {
    * Makes a single API call regardless of directory depth.
    * Returns blob entries filtered to the requested prefix.
    */
-  async function listTree(dirPath: string, branch: string = mainBranch): Promise<Array<{
+  async function listTree(dirPath: string, branchOrSha: string = mainBranch): Promise<Array<{
     path: string
     sha: string
     size: number
     type: 'blob' | 'tree'
   }>> {
     try {
-      // Get the branch SHA
-      const branchSha = await getBranchSha(branch)
+      // If the input looks like a commit SHA (40 hex chars), use it directly;
+      // otherwise resolve the branch name to a SHA first.
+      const commitSha = /^[0-9a-f]{40}$/i.test(branchOrSha)
+        ? branchOrSha
+        : await getBranchSha(branchOrSha)
       // Fetch the full tree recursively (single API call)
-      const res = await $fetch<any>(`${apiBase}/git/trees/${branchSha}?recursive=1`, { headers })
+      const res = await $fetch<any>(`${apiBase}/git/trees/${commitSha}?recursive=1`, { headers })
       const blobs = (res.tree || []).filter((entry: any) => entry.type === 'blob')
       const filtered = dirPath
         ? blobs.filter((entry: any) => {

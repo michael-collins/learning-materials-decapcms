@@ -5,12 +5,12 @@
  * Cached per request — the config.yml is read once and reused.
  */
 import { resolveCollections, groupCollections } from '~/lib/cms/config-parser'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
-let _cachedConfig: ReturnType<typeof buildResponse> | null = null
+let _cachedConfig: any = null
 
-function buildResponse() {
-  const config = parseCmsConfigFromFile()
+async function buildResponse() {
+  const config = await getCmsConfig()
   const collections = resolveCollections(config)
   const groups = groupCollections(collections)
 
@@ -25,10 +25,10 @@ function buildResponse() {
   }
 }
 
-export default defineEventHandler(() => {
+export default defineEventHandler(async () => {
   // Cache the parsed config in memory (invalidated on server restart)
   if (!_cachedConfig) {
-    _cachedConfig = buildResponse()
+    _cachedConfig = await buildResponse()
   }
   return _cachedConfig
 })

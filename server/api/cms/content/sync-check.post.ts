@@ -25,7 +25,7 @@ import matter from 'gray-matter'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { createLocalBackend } from '~/lib/cms/local-backend'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 import { extractAuthToken } from '~/server/utils/auth'
 
 function contentHash(content: string): string {
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const token = extractAuthToken(event, bodyToken)
-  const config = parseCmsConfigFromFile()
+  const config = await getCmsConfig()
   const collection = findCollection(config, collectionName)
 
   if (!collection?.folder) {

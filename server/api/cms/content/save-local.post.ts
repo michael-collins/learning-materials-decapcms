@@ -17,7 +17,7 @@ import {
   getPathPattern,
 } from '~/lib/cms/config-parser'
 import { createLocalBackend } from '~/lib/cms/local-backend'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const config = parseCmsConfigFromFile()
+  const config = await getCmsConfig()
   const collection = findCollection(config, collectionName)
 
   if (!collection) {

@@ -4,9 +4,15 @@
  * Scan one or more collection folders and compare local files against
  * GitHub, returning a list of files that differ.
  *
+ * Works in two modes:
+ *
+ * **Development (local files available):**
  * Uses git blob SHA comparison — computes the git-compatible SHA-1 hash
- * of each local file and compares it to the SHA from the GitHub Contents API,
- * so we only need ONE API call per collection (directory listing).
+ * of each local file and compares it to the SHA from the GitHub Trees API.
+ *
+ * **Production / Netlify (no local files):**
+ * Compares the tree at the deploy commit (COMMIT_REF) against the
+ * current branch HEAD. Shows what changed since the last deploy.
  *
  * Body:
  * - collections?: string[]  — collection names to check (all if omitted)
@@ -15,13 +21,16 @@
  * Response:
  * - changes: Array<{ collection, slug, path, status, title? }>
  * - summary: { total, modified, added, deleted }
+ * - mode: 'local' | 'deployed'   — which comparison mode was used
  */
 import { createHash } from 'node:crypto'
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
 import matter from 'gray-matter'
 import { findCollection, getPathPattern } from '~/lib/cms/config-parser'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { createLocalBackend } from '~/lib/cms/local-backend'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 import { extractAuthToken } from '~/server/utils/auth'
 
 /**
@@ -45,12 +54,29 @@ export interface BatchChangeEntry {
   title?: string
 }
 
+/**
+ * Extract slug from a file path, handling path patterns like {{slug}}/index.
+ */
+function extractSlug(filePath: string, collectionFolder: string, ext: string, pathPattern: string | null): string {
+  let slug = filePath
+    .replace(`${collectionFolder}/`, '')
+    .replace(new RegExp(`\\.${ext}$`), '')
+
+  if (pathPattern) {
+    const suffix = pathPattern.replace('{{slug}}', '').replace(/^\//, '')
+    if (suffix && slug.endsWith(`/${suffix}`)) {
+      slug = slug.replace(new RegExp(`/${suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`), '')
+    }
+  }
+  return slug
+}
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { collections: requestedCollections, token: bodyToken } = body
 
   const token = extractAuthToken(event, bodyToken)
-  const config = parseCmsConfigFromFile()
+  const config = await getCmsConfig()
   const { owner, repo } = parseRepo(config.backend.repo)
 
   const git = createGitBackend({
@@ -60,19 +86,53 @@ export default defineEventHandler(async (event) => {
     token,
   })
 
-  const local = createLocalBackend({ rootDir: process.cwd() })
-
   // Determine which collections to scan
   const collectionNames: string[] = requestedCollections?.length
     ? requestedCollections
     : config.collections
-        .filter((c: any) => c.folder) // Only folder collections
+        .filter((c: any) => c.folder)
         .map((c: any) => c.name)
 
-  // Pre-fetch the full repo tree once (recursive) — shared across all collections
+  // Check if local content files are available (development mode)
+  const hasLocalFiles = collectionNames.some((name) => {
+    const collection = findCollection(config, name)
+    if (!collection?.folder) return false
+    return existsSync(resolve(process.cwd(), collection.folder))
+  })
+
+  if (hasLocalFiles) {
+    // ── Development mode: compare local filesystem vs GitHub ──
+    return await scanLocalVsRemote(git, config, collectionNames)
+  } else {
+    // ── Production mode: compare deploy commit vs current HEAD ──
+    const runtimeConfig = useRuntimeConfig()
+    const deployCommitRef = runtimeConfig.deployCommitRef as string
+
+    if (!deployCommitRef) {
+      return {
+        changes: [],
+        summary: { total: 0, modified: 0, added: 0, deleted: 0 },
+        mode: 'deployed',
+        message: 'No deploy commit reference available. Changes will appear after your next Netlify deploy.',
+      }
+    }
+
+    return await scanDeployedVsRemote(git, config, collectionNames, deployCommitRef)
+  }
+})
+
+// ─── Development mode: compare local files against GitHub tree ───
+
+async function scanLocalVsRemote(
+  git: ReturnType<typeof createGitBackend>,
+  config: any,
+  collectionNames: string[]
+) {
+  const local = createLocalBackend({ rootDir: process.cwd() })
+
   let fullTree: Array<{ path: string; sha: string }> = []
   try {
-    fullTree = await git.listTree('')  // empty prefix = root
+    fullTree = await git.listTree('')
   } catch {
     // If tree can't be fetched, everything will show as "added"
   }
@@ -86,13 +146,11 @@ export default defineEventHandler(async (event) => {
     const ext = collection.extension || 'md'
     const pathPattern = getPathPattern(collection)
 
-    // List local files
     const localFiles = local.listFiles(collection.folder, {
       recursive: true,
       extensions: [`.${ext}`],
     }).filter(f => !f.isDirectory)
 
-    // Filter the pre-fetched tree to this collection's folder
     const prefix = collection.folder.endsWith('/')
       ? collection.folder
       : `${collection.folder}/`
@@ -100,7 +158,6 @@ export default defineEventHandler(async (event) => {
       e => e.path.startsWith(prefix) && e.path.endsWith(`.${ext}`)
     )
 
-    // Build maps for comparison
     const remoteByPath = new Map(remoteEntries.map(e => [e.path, e.sha]))
     const localByPath = new Map<string, { content: string; path: string }>()
 
@@ -111,79 +168,32 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Compare: files in local but not remote (added), files in both but different (modified)
     for (const [filePath, fileData] of localByPath) {
       const localSha = gitBlobSha(fileData.content)
       const remoteSha = remoteByPath.get(filePath)
+      const slug = extractSlug(filePath, collection.folder, ext, pathPattern)
 
-      let slug = filePath
-        .replace(`${collection.folder}/`, '')
-        .replace(new RegExp(`\\.${ext}$`), '')
-
-      // Handle path patterns (e.g., {{slug}}/index)
-      if (pathPattern) {
-        const suffix = pathPattern.replace('{{slug}}', '').replace(/^\//, '')
-        if (suffix && slug.endsWith(`/${suffix}`)) {
-          slug = slug.replace(new RegExp(`/${suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`), '')
-        }
-      }
-
-      // Try to extract title from frontmatter
       let title: string | undefined
       try {
         const parsed = matter(fileData.content)
         title = parsed.data?.title
-      } catch {
-        // ignore parse errors
-      }
+      } catch { /* ignore */ }
 
       if (!remoteSha) {
-        // File exists locally but not remotely
-        changes.push({
-          collection: collectionName,
-          slug,
-          path: filePath,
-          status: 'added',
-          title,
-        })
+        changes.push({ collection: collectionName, slug, path: filePath, status: 'added', title })
       } else if (localSha !== remoteSha) {
-        // File content differs
-        changes.push({
-          collection: collectionName,
-          slug,
-          path: filePath,
-          status: 'modified',
-          title,
-        })
+        changes.push({ collection: collectionName, slug, path: filePath, status: 'modified', title })
       }
-      // If SHAs match, the file is in sync — skip
     }
 
-    // Compare: files on remote but not local (deleted)
     for (const [filePath] of remoteByPath) {
       if (!localByPath.has(filePath)) {
-        let slug = filePath
-          .replace(`${collection.folder}/`, '')
-          .replace(new RegExp(`\\.${ext}$`), '')
-
-        if (pathPattern) {
-          const suffix = pathPattern.replace('{{slug}}', '').replace(/^\//, '')
-          if (suffix && slug.endsWith(`/${suffix}`)) {
-            slug = slug.replace(new RegExp(`/${suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`), '')
-          }
-        }
-
-        changes.push({
-          collection: collectionName,
-          slug,
-          path: filePath,
-          status: 'deleted',
-        })
+        const slug = extractSlug(filePath, collection.folder, ext, pathPattern)
+        changes.push({ collection: collectionName, slug, path: filePath, status: 'deleted' })
       }
     }
   }
 
-  // Sort: modified first, then added, then deleted
   const statusOrder = { modified: 0, added: 1, deleted: 2 }
   changes.sort((a, b) => statusOrder[a.status] - statusOrder[b.status])
 
@@ -195,5 +205,97 @@ export default defineEventHandler(async (event) => {
       added: changes.filter(c => c.status === 'added').length,
       deleted: changes.filter(c => c.status === 'deleted').length,
     },
+    mode: 'local' as const,
   }
-})
+}
+
+// ─── Production mode: compare deploy tree vs current HEAD tree ───
+
+async function scanDeployedVsRemote(
+  git: ReturnType<typeof createGitBackend>,
+  config: any,
+  collectionNames: string[],
+  deployCommitRef: string
+) {
+  const branch = config.backend.branch
+
+  let deployTree: Array<{ path: string; sha: string }> = []
+  let headTree: Array<{ path: string; sha: string }> = []
+
+  try {
+    deployTree = await git.listTree('', deployCommitRef)
+  } catch {
+    return {
+      changes: [],
+      summary: { total: 0, modified: 0, added: 0, deleted: 0 },
+      mode: 'deployed' as const,
+      message: 'Could not fetch the deploy commit tree. The deploy commit may have been rebased.',
+    }
+  }
+
+  try {
+    headTree = await git.listTree('', branch)
+  } catch {
+    return {
+      changes: [],
+      summary: { total: 0, modified: 0, added: 0, deleted: 0 },
+      mode: 'deployed' as const,
+      message: 'Could not fetch the current branch tree.',
+    }
+  }
+
+  const changes: BatchChangeEntry[] = []
+
+  for (const collectionName of collectionNames) {
+    const collection = findCollection(config, collectionName)
+    if (!collection?.folder) continue
+
+    const ext = collection.extension || 'md'
+    const pathPattern = getPathPattern(collection)
+    const prefix = collection.folder.endsWith('/')
+      ? collection.folder
+      : `${collection.folder}/`
+
+    const deployEntries = deployTree.filter(
+      e => e.path.startsWith(prefix) && e.path.endsWith(`.${ext}`)
+    )
+    const headEntries = headTree.filter(
+      e => e.path.startsWith(prefix) && e.path.endsWith(`.${ext}`)
+    )
+
+    const deployByPath = new Map(deployEntries.map(e => [e.path, e.sha]))
+    const headByPath = new Map(headEntries.map(e => [e.path, e.sha]))
+
+    for (const [filePath, headSha] of headByPath) {
+      const deploySha = deployByPath.get(filePath)
+      const slug = extractSlug(filePath, collection.folder, ext, pathPattern)
+
+      if (!deploySha) {
+        changes.push({ collection: collectionName, slug, path: filePath, status: 'added' })
+      } else if (headSha !== deploySha) {
+        changes.push({ collection: collectionName, slug, path: filePath, status: 'modified' })
+      }
+    }
+
+    for (const [filePath] of deployByPath) {
+      if (!headByPath.has(filePath)) {
+        const slug = extractSlug(filePath, collection.folder, ext, pathPattern)
+        changes.push({ collection: collectionName, slug, path: filePath, status: 'deleted' })
+      }
+    }
+  }
+
+  const statusOrder = { modified: 0, added: 1, deleted: 2 }
+  changes.sort((a, b) => statusOrder[a.status] - statusOrder[b.status])
+
+  return {
+    changes,
+    summary: {
+      total: changes.length,
+      modified: changes.filter(c => c.status === 'modified').length,
+      added: changes.filter(c => c.status === 'added').length,
+      deleted: changes.filter(c => c.status === 'deleted').length,
+    },
+    mode: 'deployed' as const,
+  }
+}

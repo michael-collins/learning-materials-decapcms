@@ -26,7 +26,7 @@ import {
   getPathPattern,
 } from '~/lib/cms/config-parser'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
-import { parseCmsConfigFromFile } from '~/server/utils/config-parser-server'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
   // Resolve token from OAuth session cookie or request body
   const token = extractAuthToken(event, bodyToken)
 
-  const config = parseCmsConfigFromFile()
+  const config = await getCmsConfig()
   const collection = findCollection(config, collectionName)
 
   if (!collection?.folder) {

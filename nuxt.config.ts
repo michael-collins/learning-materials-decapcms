@@ -1,4 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { readFileSync } from 'node:fs'
+
+// Read CMS config.yml at build time so it's available in Netlify functions
+// via runtimeConfig (server assets don't reliably bundle for all presets)
+const cmsConfigYaml = readFileSync('./cms/config.yml', 'utf-8')
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: {
@@ -16,6 +22,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Server-only (never exposed to client)
     githubClientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+    // Deploy commit SHA (Netlify provides COMMIT_REF at build time)
+    deployCommitRef: process.env.COMMIT_REF || '',
+    // CMS config.yml inlined at build time — available in Netlify functions
+    cmsConfigYaml,
     // Public (available on client)
     public: {
       githubClientId: process.env.GITHUB_CLIENT_ID || '',
