@@ -388,7 +388,7 @@ const showPreview = ref(true)
         </div>
 
         <!-- Editorial workflow: split button (Save Draft + Publish) -->
-        <div v-if="editorialWorkflow" class="relative flex items-center">
+        <div v-if="editorialWorkflow" class="relative flex items-stretch">
           <!-- Primary: Save as Draft -->
           <button
             type="button"
@@ -415,7 +415,7 @@ const showPreview = ref(true)
               type="button"
               @click="showSaveDropdown = !showSaveDropdown"
               :disabled="saving || !isDirty"
-              class="rounded-r-md border-l border-primary-foreground/20 bg-primary px-2 py-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+              class="flex h-full items-center rounded-r-md border-l border-primary-foreground/20 bg-primary px-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
             >
               <ChevronDown class="h-4 w-4" />
             </button>
@@ -449,7 +449,7 @@ const showPreview = ref(true)
         <!-- Non-editorial: save button + optional Publish to GitHub -->
         <div v-else class="flex items-center gap-3">
           <!-- Publish to GitHub (only in local backend mode) -->
-          <div v-if="localBackend" class="relative flex items-center">
+          <div v-if="localBackend" class="relative flex items-stretch">
             <button
               type="button"
               @click="handlePublish('direct')"
@@ -475,7 +475,7 @@ const showPreview = ref(true)
                 type="button"
                 @click="showPublishDropdown = !showPublishDropdown"
                 :disabled="publishing || saving || !canPublish"
-                class="rounded-r-md border border-l-0 border-foreground/20 bg-background px-2 py-2 transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
+                class="flex h-full items-center rounded-r-md border border-l-0 border-foreground/20 bg-background px-2 transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
               >
                 <ChevronDown class="h-4 w-4" />
               </button>
