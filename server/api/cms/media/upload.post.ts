@@ -34,12 +34,20 @@ export default defineEventHandler(async (event) => {
 
   // ── JSON body path (production on Netlify) ──
   if (ct.includes('application/json') || !hasLocalFiles) {
+    // If someone sends multipart to the JSON path (stale client), give a clear error
+    if (ct.includes('multipart/form-data')) {
+      throw createError({
+        statusCode: 400,
+        message: 'Multipart uploads are not supported in production. Please hard-refresh your browser (Cmd+Shift+R) to get the updated client.',
+      })
+    }
+
     const body = await readBody(event)
 
     if (!body?.filename || !body?.content) {
       throw createError({
         statusCode: 400,
-        message: 'Missing required fields: filename, content (base64)',
+        message: `Missing required fields: filename, content (base64). Received keys: ${body ? Object.keys(body).join(', ') : 'null body'}`,
       })
     }
 
