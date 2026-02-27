@@ -7,7 +7,7 @@
  */
 import type { CmsFieldDef, CmsCollectionDef } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
-import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload } from 'lucide-vue-next'
+import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload, Undo2 } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -27,11 +27,14 @@ const props = defineProps<{
   localBackend?: boolean
   /** Whether local content differs from GitHub (set by parent after sync-check) */
   unpublishedChanges?: boolean
+  /** Whether a discard operation is in progress */
+  discarding?: boolean
 }>()
 
 const emit = defineEmits<{
   submit: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
   publish: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
+  discard: []
   'update:title': [title: string]
 }>()
 
@@ -175,6 +178,14 @@ const isDirty = computed(() => {
 // saved local content differs from what's on GitHub.
 const canPublish = computed(() => isDirty.value || !!props.unpublishedChanges)
 
+// ─── Discard state ──────────────────────────────────────
+const showDiscardConfirm = ref(false)
+
+function handleDiscard() {
+  showDiscardConfirm.value = false
+  emit('discard')
+}
+
 // ─── Layout state ───────────────────────────────────────
 const { width } = useWindowSize()
 const isDesktop = computed(() => width.value >= 1024)
@@ -294,19 +305,56 @@ const showPreview = ref(true)
     <!-- Submit Toolbar -->
     <div class="sticky bottom-0 z-10 -mx-6 mt-6 border-t bg-background px-6 py-4 md:-mx-8 md:px-8">
       <div class="flex items-center justify-between">
-        <div class="text-sm text-muted-foreground">
-          <span v-if="isDirty" class="flex items-center gap-1.5">
-            <span class="h-2 w-2 rounded-full bg-yellow-500" />
-            Unsaved changes
-          </span>
-          <span v-else-if="unpublishedChanges" class="flex items-center gap-1.5">
-            <span class="h-2 w-2 rounded-full bg-orange-500" />
-            Unpublished changes
-          </span>
-          <span v-else class="flex items-center gap-1.5">
-            <span class="h-2 w-2 rounded-full bg-green-500" />
-            No changes
-          </span>
+        <div class="flex items-center gap-3">
+          <div class="text-sm text-muted-foreground">
+            <span v-if="isDirty" class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-yellow-500" />
+              Unsaved changes
+            </span>
+            <span v-else-if="unpublishedChanges" class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-orange-500" />
+              Unpublished changes
+            </span>
+            <span v-else class="flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-green-500" />
+              No changes
+            </span>
+          </div>
+
+          <!-- Discard changes (local backend only, when there are changes) -->
+          <template v-if="localBackend && !isNew && (isDirty || unpublishedChanges)">
+            <div v-if="!showDiscardConfirm" class="flex items-center">
+              <button
+                type="button"
+                @click="showDiscardConfirm = true"
+                :disabled="saving || publishing || discarding"
+                class="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+                title="Discard all changes and revert to last published version"
+              >
+                <Undo2 class="h-3.5 w-3.5" />
+                Discard
+              </button>
+            </div>
+            <div v-else class="flex items-center gap-1.5">
+              <span class="text-xs text-destructive">Revert to GitHub?</span>
+              <button
+                type="button"
+                @click="handleDiscard"
+                :disabled="discarding"
+                class="rounded-md bg-destructive px-2.5 py-1 text-[11px] font-medium text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+              >
+                <Loader2 v-if="discarding" class="h-3 w-3 animate-spin" />
+                <span v-else>Discard</span>
+              </button>
+              <button
+                type="button"
+                @click="showDiscardConfirm = false"
+                class="rounded-md border px-2.5 py-1 text-[11px] text-muted-foreground hover:bg-accent"
+              >
+                Cancel
+              </button>
+            </div>
+          </template>
         </div>
 
         <!-- Editorial workflow: split button (Save Draft + Publish) -->

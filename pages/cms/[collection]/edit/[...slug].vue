@@ -38,6 +38,10 @@ const loading = ref(true)
 /** Whether local content differs from what's on GitHub */
 const unpublishedChanges = ref(false)
 
+/** Whether a discard operation is in progress */
+const discarding = ref(false)
+const discardError = ref<string | null>(null)
+
 // ─── Sync conflict dialog state ─────────────────────────
 const showSyncDialog = ref(false)
 const showResolver = ref(false)
@@ -284,6 +288,46 @@ function handleResolverCancel() {
   // Re-open the sync dialog so the user can choose another option
   showSyncDialog.value = true
 }
+
+/**
+ * Discard all local changes — revert the file to its last committed (GitHub) state.
+ * Calls the discard API and reloads the content from disk.
+ */
+async function handleDiscard() {
+  discarding.value = true
+  discardError.value = null
+
+  try {
+    // Construct the file path: content/{collection}/{slug}/index.md
+    // Uses the collection folder + path pattern from config
+    const col = collection.value
+    const folder = col?.folder ?? `content/${collectionName.value}`
+    const pathPattern = col?.path ?? '{{slug}}/index'
+    const filePath = `${folder}/${pathPattern.replace('{{slug}}', slug.value)}.md`
+
+    await $fetch('/api/cms/content/discard', {
+      method: 'POST',
+      body: {
+        files: [{ path: filePath, status: 'modified' }],
+      },
+    })
+
+    // Reload content from the now-reverted file
+    const token = getToken()
+    const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
+      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+    })
+    initialData.value = {
+      ...res.frontmatter,
+      body: res.body,
+    }
+    unpublishedChanges.value = false
+  } catch (err: any) {
+    discardError.value = err.data?.message || err.message || 'Failed to discard changes'
+  } finally {
+    discarding.value = false
+  }
+}
 </script>
 
 <template>
@@ -399,6 +443,15 @@ function handleResolverCancel() {
       <p class="text-sm text-destructive">{{ saveError }}</p>
     </div>
 
+    <!-- Discard Error -->
+    <div
+      v-if="discardError && !showSuccess"
+      class="mb-6 flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/5 p-4"
+    >
+      <AlertCircle class="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+      <p class="text-sm text-destructive">{{ discardError }}</p>
+    </div>
+
     <!-- Form -->
     <CmsCollectionForm
       v-if="collection?.fields && initialData && !showSuccess"
@@ -410,8 +463,10 @@ function handleResolverCancel() {
       :editorial-workflow="isEditorial"
       :local-backend="isLocalBackend"
       :unpublished-changes="unpublishedChanges"
+      :discarding="discarding"
       @submit="handleSubmit"
       @publish="handlePublish"
+      @discard="handleDiscard"
     />
 
     <!-- Sync Conflict Dialog -->
