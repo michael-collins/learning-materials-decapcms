@@ -28,6 +28,8 @@ const user = ref<CmsUser | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const _patToken = ref<string | null>(null)
+/** Tracks the in-flight restoreSession() promise so multiple callers can await the same one */
+let _restorePromise: Promise<void> | null = null
 
 export function useCmsAuth() {
   const isAuthenticated = computed(() => !!user.value)
@@ -96,10 +98,24 @@ export function useCmsAuth() {
   /**
    * Restore session from either OAuth cookie or localStorage PAT.
    * Called on app mount and CMS page navigation.
+   * Deduplicates concurrent calls — safe to call from multiple components.
    */
   async function restoreSession() {
-    if (import.meta.server || user.value) return
+    if (import.meta.server) return
+    // Already authenticated
+    if (user.value) return
+    // If a restore is already in-flight, wait for it
+    if (_restorePromise) return _restorePromise
 
+    _restorePromise = _doRestore()
+    try {
+      await _restorePromise
+    } finally {
+      _restorePromise = null
+    }
+  }
+
+  async function _doRestore() {
     isLoading.value = true
     try {
       // 1. Check for OAuth session (server-side cookie)

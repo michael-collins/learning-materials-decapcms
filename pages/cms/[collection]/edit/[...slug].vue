@@ -26,7 +26,7 @@ const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
 const { save, publishToGitHub, loadRaw, saving, publishing, error: saveError, lastResult, isLocalBackend } = useCmsSave()
 const { prePublishCheck, pullFromGitHub, syncStatus, syncMessage, pulling, localVersion, remoteVersion } = useCmsSync()
-const { getToken } = useCmsAuth()
+const { getToken, restoreSession } = useCmsAuth()
 
 const isEditorial = computed(() => !isLocalBackend.value && config.value?.publishMode === 'editorial_workflow')
 
@@ -45,6 +45,8 @@ const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; pub
 // gray-matter's Node.js Buffer dependency in the browser)
 onMounted(async () => {
   try {
+    // Ensure auth session is restored before making API calls
+    await restoreSession()
     const token = getToken()
     const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
       params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },

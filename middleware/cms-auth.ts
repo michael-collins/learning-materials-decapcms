@@ -3,9 +3,8 @@
  * Redirects unauthenticated users to the CMS login page.
  * Only applies to /cms routes (except /cms/login).
  *
- * Supports two auth methods:
- *   1. OAuth session — server-side cookie (checked via API)
- *   2. PAT — token in localStorage (client-side check)
+ * Also triggers session restoration so the PAT token is available
+ * by the time the page's onMounted fires.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
   // Only guard /cms routes (except login)
@@ -16,17 +15,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // On server, skip — auth check happens client-side
   if (import.meta.server) return
 
-  // Check PAT in localStorage (fast, synchronous)
-  const token = localStorage.getItem('cms-github-token')
-  if (token) return
+  const { restoreSession, isAuthenticated } = useCmsAuth()
 
-  // Check for OAuth session cookie via server API
-  try {
-    const session = await $fetch<{ authenticated: boolean }>('/api/cms/auth/session')
-    if (session.authenticated) return
-  } catch {
-    // API error — fall through to redirect
+  // Restore session (validates PAT or OAuth cookie, sets _patToken + user)
+  await restoreSession()
+
+  // If still not authenticated after restore, redirect to login
+  if (!isAuthenticated.value) {
+    return navigateTo('/cms/login')
   }
-
-  return navigateTo('/cms/login')
 })
