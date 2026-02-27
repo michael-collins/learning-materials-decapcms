@@ -18,11 +18,22 @@ import { extractAuthToken } from '~/server/utils/auth'
 import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
-  const formData = await readMultipartFormData(event)
-  if (!formData || formData.length === 0) {
+  let formData: Awaited<ReturnType<typeof readMultipartFormData>>
+  try {
+    formData = await readMultipartFormData(event)
+  } catch (err: any) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'No file provided',
+      statusMessage: `Failed to parse multipart form data: ${err.message}`,
+    })
+  }
+
+  if (!formData || formData.length === 0) {
+    // Debug: include content-type header to diagnose
+    const ct = getHeader(event, 'content-type') || 'none'
+    throw createError({
+      statusCode: 400,
+      statusMessage: `No file provided (content-type: ${ct}, formData: ${formData === null ? 'null' : 'empty'})`,
     })
   }
 
@@ -31,9 +42,10 @@ export default defineEventHandler(async (event) => {
   const folderEntry = formData.find((entry) => entry.name === 'folder')
 
   if (!fileEntry || !fileEntry.data || !fileEntry.filename) {
+    const names = formData.map(e => e.name).join(', ')
     throw createError({
       statusCode: 400,
-      statusMessage: 'No file data found in upload',
+      statusMessage: `No file data found in upload (fields: ${names})`,
     })
   }
 
