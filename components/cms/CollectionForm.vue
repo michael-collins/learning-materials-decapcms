@@ -300,7 +300,7 @@ const showPreview = ref(true)
         </div>
 
         <!-- Editorial workflow: split button (Save Draft + Publish) -->
-        <div v-if="editorialWorkflow" class="flex items-center">
+        <div v-if="editorialWorkflow" class="relative flex items-center">
           <!-- Primary: Save as Draft -->
           <button
             type="button"
@@ -312,6 +312,14 @@ const showPreview = ref(true)
             <GitPullRequest v-else class="h-4 w-4" />
             {{ saving ? 'Saving...' : isNew ? 'Save as Draft' : 'Save Draft' }}
           </button>
+          <!-- Orange notification badge when there are unpublished changes -->
+          <span
+            v-if="isDirty && !saving"
+            class="absolute -right-1 -top-1 z-10 flex h-3 w-3 items-center justify-center"
+          >
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-orange-500" />
+          </span>
 
           <!-- Dropdown toggle -->
           <div class="relative">
@@ -353,24 +361,32 @@ const showPreview = ref(true)
         <!-- Non-editorial: save button + optional Publish to GitHub -->
         <div v-else class="flex items-center gap-3">
           <!-- Publish to GitHub (only in local backend mode) -->
-          <div v-if="localBackend" class="flex items-center">
+          <div v-if="localBackend" class="relative flex items-center">
             <button
               type="button"
               @click="handlePublish('direct')"
-              :disabled="publishing || saving"
+              :disabled="publishing || saving || !isDirty"
               class="flex items-center gap-2 rounded-l-md border border-foreground/20 bg-background px-3 py-2 text-sm font-medium transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
             >
               <Loader2 v-if="publishing" class="h-4 w-4 animate-spin" />
               <Upload v-else class="h-4 w-4" />
               {{ publishing ? 'Publishing...' : 'Publish to GitHub' }}
             </button>
+            <!-- Orange notification badge when there are unpublished changes -->
+            <span
+              v-if="isDirty && !publishing"
+              class="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center"
+            >
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+              <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-orange-500" />
+            </span>
 
             <!-- Dropdown for editorial option -->
             <div class="relative">
               <button
                 type="button"
                 @click="showPublishDropdown = !showPublishDropdown"
-                :disabled="publishing || saving"
+                :disabled="publishing || saving || !isDirty"
                 class="rounded-r-md border border-l-0 border-foreground/20 bg-background px-2 py-2 transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
               >
                 <ChevronDown class="h-4 w-4" />
@@ -409,15 +425,25 @@ const showPreview = ref(true)
           </div>
 
           <!-- Save button -->
-          <button
-            type="submit"
-            :disabled="saving || publishing || !isDirty"
-            class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
-          >
-            <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
-            <Save v-else class="h-4 w-4" />
-            {{ saving ? 'Saving...' : isNew ? 'Create' : 'Save' }}
-          </button>
+          <div class="relative">
+            <button
+              type="submit"
+              :disabled="saving || publishing || !isDirty"
+              class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+            >
+              <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
+              <Save v-else class="h-4 w-4" />
+              {{ saving ? 'Saving...' : isNew ? 'Create' : 'Save' }}
+            </button>
+            <!-- Orange notification badge when there are unpublished changes -->
+            <span
+              v-if="isDirty && !saving && !localBackend"
+              class="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center"
+            >
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+              <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-orange-500" />
+            </span>
+          </div>
         </div>
       </div>
     </div>
