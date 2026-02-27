@@ -1,21 +1,15 @@
 /**
- * Media upload API endpoint.
+ * Media upload API endpoint — LOCAL DEV ONLY.
  *
- * Handles file uploads to the public/uploads directory.
+ * In production, the client uploads directly to the GitHub Contents API
+ * (see composables/useCmsUpload.ts). This endpoint is only used in local
+ * development to write files to the local public/uploads directory.
  *
- * Two modes:
- * 1. JSON body (production / Netlify) — client sends base64-encoded file data:
- *    { filename: string, content: string (base64), folder?: string, token?: string }
- * 2. Multipart form data (dev mode) — standard file upload:
- *    file: File, folder?: string
- *
+ * Accepts multipart form data: file: File, folder?: string
  * Returns: { path: string, filename: string, size: number }
  */
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve, join, extname } from 'node:path'
-import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
-import { extractAuthToken } from '~/server/utils/auth'
-import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 function sanitizeFilename(originalFilename: string) {
   const ext = extname(originalFilename)
@@ -29,79 +23,13 @@ function sanitizeFilename(originalFilename: string) {
 }
 
 export default defineEventHandler(async (event) => {
-  const ct = getHeader(event, 'content-type') || ''
   const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
 
-  console.log('[upload] content-type:', ct, 'hasLocalFiles:', hasLocalFiles)
-
-  // ── JSON body path (production on Netlify) ──
-  if (ct.includes('application/json') || !hasLocalFiles) {
-    // If someone sends multipart to the JSON path (stale client), give a clear error
-    if (ct.includes('multipart/form-data')) {
-      throw createError({
-        statusCode: 400,
-        message: 'Multipart uploads are not supported in production. Please hard-refresh your browser (Cmd+Shift+R) to get the updated client.',
-      })
-    }
-
-    let body: any
-    try {
-      body = await readBody(event)
-    } catch (parseErr: any) {
-      console.error('[upload] readBody failed:', parseErr.message)
-      throw createError({
-        statusCode: 400,
-        message: `Failed to parse request body: ${parseErr.message}`,
-      })
-    }
-
-    console.log('[upload] body type:', typeof body, 'keys:', body ? Object.keys(body) : 'null', 'has filename:', !!body?.filename, 'has content:', !!body?.content)
-
-    if (!body?.filename || !body?.content) {
-      throw createError({
-        statusCode: 400,
-        message: `Missing required fields: filename, content (base64). Received keys: ${body ? Object.keys(body).join(', ') : 'null body'}. Body type: ${typeof body}`,
-      })
-    }
-
-    const originalFilename = body.filename as string
-    const base64Content = body.content as string
-    const folder = (body.folder as string) || 'uploads'
-    const normalizedFolder = folder.replace(/\.\./g, '').replace(/^\//, '')
-    const { safeFilename } = sanitizeFilename(originalFilename)
-    const publicPath = `/${normalizedFolder}/${safeFilename}`
-
-    try {
-      const token = extractAuthToken(event, body.token)
-      const config = await getCmsConfig()
-      const backend = config.backend || {}
-      const { owner, repo } = parseRepo(backend.repo || '')
-      const branch = backend.branch || 'main'
-
-      const git = createGitBackend({ owner, repo, branch, token })
-      const repoPath = `public/${normalizedFolder}/${safeFilename}`
-
-      // Write file directly via Contents API (content is already base64)
-      await git.writeFile({
-        path: repoPath,
-        content: base64Content,
-        message: `media: upload ${safeFilename}`,
-      })
-
-      const fileSize = Math.ceil(base64Content.length * 3 / 4)
-      return {
-        path: publicPath,
-        filename: safeFilename,
-        originalFilename,
-        size: fileSize,
-        contentType: body.contentType || 'application/octet-stream',
-      }
-    } catch (err: any) {
-      throw createError({
-        statusCode: err.statusCode || 500,
-        message: `Upload failed: ${err.message || err}`,
-      })
-    }
+  if (!hasLocalFiles) {
+    throw createError({
+      statusCode: 400,
+      message: 'File uploads in production go directly to GitHub from the browser. This endpoint is for local development only.',
+    })
   }
 
   // ── Multipart form data path (local dev) ──
