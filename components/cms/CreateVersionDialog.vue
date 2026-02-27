@@ -21,6 +21,7 @@ const emit = defineEmits<{
 }>()
 
 // ─── State ──────────────────────────────────────────────
+const { getToken } = useCmsAuth()
 const loading = ref(false)
 const creating = ref(false)
 const error = ref<string | null>(null)
@@ -72,11 +73,12 @@ async function fetchVersions() {
   loading.value = true
   error.value = null
   try {
+    const token = getToken()
     const data = await $fetch<{
       currentVersion: string
       versions: Array<{ version: string; versionStatus: string; createdAt?: string; title?: string }>
     }>('/api/cms/content/versions', {
-      params: { collection: props.collection, slug: props.slug },
+      params: { collection: props.collection, slug: props.slug, ...(token ? { token } : {}) },
     })
     existingVersions.value = data.versions
   } catch (err: any) {
