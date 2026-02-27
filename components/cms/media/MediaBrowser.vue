@@ -189,6 +189,8 @@ watch(typeFilter, fetchFiles)
 onMounted(fetchFiles)
 
 // ─── Upload ────────────────────────────────────────────────
+const { getToken } = useCmsAuth()
+
 async function handleUpload(fileList: FileList | null) {
   if (!fileList || fileList.length === 0) return
 
@@ -203,6 +205,8 @@ async function handleUpload(fileList: FileList | null) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('folder', currentFolder.value)
+    const token = getToken()
+    if (token) formData.append('token', token)
 
     try {
       await $fetch('/api/cms/media/upload', { method: 'POST', body: formData })

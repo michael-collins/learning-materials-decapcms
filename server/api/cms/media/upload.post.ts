@@ -15,6 +15,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve, join, extname } from 'node:path'
 import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
 import { extractAuthToken } from '~/server/utils/auth'
+import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
   const formData = await readMultipartFormData(event)
@@ -58,15 +59,17 @@ export default defineEventHandler(async (event) => {
   const publicPath = `/${normalizedFolder}/${safeFilename}`
 
   // ── Production: commit to GitHub via API ──
-  if (!import.meta.dev) {
+  const hasLocalFiles = existsSync(resolve(process.cwd(), 'content'))
+  if (!hasLocalFiles) {
     // Extract token from the form data or session cookie
     const tokenEntry = formData.find((entry) => entry.name === 'token')
     const bodyToken = tokenEntry?.data?.toString()
     const token = extractAuthToken(event, bodyToken)
 
-    const config = useRuntimeConfig()
-    const { owner, repo } = parseRepo(config.public.cmsRepo as string)
-    const branch = (config.public.cmsBranch as string) || 'main'
+    const config = await getCmsConfig()
+    const backend = config.backend || {}
+    const { owner, repo } = parseRepo(backend.repo || '')
+    const branch = backend.branch || 'main'
 
     const git = createGitBackend({ owner, repo, branch, token })
 

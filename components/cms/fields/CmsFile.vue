@@ -49,6 +49,8 @@ const fileExtension = computed(() => {
 })
 
 // ─── File upload ──────────────────────────────────────────────
+const { getToken } = useCmsAuth()
+
 function triggerFileInput() {
   fileInput.value?.click()
 }
@@ -65,6 +67,8 @@ async function handleFileSelect(event: Event) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('folder', 'uploads')
+    const token = getToken()
+    if (token) formData.append('token', token)
 
     const response = await $fetch<{ path: string }>('/api/cms/media/upload', {
       method: 'POST',
