@@ -18,11 +18,11 @@ import {
   GitCompareArrows, Check, User, Globe, Merge,
   ChevronDown, ChevronUp, FileText, Layers,
 } from 'lucide-vue-next'
-import type { ContentVersion } from '~/composables/useCmsSync'
+import type { SyncContentVersion } from '~/composables/useCmsSync'
 
 const props = defineProps<{
-  localVersion: ContentVersion
-  remoteVersion: ContentVersion
+  localVersion: SyncContentVersion
+  remoteVersion: SyncContentVersion
 }>()
 
 const emit = defineEmits<{

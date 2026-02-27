@@ -1,21 +1,20 @@
 /**
  * Create a folder inside public/uploads (or a subfolder thereof).
  *
- * Body: { folder: string, name: string }
+ * Body: { folder: string, name: string, token?: string }
  *   folder — parent directory relative to public/ (e.g. "uploads" or "uploads/images")
  *   name   — new folder name (alphanumeric, hyphens, underscores)
+ *   token  — GitHub PAT (optional, used in production mode)
+ *
+ * In dev mode:  creates the directory on the local filesystem.
+ * In production: commits a .gitkeep file to GitHub (git doesn't track empty dirs).
  */
 import { mkdirSync, existsSync } from 'node:fs'
 import { resolve, normalize } from 'node:path'
+import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
+import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
-  if (!import.meta.dev) {
-    throw createError({
-      statusCode: 501,
-      statusMessage: 'Folder creation via GitHub API not yet implemented. Use local development mode.',
-    })
-  }
-
   const body = await readBody(event)
   const parentFolder = (body?.folder as string) || 'uploads'
   const folderName = (body?.name as string) || ''
@@ -40,6 +39,50 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Folders must be within /uploads/' })
   }
 
+  const folderPath = `${normalizedParent}/${safeName}`
+
+  // ── Production: commit a .gitkeep to GitHub via API ──
+  if (!import.meta.dev) {
+    const token = extractAuthToken(event, body?.token)
+    const config = useRuntimeConfig()
+    const { owner, repo } = parseRepo(config.public.cmsRepo as string)
+    const branch = (config.public.cmsBranch as string) || 'main'
+
+    const git = createGitBackend({ owner, repo, branch, token })
+
+    // Repo path: public/<parent>/<name>/.gitkeep
+    const gitkeepPath = `public/${folderPath}/.gitkeep`
+
+    // Check if folder already has files (i.e. already exists)
+    const existing = await git.getFile(gitkeepPath)
+    if (existing) {
+      throw createError({ statusCode: 409, statusMessage: `Folder "${safeName}" already exists` })
+    }
+
+    try {
+      // Commit an empty .gitkeep to create the folder in the repo
+      const emptyContent = Buffer.from('').toString('base64')
+      await git.writeFile({
+        path: gitkeepPath,
+        content: emptyContent,
+        message: `media: create folder ${folderPath}`,
+      })
+    } catch (err: any) {
+      // If it's a 422, the file may already exist (race condition or existing folder)
+      if (err.statusCode === 422 || err.status === 422) {
+        throw createError({ statusCode: 409, statusMessage: `Folder "${safeName}" already exists` })
+      }
+      throw createError({ statusCode: 500, statusMessage: `Failed to create folder on GitHub: ${err.message}` })
+    }
+
+    return {
+      success: true,
+      name: safeName,
+      path: folderPath,
+    }
+  }
+
+  // ── Dev mode: create directory on local filesystem ──
   const targetDir = resolve(process.cwd(), 'public', normalizedParent, safeName)
 
   // Ensure it doesn't already exist
@@ -56,6 +99,6 @@ export default defineEventHandler(async (event) => {
   return {
     success: true,
     name: safeName,
-    path: `${normalizedParent}/${safeName}`,
+    path: folderPath,
   }
 })

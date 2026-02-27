@@ -24,6 +24,7 @@ import {
   Image as ImageIcon, File, FileText, Box, Film, Music,
   FolderOpen, FolderPlus, RefreshCw, X, ArrowUpFromLine,
   Pencil, FolderInput, CheckSquare, Square, ChevronRight,
+  AlertTriangle, FileWarning,
 } from 'lucide-vue-next'
 
 interface MediaFile {
@@ -91,6 +92,35 @@ const moving = ref(false)
 
 // Clipboard feedback
 const copiedPath = ref('')
+
+// Reference scanning state
+interface ContentReference {
+  file: string
+  line: number
+  context: string
+}
+interface UpdatedFile {
+  file: string
+  replacements: number
+}
+const showRefConfirm = ref(false)
+const refScanLoading = ref(false)
+const pendingReferences = ref<ContentReference[]>([])
+const pendingOperation = ref<'rename' | 'move' | null>(null)
+// Store the pending operation data
+const pendingSource = ref('')
+const pendingDestination = ref('')
+const pendingMoveFiles = ref<Array<{ source: string; destination: string }>>([])
+
+// Post-operation result
+const operationResult = ref<{ message: string; updatedFiles: UpdatedFile[] } | null>(null)
+
+// Auto-dismiss operation result after 10 seconds
+watch(operationResult, (v) => {
+  if (v) {
+    setTimeout(() => { operationResult.value = null }, 10000)
+  }
+})
 
 // ─── Computed ──────────────────────────────────────────────
 const typeOptions = computed(() => {
@@ -255,25 +285,67 @@ async function bulkDelete() {
 }
 
 // ─── Rename ────────────────────────────────────────────────
-async function confirmRename() {
+async function scanAndRename() {
   if (!renameTarget.value || !renameValue.value.trim()) return
+  if (renameValue.value === renameTarget.value.name) return
+
+  const oldPath = renameTarget.value.path.replace(/^\//, '')
+  const folder = oldPath.substring(0, oldPath.lastIndexOf('/'))
+  const newPath = `${folder}/${renameValue.value.trim()}`
+
+  // Scan for references
+  refScanLoading.value = true
+  try {
+    const res = await $fetch<{ references: ContentReference[] }>('/api/cms/media/find-references', {
+      method: 'POST',
+      body: { path: renameTarget.value.path },
+    })
+    pendingReferences.value = res.references
+    pendingSource.value = oldPath
+    pendingDestination.value = newPath
+    pendingOperation.value = 'rename'
+
+    if (res.references.length > 0) {
+      // Show confirmation dialog
+      showRefConfirm.value = true
+    } else {
+      // No references — proceed directly
+      await executeRename(oldPath, newPath)
+    }
+  } catch (err: any) {
+    error.value = err.data?.message || 'Failed to scan for references'
+  } finally {
+    refScanLoading.value = false
+  }
+}
+
+async function executeRename(source: string, destination: string) {
   renaming.value = true
   try {
-    const oldPath = renameTarget.value.path.replace(/^\//, '')
-    const folder = oldPath.substring(0, oldPath.lastIndexOf('/'))
-    const newPath = `${folder}/${renameValue.value.trim()}`
-    await $fetch('/api/cms/media/move', {
+    const res = await $fetch<{ success: boolean; updatedReferences: UpdatedFile[] }>('/api/cms/media/move', {
       method: 'POST',
-      body: { source: oldPath, destination: newPath },
+      body: { source, destination, updateReferences: true },
     })
+    if (res.updatedReferences?.length > 0) {
+      operationResult.value = {
+        message: `Renamed file and updated ${res.updatedReferences.reduce((sum, f) => sum + f.replacements, 0)} reference(s) across ${res.updatedReferences.length} file(s).`,
+        updatedFiles: res.updatedReferences,
+      }
+    }
     renameTarget.value = null
     renameValue.value = ''
+    showRefConfirm.value = false
+    pendingOperation.value = null
     await fetchFiles()
   } catch (err: any) {
     error.value = err.data?.message || 'Failed to rename file'
   } finally {
     renaming.value = false
   }
+}
+
+async function confirmRename() {
+  await executeRename(pendingSource.value, pendingDestination.value)
 }
 
 // ─── Move files ────────────────────────────────────────────
@@ -283,25 +355,98 @@ function openMoveModal() {
   showMoveModal.value = true
 }
 
-async function confirmMove() {
+async function scanAndMove() {
   if (selectedFiles.value.size === 0) return
-  moving.value = true
-  let moved = 0
+
+  // Build the list of source → destination pairs
+  const moveOps: Array<{ source: string; destination: string }> = []
   for (const srcPath of selectedFiles.value) {
     const fileName = srcPath.split('/').pop()
     const destPath = `${moveTargetFolder.value}/${fileName}`
-    try {
-      await $fetch('/api/cms/media/move', {
+    moveOps.push({
+      source: srcPath.replace(/^\//, ''),
+      destination: destPath,
+    })
+  }
+
+  // Scan all files for references
+  refScanLoading.value = true
+  try {
+    const allRefs: ContentReference[] = []
+    for (const op of moveOps) {
+      const res = await $fetch<{ references: ContentReference[] }>('/api/cms/media/find-references', {
         method: 'POST',
-        body: { source: srcPath.replace(/^\//, ''), destination: destPath },
+        body: { path: `/${op.source}` },
+      })
+      allRefs.push(...res.references)
+    }
+
+    // Deduplicate by file+line
+    const seen = new Set<string>()
+    pendingReferences.value = allRefs.filter((r) => {
+      const key = `${r.file}:${r.line}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+
+    pendingMoveFiles.value = moveOps
+    pendingOperation.value = 'move'
+
+    if (pendingReferences.value.length > 0) {
+      showRefConfirm.value = true
+    } else {
+      await executeMove()
+    }
+  } catch (err: any) {
+    error.value = err.data?.message || 'Failed to scan for references'
+  } finally {
+    refScanLoading.value = false
+  }
+}
+
+async function executeMove() {
+  moving.value = true
+  let moved = 0
+  const allUpdated: UpdatedFile[] = []
+  for (const op of pendingMoveFiles.value) {
+    try {
+      const res = await $fetch<{ success: boolean; updatedReferences: UpdatedFile[] }>('/api/cms/media/move', {
+        method: 'POST',
+        body: { source: op.source, destination: op.destination, updateReferences: true },
       })
       moved++
+      if (res.updatedReferences?.length > 0) {
+        allUpdated.push(...res.updatedReferences)
+      }
     } catch { /* continue */ }
   }
+
+  if (allUpdated.length > 0) {
+    // Deduplicate updated files
+    const fileMap = new Map<string, number>()
+    for (const f of allUpdated) {
+      fileMap.set(f.file, (fileMap.get(f.file) || 0) + f.replacements)
+    }
+    const deduped = Array.from(fileMap.entries()).map(([file, replacements]) => ({ file, replacements }))
+    const totalRefs = deduped.reduce((sum, f) => sum + f.replacements, 0)
+    operationResult.value = {
+      message: `Moved ${moved} file(s) and updated ${totalRefs} reference(s) across ${deduped.length} content file(s).`,
+      updatedFiles: deduped,
+    }
+  }
+
   selectedFiles.value.clear()
   showMoveModal.value = false
+  showRefConfirm.value = false
+  pendingOperation.value = null
+  pendingMoveFiles.value = []
   moving.value = false
   await fetchFiles()
+}
+
+async function confirmMove() {
+  await executeMove()
 }
 
 // Available folders for move target (fetched when modal opens)
@@ -810,18 +955,19 @@ function startRename(file: MediaFile) {
             v-model="renameValue"
             type="text"
             class="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            @keyup.enter="confirmRename"
+            @keyup.enter="scanAndRename"
             autofocus
           />
           <div class="mt-4 flex justify-end gap-2">
             <button type="button" @click="renameTarget = null" class="rounded-md border px-4 py-2 text-sm hover:bg-accent">Cancel</button>
             <button
               type="button"
-              @click="confirmRename"
-              :disabled="renaming || !renameValue.trim() || renameValue === renameTarget.name"
+              @click="scanAndRename"
+              :disabled="renaming || refScanLoading || !renameValue.trim() || renameValue === renameTarget.name"
               class="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
-              {{ renaming ? 'Renaming...' : 'Rename' }}
+              <RefreshCw v-if="refScanLoading" class="mr-1 inline h-3.5 w-3.5 animate-spin" />
+              {{ refScanLoading ? 'Scanning...' : renaming ? 'Renaming...' : 'Rename' }}
             </button>
           </div>
         </div>
@@ -860,12 +1006,99 @@ function startRename(file: MediaFile) {
             <button type="button" @click="showMoveModal = false" class="rounded-md border px-4 py-2 text-sm hover:bg-accent">Cancel</button>
             <button
               type="button"
-              @click="confirmMove"
-              :disabled="moving || !moveTargetFolder"
+              @click="scanAndMove"
+              :disabled="moving || refScanLoading || !moveTargetFolder"
               class="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
-              {{ moving ? 'Moving...' : 'Move' }}
+              <RefreshCw v-if="refScanLoading" class="mr-1 inline h-3.5 w-3.5 animate-spin" />
+              {{ refScanLoading ? 'Scanning...' : moving ? 'Moving...' : 'Move' }}
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference confirmation dialog -->
+      <div v-if="showRefConfirm" class="fixed inset-0 z-60 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/50" @click="showRefConfirm = false; pendingOperation = null" />
+        <div class="relative z-10 mx-4 w-full max-w-lg rounded-lg border bg-background p-6 shadow-xl">
+          <div class="mb-3 flex items-center gap-2">
+            <AlertTriangle class="h-5 w-5 text-amber-500" />
+            <h3 class="text-lg font-semibold">Content References Found</h3>
+          </div>
+          <p class="mb-3 text-sm text-muted-foreground">
+            {{ pendingReferences.length }} content file{{ pendingReferences.length !== 1 ? 's' : '' }}
+            reference{{ pendingReferences.length !== 1 ? '' : 's' }} this media asset.
+            {{ pendingOperation === 'rename' ? 'Renaming' : 'Moving' }} will automatically update all references.
+          </p>
+
+          <!-- Reference list -->
+          <div class="max-h-48 space-y-1 overflow-auto rounded-md border bg-muted/30 p-2">
+            <div
+              v-for="(ref, i) in pendingReferences.slice(0, 50)"
+              :key="i"
+              class="flex items-start gap-2 rounded px-2 py-1.5 text-xs hover:bg-muted/50"
+            >
+              <FileWarning class="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+              <div class="min-w-0 flex-1">
+                <span class="font-mono font-medium">{{ ref.file }}</span>
+                <span class="ml-1 text-muted-foreground">line {{ ref.line }}</span>
+                <p class="mt-0.5 truncate text-muted-foreground">{{ ref.context }}</p>
+              </div>
+            </div>
+            <p v-if="pendingReferences.length > 50" class="px-2 py-1 text-xs text-muted-foreground">
+              ...and {{ pendingReferences.length - 50 }} more
+            </p>
+          </div>
+
+          <div class="mt-4 flex justify-end gap-2">
+            <button
+              type="button"
+              @click="showRefConfirm = false; pendingOperation = null"
+              class="rounded-md border px-4 py-2 text-sm hover:bg-accent"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="pendingOperation === 'rename' ? confirmRename() : confirmMove()"
+              :disabled="renaming || moving"
+              class="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            >
+              <RefreshCw v-if="renaming || moving" class="mr-1 inline h-3.5 w-3.5 animate-spin" />
+              {{ renaming || moving ? 'Processing...' : pendingOperation === 'rename' ? 'Rename & Update References' : 'Move & Update References' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operation result toast -->
+      <div
+        v-if="operationResult"
+        class="fixed bottom-4 right-4 z-70 w-full max-w-md rounded-lg border bg-background p-4 shadow-xl"
+      >
+        <div class="mb-2 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <Check class="h-4 w-4 text-green-500" />
+            <span class="text-sm font-medium">References Updated</span>
+          </div>
+          <button
+            type="button"
+            @click="operationResult = null"
+            class="rounded p-1 text-muted-foreground hover:bg-accent"
+          >
+            <X class="h-4 w-4" />
+          </button>
+        </div>
+        <p class="mb-2 text-sm text-muted-foreground">{{ operationResult.message }}</p>
+        <div v-if="operationResult.updatedFiles.length > 0" class="max-h-32 space-y-0.5 overflow-auto text-xs">
+          <div
+            v-for="f in operationResult.updatedFiles"
+            :key="f.file"
+            class="flex items-center gap-1.5 rounded px-1.5 py-0.5 text-muted-foreground"
+          >
+            <FileText class="h-3 w-3 shrink-0" />
+            <span class="truncate font-mono">{{ f.file }}</span>
+            <span class="ml-auto shrink-0">({{ f.replacements }})</span>
           </div>
         </div>
       </div>

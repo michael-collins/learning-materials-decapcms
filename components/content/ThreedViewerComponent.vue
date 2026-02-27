@@ -60,7 +60,7 @@ const modelViewerAttrs = computed(() => ({
       </p>
     </div>
     
-    <ContentMediaCaption
+    <MediaCaption
       v-if="hasValidSrc"
       :title="title"
       :caption="caption"

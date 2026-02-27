@@ -45,7 +45,7 @@ const embedUrl = computed(() => {
       mozallowfullscreen="true"
       webkitallowfullscreen="true"
     />
-    <ContentMediaCaption
+    <MediaCaption
       :title="title"
       :caption="caption"
       :credit="credit"

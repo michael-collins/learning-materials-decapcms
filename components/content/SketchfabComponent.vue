@@ -78,7 +78,7 @@ const sketchfabEmbedUrl = computed(() => {
       />
     </div>
     
-    <ContentMediaCaption
+    <MediaCaption
       :title="title"
       :caption="caption"
       :credit="credit"

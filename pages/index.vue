@@ -122,7 +122,7 @@ definePageMeta({
           <p class="text-muted-foreground leading-relaxed mb-4">
             This platform implements the OER Schema specification, which extends Schema.org with educational metadata specifically designed for Open Educational Resources. Each page includes structured JSON-LD markup that makes content discoverable by search engines and educational resource repositories.
           </p>
-          <a href="https://github.com/michael-collins/oerschema" target="_blank" class="inline-flex items-center gap-2 text-primary hover:underline">
+          <a href="https://oerschema.org" target="_blank" class="inline-flex items-center gap-2 text-primary hover:underline">
             Learn more about OER Schema
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -135,7 +135,7 @@ definePageMeta({
           <p class="text-muted-foreground leading-relaxed mb-4">
             AIUL provides a flexible licensing framework specifically designed for educational materials and AI usage transparency. It allows content creators to specify granular permissions for different types of academic use and AI training, including teaching, research, and institutional contexts.
           </p>
-          <a href="https://github.com/michael-collins/aiul" target="_blank" class="inline-flex items-center gap-2 text-primary hover:underline">
+          <a href="https://dmd-program.github.io/aiul/" target="_blank" class="inline-flex items-center gap-2 text-primary hover:underline">
             Learn more about AIUL
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -145,75 +145,5 @@ definePageMeta({
       </div>
     </div>
 
-    <!-- Technology Stack -->
-    <div class="rounded-xl border bg-card p-10 shadow-sm mb-16">
-      <h2 class="mb-8 text-3xl font-semibold">Technology Stack</h2>
-      <div class="grid gap-6 sm:grid-cols-2">
-        <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          </div>
-          <div>
-            <strong class="block text-foreground text-lg mb-2">Nuxt 4</strong>
-            <span class="text-sm text-muted-foreground leading-relaxed">The Intuitive Vue Framework providing SSR, static generation, and a powerful plugin ecosystem</span>
-          </div>
-        </div>
-        <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
-          </div>
-          <div>
-            <strong class="block text-foreground text-lg mb-2">Nuxt Content</strong>
-            <span class="text-sm text-muted-foreground leading-relaxed">File-based CMS with Markdown support, syntax highlighting, and powerful querying capabilities</span>
-          </div>
-        </div>
-        <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          </div>
-          <div>
-            <strong class="block text-foreground text-lg mb-2">Custom CMS</strong>
-            <span class="text-sm text-muted-foreground leading-relaxed">Built-in content management with Git-based workflow and customizable content modeling</span>
-          </div>
-        </div>
-        <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          </div>
-          <div>
-            <strong class="block text-foreground text-lg mb-2">shadcn-vue & Tailwind CSS</strong>
-            <span class="text-sm text-muted-foreground leading-relaxed">Beautiful, accessible UI components with utility-first styling for rapid development</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Get Started -->
-    <div class="rounded-xl bg-gradient-to-br from-primary/10 to-purple-600/10 p-10 text-center">
-      <h2 class="text-3xl font-bold mb-4">Ready to Explore?</h2>
-      <p class="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-        Browse our collection of educational materials or visit the admin panel to start creating your own content.
-      </p>
-      <div class="flex flex-wrap gap-4 justify-center">
-        <NuxtLink to="/exercises" class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
-          Browse Exercises
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </NuxtLink>
-        <NuxtLink to="/projects" class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
-          View Projects
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </NuxtLink>
-        <a href="/admin" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-primary bg-background px-6 py-3 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/10">
-          Open CMS Admin
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-        </a>
-      </div>
-    </div>
   </div>
 </template>

@@ -49,6 +49,17 @@ const currentPageVersion = ref<string | null>(null)
 const allVersions = ref<Array<{ version: string, versionStatus: string }>>([])
 const isValidVersion = ref(true)
 
+// Only show version UI on content detail pages (e.g. /lessons/my-lesson),
+// not on listing pages (/lessons), the front page (/), or tools pages.
+const isContentDetailPage = computed(() => {
+  const pathParts = route.path.split('/').filter(Boolean)
+  // Need at least 2 segments: <collection>/<slug>
+  // Exclude CMS and tools routes which aren't versioned content
+  if (pathParts.length < 2) return false
+  if (pathParts[0] === 'cms' || pathParts[0] === 'tools' || pathParts[0] === 'embed') return false
+  return true
+})
+
 // Fetch all versions and latest version
 const fetchLatestVersion = async () => {
   if (!route.query.version) {
@@ -198,6 +209,15 @@ onMounted(() => {
 
 // Re-fetch when route changes
 watch(() => route.query.version, () => {
+  fetchLatestVersion()
+})
+
+// Reset version state when navigating to a different page
+watch(() => route.path, () => {
+  currentPageVersion.value = null
+  latestVersion.value = null
+  allVersions.value = []
+  isValidVersion.value = true
   fetchLatestVersion()
 })
 
@@ -497,7 +517,7 @@ onUnmounted(() => {
               </Breadcrumb>
               
               <!-- Version badge -->
-              <TooltipProvider v-if="route.query.version" :delay-duration="300">
+              <TooltipProvider v-if="isContentDetailPage && route.query.version" :delay-duration="300">
                 <Tooltip>
                   <TooltipTrigger as-child>
                     <a 
@@ -533,7 +553,7 @@ onUnmounted(() => {
       <div 
         class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 flex justify-end"
       >
-        <Popover v-if="route.query.version">
+        <Popover v-if="isContentDetailPage && route.query.version">
           <PopoverTrigger
             :class="[
               'inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-200 cursor-pointer',
@@ -612,7 +632,7 @@ onUnmounted(() => {
         </Popover>
         
         <!-- Latest version badge with popover -->
-        <Popover v-else-if="currentPageVersion">
+        <Popover v-else-if="isContentDetailPage && currentPageVersion">
           <PopoverTrigger as-child>
             <button 
               class="inline-flex items-center rounded-full bg-background border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer"

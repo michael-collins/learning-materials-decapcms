@@ -342,17 +342,20 @@ export function createGitBackend(config: GitBackendConfig) {
   }
 
   /**
-   * Commit multiple files in a single atomic commit using the Git Data API.
+   * Commit multiple file changes in a single atomic commit using the Git Data API.
+   *
+   * Supports creating/updating files AND deleting files in one commit.
    *
    * Uses the tree/commit API to batch all changes into one commit:
    * 1. Get the latest commit SHA and its tree
-   * 2. Create blobs for each file
-   * 3. Create a new tree with all changes
+   * 2. Create blobs for each file to add/update
+   * 3. Create a new tree with all changes (including deletions via sha: null)
    * 4. Create a commit
    * 5. Update the branch ref
    */
   async function commitMultiple(options: {
     files: Array<{ path: string; content: string /* base64-encoded */ }>
+    deletions?: Array<{ path: string }>
     message: string
     branch?: string
   }): Promise<GitCommitResult> {
@@ -365,8 +368,8 @@ export function createGitBackend(config: GitBackendConfig) {
     const commitData = await $fetch<any>(`${apiBase}/git/commits/${latestCommitSha}`, { headers })
     const baseTreeSha = commitData.tree.sha
 
-    // 3. Create blobs for each file
-    const treeEntries = await Promise.all(
+    // 3. Create blobs for each file to add/update
+    const addEntries = await Promise.all(
       options.files.map(async (file) => {
         const blobRes = await $fetch<any>(`${apiBase}/git/blobs`, {
           method: 'POST',
@@ -384,6 +387,16 @@ export function createGitBackend(config: GitBackendConfig) {
         }
       }),
     )
+
+    // 3b. Create deletion entries (sha: null removes from tree)
+    const deleteEntries = (options.deletions || []).map((d) => ({
+      path: d.path,
+      mode: '100644' as const,
+      type: 'blob' as const,
+      sha: null,
+    }))
+
+    const treeEntries = [...addEntries, ...deleteEntries]
 
     // 4. Create a new tree
     const treeRes = await $fetch<any>(`${apiBase}/git/trees`, {

@@ -341,15 +341,23 @@ function renderMdcBlock(parsed: MdcParsed, refTracker: ReturnType<typeof createP
       const title = esc(p.title || 'Google Slides')
       if (!raw) return wrapper('<div class="p-4 text-sm text-muted-foreground italic">No presentation ID specified</div>', '📊 Google Slides')
       let embedUrl: string | null = null
-      if (raw.startsWith('http')) {
+      let slideId = raw
+      // Extract ID from full URL if provided
+      if (slideId.includes('docs.google.com')) {
         const safe = safeEmbedUrl(raw, ['docs.google.com', 'google.com'])
         if (!safe) return wrapper(invalidMsg(`URL is not a valid Google Slides link: <code>${esc(raw)}</code>`), '📊 Google Slides')
-        const docIdMatch = raw.match(/\/d\/([a-zA-Z0-9_-]+)/)
-        const docId = docIdMatch ? docIdMatch[1] : null
-        if (!docId) return wrapper(invalidMsg(`Could not extract presentation ID from URL: <code>${esc(raw)}</code>`), '📊 Google Slides')
-        embedUrl = `https://docs.google.com/presentation/d/${encodeURIComponent(docId!)}/embed?start=false&loop=false&delayms=3000`
-      } else if (/^[a-zA-Z0-9_-]+$/.test(raw)) {
-        embedUrl = `https://docs.google.com/presentation/d/${encodeURIComponent(raw)}/embed?start=false&loop=false&delayms=3000`
+        const docIdMatch = slideId.match(/\/d\/e?\/([a-zA-Z0-9_-]+)/)
+        slideId = docIdMatch ? docIdMatch[1]! : ''
+        if (!slideId) return wrapper(invalidMsg(`Could not extract presentation ID from URL: <code>${esc(raw)}</code>`), '📊 Google Slides')
+      }
+      // Published slides (2PACX-*) use /d/e/{id}/pubembed format
+      // Regular slides use /d/{id}/embed format
+      if (/^[a-zA-Z0-9_-]+$/.test(slideId)) {
+        if (slideId.startsWith('2PACX')) {
+          embedUrl = `https://docs.google.com/presentation/d/e/${encodeURIComponent(slideId)}/pubembed?start=false&loop=false&delayms=3000`
+        } else {
+          embedUrl = `https://docs.google.com/presentation/d/${encodeURIComponent(slideId)}/embed?start=false&loop=false&delayms=3000`
+        }
       }
       if (!embedUrl) return wrapper(invalidMsg(`Invalid Google Slides ID: <code>${esc(raw)}</code>`), '📊 Google Slides')
       return wrapper(
@@ -445,38 +453,194 @@ const renderedBody = computed(() => {
     return `\n<!--MDC_PLACEHOLDER_${idx}-->\n`
   })
 
-  // Standard markdown → HTML
-  let html = bodyWithPlaceholders
-    // Code blocks (fenced)
-    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>')
-    // Headers
-    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // Bold and italic
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Inline code
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    // Images
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="rounded-md max-w-full" />')
-    // Blockquotes
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    // Unordered lists
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    // Horizontal rules
-    .replace(/^---$/gm, '<hr />')
-    // Paragraphs (remaining lines)
-    .replace(/\n\n/g, '</p><p>')
+  // Standard markdown → HTML (inline formatting applied later, lists parsed line-by-line)
 
-  // Wrap in paragraph if not already block-level
-  if (!html.startsWith('<')) {
-    html = `<p>${html}</p>`
+  // First, protect code blocks from any processing
+  const codeBlocks: string[] = []
+  let processed = bodyWithPlaceholders.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length
+    codeBlocks.push(`<pre><code class="language-${lang}">${code}</code></pre>`)
+    return `\n<!--CODE_BLOCK_${idx}-->\n`
+  })
+
+  // Apply inline formatting helpers
+  function inlineFmt(line: string): string {
+    return line
+      // Images (before links so ![...](...) isn't caught by link regex)
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="rounded-md max-w-full" />')
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+      // Bold+italic
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      // Bold
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
   }
+
+  // ─── Line-by-line list-aware parser ────────────────────
+  const lines = processed.split('\n')
+  const outputParts: string[] = []
+  // Stack tracks open list tags: { tag: 'ul'|'ol', indent: number }
+  const listStack: Array<{ tag: string; indent: number }> = []
+
+  function closeListsToIndent(indent: number) {
+    while (listStack.length > 0 && listStack[listStack.length - 1]!.indent >= indent) {
+      const popped = listStack.pop()!
+      outputParts.push(`</${popped.tag}>`)
+    }
+  }
+
+  function closeAllLists() {
+    closeListsToIndent(-1)
+  }
+
+  // Regex to detect list items:
+  //   unordered: optional leading whitespace, then - or * followed by space
+  //   ordered:   optional leading whitespace, then digits. followed by space
+  const ulRegex = /^(\s*)([-*])\s+(.*)$/
+  const olRegex = /^(\s*)(\d+)\.\s+(.*)$/
+
+  let pendingParagraph: string[] = []
+
+  function flushParagraph() {
+    if (pendingParagraph.length > 0) {
+      const text = pendingParagraph.join(' ').trim()
+      if (text) outputParts.push(`<p>${inlineFmt(text)}</p>`)
+      pendingParagraph = []
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!
+
+    // Blank line — flush paragraph, but don't close lists yet
+    // (lists are separated by blank lines in some markdown styles)
+    if (line.trim() === '') {
+      flushParagraph()
+      // Check if the next non-blank line is still a list item
+      let nextContentIdx = i + 1
+      while (nextContentIdx < lines.length && lines[nextContentIdx]!.trim() === '') nextContentIdx++
+      if (nextContentIdx < lines.length) {
+        const nextLine = lines[nextContentIdx]!
+        if (!ulRegex.test(nextLine) && !olRegex.test(nextLine)) {
+          closeAllLists()
+        }
+      } else {
+        closeAllLists()
+      }
+      continue
+    }
+
+    // MDC/code block placeholders — pass through as-is
+    if (line.trim().startsWith('<!--MDC_PLACEHOLDER_') || line.trim().startsWith('<!--CODE_BLOCK_')) {
+      flushParagraph()
+      closeAllLists()
+      outputParts.push(line)
+      continue
+    }
+
+    // Headers
+    const headerMatch = line.match(/^(#{1,6})\s+(.+)$/)
+    if (headerMatch) {
+      flushParagraph()
+      closeAllLists()
+      const level = headerMatch[1]!.length
+      outputParts.push(`<h${level}>${inlineFmt(headerMatch[2]!)}</h${level}>`)
+      continue
+    }
+
+    // Blockquotes
+    const bqMatch = line.match(/^>\s?(.*)$/)
+    if (bqMatch) {
+      flushParagraph()
+      closeAllLists()
+      outputParts.push(`<blockquote>${inlineFmt(bqMatch[1]!)}</blockquote>`)
+      continue
+    }
+
+    // Horizontal rules
+    if (/^---+$/.test(line.trim())) {
+      flushParagraph()
+      closeAllLists()
+      outputParts.push('<hr />')
+      continue
+    }
+
+    // Unordered list item
+    const ulMatch = line.match(ulRegex)
+    if (ulMatch) {
+      flushParagraph()
+      const indent = ulMatch[1]!.length
+      const content = ulMatch[3]!
+
+      // Close deeper or same-level lists that were a different type
+      while (listStack.length > 0) {
+        const top = listStack[listStack.length - 1]!
+        if (top.indent > indent) {
+          outputParts.push(`</${listStack.pop()!.tag}>`)
+        } else if (top.indent === indent && top.tag !== 'ul') {
+          outputParts.push(`</${listStack.pop()!.tag}>`)
+        } else {
+          break
+        }
+      }
+
+      // Open a new <ul> if needed
+      if (listStack.length === 0 || listStack[listStack.length - 1]!.indent < indent) {
+        outputParts.push('<ul>')
+        listStack.push({ tag: 'ul', indent })
+      }
+
+      outputParts.push(`<li>${inlineFmt(content)}</li>`)
+      continue
+    }
+
+    // Ordered list item
+    const olMatch = line.match(olRegex)
+    if (olMatch) {
+      flushParagraph()
+      const indent = olMatch[1]!.length
+      const content = olMatch[3]!
+
+      // Close deeper or same-level lists that were a different type
+      while (listStack.length > 0) {
+        const top = listStack[listStack.length - 1]!
+        if (top.indent > indent) {
+          outputParts.push(`</${listStack.pop()!.tag}>`)
+        } else if (top.indent === indent && top.tag !== 'ol') {
+          outputParts.push(`</${listStack.pop()!.tag}>`)
+        } else {
+          break
+        }
+      }
+
+      // Open a new <ol> if needed
+      if (listStack.length === 0 || listStack[listStack.length - 1]!.indent < indent) {
+        outputParts.push('<ol>')
+        listStack.push({ tag: 'ol', indent })
+      }
+
+      outputParts.push(`<li>${inlineFmt(content)}</li>`)
+      continue
+    }
+
+    // Regular text line — accumulate into paragraph
+    pendingParagraph.push(line)
+  }
+
+  // Flush any remaining state
+  flushParagraph()
+  closeAllLists()
+
+  let html = outputParts.join('\n')
+
+  // Restore code blocks
+  codeBlocks.forEach((block, idx) => {
+    html = html.replace(`<!--CODE_BLOCK_${idx}-->`, block)
+  })
 
   // Restore MDC blocks from placeholders
   mdcBlocks.forEach((blockHtml, idx) => {

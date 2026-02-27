@@ -3,7 +3,7 @@
  *
  * Handles file uploads to the public/uploads directory.
  * In local dev: writes directly to filesystem.
- * In production: would commit to GitHub via API (future enhancement).
+ * In production: commits to GitHub via the Contents API.
  *
  * Accepts multipart form data with:
  *  - file: the file to upload
@@ -13,17 +13,10 @@
  */
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve, join, extname } from 'node:path'
+import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
+import { extractAuthToken } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
-  // Only allow in development mode for now
-  // Production uploads would go through GitHub API
-  if (!import.meta.dev) {
-    throw createError({
-      statusCode: 501,
-      statusMessage: 'Media upload via GitHub API not yet implemented. Use local development mode.',
-    })
-  }
-
   const formData = await readMultipartFormData(event)
   if (!formData || formData.length === 0) {
     throw createError({
@@ -58,8 +51,52 @@ export default defineEventHandler(async (event) => {
   const timestamp = Date.now().toString(36)
   const safeFilename = `${baseName}-${timestamp}${ext}`
 
-  // Resolve the target directory
-  const targetDir = resolve(process.cwd(), 'public', folder)
+  // Security: ensure folder stays within uploads/
+  const normalizedFolder = folder.replace(/\.\./g, '').replace(/^\//, '')
+
+  // Public path (returned to the client as the media URL)
+  const publicPath = `/${normalizedFolder}/${safeFilename}`
+
+  // ── Production: commit to GitHub via API ──
+  if (!import.meta.dev) {
+    // Extract token from the form data or session cookie
+    const tokenEntry = formData.find((entry) => entry.name === 'token')
+    const bodyToken = tokenEntry?.data?.toString()
+    const token = extractAuthToken(event, bodyToken)
+
+    const config = useRuntimeConfig()
+    const { owner, repo } = parseRepo(config.public.cmsRepo as string)
+    const branch = (config.public.cmsBranch as string) || 'main'
+
+    const git = createGitBackend({ owner, repo, branch, token })
+
+    // Repo path: public/<folder>/<filename>
+    const repoPath = `public/${normalizedFolder}/${safeFilename}`
+
+    try {
+      await git.uploadFile({
+        path: repoPath,
+        content: fileEntry.data,
+        message: `media: upload ${safeFilename}`,
+      })
+    } catch (err: any) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Failed to upload file to GitHub: ${err.message}`,
+      })
+    }
+
+    return {
+      path: publicPath,
+      filename: safeFilename,
+      originalFilename,
+      size: fileEntry.data.length,
+      contentType: fileEntry.type || 'application/octet-stream',
+    }
+  }
+
+  // ── Dev mode: write to local filesystem ──
+  const targetDir = resolve(process.cwd(), 'public', normalizedFolder)
 
   // Ensure directory exists
   if (!existsSync(targetDir)) {
@@ -68,7 +105,6 @@ export default defineEventHandler(async (event) => {
 
   const targetPath = join(targetDir, safeFilename)
 
-  // Write file
   try {
     writeFileSync(targetPath, fileEntry.data)
   } catch (err: any) {
@@ -77,9 +113,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: `Failed to write file: ${err.message}`,
     })
   }
-
-  // Return the public path (relative to public/ so it works as an href)
-  const publicPath = `/${folder}/${safeFilename}`
 
   return {
     path: publicPath,

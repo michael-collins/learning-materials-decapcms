@@ -57,7 +57,7 @@ const embedUrl = computed(() => {
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
     />
-    <ContentMediaCaption
+    <MediaCaption
       :title="title"
       :caption="caption"
       :credit="credit"

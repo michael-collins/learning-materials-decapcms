@@ -34,7 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
     >
       Missing image source
     </div>
-    <ContentMediaCaption
+    <MediaCaption
       v-if="src"
       :caption="caption"
       :credit="credit"

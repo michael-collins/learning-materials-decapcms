@@ -9,9 +9,14 @@
  *  - type: filter by file type ('image' | 'document' | '3d' | 'video' | 'all')
  *  - search: filename search query
  *  - recursive: if 'true', search recursively in all subfolders
+ *
+ * In dev mode:  reads from local filesystem.
+ * In production: uses GitHub Git Trees API to list files from the repo.
  */
 import { readdirSync, statSync, existsSync } from 'node:fs'
-import { resolve, join, extname, relative } from 'node:path'
+import { resolve, join, extname, relative, basename, posix } from 'node:path'
+import { createGitBackend, parseRepo } from '~/lib/cms/git-backend'
+import { extractAuthToken } from '~/server/utils/auth'
 
 interface MediaFile {
   name: string
@@ -62,6 +67,78 @@ export default defineEventHandler(async (event) => {
 
   // Security: prevent traversal outside public/
   const normalizedFolder = folder.replace(/\.\./g, '').replace(/^\//, '')
+
+  // ── Production: list from GitHub via Git Trees API ──
+  if (!import.meta.dev) {
+    const token = extractAuthToken(event)
+    const config = useRuntimeConfig()
+    const { owner, repo } = parseRepo(config.public.cmsRepo as string)
+    const branch = (config.public.cmsBranch as string) || 'main'
+
+    const git = createGitBackend({ owner, repo, branch, token })
+
+    // The repo stores media at public/<folder> (e.g. public/uploads)
+    const repoPrefix = `public/${normalizedFolder}`
+
+    const treeEntries = await git.listTree(repoPrefix, branch)
+
+    const files: MediaFile[] = []
+    const foldersSet = new Set<string>()
+
+    for (const entry of treeEntries) {
+      // entry.path is the full repo path, e.g. "public/uploads/images/photo.jpg"
+      // Derive the relative path within the target folder
+      const relativeToFolder = entry.path.slice(repoPrefix.length + 1) // "images/photo.jpg"
+      const segments = relativeToFolder.split('/')
+      const fileName = segments[segments.length - 1]
+
+      // Skip hidden files
+      if (fileName.startsWith('.')) continue
+
+      // If the file is in a subfolder
+      if (segments.length > 1) {
+        // Track immediate child folders
+        foldersSet.add(segments[0])
+
+        // Only include files in subfolders if recursive mode
+        if (!recursive) continue
+      }
+
+      const ext = posix.extname(fileName)
+      const fileType = getFileType(ext)
+
+      // Apply type filter
+      if (typeFilter !== 'all' && fileType !== typeFilter) continue
+
+      // Apply search filter
+      if (searchQuery && !fileName.toLowerCase().includes(searchQuery)) continue
+
+      // Public URL: strip "public" prefix → "/uploads/images/photo.jpg"
+      const publicPath = '/' + entry.path.replace(/^public\//, '')
+
+      files.push({
+        name: fileName,
+        path: publicPath,
+        size: entry.size,
+        type: fileType,
+        ext,
+        modified: new Date().toISOString(), // Git Trees API doesn't provide dates
+        contentType: getMimeType(ext),
+      })
+    }
+
+    // Sort by name since we don't have modification dates from Git Trees
+    files.sort((a, b) => a.name.localeCompare(b.name))
+
+    return {
+      files,
+      folders: Array.from(foldersSet).sort(),
+      folder: normalizedFolder,
+      total: files.length,
+    }
+  }
+
+  // ── Dev mode: read from local filesystem ──
   const targetDir = resolve(process.cwd(), 'public', normalizedFolder)
 
   if (!existsSync(targetDir)) {

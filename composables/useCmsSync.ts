@@ -11,7 +11,7 @@ import { ref, readonly } from 'vue'
 
 export type SyncStatus = 'unknown' | 'checking' | 'in-sync' | 'local-only' | 'remote-only' | 'diverged' | 'error'
 
-export interface ContentVersion {
+export interface SyncContentVersion {
   frontmatter: Record<string, any>
   body: string
 }
@@ -23,9 +23,9 @@ export interface SyncResult {
   remoteExists: boolean
   remoteSha?: string
   /** Parsed local content (only when diverged) */
-  local?: ContentVersion
+  local?: SyncContentVersion
   /** Parsed remote content (only when diverged) */
-  remote?: ContentVersion
+  remote?: SyncContentVersion
 }
 
 export function useCmsSync() {
@@ -38,9 +38,9 @@ export function useCmsSync() {
   const syncError = ref<string | null>(null)
 
   /** Parsed local content from the last diverged sync check */
-  const localVersion = ref<ContentVersion | null>(null)
+  const localVersion = ref<SyncContentVersion | null>(null)
   /** Parsed remote content from the last diverged sync check */
-  const remoteVersion = ref<ContentVersion | null>(null)
+  const remoteVersion = ref<SyncContentVersion | null>(null)
 
   /**
    * Check sync status between local and GitHub for a specific file.
