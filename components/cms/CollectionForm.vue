@@ -7,7 +7,7 @@
  */
 import type { CmsFieldDef, CmsCollectionDef } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
-import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload, Undo2, FileDiff } from 'lucide-vue-next'
+import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload, Undo2, FileDiff, GitBranch } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -29,12 +29,15 @@ const props = defineProps<{
   unpublishedChanges?: boolean
   /** Whether a discard operation is in progress */
   discarding?: boolean
+  /** Whether we're editing an archived version (hides version actions) */
+  isArchived?: boolean
 }>()
 
 const emit = defineEmits<{
   submit: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
   publish: [data: { frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' }]
   discard: []
+  'create-version': [data: { type: 'save' | 'publish'; frontmatter: Record<string, any>; body: string }]
   'update:title': [title: string]
 }>()
 
@@ -141,6 +144,14 @@ function validate(): boolean {
 // ─── Submit ─────────────────────────────────────────────
 const showSaveDropdown = ref(false)
 const showPublishDropdown = ref(false)
+const showLocalSaveDropdown = ref(false)
+
+/** Whether version actions should appear in the dropdown menus */
+const showVersionActions = computed(() => {
+  if (props.isNew || props.isArchived) return false
+  if (!props.localBackend) return false
+  return props.collection.fields?.some((f: any) => f.name === 'version') ?? false
+})
 
 function handleSubmit(publishMode?: 'draft' | 'direct') {
   if (!validate()) return
@@ -166,6 +177,19 @@ function handlePublish(publishMode?: 'draft' | 'direct') {
     frontmatter,
     body: bodyContent.value,
     publishMode,
+  })
+}
+
+function handleCreateVersion(type: 'save' | 'publish') {
+  if (!validate()) return
+  showLocalSaveDropdown.value = false
+  showPublishDropdown.value = false
+
+  const frontmatter = { ...formData }
+  emit('create-version', {
+    type,
+    frontmatter,
+    body: bodyContent.value,
   })
 }
 
@@ -500,6 +524,17 @@ const showPreview = ref(true)
                   <GitPullRequest class="h-4 w-4" />
                   Create Pull Request
                 </button>
+                <template v-if="showVersionActions">
+                  <div class="my-1 border-t" />
+                  <button
+                    type="button"
+                    @click="handleCreateVersion('publish')"
+                    class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                  >
+                    <GitBranch class="h-4 w-4" />
+                    Publish as New Version
+                  </button>
+                </template>
               </div>
             </div>
 
@@ -512,8 +547,49 @@ const showPreview = ref(true)
             </Teleport>
           </div>
 
-          <!-- Save button -->
-          <div class="relative">
+          <!-- Save button (with optional dropdown for version actions) -->
+          <div v-if="showVersionActions" class="relative flex items-stretch">
+            <button
+              type="submit"
+              :disabled="saving || publishing || !isDirty"
+              class="flex items-center gap-2 rounded-l-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+            >
+              <Loader2 v-if="saving" class="h-4 w-4 animate-spin" />
+              <Save v-else class="h-4 w-4" />
+              {{ saving ? 'Saving...' : 'Save' }}
+            </button>
+            <div class="relative">
+              <button
+                type="button"
+                @click="showLocalSaveDropdown = !showLocalSaveDropdown"
+                :disabled="saving || publishing"
+                class="flex h-full items-center rounded-r-md border-l border-primary-foreground/20 bg-primary px-2 text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+              >
+                <ChevronDown class="h-4 w-4" />
+              </button>
+              <div
+                v-if="showLocalSaveDropdown"
+                class="absolute bottom-full right-0 mb-2 w-52 rounded-md border bg-popover p-1 shadow-lg"
+              >
+                <button
+                  type="button"
+                  @click="handleCreateVersion('save')"
+                  class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                >
+                  <GitBranch class="h-4 w-4" />
+                  Save as New Version
+                </button>
+              </div>
+            </div>
+            <Teleport to="body">
+              <div
+                v-if="showLocalSaveDropdown"
+                class="fixed inset-0 z-9"
+                @click="showLocalSaveDropdown = false"
+              />
+            </Teleport>
+          </div>
+          <div v-else class="relative">
             <button
               type="submit"
               :disabled="saving || publishing || !isDirty"

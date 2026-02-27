@@ -7,7 +7,7 @@
  * Publish-to-GitHub flow includes a sync check to prevent
  * accidental overwrites when local and remote diverge.
  */
-import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, GitBranch, Archive } from 'lucide-vue-next'
+import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, Archive } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'cms',
@@ -54,7 +54,7 @@ const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; pub
 // ─── Version creation dialog state ──────────────────────
 const showVersionDialog = ref(false)
 
-/** Whether this collection has a version field (used to show/hide the Create Version button) */
+/** Whether this collection has a version field */
 const hasVersionField = computed(() => {
   return collection.value?.fields?.some((f: any) => f.name === 'version') ?? false
 })
@@ -64,9 +64,40 @@ const currentVersion = computed(() => {
   return initialData.value?.version || '1.0.0'
 })
 
+/** Whether the version dialog was triggered for a publish action */
+const versionActionType = ref<'save' | 'publish'>('save')
+
+/**
+ * Handle "Save as New Version" or "Publish as New Version" from the
+ * CollectionForm dropdown. Saves current form data first, then opens
+ * the CreateVersionDialog.
+ */
+async function handleCreateVersion(data: { type: 'save' | 'publish'; frontmatter: Record<string, any>; body: string }) {
+  versionActionType.value = data.type
+
+  // Save form data to disk first so the version snapshot captures the latest edits
+  try {
+    await save({
+      collection: collectionName.value,
+      slug: slug.value,
+      frontmatter: data.frontmatter,
+      body: data.body,
+      isNew: false,
+      ...(editVersion.value ? { version: editVersion.value } : {}),
+    })
+  } catch {
+    // Error is captured in the composable — don't proceed to version dialog
+    return
+  }
+
+  // Open the version creation dialog
+  showVersionDialog.value = true
+}
+
 /**
  * Handle version creation — reload the content from disk since
  * the server endpoint updated both index.md and created the snapshot.
+ * If the version was triggered by "Publish as New Version", auto-publish.
  */
 async function handleVersionCreated(data: { previousVersion: string; newVersion: string }) {
   try {
@@ -76,7 +107,6 @@ async function handleVersionCreated(data: { previousVersion: string; newVersion:
         collection: collectionName.value,
         slug: slug.value,
         ...(token ? { token } : {}),
-        ...(editVersion.value ? { version: editVersion.value } : {}),
       },
     })
     initialData.value = {
@@ -85,6 +115,15 @@ async function handleVersionCreated(data: { previousVersion: string; newVersion:
     }
     // The file on disk changed, so mark as unpublished
     unpublishedChanges.value = true
+
+    // If this was a "Publish as New Version" action, auto-publish now
+    if (versionActionType.value === 'publish') {
+      await doPublish({
+        frontmatter: res.frontmatter,
+        body: res.body,
+        publishMode: 'direct',
+      })
+    }
   } catch (err: any) {
     loadError.value = err.data?.message || err.message || 'Failed to reload content after version creation'
   }
@@ -382,18 +421,6 @@ async function handleDiscard() {
         <h1 class="text-2xl font-bold tracking-tight">
           Edit: {{ initialData?.title || slug }}
         </h1>
-
-        <!-- Create Version button (only for collections with version field, not when editing archived version) -->
-        <button
-          v-if="hasVersionField && !editVersion && initialData && !loading && !showSuccess"
-          type="button"
-          @click="showVersionDialog = true"
-          class="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent"
-          title="Create a new version of this content"
-        >
-          <GitBranch class="h-4 w-4" />
-          <span class="hidden sm:inline">v{{ currentVersion }}</span>
-        </button>
       </div>
     </div>
 
@@ -453,10 +480,12 @@ async function handleDiscard() {
           </h2>
           <p class="mt-1 text-sm text-muted-foreground">
             <template v-if="lastResult.mode === 'editorial'">
-              A pull request has been created for review.
+              A pull request has been created for review. To publish these changes to the live site,
+              the PR must be merged. After merging, allow a few minutes for the site to rebuild and deploy.
             </template>
             <template v-else-if="lastResult.mode === 'direct'">
               Changes have been committed directly to {{ lastResult.branch }}.
+              Allow a few minutes for the site to rebuild and deploy.
             </template>
             <template v-else>
               Changes have been saved locally. Use the <strong>Publish to GitHub</strong> button to push changes to the repository.
@@ -519,9 +548,11 @@ async function handleDiscard() {
       :local-backend="isLocalBackend"
       :unpublished-changes="unpublishedChanges"
       :discarding="discarding"
+      :is-archived="!!editVersion"
       @submit="handleSubmit"
       @publish="handlePublish"
       @discard="handleDiscard"
+      @create-version="handleCreateVersion"
     />
 
     <!-- Sync Conflict Dialog -->
