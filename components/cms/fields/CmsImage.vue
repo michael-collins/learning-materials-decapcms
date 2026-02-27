@@ -37,10 +37,12 @@ const fileInput = ref<HTMLInputElement>()
 // ─── Image preview URL ────────────────────────────────────────
 const previewUrl = computed(() => {
   if (!imagePath.value) return ''
-  // Handle both absolute URLs and relative paths
+  // If we just uploaded this image, use the raw GitHub URL for immediate preview
+  if (uploadRawUrl.value) return uploadRawUrl.value
+  // Handle absolute URLs
   if (imagePath.value.startsWith('http')) return imagePath.value
-  // Relative path from public folder
-  return imagePath.value
+  // For relative paths, resolve through GitHub raw URL (file may not be deployed yet)
+  return getRawUrl(imagePath.value) || imagePath.value
 })
 
 const hasImage = computed(() => !!imagePath.value)
@@ -51,7 +53,10 @@ function triggerFileInput() {
 }
 
 const { getToken } = useCmsAuth()
-const { uploadFile } = useCmsUpload()
+const { uploadFile, getRawUrl } = useCmsUpload()
+
+// Temporary raw URL for just-uploaded images (for immediate preview)
+const uploadRawUrl = ref('')
 
 async function handleFileSelect(event: Event) {
   const input = event.target as HTMLInputElement
@@ -70,6 +75,8 @@ async function handleFileSelect(event: Event) {
   try {
     const response = await uploadFile(file, 'uploads')
     imagePath.value = response.path
+    // Use raw GitHub URL for immediate preview (file isn't deployed yet)
+    uploadRawUrl.value = response.rawUrl || ''
   } catch (e: any) {
     uploadError.value = e?.data?.message || e?.message || 'Upload failed'
     console.error('Upload error:', e, 'data:', e?.data, 'status:', e?.statusCode, 'response:', e?.response?._data)
@@ -92,6 +99,7 @@ function applyUrl() {
 function clearImage() {
   imagePath.value = ''
   uploadError.value = ''
+  uploadRawUrl.value = ''
 }
 
 /** Handle drag-and-drop file */

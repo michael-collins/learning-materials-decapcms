@@ -45,7 +45,17 @@ export function useCmsUpload() {
    * Production: calls GitHub Contents API directly from the browser.
    * Dev: posts to /api/cms/media/upload (local filesystem).
    */
-  async function uploadFile(file: File, folder: string = 'uploads'): Promise<{ path: string; filename: string }> {
+  /**
+   * Returns the raw GitHub URL for a public path (for immediate preview of just-uploaded files).
+   */
+  function getRawUrl(publicPath: string): string {
+    if (!config.value?.backend?.repo) return publicPath
+    const repoStr = config.value.backend.repo
+    const branch = config.value.backend.branch || 'main'
+    return `https://raw.githubusercontent.com/${repoStr}/${branch}/public${publicPath}`
+  }
+
+  async function uploadFile(file: File, folder: string = 'uploads'): Promise<{ path: string; filename: string; rawUrl?: string }> {
     const base64 = await fileToBase64(file)
     const token = getToken()
     const safeFilename = sanitizeFilename(file.name)
@@ -94,7 +104,8 @@ export function useCmsUpload() {
       console.log('[useCmsUpload] GitHub upload success, sha:', res.content?.sha)
 
       const publicPath = `/${normalizedFolder}/${safeFilename}`
-      return { path: publicPath, filename: safeFilename }
+      const rawUrl = `https://raw.githubusercontent.com/${repoStr}/${branch}/${repoPath}`
+      return { path: publicPath, filename: safeFilename, rawUrl }
     }
 
     // Fallback: local dev — use the server endpoint (multipart)
@@ -111,5 +122,5 @@ export function useCmsUpload() {
     return res
   }
 
-  return { uploadFile }
+  return { uploadFile, getRawUrl }
 }
