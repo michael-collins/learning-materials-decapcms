@@ -565,6 +565,200 @@ Build one Vue component per Decap widget type. Each receives a `DecapField` defi
 
 ---
 
+## Phase 10 — Layout & Design Components
+
+> **Status:** Research complete. Ready for implementation.
+>
+> **Goal:** Give content authors control over how media and text blocks render — alignment, sizing, callouts, collapsible sections, card views — without requiring theme edits or raw HTML.
+
+### Research Summary
+
+#### Current State
+- All 10 existing MDC components (image, video, iframe, code-embed, Google Slides, rubric, Sketchfab, 3D viewer, citation, YouTube) are **atom-type** blocks in Tiptap (`atom: true`), meaning they render as non-editable cards in the editor.
+- MDC blocks use **double-colon** syntax: `::component-name{props}::` — no nested markdown content.
+- Content pages are constrained by `container max-w-4xl mx-auto` in `CollectionItem.vue`, and prose gets `max-w-none` (fluid within the container).
+- No layout CSS or alignment utilities exist in the project today.
+
+#### MDC Container Syntax (Triple-Colon)
+MDC natively supports **container components** with nested markdown content:
+
+```md
+:::callout{type="warning"}
+This is a **warning** with _formatted_ markdown inside.
+:::
+```
+
+Container components:
+- Use `:::` (triple-colon) instead of `::` (double-colon)
+- Accept a default slot for nested markdown content
+- Support named slots via `#slotName` syntax
+- Render nested content through `<MDCSlot unwrap="p" />` in the Vue component
+- Are auto-resolved from `components/content/` directory by Nuxt Content
+
+#### Industry Patterns (Notion, Editor.js)
+- **Notion** succeeds with a minimal set of layout blocks: Callout (boxed text with emoji icon for tips/warnings), Toggle list (collapsible), Quote, Columns, Divider. These cover ~90% of content layout needs.
+- **Editor.js** favors a block-based architecture with clean JSON output, keeping each block self-contained.
+- **Best practice:** A small set of composable layout primitives outperforms a large library of specialized components. Don't recreate a CSS framework.
+
+#### Technical Constraint: Tiptap Editor
+- The current `MdcBlockExtension.ts` creates atom nodes — no editable content inside.
+- Container blocks with editable nested markdown require either:
+  1. A **new Tiptap node type** that supports nested editable content (complex but ideal UX)
+  2. **Code-mode insertion** — authors type `:::` syntax in the markdown code view; Nuxt Content renders it correctly at view time (simpler, leverages existing infrastructure)
+  3. A **hybrid approach** — card preview in rich editor with a mini-editor for the inner content (modal or inline expandable)
+- **Recommendation:** Start with approach 2 (code-mode) for container components while building prop-based features (Tier 1) in the rich editor. Upgrade to approach 1 or 3 as a follow-up.
+
+### Implementation Tiers
+
+#### Tier 1 — Media Alignment & Sizing Props (Easiest)
+Add `align` and `size` props to existing atom-type MDC components.
+
+**Components affected:** `image-component`, `video-component`, `iframe-component`, `youtube-video`
+
+**New props:**
+| Prop | Values | Default | Description |
+|------|--------|---------|-------------|
+| `align` | `left`, `center`, `right`, `full` | `center` | Horizontal alignment within the content column |
+| `size` | `small` (25%), `medium` (50%), `large` (75%), `full` (100%) | `full` | Width relative to content column |
+| `float` | `left`, `right`, `none` | `none` | Text wrap behavior (left/right float with margin) |
+| `caption` | string | — | Optional caption below the media |
+
+**Markdown syntax (existing atom format):**
+```md
+::image-component{src="/img/photo.jpg" alt="Example" align="right" size="medium" caption="Photo credit: Author"}::
+```
+
+**CSS approach:**
+- Alignment classes applied to the component wrapper: `mx-auto`, `mr-auto`, `ml-auto`
+- Size classes set `max-width` percentages
+- `align="full"` uses negative margins to break out of the `max-w-4xl` container (standard CSS breakout pattern)
+- Float classes use `float-left`/`float-right` with `mr-4`/`ml-4` margin and `clear` rules
+
+**Editor UX:** Add alignment and size dropdowns to MdcToolbar field definitions for media components. No Tiptap architecture changes needed.
+
+**Tasks:**
+- [ ] Add `align`, `size`, `float`, `caption` props to media MDC components
+- [ ] Create shared CSS utility classes for layout (e.g., `.mdc-align-left`, `.mdc-size-medium`, `.mdc-float-right`)
+- [ ] Add full-width breakout CSS (negative margin pattern for `align="full"`)
+- [ ] Update MdcToolbar to include alignment/size fields on media insert dialogs
+- [ ] Update MdcBlockExtension to pass new props through to rendered components
+
+#### Tier 2 — Container Components (Moderate)
+New MDC components that wrap arbitrary markdown content using triple-colon syntax.
+
+**Components to build:**
+
+| Component | Purpose | Education Use Case |
+|-----------|---------|-------------------|
+| `callout` | Boxed text with icon/color by type | Tips, warnings, definitions, key concepts, learning objectives |
+| `accordion` | Collapsible section with title | FAQ, progressive disclosure, self-assessment answers |
+| `card` | Styled card with optional title/image | Highlighted content blocks, summaries |
+| `figure` | Captioned wrapper for any content | Images with credits, diagrams with descriptions |
+
+**Markdown syntax (container format):**
+```md
+:::callout{type="info" title="Key Concept"}
+The **OER Schema** defines metadata for open educational resources.
+:::
+
+:::accordion{title="Click to reveal the answer"}
+The answer is **42**. This is because...
+:::
+
+:::card{title="Summary" variant="outlined"}
+This lesson covered three main topics:
+1. First topic
+2. Second topic
+3. Third topic
+:::
+
+:::figure{caption="Figure 1: System Architecture" align="center"}
+::image-component{src="/img/architecture.png" alt="Architecture diagram"}::
+:::
+```
+
+**Callout types and styling:**
+| Type | Icon | Color | Use Case |
+|------|------|-------|----------|
+| `info` | ℹ️ | Blue | General information |
+| `tip` | 💡 | Green | Helpful tips, best practices |
+| `warning` | ⚠️ | Amber | Cautions, common mistakes |
+| `danger` | 🚫 | Red | Critical warnings, errors |
+| `definition` | 📖 | Purple | Terms, glossary entries |
+| `objective` | 🎯 | Teal | Learning objectives |
+
+**Vue component pattern:**
+```vue
+<!-- components/content/Callout.vue -->
+<template>
+  <div :class="['callout', `callout-${type}`]" role="note">
+    <div class="callout-icon">{{ icon }}</div>
+    <div class="callout-content">
+      <div v-if="title" class="callout-title">{{ title }}</div>
+      <MDCSlot unwrap="p" />
+    </div>
+  </div>
+</template>
+```
+
+**Tasks:**
+- [ ] Create `components/content/Callout.vue` with type variants and styling
+- [ ] Create `components/content/Accordion.vue` using shadcn-vue/radix-vue accordion primitives
+- [ ] Create `components/content/CardBlock.vue` (name avoids shadcn `Card` conflict)
+- [ ] Create `components/content/Figure.vue` with caption and alignment support
+- [ ] Add CSS for all container component variants (Tailwind utilities + custom classes)
+- [ ] Document triple-colon syntax for content authors
+- [ ] Test nested markdown rendering with `<MDCSlot unwrap="p" />`
+
+**Editor integration (deferred to Tier 2b):**
+- [ ] Implement Tiptap container node type for editable nested content
+- [ ] OR implement code-mode insertion helpers (toolbar buttons that insert `:::` boilerplate)
+- [ ] Add container component previews in the rich editor
+
+#### Tier 3 — Layout Primitives (Advanced)
+Multi-column layouts and spatial arrangement.
+
+**Components:**
+
+| Component | Purpose | Syntax |
+|-----------|---------|--------|
+| `columns` | Side-by-side column layout | `:::columns{count="2"}` with `:::col` dividers |
+| `divider` | Horizontal rule with optional label | `:::divider{label="Section 2"}:::` |
+| `spacer` | Vertical spacing control | `::spacer{size="lg"}::` (atom, not container) |
+
+**Column syntax:**
+```md
+:::columns{count="2" gap="lg"}
+#left
+This content appears in the **left column**.
+
+#right
+This content appears in the **right column**.
+:::
+```
+
+**Tasks:**
+- [ ] Create `components/content/Columns.vue` with named slots and responsive collapse
+- [ ] Create `components/content/ContentDivider.vue` (avoids HTML `<hr>` naming)
+- [ ] Create `components/content/Spacer.vue` (atom component, simple)
+- [ ] Implement responsive behavior (columns stack on mobile)
+- [ ] Test with various content combinations (media inside columns, etc.)
+
+### Dependencies
+- **Tier 1** has no blockers — can begin immediately using existing atom-block architecture
+- **Tier 2** requires decisions on editor integration approach (code-mode vs. nested Tiptap nodes)
+- **Tier 3** depends on Tier 2 container infrastructure being proven
+
+### Design Principles
+1. **Minimal and composable** — A few well-designed primitives that combine, not dozens of specialized blocks
+2. **Markdown-first** — All layout expressed in standard MDC syntax, stored as plain markdown files
+3. **Progressive enhancement** — Content remains readable without layout styling (graceful degradation)
+4. **Mobile-responsive** — All layout components collapse sensibly on small screens
+5. **Accessible** — Semantic HTML, ARIA roles, keyboard navigation (especially accordion)
+6. **Education-focused** — Prioritize components that serve teaching: callouts for key concepts, accordions for self-assessment, figures for diagrams
+
+---
+
 ## Future Phases (Post-Launch)
 
 ### Real-Time Collaboration
@@ -602,8 +796,9 @@ Build one Vue component per Decap widget type. Each receives a `DecapField` defi
 | **Phase 7** | Outline Builder integration | Weeks 9–10 | Week 10 |
 | **Phase 8** | Bulk operations & analytics | Weeks 10–11 | Week 11 |
 | **Phase 9** | Polish, testing, migration | Weeks 11–12 | Week 12 |
+| **Phase 10** | Layout & design components (Tier 1→3) | Weeks 12–14 | Week 14 |
 
-**Total estimated timeline: 12 weeks (3 months)**
+**Total estimated timeline: 14 weeks (~3.5 months)**
 
 ### Acceleration Strategies
 
