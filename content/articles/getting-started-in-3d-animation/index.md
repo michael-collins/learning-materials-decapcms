@@ -1,14 +1,16 @@
 ---
 title: Getting started in 3D Animation
-description: We discuss the hardware, software, and other aspects of
-  understanding the long journey of learning 3D animation.
+description: >-
+  We discuss the hardware, software, and other aspects of understanding the long
+  journey of learning 3D animation.
 author: Michael Collins
-authorUrl: https://michaelcollins.xyz
-date: 2026-01-21T16:33:00.000-05:00
+date: '2026-01-21T21:33:00.000Z'
 license: CC BY 4.0
 allowEmbed: true
-version: '1.0.0'
+version: 1.0.0
 versionStatus: latest
+prerequisites: []
+attachments: []
 ---
 ## A Note About Hardware
 
