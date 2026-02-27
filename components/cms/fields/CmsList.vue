@@ -143,6 +143,64 @@ function getItemLabel(item: any, index: number): string {
 }
 
 const canAdd = computed(() => props.field.allow_add !== false)
+
+// ─── Drag and drop ───────────────────────────────────────
+const dragIndex = ref<number | null>(null)
+const dropTargetIndex = ref<number | null>(null)
+
+function onDragStart(index: number, e: DragEvent) {
+  dragIndex.value = index
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', String(index))
+  }
+}
+
+function onDragOver(index: number, e: DragEvent) {
+  if (dragIndex.value === null || dragIndex.value === index) {
+    dropTargetIndex.value = null
+    return
+  }
+  e.preventDefault()
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'
+  dropTargetIndex.value = index
+}
+
+function onDragLeave() {
+  dropTargetIndex.value = null
+}
+
+function onDrop(index: number, e: DragEvent) {
+  e.preventDefault()
+  dropTargetIndex.value = null
+  if (dragIndex.value === null || dragIndex.value === index) return
+
+  const copy = [...items.value]
+  const [moved] = copy.splice(dragIndex.value, 1)
+  copy.splice(index, 0, moved)
+  items.value = copy
+
+  // Fix collapsed indices after reorder
+  const oldCollapsed = new Set(collapsedItems.value)
+  collapsedItems.value = new Set()
+  for (const ci of oldCollapsed) {
+    if (ci === dragIndex.value) {
+      collapsedItems.value.add(index)
+    } else {
+      let adjusted = ci
+      if (dragIndex.value < ci && index >= ci) adjusted--
+      else if (dragIndex.value > ci && index <= ci) adjusted++
+      collapsedItems.value.add(adjusted)
+    }
+  }
+
+  dragIndex.value = null
+}
+
+function onDragEnd() {
+  dragIndex.value = null
+  dropTargetIndex.value = null
+}
 </script>
 
 <template>
@@ -159,7 +217,14 @@ const canAdd = computed(() => props.field.allow_add !== false)
       <div
         v-for="(item, index) in items"
         :key="index"
-        class="group rounded-md border bg-card"
+        class="group rounded-md border bg-card transition-all"
+        :class="[
+          dragIndex === index && 'opacity-50',
+          dropTargetIndex === index && 'ring-2 ring-primary ring-offset-1',
+        ]"
+        @dragover="onDragOver(index, $event)"
+        @dragleave="onDragLeave"
+        @drop="onDrop(index, $event)"
       >
         <!-- Item header (for structured mode with collapsible sections) -->
         <div
@@ -167,7 +232,14 @@ const canAdd = computed(() => props.field.allow_add !== false)
           class="flex items-center gap-2 border-b px-3 py-2"
           :class="{ 'border-b-0': isCollapsed(index) }"
         >
-          <GripVertical class="h-4 w-4 shrink-0 text-muted-foreground/40" />
+          <span
+            draggable="true"
+            class="flex shrink-0 cursor-grab items-center active:cursor-grabbing"
+            @dragstart="onDragStart(index, $event)"
+            @dragend="onDragEnd"
+          >
+            <GripVertical class="h-4 w-4 text-muted-foreground/40 hover:text-muted-foreground" />
+          </span>
           <button
             type="button"
             @click="toggleCollapse(index)"
@@ -225,7 +297,14 @@ const canAdd = computed(() => props.field.allow_add !== false)
           v-if="mode === 'simple' || mode === 'single'"
           class="flex items-center gap-2 p-2"
         >
-          <GripVertical class="h-4 w-4 shrink-0 text-muted-foreground/40" />
+          <span
+            draggable="true"
+            class="flex shrink-0 cursor-grab items-center active:cursor-grabbing"
+            @dragstart="onDragStart(index, $event)"
+            @dragend="onDragEnd"
+          >
+            <GripVertical class="h-4 w-4 text-muted-foreground/40 hover:text-muted-foreground" />
+          </span>
 
           <!-- Simple string input -->
           <input
