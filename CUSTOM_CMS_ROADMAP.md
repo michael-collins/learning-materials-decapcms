@@ -204,22 +204,6 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 **Milestone: ✅ Create and edit all collections via custom CMS. Form auto-generates from config.yml.**
 
-- [ ] **`pages/cms/[collection]/new.vue`** — Create new content item
-- [ ] **`pages/cms/[collection]/edit/[...slug].vue`** — Edit existing content item
-  - Load existing markdown via GitHub API (or filesystem in dev)
-  - Parse frontmatter with gray-matter
-  - Populate form
-  - Save → branch + PR
-
-### 1.5 Local Development Backend
-
-- [ ] **`server/api/cms/local/`** — File-system based read/write for `nuxt dev`
-  - Read: `fs.readFile` from content directory
-  - Write: `fs.writeFile` directly (no git operations)
-  - Toggle via `local_backend: true` in config (same as Decap)
-
-**Milestone: Create and edit articles via custom CMS. Form auto-generates from config.yml.**
-
 ---
 
 ## Phase 2 — Complex Widgets ✅ COMPLETE
@@ -366,6 +350,49 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ---
 
+## Phase 5.5 — Version Management & Editing UX ✅ COMPLETE
+
+**Goal:** CMS-native versioning, change tracking, and editing quality-of-life improvements.
+
+### 5.5.1 Content Versioning System
+
+- [x] **`server/api/cms/content/create-version.post.ts`** — Create new version (archive current, bump index.md)
+- [x] **`server/api/cms/content/versions.get.ts`** — List all versions (local filesystem + GitHub API modes)
+- [x] **`components/cms/CreateVersionDialog.vue`** — Version bump UI (major/minor/patch/custom, conflict checking)
+- [x] **`components/cms/VersionProtectionDialog.vue`** — Requires typing "OVERRIDE" to publish modified archived versions
+- [x] Version-aware server endpoints (`read`, `save-local`, `save`, `sync-check`, `pull` all accept `version` param)
+- [x] Version-aware composables (`useCmsSave`, `useCmsSync` pass version through all operations)
+
+### 5.5.2 Version-Aware Editing
+
+- [x] Edit page reads `?version=` query param for archived version editing
+- [x] Amber "Editing archived version" banner with link to latest
+- [x] Version switcher dropdown in edit page header (fetch versions, navigate between them)
+- [x] "Save as New Version" option in local Save button dropdown
+- [x] "Publish as New Version" option in Publish to GitHub dropdown
+- [x] Auto-publish flow: save → create version → publish to GitHub in one action
+- [x] Version dropdown on collection listing pages (clickable badge → navigate to edit)
+
+### 5.5.3 Change Tracking & Editing UX
+
+- [x] **`components/cms/ViewChangesDialog.vue`** — Field-level diff (added/removed/modified) + LCS-based line-by-line body diff
+- [x] "Changes" button in sticky toolbar next to Discard
+- [x] False-positive dirty state fix (`cleanSnapshot` captures post-initialization form state)
+- [x] Drag-and-drop reordering for `CmsList.vue` (simple, single, and structured modes)
+- [x] Drag-and-drop reordering for `CmsTypedList.vue`
+- [x] Split button height consistency fix (flex items-stretch + h-full)
+- [x] Discard changes feature (revert to last committed GitHub state)
+- [x] Sync check fix: `local-only` files no longer falsely flagged as "unpublished changes"
+
+### 5.5.4 Editorial Workflow Messaging
+
+- [x] Improved success messages explaining PR → merge → deploy pipeline
+- [x] Deployment timing expectations ("allow a few minutes for the site to rebuild")
+
+**Milestone: ✅ Full version management, change tracking, and editing UX polish.**
+
+---
+
 ## Phase 6 — Enhanced UX for Education Content (⬜ NEXT UP)
 
 **Goal:** Custom interfaces that go far beyond what any generic CMS can offer.
@@ -417,12 +444,13 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ### 6.6 Version Management Dashboard
 
-- [ ] **`pages/cms/versions/[collection]/[...slug].vue`**
-  - List all version snapshots
-  - Side-by-side diff between versions
-  - Rollback option (create new version from old)
-  - Changelog and breaking changes display
-  - Embed status per version
+- [x] Version switcher dropdown on edit page (list all versions, navigate between them)
+- [x] Save as New Version / Publish as New Version from toolbar dropdowns
+- [x] Version creation dialog with semver bump and conflict detection
+- [ ] Side-by-side diff between two version snapshots
+- [ ] Rollback option (create new version from old snapshot content)
+- [ ] Changelog and breaking changes display
+- [ ] Embed status per version
 
 ### 6.7 Rubric Editor
 
@@ -619,11 +647,11 @@ Add `align` and `size` props to existing atom-type MDC components.
 **Editor UX:** Add alignment and size dropdowns to MdcToolbar field definitions for media components. No Tiptap architecture changes needed.
 
 **Tasks:**
-- [ ] Add `align`, `size`, `float`, `caption` props to media MDC components
-- [ ] Create shared CSS utility classes for layout (e.g., `.mdc-align-left`, `.mdc-size-medium`, `.mdc-float-right`)
-- [ ] Add full-width breakout CSS (negative margin pattern for `align="full"`)
-- [ ] Update MdcToolbar to include alignment/size fields on media insert dialogs
-- [ ] Update MdcBlockExtension to pass new props through to rendered components
+- [x] Add `align`, `size`, `float`, `caption` props to media MDC components
+- [x] Create shared CSS utility classes for layout (e.g., `.mdc-align-left`, `.mdc-size-medium`, `.mdc-float-right`)
+- [x] Add full-width breakout CSS (negative margin pattern for `align="full"`)
+- [x] Update MdcToolbar to include alignment/size fields on media insert dialogs
+- [x] Update MdcBlockExtension to pass new props through to rendered components
 
 #### Tier 2 — Container Components (Moderate)
 New MDC components that wrap arbitrary markdown content using triple-colon syntax.
@@ -684,17 +712,17 @@ This lesson covered three main topics:
 ```
 
 **Tasks:**
-- [ ] Create `components/content/Callout.vue` with type variants and styling
-- [ ] Create `components/content/Accordion.vue` using shadcn-vue/radix-vue accordion primitives
-- [ ] Create `components/content/CardBlock.vue` (name avoids shadcn `Card` conflict)
-- [ ] Create `components/content/Figure.vue` with caption and alignment support
-- [ ] Add CSS for all container component variants (Tailwind utilities + custom classes)
+- [x] Create `components/content/Callout.vue` with type variants and styling
+- [x] Create `components/content/Accordion.vue` using shadcn-vue/radix-vue accordion primitives
+- [x] Create `components/content/CardBlock.vue` (name avoids shadcn `Card` conflict)
+- [x] Create `components/content/Figure.vue` with caption and alignment support
+- [x] Add CSS for all container component variants (Tailwind utilities + custom classes)
 - [ ] Document triple-colon syntax for content authors
 - [ ] Test nested markdown rendering with `<MDCSlot unwrap="p" />`
 
 **Editor integration (deferred to Tier 2b):**
 - [ ] Implement Tiptap container node type for editable nested content
-- [ ] OR implement code-mode insertion helpers (toolbar buttons that insert `:::` boilerplate)
+- [x] OR implement code-mode insertion helpers (toolbar buttons that insert `:::` boilerplate)
 - [ ] Add container component previews in the rich editor
 
 #### Tier 3 — Layout Primitives (Advanced)
@@ -720,10 +748,10 @@ This content appears in the **right column**.
 ```
 
 **Tasks:**
-- [ ] Create `components/content/Columns.vue` with named slots and responsive collapse
-- [ ] Create `components/content/ContentDivider.vue` (avoids HTML `<hr>` naming)
-- [ ] Create `components/content/Spacer.vue` (atom component, simple)
-- [ ] Implement responsive behavior (columns stack on mobile)
+- [x] Create `components/content/Columns.vue` with named slots and responsive collapse
+- [x] Create `components/content/ContentDivider.vue` (avoids HTML `<hr>` naming)
+- [x] Create `components/content/Spacer.vue` (atom component, simple)
+- [x] Implement responsive behavior (columns stack on mobile)
 - [ ] Test with various content combinations (media inside columns, etc.)
 
 ### Dependencies
@@ -774,6 +802,7 @@ This content appears in the **right column**.
 | **Phase 3** | Markdown editor (Tiptap + CodeMirror + MDC components) | ✅ Complete |
 | **Phase 4** | Media manager | ✅ Complete |
 | **Phase 5** | Editorial workflow, sync, conflict resolution, batch publish | ✅ Complete |
+| **Phase 5.5** | Version management, change tracking, editing UX | ✅ Complete |
 | **Phase 6** | Education-specific UX (custom builders) | ⬜ **Next up** |
 | **Phase 7** | Outline Builder integration | ⬜ Planned |
 | **Phase 8** | Bulk operations & analytics | ⬜ Planned |
@@ -944,6 +973,14 @@ server/api/cms/
 - [x] Editorial workflow (draft → review → publish) works
 - [x] Sync checking, conflict resolution, batch publishing
 - [x] No reason to use Decap for standard editing
+
+**Phase 5.5 complete (Version Management & UX): ✅ DONE**
+- [x] CMS-native versioning (create, browse, switch, edit archived versions)
+- [x] Version creation from dropdown menus (Save as New Version / Publish as New Version)
+- [x] View Changes dialog with field-level and body diffs
+- [x] Drag-and-drop reordering in list widgets
+- [x] False-positive dirty state and sync check fixes
+- [x] Improved editorial workflow messaging
 
 **Phase 6+ complete (Beyond Decap): ⬜ IN PROGRESS**
 - [ ] Custom education UX that Decap cannot provide

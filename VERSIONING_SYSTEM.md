@@ -1,106 +1,92 @@
-# Content Versioning & Embed Protection System
+# Content Versioning System
 
-This document explains the multi-layer protection system that prevents accidental modifications to archived version snapshots.
+This document explains the content versioning system built into the custom CMS.
 
 ## Overview
 
-When content (exercises, tutorials, etc.) is embedded in external courses, users rely on stable, unchanging versions. This system ensures that published content versions remain immutable while still allowing for updates through new version releases.
+When content (exercises, tutorials, etc.) is embedded in external courses, users rely on stable, unchanging versions. This system creates immutable version snapshots while allowing updates through new version releases.
+
+## How It Works
+
+### File Structure
+
+Each content item uses a directory-based structure:
+
+```
+content/lessons/
+├── animation-basics/
+│   ├── index.md            # Current working version (latest)
+│   └── v/
+│       ├── 1.0.0.md        # Archived snapshot
+│       ├── 1.1.0.md        # Archived snapshot
+│       └── 1.2.0.md        # Archived snapshot
+```
+
+- `index.md` — always the latest version, editable
+- `v/{version}.md` — archived snapshots, read-only by convention
+
+### Version Frontmatter
+
+```yaml
+---
+title: "Animation Basics"
+version: "2.0.0"               # Semantic version number
+versionStatus: "latest"         # latest | archived
+changelog: "Major rewrite"      # What changed in this version
+---
+```
+
+Archived versions have `versionStatus: "archived"` and a `_snapshotCreatedAt` timestamp.
+
+## CMS Version Management
+
+### Creating a New Version
+
+Two ways to create a new version from the edit page:
+
+1. **Save as New Version** — from the Save button dropdown (local backend)
+   - Saves current form data to disk
+   - Opens the version dialog to choose a version bump (major/minor/patch/custom)
+   - Archives the current version as a snapshot in `v/`
+   - Updates `index.md` with the new version number
+
+2. **Publish as New Version** — from the Publish to GitHub dropdown
+   - Same as above, but also publishes to GitHub after version creation
+
+### Version Switcher
+
+The edit page header shows a version button (e.g., **v2.0.0 ▾**) that:
+- Fetches all available versions from the API
+- Shows latest version with a "latest" badge
+- Lists archived versions below a separator
+- Clicking any version navigates to edit it
+
+### Editing Archived Versions
+
+- An amber banner warns when editing an archived version
+- Changes are saved to the archived version file (`v/{version}.md`)
+- Publishing a modified archived version requires typing "OVERRIDE" (version protection)
+- A link to "Edit latest version instead" is always available
+
+### Version API Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/cms/content/versions` | List all versions for a content item (local + GitHub modes) |
+| `POST /api/cms/content/create-version` | Archive current version and bump to new version (local only) |
+| `GET /api/cms/content/read?version=X.Y.Z` | Read a specific archived version |
+| `POST /api/cms/content/save-local?version=X.Y.Z` | Save to an archived version file |
+| `POST /api/cms/content/save?version=X.Y.Z` | Publish an archived version to GitHub |
 
 ## Protection Layers
 
-### 1. 🚫 Decap CMS UI Protection
-**What:** Version snapshot files are hidden from the Decap CMS interface.
+### CMS Version Protection Dialog
+When publishing a modified archived version via the custom CMS, users must type "OVERRIDE" to confirm. This prevents accidental changes to historical snapshots.
 
-**How:** The `config.yml` excludes files matching `**/v[0-9]*.md` pattern.
+### Version Field as Hidden Widget
+The `version` and `versionStatus` fields are configured as `widget: "hidden"` in `cms/config.yml`. Authors can't accidentally change version numbers through the form — versioning is managed exclusively through the version creation workflow.
 
-**Benefit:** Content editors never see archived versions in their CMS, preventing accidental selection.
-
-```yaml
-# In public/admin/config.yml
-collections:
-  - name: "exercises"
-    exclude: "**/v[0-9]*.md"  # Hides v1.0.0.md, v1.2.3.md, etc.
-```
-
-### 2. 💻 Local Pre-Commit Hook
-**What:** Interactive confirmation before committing version file changes.
-
-**How:** Git pre-commit hook (Husky) detects staged version files and prompts user.
-
-**Benefit:** Catches accidental edits before they reach the remote repository.
-
-**Setup:**
-```bash
-npm install
-npx husky install
-```
-
-**Bypass (emergency only):**
-```bash
-git commit --no-verify -m "Critical security fix for v1.2.0"
-```
-
-### 3. 🔍 GitHub PR Validation
-**What:** Automated check on all pull requests that modify version files.
-
-**How:** GitHub Action workflow runs on PR open/update.
-
-**Actions Taken:**
-- ✅ Adds warning comment to PR
-- 🏷️ Adds labels: `⚠️ version-edit`, `needs-admin-review`
-- 📝 Updates PR description with warning banner
-- ❌ **Fails the check** to block auto-merge
-
-**Workflow:** [.github/workflows/validate-version-edits.yml](.github/workflows/validate-version-edits.yml)
-
-### 4. 👤 Required Admin Review
-**What:** Version files require explicit approval from repository owner.
-
-**How:** CODEOWNERS file specifies required reviewers for version files.
-
-**Benefit:** No merge possible without conscious admin approval.
-
-**Configuration:** [.github/CODEOWNERS](.github/CODEOWNERS)
-
-### 5. 🔬 Integrity Validation
-**What:** Comprehensive validation of all version files in repository.
-
-**How:** Script checks version consistency, frontmatter validity, registry sync.
-
-**Run manually:**
-```bash
-npm run version:validate
-```
-
-**Checks performed:**
-- Version number matches filename
-- Required frontmatter fields present
-- Status matches version registry
-- No corruption or invalid data
-
-## File Naming Convention
-
-```
-content/exercises/
-├── animation-basics.md          # Current working version (edit this)
-├── v1.0.0.md                    # Archived snapshot (DO NOT EDIT)
-├── v1.1.0.md                    # Archived snapshot (DO NOT EDIT)
-└── v1.2.0.md                    # Latest published snapshot (DO NOT EDIT)
-```
-
-## Version File Frontmatter
-
-```yaml
----
-title: "Animation Basics Exercise"
-version: "1.2.0"                    # Must match filename
-versionStatus: "archived"           # latest | archived | deprecated
-changelog: "Fixed typo in step 3"   # What changed in this version
-breakingChanges: []                 # Array of breaking change descriptions
----
-```
-
-## When to Edit Version Files (Rare!)
+## When to Edit Archived Versions (Rare!)
 
 ### ✅ Acceptable Reasons:
 1. **Critical Security Issue** - Fix security vulnerability in embedded content
@@ -116,33 +102,29 @@ breakingChanges: []                 # Array of breaking change descriptions
 
 ## Creating New Versions
 
-Instead of editing archived versions, create a new version:
+Use the CMS version creation UI:
 
-### 1. Edit Current Version
-Edit the main file (e.g., `animation-basics.md`) in Decap CMS or directly.
+### From the Edit Page
 
-### 2. Bump Version Number
-Update the `version` field in frontmatter:
-```yaml
-version: "1.3.0"  # Was 1.2.0
-```
+1. Make your changes to the content
+2. Click the **Save ▾** dropdown and choose **Save as New Version**
+   - Or click the **Publish to GitHub ▾** dropdown and choose **Publish as New Version**
+3. In the version dialog, select a bump type:
+   - **Major** (2.0.0) — breaking changes
+   - **Minor** (1.1.0) — new content or features
+   - **Patch** (1.0.1) — bug fixes, typos
+   - **Custom** — enter any valid semver
+4. Click **Create Version**
 
-### 3. Add Changelog
-```yaml
-changelog: "Added new section on keyframe timing"
-```
+The system will:
+- Save your current form edits to disk
+- Copy the current `index.md` to `v/{currentVersion}.md` with `versionStatus: archived`
+- Update `index.md` with the new version number and `versionStatus: latest`
+- (If Publish as New Version) Auto-publish to GitHub
 
-### 4. Commit Changes
-When you push to main, GitHub Actions will:
-- Detect the version change
-- Create a snapshot file (`v1.3.0.md`)
-- Update the version registry
-- Mark previous version as archived
+### Version Switcher
 
-### 5. (Optional) Manual Snapshot
-```bash
-npm run version:snapshot
-```
+Click the version button in the edit page header (e.g., **v2.0.0 ▾**) to browse and switch between all versions of the content.
 
 ## URL Patterns for Embeds
 
@@ -163,42 +145,22 @@ Users embedding your content can choose their stability level:
 
 If you MUST edit an archived version:
 
-1. **Document the reason** in PR description
-2. **Notify affected users** if possible (check embed analytics)
-3. **Commit with --no-verify** to bypass local hook
-4. **Request explicit admin approval** on PR
-5. **Update changelog** in the version file
-6. **Consider creating hotfix version** (e.g., 1.2.1) instead
+1. Navigate to the archived version via the version switcher
+2. Make your changes
+3. Click Publish to GitHub
+4. Type "OVERRIDE" in the version protection dialog
+5. Document the reason in the commit message
+6. Consider creating a new version (e.g., 1.2.1 hotfix) instead
 
-## Scripts Reference
+## Related Files
 
-```bash
-# Validate all version files
-npm run version:validate
-
-# Check specific files for version edit issues
-npm run version:check "content/exercises/v1.0.0.md"
-
-# Create snapshots from current versions
-npm run version:snapshot
-```
-
-## Monitoring & Analytics
-
-### Check Embed Usage
-To see which versions are actively embedded:
-
-```bash
-# TODO: Add analytics endpoint
-curl https://yoursite.com/api/analytics/embed-versions/animation-basics
-```
-
-### Version Registry
-Check [content/data/version-registry.json](content/data/version-registry.json) for:
-- All published versions
-- Publication dates
-- Status (latest/archived/deprecated)
-- Changelog history
+- `server/api/cms/content/create-version.post.ts` — Version creation API
+- `server/api/cms/content/versions.get.ts` — Version listing API
+- `components/cms/CreateVersionDialog.vue` — Version creation UI
+- `components/cms/VersionProtectionDialog.vue` — Override protection for archived versions
+- `cms/config.yml` — Collection config with version fields
+- `composables/useCmsSave.ts` — Version-aware save/publish
+- `composables/useCmsSync.ts` — Version-aware sync check
 
 ## FAQ
 
@@ -217,19 +179,11 @@ A: The integrity validation will fail in CI, and deployed sites may break user e
 **Q: How do I deprecate a version?**
 A: Update the `versionStatus` to `deprecated`.
 
-## Related Files
+## Related Documentation
 
-- [.github/workflows/validate-version-edits.yml](.github/workflows/validate-version-edits.yml) - PR validation
-- [.github/workflows/version-snapshot.yml](.github/workflows/version-snapshot.yml) - Automatic snapshots
-- [.github/CODEOWNERS](.github/CODEOWNERS) - Required reviewers
-- [scripts/check-version-edits.js](scripts/check-version-edits.js) - Validation script
-- [scripts/validate-version-integrity.js](scripts/validate-version-integrity.js) - Integrity checker
-- [scripts/create-version-snapshot.js](scripts/create-version-snapshot.js) - Snapshot generator
-- [lib/version-resolver.ts](lib/version-resolver.ts) - Version resolution logic
+- [Custom CMS Roadmap](CUSTOM_CMS_ROADMAP.md) — Phase 5.5 covers version management implementation
+- [Feature Roadmap](FEATURE_ROADMAP.md)
 
-## Support
+---
 
-For questions or issues with the versioning system:
-1. Check this documentation first
-2. Review the GitHub Action logs for specific errors
-3. Contact the repository administrator
+*Last Updated: February 27, 2026*
