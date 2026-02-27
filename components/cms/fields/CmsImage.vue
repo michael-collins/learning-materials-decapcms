@@ -51,6 +51,7 @@ function triggerFileInput() {
 }
 
 const { getToken } = useCmsAuth()
+const { uploadFile } = useCmsUpload()
 
 async function handleFileSelect(event: Event) {
   const input = event.target as HTMLInputElement
@@ -67,21 +68,11 @@ async function handleFileSelect(event: Event) {
   uploading.value = true
 
   try {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('folder', 'uploads')
-    const token = getToken()
-    if (token) formData.append('token', token)
-
-    const response = await $fetch<{ path: string }>('/api/cms/media/upload', {
-      method: 'POST',
-      body: formData,
-    })
-
+    const response = await uploadFile(file, 'uploads')
     imagePath.value = response.path
   } catch (e: any) {
-    uploadError.value = e?.data?.message || e?.data?.data?.detail || e?.message || 'Upload failed'
-    console.error('Upload error:', JSON.stringify(e?.data || e?.message || e))
+    uploadError.value = e?.data?.message || e?.message || 'Upload failed'
+    console.error('Upload error:', e)
   } finally {
     uploading.value = false
     // Reset file input

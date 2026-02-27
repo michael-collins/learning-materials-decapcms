@@ -50,6 +50,7 @@ const fileExtension = computed(() => {
 
 // ─── File upload ──────────────────────────────────────────────
 const { getToken } = useCmsAuth()
+const { uploadFile } = useCmsUpload()
 
 function triggerFileInput() {
   fileInput.value?.click()
@@ -64,17 +65,7 @@ async function handleFileSelect(event: Event) {
   uploading.value = true
 
   try {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('folder', 'uploads')
-    const token = getToken()
-    if (token) formData.append('token', token)
-
-    const response = await $fetch<{ path: string }>('/api/cms/media/upload', {
-      method: 'POST',
-      body: formData,
-    })
-
+    const response = await uploadFile(file, 'uploads')
     filePath.value = response.path
   } catch (e: any) {
     uploadError.value = e?.data?.message || e?.message || 'Upload failed'

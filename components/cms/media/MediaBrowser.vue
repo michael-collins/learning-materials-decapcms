@@ -192,6 +192,7 @@ onMounted(fetchFiles)
 
 // ─── Upload ────────────────────────────────────────────────
 const { getToken } = useCmsAuth()
+const { uploadFile } = useCmsUpload()
 
 async function handleUpload(fileList: FileList | null) {
   if (!fileList || fileList.length === 0) return
@@ -204,14 +205,8 @@ async function handleUpload(fileList: FileList | null) {
     const file = fileList[i]!
     uploadProgress.value = `Uploading ${i + 1}/${fileList.length}: ${file.name}`
 
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('folder', currentFolder.value)
-    const token = getToken()
-    if (token) formData.append('token', token)
-
     try {
-      await $fetch('/api/cms/media/upload', { method: 'POST', body: formData })
+      await uploadFile(file, currentFolder.value)
       successCount++
     } catch (err: any) {
       console.error(`Failed to upload ${file.name}:`, err)
