@@ -7,7 +7,7 @@
  * Publish-to-GitHub flow includes a sync check to prevent
  * accidental overwrites when local and remote diverge.
  */
-import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, GitBranch } from 'lucide-vue-next'
+import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, GitBranch, Archive } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'cms',
@@ -21,6 +21,9 @@ const slug = computed(() => {
   if (Array.isArray(s)) return s.join('/')
   return s ?? ''
 })
+
+/** When editing an archived version, e.g. '1.0.0' */
+const editVersion = computed(() => route.query.version as string | undefined)
 
 const { getCollection, config } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
@@ -69,7 +72,12 @@ async function handleVersionCreated(data: { previousVersion: string; newVersion:
   try {
     const token = getToken()
     const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
-      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+      params: {
+        collection: collectionName.value,
+        slug: slug.value,
+        ...(token ? { token } : {}),
+        ...(editVersion.value ? { version: editVersion.value } : {}),
+      },
     })
     initialData.value = {
       ...res.frontmatter,
@@ -89,7 +97,7 @@ async function handleVersionCreated(data: { previousVersion: string; newVersion:
  */
 async function checkUnpublishedChanges() {
   try {
-    const result = await checkSync(collectionName.value, slug.value)
+    const result = await checkSync(collectionName.value, slug.value, editVersion.value)
     // Any status other than 'in-sync' means there are unpublished changes
     unpublishedChanges.value = result.status !== 'in-sync'
   } catch {
@@ -106,7 +114,12 @@ onMounted(async () => {
     await restoreSession()
     const token = getToken()
     const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
-      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+      params: {
+        collection: collectionName.value,
+        slug: slug.value,
+        ...(token ? { token } : {}),
+        ...(editVersion.value ? { version: editVersion.value } : {}),
+      },
     })
 
     initialData.value = {
@@ -135,6 +148,7 @@ async function handleSubmit(data: { frontmatter: Record<string, any>; body: stri
       body: data.body,
       isNew: false,
       publishMode: data.publishMode,
+      ...(editVersion.value ? { version: editVersion.value } : {}),
     })
     showSuccess.value = true
 
@@ -164,7 +178,7 @@ async function handlePublish(data: { frontmatter: Record<string, any>; body: str
   pendingPublish.value = data
 
   try {
-    const check = await prePublishCheck(collectionName.value, slug.value)
+    const check = await prePublishCheck(collectionName.value, slug.value, editVersion.value)
 
     if (check.safe) {
       // No conflict — publish immediately
@@ -189,6 +203,7 @@ async function doPublish(data: { frontmatter: Record<string, any>; body: string;
       body: data.body,
       isNew: false,
       publishMode: data.publishMode,
+      ...(editVersion.value ? { version: editVersion.value } : {}),
     })
     showSuccess.value = true
     showSyncDialog.value = false
@@ -209,7 +224,7 @@ async function handleForcePublish() {
 
 /** Pull from GitHub — discard local, reload with remote content */
 async function handlePull() {
-  const success = await pullFromGitHub(collectionName.value, slug.value)
+  const success = await pullFromGitHub(collectionName.value, slug.value, editVersion.value)
   if (success) {
     showSyncDialog.value = false
     pendingPublish.value = null
@@ -218,7 +233,12 @@ async function handlePull() {
     try {
       const token = getToken()
       const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
-        params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+        params: {
+          collection: collectionName.value,
+          slug: slug.value,
+          ...(token ? { token } : {}),
+          ...(editVersion.value ? { version: editVersion.value } : {}),
+        },
       })
       initialData.value = {
         ...res.frontmatter,
@@ -259,6 +279,7 @@ async function handleResolved(merged: { frontmatter: Record<string, any>; body: 
       frontmatter: merged.frontmatter,
       body: merged.body,
       isNew: false,
+      ...(editVersion.value ? { version: editVersion.value } : {}),
     })
   } catch {
     // Error captured in composable — the form data is already updated
@@ -275,6 +296,7 @@ async function handleResolved(merged: { frontmatter: Record<string, any>; body: 
       body: merged.body,
       isNew: false,
       publishMode: pendingPublish.value?.publishMode,
+      ...(editVersion.value ? { version: editVersion.value } : {}),
     })
     showSuccess.value = true
     pendingPublish.value = null
@@ -299,11 +321,17 @@ async function handleDiscard() {
 
   try {
     // Construct the file path: content/{collection}/{slug}/index.md
-    // Uses the collection folder + path pattern from config
+    // or content/{collection}/{slug}/v/{version}.md for archived versions
     const col = collection.value
     const folder = col?.folder ?? `content/${collectionName.value}`
-    const pathPattern = col?.path ?? '{{slug}}/index'
-    const filePath = `${folder}/${pathPattern.replace('{{slug}}', slug.value)}.md`
+    const ext = col?.extension ?? 'md'
+    let filePath: string
+    if (editVersion.value) {
+      filePath = `${folder}/${slug.value}/v/${editVersion.value}.${ext}`
+    } else {
+      const pathPattern = col?.path ?? '{{slug}}/index'
+      filePath = `${folder}/${pathPattern.replace('{{slug}}', slug.value)}.${ext}`
+    }
 
     await $fetch('/api/cms/content/discard', {
       method: 'POST',
@@ -315,7 +343,12 @@ async function handleDiscard() {
     // Reload content from the now-reverted file
     const token = getToken()
     const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
-      params: { collection: collectionName.value, slug: slug.value, ...(token ? { token } : {}) },
+      params: {
+        collection: collectionName.value,
+        slug: slug.value,
+        ...(token ? { token } : {}),
+        ...(editVersion.value ? { version: editVersion.value } : {}),
+      },
     })
     initialData.value = {
       ...res.frontmatter,
@@ -350,9 +383,9 @@ async function handleDiscard() {
           Edit: {{ initialData?.title || slug }}
         </h1>
 
-        <!-- Create Version button (only for collections with version field) -->
+        <!-- Create Version button (only for collections with version field, not when editing archived version) -->
         <button
-          v-if="hasVersionField && initialData && !loading && !showSuccess"
+          v-if="hasVersionField && !editVersion && initialData && !loading && !showSuccess"
           type="button"
           @click="showVersionDialog = true"
           class="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent"
@@ -361,6 +394,28 @@ async function handleDiscard() {
           <GitBranch class="h-4 w-4" />
           <span class="hidden sm:inline">v{{ currentVersion }}</span>
         </button>
+      </div>
+    </div>
+
+    <!-- Archived Version Banner -->
+    <div
+      v-if="editVersion"
+      class="mb-6 flex items-start gap-3 rounded-lg border border-amber-500/50 bg-amber-500/5 p-4"
+    >
+      <Archive class="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+      <div>
+        <p class="font-medium text-amber-600 dark:text-amber-400">
+          Editing archived version v{{ editVersion }}
+        </p>
+        <p class="mt-0.5 text-sm text-muted-foreground">
+          This is a historical snapshot. Changes will be saved to the archived version file.
+          <NuxtLink
+            :to="`/cms/${collectionName}/${slug}`"
+            class="text-primary underline underline-offset-2 hover:text-primary/80"
+          >
+            Edit latest version instead
+          </NuxtLink>
+        </p>
       </div>
     </div>
 

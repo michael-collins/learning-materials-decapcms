@@ -48,6 +48,8 @@ export function useCmsSave() {
     commitMessage?: string
     /** Override publish mode: 'draft' (branch+PR) or 'direct' (commit to main) */
     publishMode?: 'draft' | 'direct'
+    /** When editing an archived version, e.g. '1.0.0' */
+    version?: string
   }): Promise<SaveResult> {
     saving.value = true
     error.value = null
@@ -66,6 +68,7 @@ export function useCmsSave() {
             frontmatter: options.frontmatter,
             body: options.body,
             isNew: options.isNew ?? false,
+            ...(options.version ? { version: options.version } : {}),
           },
         })
 
@@ -107,6 +110,8 @@ export function useCmsSave() {
     isNew?: boolean
     commitMessage?: string
     publishMode?: 'draft' | 'direct'
+    /** When editing an archived version, e.g. '1.0.0' */
+    version?: string
   }): Promise<SaveResult> {
     publishing.value = true
     error.value = null
@@ -135,6 +140,7 @@ export function useCmsSave() {
     isNew?: boolean
     commitMessage?: string
     publishMode?: 'draft' | 'direct'
+    version?: string
   }): Promise<SaveResult> {
     const token = getToken()
     // token may be null for OAuth (server reads from cookie)
@@ -150,6 +156,7 @@ export function useCmsSave() {
         token,
         message: options.commitMessage,
         publishMode: options.publishMode,
+        ...(options.version ? { version: options.version } : {}),
       },
     })
 
@@ -167,11 +174,11 @@ export function useCmsSave() {
   /**
    * Load raw content for editing (reads from filesystem via API)
    */
-  async function loadRaw(collection: string, slug: string) {
+  async function loadRaw(collection: string, slug: string, version?: string) {
     try {
       const token = getToken()
       const res = await $fetch<{ raw: string }>('/api/cms/content/read', {
-        params: { collection, slug, ...(token ? { token } : {}) },
+        params: { collection, slug, ...(token ? { token } : {}), ...(version ? { version } : {}) },
       })
       return res.raw
     } catch (err: any) {

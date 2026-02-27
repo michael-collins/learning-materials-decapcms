@@ -40,6 +40,7 @@ export default defineEventHandler(async (event) => {
     token: bodyToken,
     message: commitMessage,
     publishMode,
+    version,
   } = body
 
   if (!collectionName || !slug) {
@@ -67,7 +68,10 @@ export default defineEventHandler(async (event) => {
   const ext = collection.extension || 'md'
   let repoFilePath: string
 
-  if (pathPattern) {
+  if (version) {
+    // Version-specific file: content/{collection}/{slug}/v/{version}.md
+    repoFilePath = `${collection.folder}/${slug}/v/${version}.${ext}`
+  } else if (pathPattern) {
     const resolvedPath = pathPattern.replace('{{slug}}', slug)
     repoFilePath = `${collection.folder}/${resolvedPath}.${ext}`
   } else {

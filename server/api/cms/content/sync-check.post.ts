@@ -34,7 +34,7 @@ function contentHash(content: string): string {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { collection: collectionName, slug, token: bodyToken } = body
+  const { collection: collectionName, slug, token: bodyToken, version } = body
 
   if (!collectionName || !slug) {
     throw createError({
@@ -58,7 +58,10 @@ export default defineEventHandler(async (event) => {
   const pathPattern = getPathPattern(collection)
   const ext = collection.extension || 'md'
   let relativePath: string
-  if (pathPattern) {
+  if (version) {
+    // Archived version file: content/{collection}/{slug}/v/{version}.md
+    relativePath = `${collection.folder}/${slug}/v/${version}.${ext}`
+  } else if (pathPattern) {
     relativePath = `${collection.folder}/${pathPattern.replace('{{slug}}', slug)}.${ext}`
   } else {
     relativePath = `${collection.folder}/${slug}.${ext}`

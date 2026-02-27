@@ -7,7 +7,7 @@
  */
 import type { CmsFieldDef, CmsCollectionDef } from '~/lib/cms/config-types'
 import { getFrontmatterFields, getBodyField, getVisibleFields } from '~/lib/cms/config-parser'
-import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload, Undo2 } from 'lucide-vue-next'
+import { Save, Loader2, AlertCircle, GitPullRequest, ChevronDown, ChevronUp, Settings2, Eye, EyeOff, Github, Upload, Undo2, FileDiff } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
@@ -53,6 +53,14 @@ const formData = reactive<Record<string, any>>({})
 const bodyContent = ref('')
 const validationErrors = ref<Record<string, string>>({})
 
+/**
+ * Snapshot of form state right after initialization.
+ * Used by isDirty instead of raw initialData so that fields filled
+ * with defaults (not present in the loaded content) don't register
+ * as changes.
+ */
+const cleanSnapshot = ref<{ fields: Record<string, any>; body: string }>({ fields: {}, body: '' })
+
 // Initialize form data from initial data or defaults
 function initializeForm() {
   const data = props.initialData ?? {}
@@ -72,6 +80,15 @@ function initializeForm() {
       formData[field.name] = getEmptyValue(field)
     }
   }
+
+  // Take a snapshot of the initialized state so isDirty compares
+  // against post-default values rather than raw initialData.
+  const snap: Record<string, any> = {}
+  for (const field of allFields.value) {
+    if (field.name === 'body') continue
+    snap[field.name] = JSON.parse(JSON.stringify(formData[field.name] ?? null))
+  }
+  cleanSnapshot.value = { fields: snap, body: bodyContent.value }
 }
 
 function getEmptyValue(field: CmsFieldDef): any {
@@ -161,13 +178,13 @@ function hasError(fieldName: string): boolean {
 const isDirty = computed(() => {
   if (!props.initialData) return true // New items are always "dirty"
 
-  // Check if any value differs from initial
+  // Compare against the clean snapshot (post-initialization values)
+  // so that fields filled with defaults don't register as changes.
+  if (bodyContent.value !== cleanSnapshot.value.body) return true
+
   for (const field of allFields.value) {
-    if (field.name === 'body') {
-      if (bodyContent.value !== (props.initialData.body ?? '')) return true
-      continue
-    }
-    if (JSON.stringify(formData[field.name]) !== JSON.stringify(props.initialData[field.name])) {
+    if (field.name === 'body') continue
+    if (JSON.stringify(formData[field.name]) !== JSON.stringify(cleanSnapshot.value.fields[field.name])) {
       return true
     }
   }
@@ -185,6 +202,9 @@ function handleDiscard() {
   showDiscardConfirm.value = false
   emit('discard')
 }
+
+// ─── View Changes dialog state ──────────────────────────
+const showViewChanges = ref(false)
 
 // ─── Layout state ───────────────────────────────────────
 const { width } = useWindowSize()
@@ -323,7 +343,17 @@ const showPreview = ref(true)
 
           <!-- Discard changes (local backend only, when there are changes) -->
           <template v-if="localBackend && !isNew && (isDirty || unpublishedChanges)">
-            <div v-if="!showDiscardConfirm" class="flex items-center">
+            <div v-if="!showDiscardConfirm" class="flex items-center gap-1.5">
+              <button
+                type="button"
+                @click="showViewChanges = true"
+                :disabled="saving || publishing || discarding"
+                class="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent disabled:opacity-50"
+                title="View all changes compared to saved version"
+              >
+                <FileDiff class="h-3.5 w-3.5" />
+                Changes
+              </button>
               <button
                 type="button"
                 @click="showDiscardConfirm = true"
@@ -506,4 +536,14 @@ const showPreview = ref(true)
       </div>
     </div>
   </form>
+
+  <!-- View Changes Dialog -->
+  <CmsViewChangesDialog
+    v-model:open="showViewChanges"
+    :fields="allFields"
+    :original-data="cleanSnapshot.fields"
+    :current-data="formData"
+    :original-body="cleanSnapshot.body"
+    :current-body="bodyContent"
+  />
 </template>

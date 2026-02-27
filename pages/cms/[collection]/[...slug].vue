@@ -8,6 +8,7 @@ import {
   Eye,
   FileText,
   Pencil,
+  Archive,
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -23,14 +24,48 @@ const slug = computed(() => {
   return s ?? ''
 })
 
+/** When viewing an archived version, e.g. '1.0.0' */
+const viewVersion = computed(() => route.query.version as string | undefined)
+
+/** Build the edit link, preserving the version query param */
+const editLink = computed(() => {
+  const base = `/cms/${collectionName.value}/edit/${slug.value}`
+  return viewVersion.value ? `${base}?version=${viewVersion.value}` : base
+})
+
 const { getCollection } = useCmsConfig()
 const collection = computed(() => getCollection(collectionName.value))
 
 // Fetch the specific item
+// For archived versions, load via the CMS read API instead of queryCollection
+const { getToken, restoreSession } = useCmsAuth()
+
 const { data: item, status } = useAsyncData(
-  `cms-item-${collectionName.value}-${slug.value}`,
+  `cms-item-${collectionName.value}-${slug.value}-${viewVersion.value || 'latest'}`,
   async () => {
     try {
+      if (viewVersion.value) {
+        // Load archived version via CMS read API
+        await restoreSession()
+        const token = getToken()
+        const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>('/api/cms/content/read', {
+          params: {
+            collection: collectionName.value,
+            slug: slug.value,
+            ...(token ? { token } : {}),
+            version: viewVersion.value,
+          },
+        })
+        // Return a shape compatible with the template
+        return {
+          ...res.frontmatter,
+          body: { type: 'root', children: [] },
+          _rawBody: res.body,
+          path: `/${collectionName.value}/${slug.value}`,
+          title: res.frontmatter.title,
+        } as any
+      }
+      // Latest version — use normal content query
       const result = await queryCollection(collectionName.value as any)
         .path(`/${collectionName.value}/${slug.value}`)
         .first()
@@ -128,12 +163,34 @@ function isObject(value: any): boolean {
             <span class="hidden sm:inline">View</span>
           </NuxtLink>
           <NuxtLink
-            :to="`/cms/${collectionName}/edit/${slug}`"
+            :to="editLink"
             class="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Pencil class="h-4 w-4" />
             <span class="hidden sm:inline">Edit</span>
           </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Archived Version Banner -->
+      <div
+        v-if="viewVersion"
+        class="mb-6 flex items-start gap-3 rounded-lg border border-amber-500/50 bg-amber-500/5 p-4"
+      >
+        <Archive class="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+        <div>
+          <p class="font-medium text-amber-600 dark:text-amber-400">
+            Viewing archived version v{{ viewVersion }}
+          </p>
+          <p class="mt-0.5 text-sm text-muted-foreground">
+            This is a historical snapshot.
+            <NuxtLink
+              :to="`/cms/${collectionName}/${slug}`"
+              class="text-primary underline underline-offset-2 hover:text-primary/80"
+            >
+              View latest version instead
+            </NuxtLink>
+          </p>
         </div>
       </div>
 
@@ -192,7 +249,7 @@ function isObject(value: any): boolean {
         <Pencil class="mx-auto mb-2 h-6 w-6 text-muted-foreground/50" />
         <p class="text-sm text-muted-foreground">
           <NuxtLink
-            :to="`/cms/${collectionName}/edit/${slug}`"
+            :to="editLink"
             class="text-primary hover:underline"
           >
             Edit this item →

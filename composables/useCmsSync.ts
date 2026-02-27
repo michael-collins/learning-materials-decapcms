@@ -45,7 +45,7 @@ export function useCmsSync() {
   /**
    * Check sync status between local and GitHub for a specific file.
    */
-  async function checkSync(collection: string, slug: string): Promise<SyncResult> {
+  async function checkSync(collection: string, slug: string, version?: string): Promise<SyncResult> {
     syncStatus.value = 'checking'
     syncError.value = null
     localVersion.value = null
@@ -55,7 +55,7 @@ export function useCmsSync() {
       const token = getToken()
       const result = await $fetch<SyncResult>('/api/cms/content/sync-check', {
         method: 'POST',
-        body: { collection, slug, token },
+        body: { collection, slug, token, ...(version ? { version } : {}) },
       })
 
       syncStatus.value = result.status
@@ -81,7 +81,7 @@ export function useCmsSync() {
    * Pull the latest version from GitHub, overwriting the local file.
    * Returns true if successful.
    */
-  async function pullFromGitHub(collection: string, slug: string): Promise<boolean> {
+  async function pullFromGitHub(collection: string, slug: string, version?: string): Promise<boolean> {
     pulling.value = true
     syncError.value = null
 
@@ -89,7 +89,7 @@ export function useCmsSync() {
       const token = getToken()
       await $fetch('/api/cms/content/pull', {
         method: 'POST',
-        body: { collection, slug, token },
+        body: { collection, slug, token, ...(version ? { version } : {}) },
       })
 
       syncStatus.value = 'in-sync'
@@ -110,14 +110,14 @@ export function useCmsSync() {
    * Pre-publish sync check.
    * Returns { safe: true } if OK to publish, or { safe: false, ...details } if conflict detected.
    */
-  async function prePublishCheck(collection: string, slug: string): Promise<{
+  async function prePublishCheck(collection: string, slug: string, version?: string): Promise<{
     safe: boolean
     status: SyncStatus
     message: string
     isNew?: boolean
   }> {
     try {
-      const result = await checkSync(collection, slug)
+      const result = await checkSync(collection, slug, version)
 
       switch (result.status) {
         case 'in-sync':

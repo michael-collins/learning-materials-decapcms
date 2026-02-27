@@ -16,6 +16,10 @@ import {
   ChevronRight,
   RefreshCw,
   Upload,
+  ChevronDown,
+  Pencil,
+  Archive,
+  Loader2,
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -67,6 +71,80 @@ function formatDate(date: string | undefined): string {
     return date
   }
 }
+
+// ─── Version dropdown state ─────────────────────────────
+const router = useRouter()
+const { getToken, restoreSession } = useCmsAuth()
+
+/** Which item's version dropdown is currently open (by slug) */
+const openVersionDropdown = ref<string | null>(null)
+/** Cached versions per slug */
+const versionCache = ref<Record<string, { currentVersion: string; versions: { version: string; versionStatus: string; createdAt?: string }[] }>>({})
+/** Loading state per slug */
+const versionLoading = ref<Record<string, boolean>>({})
+
+/** Toggle version dropdown — fetches versions on first open */
+async function toggleVersionDropdown(e: Event, itemSlug: string) {
+  e.stopPropagation()
+  e.preventDefault()
+
+  if (openVersionDropdown.value === itemSlug) {
+    openVersionDropdown.value = null
+    return
+  }
+
+  openVersionDropdown.value = itemSlug
+
+  // Fetch versions if not cached
+  if (!versionCache.value[itemSlug]) {
+    versionLoading.value[itemSlug] = true
+    try {
+      await restoreSession()
+      const token = getToken()
+      const res = await $fetch<{
+        currentVersion: string
+        versions: { version: string; versionStatus: string; createdAt?: string }[]
+      }>('/api/cms/content/versions', {
+        params: {
+          collection: collectionName.value,
+          slug: itemSlug,
+          ...(token ? { token } : {}),
+        },
+      })
+      versionCache.value[itemSlug] = res
+    } catch {
+      // If fetching fails, close the dropdown
+      openVersionDropdown.value = null
+    } finally {
+      versionLoading.value[itemSlug] = false
+    }
+  }
+}
+
+/** Navigate to edit a specific version */
+function editVersion(e: Event, itemSlug: string, version?: string) {
+  e.stopPropagation()
+  e.preventDefault()
+  openVersionDropdown.value = null
+  if (version) {
+    router.push(`/cms/${collectionName.value}/edit/${itemSlug}?version=${version}`)
+  } else {
+    router.push(`/cms/${collectionName.value}/edit/${itemSlug}`)
+  }
+}
+
+/** Close dropdown when clicking outside */
+function handleClickOutside() {
+  openVersionDropdown.value = null
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -203,9 +281,69 @@ function formatDate(date: string | undefined): string {
               </span>
               <span
                 v-if="item.version"
-                class="shrink-0 rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400"
+                class="relative shrink-0"
               >
-                v{{ item.version }}
+                <button
+                  type="button"
+                  class="flex items-center gap-0.5 rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 transition-colors hover:bg-blue-500/20 dark:text-blue-400"
+                  @click="toggleVersionDropdown($event, item.slug)"
+                  title="Select version to edit"
+                >
+                  v{{ item.version }}
+                  <ChevronDown class="h-2.5 w-2.5" />
+                </button>
+
+                <!-- Version dropdown -->
+                <div
+                  v-if="openVersionDropdown === item.slug"
+                  class="absolute left-0 top-full z-50 mt-1 min-w-50 rounded-md border bg-popover p-1 shadow-md"
+                  @click.stop
+                >
+                  <!-- Loading -->
+                  <div v-if="versionLoading[item.slug]" class="flex items-center justify-center py-3">
+                    <Loader2 class="h-4 w-4 animate-spin text-muted-foreground" />
+                  </div>
+
+                  <template v-else-if="versionCache[item.slug]">
+                    <!-- Latest version -->
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent"
+                      @click="editVersion($event, item.slug)"
+                    >
+                      <Pencil class="h-3.5 w-3.5 text-muted-foreground" />
+                      <span class="flex-1">v{{ versionCache[item.slug]?.currentVersion }}</span>
+                      <span class="text-[10px] font-medium text-green-600 dark:text-green-400">latest</span>
+                    </button>
+
+                    <!-- Divider if there are archived versions -->
+                    <div
+                      v-if="versionCache[item.slug]?.versions?.length"
+                      class="my-1 border-t"
+                    />
+
+                    <!-- Archived versions -->
+                    <button
+                      v-for="v in versionCache[item.slug]?.versions"
+                      :key="v.version"
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent"
+                      @click="editVersion($event, item.slug, v.version)"
+                    >
+                      <Archive class="h-3.5 w-3.5 text-muted-foreground" />
+                      <span class="flex-1">v{{ v.version }}</span>
+                      <span class="text-[10px] text-muted-foreground">archived</span>
+                    </button>
+
+                    <!-- No archived versions -->
+                    <p
+                      v-if="versionCache[item.slug]?.versions?.length === 0"
+                      class="px-2 py-1.5 text-xs text-muted-foreground"
+                    >
+                      No archived versions
+                    </p>
+                  </template>
+                </div>
               </span>
             </div>
             <p v-if="item.description" class="mt-0.5 truncate text-xs text-muted-foreground">

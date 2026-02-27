@@ -21,7 +21,7 @@ import { getCmsConfig } from '~/server/utils/config-parser-server'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { collection: collectionName, slug, frontmatter, body: content, isNew } = body
+  const { collection: collectionName, slug, frontmatter, body: content, isNew, version } = body
 
   if (!collectionName || !slug) {
     throw createError({
@@ -52,7 +52,10 @@ export default defineEventHandler(async (event) => {
   const ext = collection.extension || 'md'
 
   let relativePath: string
-  if (pathPattern) {
+  if (version) {
+    // Version-specific file: content/{collection}/{slug}/v/{version}.md
+    relativePath = `${collection.folder}/${slug}/v/${version}.${ext}`
+  } else if (pathPattern) {
     const resolvedPath = pathPattern.replace('{{slug}}', slug)
     relativePath = `${collection.folder}/${resolvedPath}.${ext}`
   } else {
