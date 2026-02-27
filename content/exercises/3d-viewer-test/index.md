@@ -1,18 +1,21 @@
 ---
-breakingChanges: []
-versionStatus: latest
 title: 3D Model Viewer Test
 difficulty: Beginner
+image: ''
+imageAlt: ''
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
+tags: []
 author: Michael Collins
+authorUrl: ''
 published: true
-date: 2026-01-12T12:00:00.000Z
 allowEmbed: true
-changelog: Working version for future edits
 version: 4.0.0
+versionStatus: latest
+prerequisites: []
+attachments: []
 ---
 # 3D Model Viewer Test Page
 
@@ -22,18 +25,14 @@ This page demonstrates the 3D Model Viewer component capabilities.
 
 This example shows how to embed a Sketchfab model:
 
-
-
 ::sketchfab-component{src="https://sketchfab.com/3d-models/haus-eea4fe4f1424485182c56e64be90829c" title="Haus" height="600px"}
 ::
-
 ## Example 2: Uploaded GLTF File (Placeholder)
 
 Once you upload a .glb or .gltf file, you can reference it like this:
 
 ::threed-viewer-component{src="/uploads/boxes-sculpt-1.glb" title="Box Sculpture"}
 ::
-
 ## Instructions for Students
 
 To submit your 3D model:
@@ -43,6 +42,6 @@ To submit your 3D model:
 3. Select "3D Model Viewer"
 4. Upload your .glb file
 5. Add a descriptive title
-6. Save your work
+6. Save your work.
 
 Alternatively, you can upload your model to Sketchfab and paste the URL.
