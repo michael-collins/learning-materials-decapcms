@@ -6,7 +6,6 @@
  */
 
 import type { OutlineNode } from './useOutlineBuilder'
-export type { OutlineNode }
 
 export interface FlatChapter {
   title: string

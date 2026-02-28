@@ -8,6 +8,9 @@ const outlineLeaf = z.object({
   title: z.string(),
   path: z.string().optional(),
   content: z.string().optional(),
+  imported: z.boolean().optional(),
+  locked: z.boolean().optional(),
+  importChildren: z.boolean().optional(),
 })
 
 const outlineL3 = outlineLeaf.extend({

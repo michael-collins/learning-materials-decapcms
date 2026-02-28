@@ -11,9 +11,9 @@ import {
   flattenOutline,
   getNavigableChapters,
   parseContentRef,
-  type OutlineNode,
   type FlatChapter,
 } from '~/composables/useBookOutline'
+import type { OutlineNode } from '~/composables/useOutlineBuilder'
 
 /* ------------------------------------------------------------------ */
 /*  Theme CSS for standalone pages                                     */

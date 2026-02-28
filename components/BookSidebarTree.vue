@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronRight, ChevronDown, FileText, FolderOpen } from 'lucide-vue-next'
+import { ChevronRight, ChevronDown, FileText, FolderOpen, BookOpen, Presentation, Dumbbell, FolderKanban, Newspaper, GraduationCap, Route, Lightbulb, Clapperboard, type LucideIcon } from 'lucide-vue-next'
 import type { SidebarNode } from '~/composables/useBookOutline'
 
 interface Props {
@@ -23,17 +23,36 @@ function isExpanded(node: SidebarNode): boolean {
   }
   return node.isExpanded
 }
+
+/** Map content collection prefix to a unique icon */
+const contentTypeIcons: Record<string, LucideIcon> = {
+  lessons: BookOpen,
+  lectures: Presentation,
+  tutorials: Lightbulb,
+  exercises: Dumbbell,
+  projects: FolderKanban,
+  articles: Newspaper,
+  pathways: Route,
+  specializations: GraduationCap,
+  videos: Clapperboard,
+}
+
+function getContentIcon(content?: string): LucideIcon {
+  if (!content) return FileText
+  const collection = content.split('/')[0]
+  return (collection && contentTypeIcons[collection]) || FileText
+}
 </script>
 
 <template>
   <ul :class="['space-y-0.5', depth > 0 && 'ml-3 pl-3 border-l border-border/40']" role="list">
-    <li v-for="node in nodes" :key="node.fullPath">
+    <li v-for="(node, idx) in nodes" :key="node.fullPath" :class="[depth === 0 && idx > 0 && 'mt-4 pt-3 border-t border-border/30']">
       <!-- Section heading (has children, no content) -->
       <div v-if="node.isSection">
         <button
           @click="emit('toggle', node)"
           :class="[
-            'w-full flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium transition-colors',
+            'w-full flex items-start gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug font-medium transition-colors',
             'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
             node.isActive && 'bg-accent text-accent-foreground'
           ]"
@@ -41,10 +60,10 @@ function isExpanded(node: SidebarNode): boolean {
         >
           <component
             :is="isExpanded(node) ? ChevronDown : ChevronRight"
-            class="h-3.5 w-3.5 shrink-0 text-muted-foreground/60"
+            class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60"
           />
-          <FolderOpen v-if="isExpanded(node)" class="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
-          <span class="truncate">{{ node.title }}</span>
+          <FolderOpen v-if="isExpanded(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" />
+          <span class="wrap-break-word min-w-0">{{ node.title }}</span>
         </button>
 
         <!-- Expanded children -->
@@ -61,12 +80,12 @@ function isExpanded(node: SidebarNode): boolean {
 
       <!-- Navigable chapter (has content) with possible children -->
       <div v-else-if="node.content">
-        <div class="flex items-center">
+        <div class="flex items-start">
           <!-- Expand toggle (if has children too) -->
           <button
             v-if="node.children.length"
             @click="emit('toggle', node)"
-            class="p-1 rounded hover:bg-accent/50 transition-colors shrink-0"
+            class="p-1 rounded hover:bg-accent/50 transition-colors shrink-0 mt-0.5"
             :aria-expanded="isExpanded(node)"
             :aria-label="`Toggle ${node.title} section`"
           >
@@ -78,15 +97,15 @@ function isExpanded(node: SidebarNode): boolean {
           <NuxtLink
             :to="`/books/${bookSlug}/${node.fullPath}`"
             :class="[
-              'flex-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors',
+              'flex-1 flex items-start gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors min-w-0',
               node.isActive
                 ? 'bg-primary/10 text-primary font-medium'
                 : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
               !node.children.length && 'ml-0'
             ]"
           >
-            <FileText class="h-3.5 w-3.5 shrink-0 opacity-60" />
-            <span class="truncate">{{ node.title }}</span>
+            <component :is="getContentIcon(node.content)" class="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-60" />
+            <span class="wrap-break-word min-w-0">{{ node.title }}</span>
           </NuxtLink>
         </div>
 
@@ -103,7 +122,7 @@ function isExpanded(node: SidebarNode): boolean {
       </div>
 
       <!-- Non-navigable leaf (no content, no children — just a label) -->
-      <div v-else class="px-2 py-1.5 text-sm text-muted-foreground/50 italic truncate">
+      <div v-else class="px-2 py-1 text-[13px] leading-snug text-muted-foreground/50 italic wrap-break-word min-w-0">
         {{ node.title }}
       </div>
     </li>

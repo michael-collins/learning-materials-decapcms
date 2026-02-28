@@ -3,7 +3,6 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { BookOpen, ChevronRight, ChevronDown, ChevronLeft, PanelLeft, Menu, X, Search, Sun, Moon } from 'lucide-vue-next'
 import { useWindowSize } from '@vueuse/core'
 import Button from '~/components/ui/button/Button.vue'
-import SidebarFooter from '~/components/ui/sidebar/SidebarFooter.vue'
 import type { SidebarNode } from '~/composables/useBookOutline'
 import { useBookTheme } from '~/composables/useBookTheme'
 
@@ -126,6 +125,32 @@ const openCommandPalette = () => {
   const { open } = useCommandPalette()
   open()
 }
+
+// Book-scoped search
+const bookSearchQuery = ref('')
+const bookSearchInputRef = ref<HTMLInputElement | null>(null)
+
+function filterTree(nodes: SidebarNode[], query: string): SidebarNode[] {
+  if (!query) return nodes
+  const q = query.toLowerCase()
+  const results: SidebarNode[] = []
+  for (const node of nodes) {
+    const titleMatch = node.title.toLowerCase().includes(q)
+    const filteredChildren = filterTree(node.children, query)
+    if (titleMatch || filteredChildren.length > 0) {
+      results.push({
+        ...node,
+        children: filteredChildren,
+        isExpanded: true, // auto-expand matching branches
+      })
+    }
+  }
+  return results
+}
+
+const filteredSidebarTree = computed(() =>
+  filterTree(sidebarTree.value, bookSearchQuery.value)
+)
 </script>
 
 <template>
@@ -160,16 +185,20 @@ const openCommandPalette = () => {
       ref="sidebarRef"
       :class="[
         'bg-card transition-all duration-200 ease-in-out flex flex-col',
-        'fixed inset-y-0 left-0 z-50 w-72 border-r shadow-lg -translate-x-full',
-        'md:fixed md:inset-y-0 md:left-0 md:translate-x-0 md:shadow-none md:z-30',
+        'fixed inset-y-0 left-0 z-50 w-72 border-r -translate-x-full',
+        'md:fixed md:inset-y-0 md:left-0 md:translate-x-0 md:z-30',
         isMobile && isMobileMenuOpen && 'translate-x-0',
         !isMobile && (isDesktopCollapsed ? 'md:w-0 md:border-r-0' : 'md:w-72'),
+        rootClass === 'theme-lambda' ? 'shadow-none' : 'shadow-lg md:shadow-none',
         sidebarThemeClass,
       ]"
     >
       <div :class="['flex flex-col h-full', !isMobile && isDesktopCollapsed && 'invisible']">
         <!-- Book title header -->
-        <div class="flex h-14 items-center justify-between px-4 border-b shrink-0">
+        <div :class="[
+          'flex h-14 items-center justify-between px-4 border-b shrink-0',
+          rootClass === 'theme-lambda' ? 'uppercase tracking-tight text-xs' : '',
+        ]">
           <NuxtLink
             :to="`/books/${bookSlug}`"
             class="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors truncate"
@@ -191,28 +220,26 @@ const openCommandPalette = () => {
 
         <!-- Sidebar tree navigation -->
         <nav class="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 min-h-0" aria-label="Book navigation">
-          <BookSidebarTree :nodes="sidebarTree" :book-slug="bookSlug" :toggled-sections="toggledSections" @toggle="toggleSection" />
+          <BookSidebarTree :nodes="filteredSidebarTree" :book-slug="bookSlug" :toggled-sections="toggledSections" @toggle="toggleSection" />
+          <p v-if="bookSearchQuery && filteredSidebarTree.length === 0" class="px-2 py-4 text-xs text-muted-foreground text-center">
+            No results for "{{ bookSearchQuery }}"
+          </p>
         </nav>
 
-        <!-- Footer with search shortcut -->
-        <SidebarFooter class="shrink-0 border-t">
-          <button
-            @click="openCommandPalette"
-            class="w-full flex items-center justify-between gap-2 px-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors group"
-            aria-label="Open command palette"
-          >
-            <Search class="h-4 w-4" />
-            <div class="flex items-center gap-1 text-xs">
-              <kbd class="pointer-events-none select-none rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground group-hover:border-foreground/20">
-                {{ isMac ? '⌘' : 'Ctrl' }}
-              </kbd>
-              <span class="text-muted-foreground">+</span>
-              <kbd class="pointer-events-none select-none rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground group-hover:border-foreground/20">
-                K
-              </kbd>
-            </div>
-          </button>
-        </SidebarFooter>
+        <!-- Book search -->
+        <div class="shrink-0 border-t px-2 py-2">
+          <div class="relative">
+            <Search class="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+            <input
+              ref="bookSearchInputRef"
+              v-model="bookSearchQuery"
+              type="text"
+              placeholder="Search this book…"
+              class="w-full h-8 pl-7 pr-2 text-[13px] bg-muted/50 border border-border/50 rounded-md text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors"
+              @keydown.escape="bookSearchQuery = ''"
+            />
+          </div>
+        </div>
       </div>
     </aside>
 
@@ -252,13 +279,16 @@ const openCommandPalette = () => {
       </main>
 
       <!-- Prev/Next pagination -->
-      <div v-if="prevChapter || nextChapter" class="border-t">
+      <div v-if="prevChapter || nextChapter" :class="['border-t', rootClass === 'theme-lambda' ? 'border-border' : '']">
         <div class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div class="flex items-stretch gap-4" :class="!prevChapter ? 'justify-end' : 'justify-between'">
             <NuxtLink
               v-if="prevChapter"
               :to="`/books/${bookSlug}/${prevChapter.fullPath}`"
-              class="group flex flex-col items-start gap-1 rounded-lg border px-4 py-3 hover:bg-muted/50 transition-colors max-w-[45%]"
+              :class="[
+                'group flex flex-col items-start gap-1 border px-4 py-3 transition-colors max-w-[45%]',
+                rootClass === 'theme-lambda' ? 'hover:bg-accent hover:text-accent-foreground' : 'rounded-lg hover:bg-muted/50'
+              ]"
             >
               <span class="flex items-center gap-1 text-xs text-muted-foreground">
                 <ChevronLeft class="h-3 w-3" />
@@ -272,7 +302,10 @@ const openCommandPalette = () => {
             <NuxtLink
               v-if="nextChapter"
               :to="`/books/${bookSlug}/${nextChapter.fullPath}`"
-              class="group flex flex-col items-end gap-1 rounded-lg border px-4 py-3 hover:bg-muted/50 transition-colors max-w-[45%]"
+              :class="[
+                'group flex flex-col items-end gap-1 border px-4 py-3 transition-colors max-w-[45%]',
+                rootClass === 'theme-lambda' ? 'hover:bg-accent hover:text-accent-foreground' : 'rounded-lg hover:bg-muted/50'
+              ]"
             >
               <span class="flex items-center gap-1 text-xs text-muted-foreground">
                 Next

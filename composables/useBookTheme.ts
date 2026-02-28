@@ -54,56 +54,56 @@ const themes: Record<BookTheme, ThemeConfig> = {
     header: { class: '' },
   },
 
-  /* ── Lambda (purple tech) ────────────────────────────────────────── */
+  /* ── Lambda (cyberpunk tech — inspired by lambda.ai) ──────────── */
   lambda: {
     label: 'Lambda',
     rootClass: 'theme-lambda',
     light: {
-      '--color-background':           'oklch(0.985 0.007 290)',
-      '--color-foreground':           'oklch(0.18 0.02 290)',
-      '--color-card':                 'oklch(0.97 0.01 290)',
-      '--color-card-foreground':      'oklch(0.18 0.02 290)',
+      '--color-background':           'oklch(1 0 0)',           // pure white
+      '--color-foreground':           'oklch(0.10 0.02 290)',   // near-black
+      '--color-card':                 'oklch(0.97 0.003 290)',
+      '--color-card-foreground':      'oklch(0.10 0.02 290)',
       '--color-popover':              'oklch(1 0 0)',
-      '--color-popover-foreground':   'oklch(0.18 0.02 290)',
-      '--color-primary':              'oklch(0.53 0.26 293)',   // violet-600
+      '--color-popover-foreground':   'oklch(0.10 0.02 290)',
+      '--color-primary':              'oklch(0.50 0.28 293)',   // deep electric violet
       '--color-primary-foreground':   'oklch(1 0 0)',
-      '--color-secondary':            'oklch(0.94 0.02 290)',
-      '--color-secondary-foreground': 'oklch(0.30 0.05 290)',
-      '--color-muted':                'oklch(0.94 0.012 290)',
-      '--color-muted-foreground':     'oklch(0.45 0.03 290)',
-      '--color-accent':               'oklch(0.95 0.02 290)',
-      '--color-accent-foreground':    'oklch(0.53 0.26 293)',
+      '--color-secondary':            'oklch(0.10 0.02 290)',   // near-black
+      '--color-secondary-foreground': 'oklch(1 0 0)',           // white
+      '--color-muted':                'oklch(0.95 0.005 290)',
+      '--color-muted-foreground':     'oklch(0.40 0.02 290)',
+      '--color-accent':               'oklch(0.10 0.02 290)',   // full reverse hover bg
+      '--color-accent-foreground':    'oklch(1 0 0)',           // full reverse hover text
       '--color-destructive':          'oklch(0.62 0.24 26)',
       '--color-destructive-foreground':'oklch(1 0 0)',
-      '--color-border':               'oklch(0.91 0.015 290)',
-      '--color-input':                'oklch(0.93 0.01 290)',
-      '--color-ring':                 'oklch(0.53 0.26 293)',
+      '--color-border':               'oklch(0.82 0.04 293)',   // violet-tinted border
+      '--color-input':                'oklch(0.92 0.01 290)',
+      '--color-ring':                 'oklch(0.50 0.28 293)',
     },
     dark: {
-      '--color-background':           'oklch(0.13 0.005 290)',
-      '--color-foreground':           'oklch(0.93 0.005 290)',
-      '--color-card':                 'oklch(0.17 0.008 290)',
-      '--color-card-foreground':      'oklch(0.93 0.005 290)',
-      '--color-popover':              'oklch(0.17 0.008 290)',
-      '--color-popover-foreground':   'oklch(0.93 0.005 290)',
-      '--color-primary':              'oklch(0.58 0.24 293)',   // slightly lighter violet
-      '--color-primary-foreground':   'oklch(1 0 0)',
-      '--color-secondary':            'oklch(0.22 0.03 290)',
-      '--color-secondary-foreground': 'oklch(0.80 0.03 290)',
-      '--color-muted':                'oklch(0.20 0.005 290)',
+      '--color-background':           'oklch(0 0 0)',           // pure black
+      '--color-foreground':           'oklch(0.95 0 0)',        // near-white
+      '--color-card':                 'oklch(0.06 0.005 290)',  // barely off-black
+      '--color-card-foreground':      'oklch(0.95 0 0)',
+      '--color-popover':              'oklch(0.06 0.005 290)',
+      '--color-popover-foreground':   'oklch(0.95 0 0)',
+      '--color-primary':              'oklch(0.65 0.28 293)',   // bright electric violet
+      '--color-primary-foreground':   'oklch(0 0 0)',
+      '--color-secondary':            'oklch(0.95 0 0)',        // near-white
+      '--color-secondary-foreground': 'oklch(0 0 0)',           // black
+      '--color-muted':                'oklch(0.12 0.005 290)',
       '--color-muted-foreground':     'oklch(0.55 0.02 290)',
-      '--color-accent':               'oklch(0.22 0.04 290)',
-      '--color-accent-foreground':    'oklch(0.58 0.24 293)',
+      '--color-accent':               'oklch(0.95 0 0)',        // full reverse hover bg
+      '--color-accent-foreground':    'oklch(0 0 0)',           // full reverse hover text
       '--color-destructive':          'oklch(0.62 0.24 26)',
       '--color-destructive-foreground':'oklch(1 0 0)',
-      '--color-border':               'oklch(0.28 0.015 290)',
-      '--color-input':                'oklch(0.30 0.02 290)',
-      '--color-ring':                 'oklch(0.58 0.24 293)',
+      '--color-border':               'oklch(0.25 0.06 293)',   // thin violet-tinted border
+      '--color-input':                'oklch(0.15 0.02 290)',
+      '--color-ring':                 'oklch(0.65 0.28 293)',
     },
-    sidebar: { class: '' },
+    sidebar: { class: 'border-r-[1px]' },
     content: {
       class: '',
-      proseClass: 'prose dark:prose-invert prose-a:text-primary prose-code:text-primary/80',
+      proseClass: 'prose dark:prose-invert prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:text-primary/90 prose-code:font-mono prose-headings:tracking-tight',
     },
     header: { class: '' },
   },

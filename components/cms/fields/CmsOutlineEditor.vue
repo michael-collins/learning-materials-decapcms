@@ -29,6 +29,9 @@ import {
   BookOpen,
   Pencil,
   Check,
+  PackageOpen,
+  Lock,
+  Unlock,
 } from 'lucide-vue-next'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import Button from '~/components/ui/button/Button.vue'
@@ -41,6 +44,9 @@ interface OutlineNode {
   path?: string
   content?: string
   items?: OutlineNode[]
+  imported?: boolean
+  locked?: boolean
+  importChildren?: boolean
 }
 
 interface FlatItem {
@@ -49,6 +55,10 @@ interface FlatItem {
   path: string
   content: string
   depth: number
+  imported?: boolean
+  locked?: boolean
+  importChildren?: boolean
+  importedFrom?: string  // parent item ID that imported this
 }
 
 // ── Props & Emits ─────────────────────────────────────────────────────
@@ -74,18 +84,23 @@ function slugify(text: string): string {
 
 // ── Flat ↔ Nested conversion ──────────────────────────────────────────
 
-function nestedToFlat(nodes: OutlineNode[], depth = 0): FlatItem[] {
+function nestedToFlat(nodes: OutlineNode[], depth = 0, parentId?: string): FlatItem[] {
   const result: FlatItem[] = []
   for (const node of nodes) {
-    result.push({
-      id: generateId(),
+    const id = generateId()
+    const item: FlatItem = {
+      id,
       title: node.title || '',
       path: node.path || '',
       content: node.content || '',
       depth,
-    })
+    }
+    if (node.imported) { item.imported = true; item.locked = node.locked !== false }
+    if (node.importChildren) item.importChildren = true
+    if (parentId && node.imported) item.importedFrom = parentId
+    result.push(item)
     if (node.items?.length) {
-      result.push(...nestedToFlat(node.items, depth + 1))
+      result.push(...nestedToFlat(node.items, depth + 1, node.importChildren ? id : undefined))
     }
   }
   return result
@@ -99,6 +114,9 @@ function flatToNested(items: FlatItem[]): OutlineNode[] {
     const node: OutlineNode = { title: item.title }
     if (item.path) node.path = item.path
     if (item.content) node.content = item.content
+    if (item.imported) node.imported = true
+    if (item.locked) node.locked = true
+    if (item.importChildren) node.importChildren = true
 
     while (stack.length > 0 && stack[stack.length - 1]!.depth >= item.depth) {
       stack.pop()
@@ -323,9 +341,17 @@ function addItemWithPicker() {
 function removeItem(id: string) {
   const idx = items.value.findIndex(i => i.id === id)
   if (idx < 0) return
-  const { end } = getSubtreeRange(idx)
-  const prevId = idx > 0 ? items.value[idx - 1]!.id : null
-  items.value.splice(idx, end - idx)
+  const item = items.value[idx]!
+  // If this item had imported children, remove them first
+  if (item.importChildren) {
+    removeImportedChildren(id)
+  }
+  // Re-find idx since removal may have shifted indices
+  const newIdx = items.value.findIndex(i => i.id === id)
+  if (newIdx < 0) return
+  const { end } = getSubtreeRange(newIdx)
+  const prevId = newIdx > 0 ? items.value[newIdx - 1]!.id : null
+  items.value.splice(newIdx, end - newIdx)
   collapsedIds.value.delete(id)
   if (prevId) {
     nextTick(() => {
@@ -357,6 +383,8 @@ function indentItem(id: string) {
   const idx = items.value.findIndex(i => i.id === id)
   if (idx <= 0) return
   const item = items.value[idx]!
+  // Block indent for locked imported items
+  if (item.imported && item.locked) return
   const prevDepth = items.value[idx - 1]!.depth
   if (item.depth >= 3 || item.depth > prevDepth) return
   item.depth++
@@ -367,6 +395,8 @@ function outdentItem(id: string) {
   const idx = items.value.findIndex(i => i.id === id)
   if (idx < 0) return
   const item = items.value[idx]!
+  // Block outdent for locked imported items
+  if (item.imported && item.locked) return
   if (item.depth <= 0) return
   item.depth--
   emitUpdate()
@@ -443,6 +473,158 @@ function getContentIcon(content: string) {
   return typeIcons[collection] || FileText
 }
 
+// ── Lesson sub-item import ────────────────────────────────────────────
+
+/** Map lesson item type → collection name and field key */
+const LESSON_ITEM_TYPE_MAP: Record<string, { collection: string; field: string }> = {
+  lectures: { collection: 'lectures', field: 'lecture' },
+  exercises: { collection: 'exercises', field: 'exercise' },
+  projects: { collection: 'projects', field: 'project' },
+  tutorials: { collection: 'tutorials', field: 'tutorial' },
+  articles: { collection: 'articles', field: 'article' },
+}
+
+/** Check if an outline item references a lesson */
+function isLessonContent(item: FlatItem): boolean {
+  return item.content.startsWith('lessons/')
+}
+
+/** Fetch a lesson's sub-items from its frontmatter */
+async function fetchLessonSubItems(lessonContent: string): Promise<{ collection: string; slug: string; title: string }[]> {
+  // content is like "lessons/3d-modeling-fundamentals"
+  const slug = lessonContent.replace(/^lessons\//, '')
+  try {
+    // Query all lessons (same pattern as performSearch which works)
+    const results = await queryCollection('lessons' as any).limit(200).all()
+    const lesson = results.find((r: any) => {
+      const p = (r.path || '').replace(/^\//, '')
+      return p === lessonContent || p === `lessons/${slug}`
+    }) as any
+    if (!lesson) return []
+    return extractLessonItems(lesson)
+  } catch (e) {
+    console.error('[import] fetchLessonSubItems error:', e)
+    return []
+  }
+}
+
+/** Extract sub-item references from a lesson's metadata */
+async function extractLessonItems(lesson: any): Promise<{ collection: string; slug: string; title: string }[]> {
+  // items might be stored as a JSON string in SQLite
+  let lessonItems: any[] = lesson.items || []
+  if (typeof lessonItems === 'string') {
+    try { lessonItems = JSON.parse(lessonItems) } catch { lessonItems = [] }
+  }
+  if (!Array.isArray(lessonItems) || lessonItems.length === 0) return []
+
+  const subItems: { collection: string; slug: string; title: string }[] = []
+
+  // Cache collection results to avoid redundant queries
+  const collectionCache: Record<string, any[]> = {}
+
+  for (const li of lessonItems) {
+    const typeKey = li.type as string
+    const mapping = LESSON_ITEM_TYPE_MAP[typeKey]
+    if (!mapping) continue
+    const refSlug = li[mapping.field] as string
+    if (!refSlug) continue
+
+    // Strip /index suffix if present
+    const cleanSlug = refSlug.replace(/\/index$/, '')
+
+    // Try to fetch the title from the referenced content
+    let title = cleanSlug.split('/').pop()?.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || cleanSlug
+    try {
+      if (!collectionCache[mapping.collection]) {
+        collectionCache[mapping.collection] = await queryCollection(mapping.collection as any).limit(200).all()
+      }
+      const ref = collectionCache[mapping.collection]!.find((r: any) => {
+        const p = (r.path || '').replace(/^\//, '')
+        return p.includes(cleanSlug)
+      })
+      if (ref && (ref as any).title) {
+        title = (ref as any).title
+      }
+    } catch { /* use fallback title */ }
+
+    subItems.push({
+      collection: mapping.collection,
+      slug: cleanSlug,
+      title,
+    })
+  }
+  return subItems
+}
+
+// Track importing state for loading indicator
+const importingId = ref<string | null>(null)
+
+/** Toggle import of lesson sub-items for an outline item */
+async function toggleImportChildren(id: string) {
+  const idx = items.value.findIndex(i => i.id === id)
+  if (idx < 0) return
+  const item = items.value[idx]!
+
+  if (item.importChildren) {
+    // Remove imported children
+    removeImportedChildren(id)
+    item.importChildren = false
+    emitUpdate()
+    return
+  }
+
+  // Import sub-items
+  importingId.value = id
+  try {
+    item.importChildren = true
+    const subItems = await fetchLessonSubItems(item.content)
+    if (subItems.length === 0) {
+      item.importChildren = false
+      emitUpdate()
+      return
+    }
+
+    // Re-find idx since the array may have changed
+    const freshIdx = items.value.findIndex(i => i.id === id)
+    if (freshIdx < 0) return
+    const { end } = getSubtreeRange(freshIdx)
+    const childDepth = items.value[freshIdx]!.depth + 1
+    const newItems: FlatItem[] = subItems.map(si => ({
+      id: generateId(),
+      title: si.title,
+      path: slugify(si.title),
+      content: `${si.collection}/${si.slug}`,
+      depth: childDepth,
+      imported: true,
+      locked: true,
+      importedFrom: id,
+    }))
+
+    items.value.splice(end, 0, ...newItems)
+    // Expand parent if collapsed
+    collapsedIds.value.delete(id)
+    emitUpdate()
+  } catch (e) {
+    console.error('[import] toggleImportChildren error:', e)
+    item.importChildren = false
+  } finally {
+    importingId.value = null
+  }
+}
+
+/** Remove all imported children for a given parent */
+function removeImportedChildren(parentId: string) {
+  items.value = items.value.filter(i => i.importedFrom !== parentId)
+}
+
+/** Toggle lock on an imported item */
+function toggleLock(id: string) {
+  const item = items.value.find(i => i.id === id)
+  if (!item || !item.imported) return
+  item.locked = !item.locked
+  emitUpdate()
+}
+
 function openPicker(itemId: string) {
   pickerTargetId.value = itemId
   pickerQuery.value = ''
@@ -464,6 +646,11 @@ function openPickerForItem(itemId: string) {
 function unlinkContent(id: string) {
   const item = items.value.find(i => i.id === id)
   if (!item) return
+  // If this lesson had imported children, remove them
+  if (item.importChildren) {
+    removeImportedChildren(id)
+    item.importChildren = false
+  }
   item.content = ''
   emitUpdate()
 }
@@ -641,21 +828,23 @@ function handleRowKeydown(event: KeyboardEvent, item: FlatItem, realIndex: numbe
   // Don't intercept when editing — the input handles it
   if (editingId.value === item.id) return
 
+  const isLockedImport = item.imported && item.locked
+
   if (event.key === 'Tab' && !event.shiftKey) {
     event.preventDefault()
-    indentItem(item.id)
+    if (!isLockedImport) indentItem(item.id)
   } else if (event.key === 'Tab' && event.shiftKey) {
     event.preventDefault()
-    outdentItem(item.id)
+    if (!isLockedImport) outdentItem(item.id)
   } else if (event.key === 'Enter' || event.key === 'F2') {
     event.preventDefault()
-    startEditing(item.id)
+    if (!isLockedImport) startEditing(item.id)
   } else if (event.key === 'ArrowUp' && event.altKey) {
     event.preventDefault()
-    moveUp(item.id)
+    if (!isLockedImport) moveUp(item.id)
   } else if (event.key === 'ArrowDown' && event.altKey) {
     event.preventDefault()
-    moveDown(item.id)
+    if (!isLockedImport) moveDown(item.id)
   } else if (event.key === 'ArrowUp' && !event.altKey) {
     event.preventDefault()
     // Focus previous visible item
@@ -701,6 +890,9 @@ function setItemRef(id: string, el: any) {
 const editingId = ref<string | null>(null)
 
 function startEditing(id: string) {
+  // Block editing for locked imported items
+  const item = items.value.find(i => i.id === id)
+  if (item?.imported && item?.locked) return
   editingId.value = id
   nextTick(() => {
     const el = itemInputRefs.value[id]
@@ -843,14 +1035,15 @@ const totalCount = computed(() => items.value.length)
         :key="item.id"
         data-outline-item
         :data-item-id="item.id"
-        :draggable="editingId !== item.id"
+        :draggable="editingId !== item.id && !(item.imported && item.locked)"
         tabindex="0"
         role="treeitem"
         :aria-level="item.depth + 1"
         :aria-expanded="hasChildren(realIndex) ? !collapsedIds.has(item.id) : undefined"
         :aria-label="item.title || (item.depth === 0 ? 'Empty section' : 'Empty item')"
         :class="[
-          'group relative flex items-center h-8 pl-2 pr-2 transition-colors hover:bg-accent/40 focus:bg-accent/30 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
+          'group relative flex items-center h-8 pl-2 pr-2 transition-colors focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
+          item.imported && item.locked ? 'bg-muted/30' : 'hover:bg-accent/40 focus:bg-accent/30',
           draggedId === item.id ? 'opacity-40' : '',
           vIdx > 0 ? 'border-t border-border/40' : '',
         ]"
@@ -923,12 +1116,15 @@ const totalCount = computed(() => items.value.length)
         </div>
 
         <!-- Title: display mode (draggable) or edit mode (input) -->
-        <div v-if="editingId !== item.id" class="flex-1 min-w-0 flex items-center h-full cursor-grab active:cursor-grabbing select-none" @dblclick.stop="startEditing(item.id)">
+        <div v-if="editingId !== item.id" :class="['flex-1 min-w-0 flex items-center h-full select-none', item.imported && item.locked ? 'cursor-default' : 'cursor-grab active:cursor-grabbing']" @dblclick.stop="!(item.imported && item.locked) && startEditing(item.id)">
+          <!-- Lock icon for imported locked items -->
+          <Lock v-if="item.imported && item.locked" class="h-3 w-3 shrink-0 text-muted-foreground/40 mr-0.5" />
           <span
             v-if="item.title"
             :class="[
               'truncate text-sm px-1.5',
               item.depth === 0 ? 'font-medium' : 'text-muted-foreground',
+              item.imported && item.locked ? 'text-muted-foreground/60 italic' : '',
             ]"
           >{{ item.title }}</span>
           <span
@@ -953,6 +1149,7 @@ const totalCount = computed(() => items.value.length)
 
         <!-- Edit toggle: pencil (hover only) to enter edit, checkmark to confirm -->
         <button
+          v-if="!(item.imported && item.locked)"
           type="button"
           :class="[
             'shrink-0 p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors',
@@ -963,6 +1160,18 @@ const totalCount = computed(() => items.value.length)
         >
           <Check v-if="editingId === item.id" class="h-3 w-3" />
           <Pencil v-else class="h-3 w-3" />
+        </button>
+
+        <!-- Lock/unlock toggle for imported items -->
+        <button
+          v-if="item.imported"
+          type="button"
+          class="shrink-0 p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors opacity-0 group-hover:opacity-100"
+          :title="item.locked ? 'Unlock item' : 'Lock item'"
+          @click.stop="toggleLock(item.id)"
+        >
+          <Lock v-if="item.locked" class="h-3 w-3" />
+          <Unlock v-else class="h-3 w-3" />
         </button>
 
         <!-- Collapsed children count badge -->
@@ -979,16 +1188,36 @@ const totalCount = computed(() => items.value.length)
           type="button"
           class="shrink-0 flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-primary/70 hover:bg-accent transition-colors mr-1"
           :title="item.content"
-          @click.stop="openPicker(item.id)"
+          @click.stop="!(item.imported && item.locked) && openPicker(item.id)"
         >
           <component :is="getContentIcon(item.content)" class="h-3 w-3" />
           <span class="max-w-30 truncate">{{ item.content.split('/').pop() }}</span>
         </button>
 
+        <!-- Import sub-items toggle for lessons -->
+        <button
+          v-if="isLessonContent(item) && !item.imported"
+          type="button"
+          :disabled="importingId === item.id"
+          :class="[
+            'shrink-0 p-1 rounded transition-colors mr-0.5',
+            importingId === item.id
+              ? 'text-primary animate-pulse'
+              : item.importChildren
+                ? 'text-primary hover:text-primary/80 hover:bg-accent'
+                : 'text-muted-foreground/50 hover:text-foreground hover:bg-accent opacity-0 group-hover:opacity-100',
+          ]"
+          :title="importingId === item.id ? 'Importing…' : item.importChildren ? 'Remove imported sub-items' : 'Import lesson sub-items'"
+          @click.stop="toggleImportChildren(item.id)"
+        >
+          <Loader2 v-if="importingId === item.id" class="h-3 w-3 animate-spin" />
+          <PackageOpen v-else class="h-3 w-3" />
+        </button>
+
         <!-- Hover actions -->
-        <div class="shrink-0 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div :class="['shrink-0 flex items-center transition-opacity', item.imported && item.locked ? 'opacity-0 group-hover:opacity-60' : 'opacity-0 group-hover:opacity-100']">
           <button
-            v-if="!item.content"
+            v-if="!item.content && !(item.imported && item.locked)"
             type="button"
             class="p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
             title="Link content"
@@ -997,7 +1226,7 @@ const totalCount = computed(() => items.value.length)
             <Link class="h-3 w-3" />
           </button>
           <button
-            v-if="item.content"
+            v-if="item.content && !(item.imported && item.locked)"
             type="button"
             class="p-1 rounded text-muted-foreground/50 hover:text-destructive transition-colors"
             title="Unlink"
@@ -1006,7 +1235,7 @@ const totalCount = computed(() => items.value.length)
             <X class="h-3 w-3" />
           </button>
           <button
-            v-if="item.depth < 3"
+            v-if="item.depth < 3 && !(item.imported && item.locked)"
             type="button"
             class="p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
             title="Add child"
@@ -1015,6 +1244,7 @@ const totalCount = computed(() => items.value.length)
             <Plus class="h-3 w-3" />
           </button>
           <button
+            v-if="!(item.imported && item.locked)"
             type="button"
             class="p-1 rounded text-muted-foreground/50 hover:text-destructive transition-colors"
             title="Delete"
