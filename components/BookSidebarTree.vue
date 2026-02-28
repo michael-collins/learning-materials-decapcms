@@ -75,7 +75,6 @@ function getNodeIcon(node: SidebarNode): LucideIcon {
             class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60"
           />
           <component v-if="node.icon" :is="getNodeIcon(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" />
-          <FolderOpen v-else-if="isExpanded(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" />
           <span :class="['break-words text-left min-w-0', uppercaseTopLevel && depth === 0 && 'uppercase tracking-wide']">{{ node.title }}</span>
         </button>
 

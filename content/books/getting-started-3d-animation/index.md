@@ -82,6 +82,7 @@ outline:
           - title: Introduction to Modeling
             path: introduction-to-modeling
             content: lectures/introduction-to-modeling
+            icon: AirVent
             imported: true
             locked: true
           - title: Modeling the Airline Chair

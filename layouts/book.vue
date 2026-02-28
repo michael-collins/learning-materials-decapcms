@@ -229,7 +229,7 @@ const filteredSidebarTree = computed(() =>
           <NuxtLink
             :to="`/books/${bookSlug}`"
             :class="[
-              'flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors mb-1',
+              'flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors mb-4',
               isIntroductionActive
                 ? 'bg-primary/10 text-primary font-medium'
                 : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
