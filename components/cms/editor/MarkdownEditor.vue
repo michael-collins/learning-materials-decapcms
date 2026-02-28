@@ -12,10 +12,12 @@
  */
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import { Extension } from '@tiptap/core'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown } from 'tiptap-markdown'
 import { MdcBlockExtension, parseMdcBlock, mdcToNodeAttrs } from './MdcBlockExtension'
+import LinkBubbleMenu from './LinkBubbleMenu.vue'
 import {
   Bold, Italic, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Code, Minus, Link as LinkIcon,
@@ -112,6 +114,21 @@ function fixEscapedHeadings(md: string): string {
   return md.replace(/^\\(#{1,6}\s)/gm, '$1')
 }
 
+// ─── Custom keyboard shortcuts extension ───────────────────
+// Defined here (not inline) so insertLink() is in scope when
+// the editor triggers Mod-k.
+const editorKeyboardShortcuts = Extension.create({
+  name: 'editorKeyboardShortcuts',
+  addKeyboardShortcuts() {
+    return {
+      'Mod-k': () => {
+        insertLink()
+        return true
+      },
+    }
+  },
+})
+
 // ─── Editor setup ──────────────────────────────────────────
 const editor = useEditor({
   content: mdcToHtml(props.modelValue || ''),
@@ -140,6 +157,7 @@ const editor = useEditor({
       transformCopiedText: true,
     }),
     MdcBlockExtension,
+    editorKeyboardShortcuts,
   ],
   editorProps: {
     attributes: {
@@ -197,10 +215,27 @@ function handleCodeEditorUpdate(value: string) {
 }
 
 // ─── Toolbar actions ───────────────────────────────────────
+const linkBubbleRef = ref<InstanceType<typeof LinkBubbleMenu> | null>(null)
+
 function insertLink() {
-  const url = window.prompt('Enter URL:')
-  if (!url) return
-  editor.value?.chain().focus().setLink({ href: url }).run()
+  if (!editor.value) return
+  // If already on a link, the bubble menu is already showing — toggle unlink
+  if (editor.value.isActive('link')) {
+    editor.value.chain().focus().unsetLink().run()
+    return
+  }
+  // If no text selected, insert placeholder text first
+  const { from, to } = editor.value.state.selection
+  if (from === to) {
+    editor.value.chain().focus().insertContent('link text').run()
+    // Select the just-inserted text
+    editor.value.chain().setTextSelection({ from, to: from + 9 }).run()
+  }
+  // Apply a temporary link so the bubble menu appears, then switch to edit mode
+  editor.value.chain().focus().setLink({ href: '' }).run()
+  nextTick(() => {
+    linkBubbleRef.value?.openForNewLink()
+  })
 }
 
 // ─── CodeEditor ref (for inserting snippets in code mode) ──
@@ -622,6 +657,7 @@ const toolbarButtons = computed<ToolbarBtn[]>(() => {
       <!-- Rich-text editor (edit / split modes) -->
       <div v-if="viewMode === 'edit' || viewMode === 'split'" class="min-h-[300px]">
         <EditorContent :editor="editor" class="h-full" />
+        <LinkBubbleMenu v-if="editor" ref="linkBubbleRef" :editor="editor" />
       </div>
 
       <!-- Raw code editor (code mode) — CodeMirror with syntax highlighting -->

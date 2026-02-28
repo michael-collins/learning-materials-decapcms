@@ -5,6 +5,9 @@ export default defineNuxtPlugin(() => {
   function handleKeyDown(e: KeyboardEvent) {
     // Cmd/Ctrl + K or Cmd/Ctrl + P
     if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K' || e.key === 'p' || e.key === 'P')) {
+      // Skip when focus is inside an editor, input, or anywhere on CMS pages
+      // so that Cmd+K can be used as the "insert link" shortcut in the editor
+      if (isEditorContext()) return
       e.preventDefault()
       open()
       return
@@ -27,6 +30,18 @@ export default defineNuxtPlugin(() => {
     const isInput = tagName === 'input' || tagName === 'textarea' || tagName === 'select'
     
     return isInput || isContentEditable
+  }
+
+  /** True when focus is in any input/editor OR on a CMS route */
+  function isEditorContext(): boolean {
+    // Any focused input, textarea, or contenteditable element
+    if (isInputFocused()) return true
+    // Also check if we're inside a .tiptap editor or .ProseMirror element
+    const active = document.activeElement
+    if (active?.closest?.('.tiptap, .ProseMirror, [data-cms-editor]')) return true
+    // Check if we're on a CMS page (route starts with /cms)
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/cms')) return true
+    return false
   }
 
   // Register global keyboard shortcut
