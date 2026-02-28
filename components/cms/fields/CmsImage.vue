@@ -11,7 +11,7 @@
  * Stores the public path (e.g., "/uploads/photo.jpg").
  */
 import type { CmsFieldDef } from '~/lib/cms/config-types'
-import { ImagePlus, Upload, X, Loader2, Link } from 'lucide-vue-next'
+import { ImagePlus, Upload, X, Loader2, Link, FolderOpen } from 'lucide-vue-next'
 
 const props = defineProps<{
   field: CmsFieldDef
@@ -33,6 +33,7 @@ const uploadError = ref('')
 const showUrlInput = ref(false)
 const urlInput = ref('')
 const fileInput = ref<HTMLInputElement>()
+const showMediaPicker = ref(false)
 
 // ─── Image preview URL ────────────────────────────────────────
 const previewUrl = computed(() => {
@@ -102,6 +103,13 @@ function clearImage() {
   uploadRawUrl.value = ''
 }
 
+// ─── Media picker ─────────────────────────────────────────────
+function handleMediaSelect(path: string) {
+  imagePath.value = path
+  uploadRawUrl.value = '' // clear any previous upload preview
+  showMediaPicker.value = false
+}
+
 /** Handle drag-and-drop file */
 function handleDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0]
@@ -133,10 +141,18 @@ function handleDrop(e: DragEvent) {
           @error="($event.target as HTMLImageElement).style.display = 'none'"
         />
       </div>
-      <div class="mt-1 flex items-center gap-2">
+      <div class="mt-1.5 flex items-center gap-2">
         <p class="flex-1 truncate text-xs text-muted-foreground">
           {{ imagePath }}
         </p>
+        <button
+          type="button"
+          @click="showMediaPicker = true"
+          class="shrink-0 rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+          title="Change image"
+        >
+          <FolderOpen class="h-3.5 w-3.5" />
+        </button>
         <button
           type="button"
           @click="clearImage"
@@ -152,7 +168,7 @@ function handleDrop(e: DragEvent) {
     <div v-else>
       <div
         class="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/25 p-6 transition-colors hover:border-muted-foreground/50 cursor-pointer"
-        @click="triggerFileInput"
+        @click="showMediaPicker = true"
         @dragover.prevent
         @drop.prevent="handleDrop"
       >
@@ -163,23 +179,31 @@ function handleDrop(e: DragEvent) {
         <template v-else>
           <ImagePlus class="h-8 w-8 text-muted-foreground/40" />
           <p class="text-sm text-muted-foreground">
-            Click or drag to upload an image
+            Click to browse media library
           </p>
           <p class="text-xs text-muted-foreground/60">
-            JPG, PNG, GIF, SVG, WebP
+            Or drag a file here to upload
           </p>
         </template>
       </div>
 
-      <!-- Alternative: URL input -->
-      <div class="mt-2 flex items-center gap-2">
+      <!-- Secondary actions -->
+      <div class="mt-2 flex items-center gap-3">
+        <button
+          type="button"
+          @click="triggerFileInput"
+          class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <Upload class="h-3 w-3" />
+          Upload from device
+        </button>
         <button
           type="button"
           @click="showUrlInput = !showUrlInput"
           class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           <Link class="h-3 w-3" />
-          {{ showUrlInput ? 'Cancel' : 'Or enter URL' }}
+          {{ showUrlInput ? 'Cancel' : 'Enter URL' }}
         </button>
       </div>
 
@@ -211,6 +235,15 @@ function handleDrop(e: DragEvent) {
       accept="image/*"
       class="hidden"
       @change="handleFileSelect"
+    />
+
+    <!-- Media picker modal -->
+    <CmsMediaPickerModal
+      :open="showMediaPicker"
+      :allowed-types="['image']"
+      title="Select an image"
+      @select="handleMediaSelect"
+      @close="showMediaPicker = false"
     />
   </div>
 </template>

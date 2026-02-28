@@ -10,7 +10,7 @@
  * Stores the public path (e.g., "/uploads/document.pdf").
  */
 import type { CmsFieldDef } from '~/lib/cms/config-types'
-import { FileUp, Upload, X, Loader2, Link, File as FileIcon } from 'lucide-vue-next'
+import { FileUp, Upload, X, Loader2, Link, File as FileIcon, FolderOpen } from 'lucide-vue-next'
 
 const props = defineProps<{
   field: CmsFieldDef
@@ -32,6 +32,7 @@ const uploadError = ref('')
 const showUrlInput = ref(false)
 const urlInput = ref('')
 const fileInput = ref<HTMLInputElement>()
+const showMediaPicker = ref(false)
 
 const hasFile = computed(() => !!filePath.value)
 
@@ -89,6 +90,12 @@ function clearFile() {
   uploadError.value = ''
 }
 
+// ─── Media picker ─────────────────────────────────────────────
+function handleMediaSelect(path: string) {
+  filePath.value = path
+  showMediaPicker.value = false
+}
+
 /** Handle drag-and-drop file */
 function handleDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0]
@@ -119,6 +126,14 @@ function handleDrop(e: DragEvent) {
       </div>
       <button
         type="button"
+        @click="showMediaPicker = true"
+        class="shrink-0 rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+        title="Change file"
+      >
+        <FolderOpen class="h-4 w-4" />
+      </button>
+      <button
+        type="button"
         @click="clearFile"
         class="shrink-0 rounded p-1 text-destructive/60 hover:bg-destructive/10 hover:text-destructive"
         title="Remove file"
@@ -131,7 +146,7 @@ function handleDrop(e: DragEvent) {
     <div v-else>
       <div
         class="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/25 p-4 transition-colors hover:border-muted-foreground/50 cursor-pointer"
-        @click="triggerFileInput"
+        @click="showMediaPicker = true"
         @dragover.prevent
         @drop.prevent="handleDrop"
       >
@@ -142,20 +157,31 @@ function handleDrop(e: DragEvent) {
         <template v-else>
           <FileUp class="h-6 w-6 text-muted-foreground/40" />
           <p class="text-sm text-muted-foreground">
-            Click or drag to upload a file
+            Click to browse media library
+          </p>
+          <p class="text-xs text-muted-foreground/60">
+            Or drag a file here to upload
           </p>
         </template>
       </div>
 
-      <!-- Alternative: URL input -->
-      <div class="mt-2 flex items-center gap-2">
+      <!-- Secondary actions -->
+      <div class="mt-2 flex items-center gap-3">
+        <button
+          type="button"
+          @click="triggerFileInput"
+          class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <Upload class="h-3 w-3" />
+          Upload from device
+        </button>
         <button
           type="button"
           @click="showUrlInput = !showUrlInput"
           class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           <Link class="h-3 w-3" />
-          {{ showUrlInput ? 'Cancel' : 'Or enter path/URL' }}
+          {{ showUrlInput ? 'Cancel' : 'Enter path/URL' }}
         </button>
       </div>
 
@@ -186,6 +212,15 @@ function handleDrop(e: DragEvent) {
       type="file"
       class="hidden"
       @change="handleFileSelect"
+    />
+
+    <!-- Media picker modal -->
+    <CmsMediaPickerModal
+      :open="showMediaPicker"
+      :allowed-types="[]"
+      title="Select a file"
+      @select="handleMediaSelect"
+      @close="showMediaPicker = false"
     />
   </div>
 </template>
