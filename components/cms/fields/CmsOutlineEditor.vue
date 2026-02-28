@@ -848,8 +848,6 @@ const totalCount = computed(() => items.value.length)
         :aria-label="item.title || (item.depth === 0 ? 'Empty section' : 'Empty item')"
         :class="[
           'group relative flex items-center h-8 pr-2 transition-colors hover:bg-accent/40 focus:bg-accent/30 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
-          dragOverId === item.id && dragPosition === 'before' ? 'ring-1 ring-inset ring-primary ring-offset-0' : '',
-          dragOverId === item.id && dragPosition === 'after' ? 'ring-1 ring-inset ring-primary ring-offset-0' : '',
           draggedId === item.id ? 'opacity-40' : '',
           vIdx > 0 ? 'border-t border-border/40' : '',
         ]"
@@ -860,6 +858,19 @@ const totalCount = computed(() => items.value.length)
         @dragleave="onDragLeave($event, item.id)"
         @drop="onDrop($event, item.id)"
       >
+        <!-- Drop indicator line -->
+        <div
+          v-if="dragOverId === item.id && draggedId !== item.id"
+          class="absolute left-0 right-0 z-20 pointer-events-none"
+          :class="dragPosition === 'before' ? '-top-px' : '-bottom-px'"
+        >
+          <div class="h-0.5 bg-primary rounded-full" />
+          <div
+            class="absolute w-2 h-2 rounded-full border-2 border-primary bg-background"
+            :class="dragPosition === 'before' ? '-top-[3px] -left-1' : '-top-[3px] -left-1'"
+          />
+        </div>
+
         <!-- Tree indent + lines -->
         <div
           class="flex items-center shrink-0 h-full"
