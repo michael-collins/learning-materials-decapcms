@@ -513,12 +513,56 @@ function renderMdcBlock(parsed: MdcParsed, refTracker: ReturnType<typeof createP
 
     case 'columns': {
       const count = p.count || '2'
-      const bodyHtml = parsed.body ? esc(parsed.body) : ''
+      const gapMap: Record<string, string> = { sm: '0.5rem', md: '1rem', lg: '1.5rem' }
+      const gap = gapMap[p.gap || 'md'] || '1rem'
+
+      // Parse named slots from body: lines starting with #slotName
+      // For 2 columns: #left / #right; for 3+: #first / #second / #third / #fourth
+      const slotNames = count === '2'
+        ? ['left', 'right']
+        : ['first', 'second', 'third', 'fourth'].slice(0, Number(count))
+
+      const slotContents: Record<string, string> = {}
+      if (parsed.body) {
+        // Split body by #slotName markers
+        const slotRegex = /^#(\w+)\s*$/gm
+        let lastSlot = ''
+        let lastIdx = 0
+        let match: RegExpExecArray | null
+        const bodyStr = parsed.body
+
+        // Collect all slot markers and their positions
+        const markers: Array<{ name: string; contentStart: number }> = []
+        while ((match = slotRegex.exec(bodyStr)) !== null) {
+          if (lastSlot && markers.length > 0) {
+            const prev = markers[markers.length - 1]!
+            slotContents[lastSlot] = bodyStr.slice(prev.contentStart, match.index).trim()
+          }
+          lastSlot = match[1]!
+          markers.push({ name: lastSlot, contentStart: match.index + match[0].length })
+        }
+        // Capture content after the last marker
+        if (lastSlot && markers.length > 0) {
+          const prev = markers[markers.length - 1]!
+          slotContents[lastSlot] = bodyStr.slice(prev.contentStart).trim()
+        }
+
+        // If no slot markers found, dump everything into the first column
+        if (markers.length === 0) {
+          slotContents[slotNames[0]!] = bodyStr.trim()
+        }
+      }
+
+      const colsHtml = slotNames.map(name => {
+        const content = slotContents[name]
+        const rendered = content ? inlineFormatBody(content) : '<span class="text-muted-foreground italic text-sm">Empty</span>'
+        return `<div class="border rounded-md p-3 prose prose-sm max-w-none min-h-[2rem]">${rendered}</div>`
+      }).join('')
+
       return `<div class="mdc-preview-block my-4 rounded-lg border overflow-hidden">
-        <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">⬜ Columns (${count})</div>
-        <div class="p-4 grid gap-4" style="grid-template-columns: repeat(${esc(count)}, 1fr)">
-          <div class="border rounded p-3 text-sm text-muted-foreground italic">Column content (preview renders in published view)</div>
-          ${'<div class="border rounded p-3 text-sm text-muted-foreground italic">Column content</div>'.repeat(Number(count) - 1)}
+        <div class="bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground border-b">⬜ Columns (${esc(count)})</div>
+        <div class="p-4 grid" style="grid-template-columns: repeat(${esc(count)}, 1fr); gap: ${gap}">
+          ${colsHtml}
         </div>
       </div>`
     }
