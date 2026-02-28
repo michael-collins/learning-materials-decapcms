@@ -239,6 +239,7 @@ const navigationGroups = [
     items: [
       { title: 'Pathways', path: '/pathways' },
       { title: 'Specializations', path: '/specializations' },
+      { title: 'Books', path: '/books' },
     ]
   },
   {

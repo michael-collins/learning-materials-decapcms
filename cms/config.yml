@@ -978,6 +978,68 @@ collections:
               - {label: "URL", name: "url", widget: "string"}
               - {label: "Alt Text", name: "alt", widget: "string", required: false, hint: "Defaults to name if not provided"}
 
+  - name: "books"
+    label: "Books"
+    folder: "content/books"
+    create: true
+    slug: "{{slug}}"
+    path: "{{slug}}/index"
+    identifier_field: "title"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Description", name: "description", widget: "text", required: false}
+      - {label: "Author", name: "author", widget: "string", required: false}
+      - {label: "Author URL", name: "authorUrl", widget: "string", required: false}
+      - {label: "Date", name: "date", widget: "datetime", required: false}
+      - {label: "Cover Image", name: "coverImage", widget: "image", required: false}
+      - {label: "Cover Image Alt", name: "coverImageAlt", widget: "string", required: false}
+      - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
+      - {label: "Published", name: "published", widget: "boolean", default: false, required: false}
+      - label: "Theme"
+        name: "theme"
+        widget: "select"
+        required: false
+        default: "default"
+        options:
+          - { label: "Default", value: "default" }
+          - { label: "Lambda (Dark Tech)", value: "lambda" }
+          - { label: "Minimal", value: "minimal" }
+        hint: "Visual theme for the book's public-facing pages"
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+        allow_add: true
+        field: {label: "Tag", name: "tag", widget: "string"}
+      - label: "Outline"
+        name: "outline"
+        widget: "list"
+        required: false
+        hint: "Build the book's table of contents. Sections and chapters with content references."
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Path", name: "path", widget: "string", required: false, hint: "URL path segment for this chapter"}
+          - {label: "Content Reference", name: "content", widget: "string", required: false, hint: "Reference existing content: collection/slug (e.g., articles/my-article)"}
+          - label: "Items"
+            name: "items"
+            widget: "list"
+            required: false
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Path", name: "path", widget: "string", required: false}
+              - {label: "Content Reference", name: "content", widget: "string", required: false}
+              - label: "Items"
+                name: "items"
+                widget: "list"
+                required: false
+                fields:
+                  - {label: "Title", name: "title", widget: "string"}
+                  - {label: "Path", name: "path", widget: "string", required: false}
+                  - {label: "Content Reference", name: "content", widget: "string", required: false}
+      - {label: "Body", name: "body", widget: "markdown", required: false, hint: "Optional introduction or landing page content for the book"}
+
 # Editor configuration
 editor:
   preview: true

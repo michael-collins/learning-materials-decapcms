@@ -6,6 +6,7 @@ import {
   GraduationCap,
   ClipboardCheck,
   FolderOpen,
+  BookOpen,
   ChevronRight,
   LogOut,
   ExternalLink,
@@ -49,6 +50,7 @@ watch(() => route.path, () => {
 const groupIcons: Record<string, any> = {
   'Content': FileText,
   'Curriculum': GraduationCap,
+  'Publishing': BookOpen,
   'Assessment': ClipboardCheck,
   'Other': FolderOpen,
 }

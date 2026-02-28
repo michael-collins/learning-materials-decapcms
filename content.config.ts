@@ -1,5 +1,27 @@
 import { defineContentConfig, defineCollection, z } from '@nuxt/content'
 
+// Fixed-depth outline node schema for book table of contents.
+// Nuxt Content doesn't support z.lazy() recursive schemas, so we
+// unroll to 4 levels deep (leaf → L3 → L2 → L1), which is sufficient
+// for most book structures (Part > Chapter > Section > Subsection).
+const outlineLeaf = z.object({
+  title: z.string(),
+  path: z.string().optional(),
+  content: z.string().optional(),
+})
+
+const outlineL3 = outlineLeaf.extend({
+  items: z.array(outlineLeaf).optional(),
+})
+
+const outlineL2 = outlineLeaf.extend({
+  items: z.array(outlineL3).optional(),
+})
+
+const outlineNodeSchema = outlineLeaf.extend({
+  items: z.array(outlineL2).optional(),
+})
+
 export default defineContentConfig({
   collections: {
     articles: defineCollection({
@@ -272,6 +294,25 @@ export default defineContentConfig({
           name: z.string(),
           description: z.string().optional(),
         })).optional(),
+      })
+    }),
+    books: defineCollection({
+      type: 'page',
+      source: 'books/*/index.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        author: z.string().optional(),
+        authorUrl: z.string().optional(),
+        date: z.string().optional(),
+        license: z.string().optional(),
+        coverImage: z.string().optional(),
+        coverImageAlt: z.string().optional(),
+        published: z.boolean().optional(),
+        theme: z.enum(['default', 'lambda', 'minimal']).optional(),
+        tags: z.array(z.string()).optional(),
+        // Book outline — hierarchical tree of chapters/sections
+        outline: z.array(outlineNodeSchema).optional(),
       })
     })
   }

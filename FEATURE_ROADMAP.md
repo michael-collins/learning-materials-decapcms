@@ -195,67 +195,72 @@ Evolve the chatbot into a comprehensive course construction tool that understand
 ## 3. OER Course Book Publishing System
 
 **Status:** Planned  
-**Priority:** TBD
+**Priority:** High  
+**CMS Roadmap:** Phase 7
 
 ### Description
-Create a comprehensive system for publishing OER materials as cohesive course books with multiple export formats and interactive features.
+Publish OER materials as cohesive books (course books, textbooks, guides) by arranging existing content into a hierarchical outline using the CMS Outline Builder, then exporting to multiple formats. The primary and most useful output is a **GitBook / docs-style website** — a standalone, navigable, searchable static site generated from the book outline. PDF and Common Cartridge exports are secondary formats for print and LMS import.
+
+### Core Workflow
+1. **Curate** — Browse the content library and select items (lessons, lectures, articles, exercises, projects, tutorials)
+2. **Arrange** — Organize selected items into a hierarchical outline (parts → chapters → sections) using a drag-and-drop tree builder in the CMS
+3. **Publish** — Export the arranged outline as a docs-style website, PDF, or Common Cartridge package
 
 ### Requirements
 
-#### 3.1 Table of Contents (TOC) Builder UI
-- Visual drag-and-drop interface for organizing content
-- Select from existing materials (lessons, lectures, articles, etc.)
-- Reorder and nest content hierarchically
-- Add custom sections and chapter markers
-- Preview TOC structure
-- Save and load TOC configurations
+#### 3.1 Book Content Type
+- New `books` collection storing outline as structured frontmatter (references content by slug, not duplicated)
+- Outline tree schema: nested `{ title, slug?, type?, description?, children[] }` — items with a slug reference existing content, items without are section headings
+- Book metadata: title, description, author, license, cover image, learning objectives
 
-#### 3.2 Content Bundling System
-- Aggregate selected materials into a unified book structure
-- Maintain internal cross-references and links
-- Apply consistent styling and branding
-- Handle media assets (images, videos, 3D models)
-- Version management for book releases
+#### 3.2 Outline Builder (CMS Tool)
+- Visual drag-and-drop hierarchical tree builder with unlimited nesting
+- Content picker panel: search/filter existing content by collection, tags, difficulty; drag into tree or click to append
+- Section headings for parts/chapters that don't link to content
+- Inline author notes and transition text between sections
+- Auto-generated, live-updating Table of Contents preview
+- Save/load outlines; commits via CMS git backend
 
 #### 3.3 Export Formats
 
-**Book Website**
-- Static site generation for the course book
-- Navigation with TOC sidebar
-- Responsive design
-- Search functionality
-- Print-friendly styling
+**GitBook / Docs-Style Website** (primary format)
+- Static site generation producing a standalone, deployable book site
+- Sidebar navigation matching the outline hierarchy
+- Chapter-by-chapter pagination (previous/next links)
+- Full-text search within the book
+- Responsive design with print-friendly CSS
+- Deployable to GitHub Pages, Netlify, or any static host
+- Optional: custom domain, branding, and theme configuration
 
 **PDF Export**
-- High-quality PDF generation
-- Proper pagination and typography
-- Include all media (or placeholders)
+- Rendered from the book outline with proper pagination, typography, headers/footers
 - Table of contents with page numbers
-- Headers/footers with course information
+- Includes all referenced content (prose, images, figures, callouts)
+- Generated via Puppeteer/Playwright or a dedicated PDF library
 
-**Embeddable Interactive UI**
-- Fully-featured interactive widget
-- Can be embedded in external LMS or websites
-- Preserves interactive elements (exercises, 3D viewers, etc.)
-- Configurable theming to match host site
-- Analytics/progress tracking
+**Common Cartridge (IMS CC)**
+- Standard IMS Common Cartridge package for LMS import (Canvas, Blackboard, Moodle, etc.)
+- Maps outline hierarchy to CC organization structure
+- Includes content items, metadata, and learning objectives
 
 ### Technical Considerations
-- Extend existing pathway/specialization concepts or create new "book" content type
-- Integrate with existing versioning system
-- PDF generation library (e.g., Puppeteer, Playwright, or dedicated PDF service)
-- Static site export using Nuxt's generate capabilities
-- Embed widget packaging and security considerations
-- Build process and CI/CD for publishing
-- Storage and hosting for published books
+- Book outline stored as structured YAML/JSON in frontmatter (references, not copies)
+- Export pipeline: read outline → resolve content references → render per format
+- GitBook export could use a dedicated Nuxt layout (`layouts/book.vue`) or a separate mini Nuxt app
+- PDF generation runs server-side (H3 route) or as a CLI script
+- Common Cartridge XML generated from outline + content metadata
+- Integrate with existing versioning system for book releases
+- Consider incremental rebuilds for large books (only re-export changed chapters)
 - SCORM/LTI compliance for LMS integration (optional)
 
 ### Related Files
 - New content type: `/content/books/`
-- New components: `/components/BookBuilder.vue`, `/components/BookTOC.vue`
+- CMS tool: `/pages/cms/outline-builder.vue`
+- New components: `/components/OutlineBuilder.vue`, `/components/BookTOC.vue`
+- Book layout: `/layouts/book.vue`
 - New composable: `/composables/useBookPublishing.ts`
-- New pages: `/pages/books/`, `/pages/book-builder/`
-- Export utilities: `/lib/book-export-utils.ts`
+- New pages: `/pages/books/[...slug].vue`
+- Export utilities: `/lib/book-export/` (website, PDF, Common Cartridge generators)
 - Server API: `/server/api/books/`
 
 ### Dependencies
@@ -556,4 +561,4 @@ Future features to be determined based on user feedback and platform evolution.
 
 ---
 
-*Last Updated: February 26, 2026*
+*Last Updated: February 27, 2026*

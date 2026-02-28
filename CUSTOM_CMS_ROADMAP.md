@@ -261,10 +261,10 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ### 3.1 Tiptap Integration
 
-- [x] **`components/cms/editor/MarkdownEditor.vue`** — Main editor component (513 lines)
+- [x] **`components/cms/editor/MarkdownEditor.vue`** — Main editor component (~760 lines)
   - Tiptap with `tiptap-markdown` extension for markdown ↔ rich-text
   - Toolbar: bold, italic, headings (1-3), lists (ordered/unordered), blockquote, code block, horizontal rule, link, image
-  - Three modes: Rich editor, Code view, Preview
+  - Four modes: Rich editor, Split (editor + preview), Code view, Preview
   - Responsive full-width layout
 
 ### 3.2 MDC Component Toolbar
@@ -281,7 +281,38 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
   - Markdown + YAML frontmatter syntax highlighting
   - Dark/light theme support
 
-**Milestone: ✅ Rich markdown editing with MDC components. Matches or exceeds Decap's editor.**
+### 3.4 Editor Interaction Improvements ✅ COMPLETE
+
+- [x] **`components/cms/editor/LinkBubbleMenu.vue`** — Floating bubble menu for link editing (NEW)
+  - Replaces `window.prompt()` with proper inline editing UX
+  - Preview mode: shows URL + edit/open/copy/unlink actions on link click
+  - Edit mode: URL + display text fields, Enter to apply, Escape to cancel
+  - Uses `BubbleMenu` from `@tiptap/vue-3/menus` subpath export
+- [x] **Keyboard shortcut: `Cmd+K` for link insertion** — Custom Tiptap Extension (`editorKeyboardShortcuts`)
+  - Maps `Mod-k` to `insertLink()` within the editor
+  - Global command palette (`commandPalette.client.ts`) updated with `isEditorContext()` guard
+  - Cmd+K defers to the editor on `/cms` pages or when focus is in editor/input; opens command palette elsewhere
+- [x] **Visual NodeViews (Phase A)** — Complete rewrite of `MdcBlockView.vue` (~830 lines)
+  - Upgraded from generic pill/card widgets to styled inline previews showing actual rendered content
+  - Each MDC component type gets a purpose-built preview (YouTube thumbnails, 3D model cards, rubric tables, etc.)
+  - Floating toolbar with opacity-based visibility (CSS `opacity` + `pointer-events-none` instead of `v-show`) to keep `data-drag-handle` in the DOM for ProseMirror
+- [x] **Drag-and-drop for MDC blocks** — Custom ProseMirror plugin in `MdcBlockExtension.ts`
+  - Uses `handleDOMEvents.drop` (fires BEFORE tiptap-markdown's clipboard pipeline)
+  - Detects `NodeSelection` of mdcBlock, uses `dropPoint()` for valid position, moves node via direct ProseMirror transaction
+  - Prevents tiptap-markdown's `transformPastedText` from corrupting atom nodes into plain text
+- [x] **Move up/down buttons** — ChevronUp/ChevronDown in toolbar for reliable block reordering
+  - Programmatic ProseMirror transactions (delete + insert at new position)
+- [x] **Container MDC preview rendering** — `ContentPreview.vue` updated
+  - Added `MDC_CONTAINER_REGEX` for `:::triple-colon` syntax (runs before atom regex)
+  - Renders 7 container component types: callout, accordion, card-block, figure, columns, tabs, steps
+  - `inlineFormatBody()` helper for inline markdown formatting in body content
+- [x] **Live columns preview** — Parses `#slotName` markers from body and renders actual column content
+- [x] **Media browser integration for image/file fields**
+  - `CmsImage.vue` and `CmsFile.vue` now open `MediaPickerModal` as primary action
+  - Secondary actions: "Upload from device" and "Enter URL/path" below the drop zone
+  - "Change" button (folder icon) when a file is already selected
+
+**Milestone: ✅ Rich markdown editing with MDC components. Matches or exceeds Decap's editor. Editor interactions polished with proper link editing, drag-and-drop, keyboard shortcuts, and visual node previews.**
 
 ---
 
@@ -464,33 +495,72 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ---
 
-## Phase 7 — Outline Builder Integration (⬜ PLANNED)
+## Phase 7 — Book Publishing via Outline Builder (⬜ PLANNED)
 
-**Goal:** Implement the course creation pipeline from OUTLINE_BUILDER_PLAN.md using the new CMS infrastructure.
+**Goal:** Enable authors to compose and publish books (course books, textbooks, guides) by arranging existing content into a hierarchical outline, then exporting to multiple formats — most importantly a GitBook/docs-style website.
 
-### 7.1 Course Content Type
+### Vision
 
-- [ ] Add `courses` collection to config.yml
-- [ ] Add courses collection to content.config.ts
-- [ ] Create `pages/courses/[...slug].vue`
-- [ ] Add to navigation sidebar
+The core workflow is: **curate → arrange → publish**. Authors select from the existing content library (lessons, lectures, articles, exercises, projects, tutorials), organize items into a hierarchical chapter/section structure using a visual outline builder, and publish the result as a standalone book. The book is a new content type that references (not duplicates) existing materials.
 
-### 7.2 Outline Builder Page
+### 7.1 Book Content Type
 
-- [ ] **`pages/cms/outline-builder.vue`**
-  - Course metadata panel (title, description, author, license, difficulty, objectives)
-  - Hierarchical module builder (drag-and-drop tree)
-  - Content linker: search and attach existing content to each module node
-  - Free-text sections for module descriptions
-  - Generate → creates course markdown → commits via CMS git backend
+- [ ] Add `books` collection to config.yml (title, description, author, license, cover image, objectives, outline tree)
+- [ ] Add books collection to content.config.ts
+- [ ] Define outline tree schema: nested array of `{ title, slug?, type?, description?, children[] }` where `slug` references existing content and items without a slug are section headings
+- [ ] Create `pages/books/[...slug].vue` — book landing page with TOC and chapter navigation
+- [ ] Add to navigation sidebar and dashboard
 
-### 7.3 Course Editing
+### 7.2 Outline Builder Tool
 
-- [ ] Generated courses editable via standard CMS collection form
-- [ ] Module reordering via custom Lesson Composer-style UI
-- [ ] Content linking updated via Relation widget
+- [ ] **`pages/cms/outline-builder.vue`** — Visual book composition interface
+  - **Metadata panel**: Title, description, author, license, cover image, learning objectives
+  - **Hierarchical tree builder**: Drag-and-drop tree with unlimited nesting depth
+    - Part → Chapter → Section → Subsection (or any custom hierarchy)
+    - Each node is either a **heading** (custom title, no linked content) or a **content reference** (links to an existing item)
+  - **Content picker**: Searchable panel to browse/filter existing content by collection, tags, difficulty; drag items into the tree or click to append
+  - **Inline notes**: Optional author notes or transition text between sections
+  - **Auto-generated Table of Contents**: Live-updating, numbered TOC preview reflecting the current tree structure
+  - **Save**: Commits book outline as structured frontmatter + markdown via CMS git backend
 
-**Milestone: Full course authoring pipeline from outline to published course.**
+### 7.3 Book Editing & Preview
+
+- [ ] Generated books editable via standard CMS collection form and outline builder
+- [ ] Live preview showing rendered TOC with linked content titles and descriptions
+- [ ] Reorder chapters/sections via drag-and-drop in outline builder
+- [ ] Add/remove content references; update outline without affecting source content
+
+### 7.4 Export Formats
+
+- [ ] **GitBook / Docs-style Website** (primary format)
+  - Static site generation (Nuxt `generate` or dedicated build) producing a standalone book site
+  - Sidebar navigation matching the outline hierarchy
+  - Chapter-by-chapter pagination (previous/next)
+  - Full-text search within the book
+  - Responsive design, print-friendly CSS
+  - Deployable to GitHub Pages, Netlify, or any static host
+  - Optional: custom domain, branding, and theme configuration
+- [ ] **PDF Export**
+  - Rendered from the book outline with proper pagination, headers/footers, and TOC with page numbers
+  - Includes all referenced content (prose, images, figures, callouts)
+  - Print-quality typography
+  - Generated via Puppeteer/Playwright or a dedicated PDF library
+- [ ] **Common Cartridge (IMS CC)**
+  - Standard IMS Common Cartridge package for LMS import (Canvas, Blackboard, Moodle, etc.)
+  - Maps outline hierarchy to CC organization structure
+  - Includes content items, metadata, and learning objectives
+  - Optional LTI links for interactive content
+
+### 7.5 Technical Considerations
+
+- Book outline stored as structured YAML/JSON in frontmatter (references content by slug, not duplicated)
+- Export pipeline: read outline → resolve content references → render per format
+- GitBook export could use a dedicated Nuxt layout (`layouts/book.vue`) or a separate mini Nuxt app generated from the outline
+- PDF generation could run server-side (H3 route) or as a CLI script
+- Common Cartridge XML generated from outline + content metadata
+- Consider incremental rebuilds for large books (only re-export changed chapters)
+
+**Milestone: Authors can compose books from existing content and publish as a docs-style website, PDF, or Common Cartridge package for LMS import.**
 
 ---
 
@@ -534,9 +604,14 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ### 9.1 UX Polish
 
-- [x] Keyboard shortcuts (Cmd+K command palette)
+- [x] Keyboard shortcuts (Cmd+K command palette, context-aware on CMS pages)
+- [x] Cmd+K link insertion in Tiptap editor (defers from command palette when in editor context)
 - [ ] Cmd+S save shortcut in editor
 - [x] Command palette integration (existing CommandPalette.vue)
+- [x] Link editing UX — floating bubble menu replaces `window.prompt()`
+- [x] MDC block drag-and-drop and move up/down
+- [x] Visual NodeViews for MDC blocks (styled inline previews)
+- [x] Media browser as primary action for image/file fields
 - [ ] Toast notifications for save/error/publish events
 - [ ] Autosave drafts to localStorage
 - [ ] Unsaved changes warning on navigation
@@ -723,7 +798,8 @@ This lesson covered three main topics:
 **Editor integration (deferred to Tier 2b):**
 - [ ] Implement Tiptap container node type for editable nested content
 - [x] OR implement code-mode insertion helpers (toolbar buttons that insert `:::` boilerplate)
-- [ ] Add container component previews in the rich editor
+- [x] Container component previews in ContentPreview.vue (callout, accordion, card-block, figure, columns, tabs, steps)
+- [ ] Container component previews in the rich editor (inline within Tiptap)
 
 #### Tier 3 — Layout Primitives (Advanced)
 Multi-column layouts and spatial arrangement.
@@ -799,15 +875,15 @@ This content appears in the **right column**.
 | **Phase 0** | Foundation, config parser, auth, content browser | ✅ Complete |
 | **Phase 1** | Form engine, basic widgets, git save, all collections editable | ✅ Complete |
 | **Phase 2** | Complex widgets (list, typed list, relation, file) | ✅ Complete |
-| **Phase 3** | Markdown editor (Tiptap + CodeMirror + MDC components) | ✅ Complete |
+| **Phase 3** | Markdown editor (Tiptap + CodeMirror + MDC + editor UX) | ✅ Complete |
 | **Phase 4** | Media manager | ✅ Complete |
 | **Phase 5** | Editorial workflow, sync, conflict resolution, batch publish | ✅ Complete |
 | **Phase 5.5** | Version management, change tracking, editing UX | ✅ Complete |
 | **Phase 6** | Education-specific UX (custom builders) | ⬜ **Next up** |
-| **Phase 7** | Outline Builder integration | ⬜ Planned |
+| **Phase 7** | Book publishing via Outline Builder (website, PDF, Common Cartridge) | ⬜ Planned |
 | **Phase 8** | Bulk operations & analytics | ⬜ Planned |
-| **Phase 9** | Polish, testing, migration | ⬜ Planned (some items done) |
-| **Phase 10** | Layout & design components (Tier 1→3) | ⬜ Planned |
+| **Phase 9** | Polish, testing, migration | 🔄 In progress (UX polish items done) |
+| **Phase 10** | Layout & design components (Tier 1→3) | 🔄 In progress (Tiers 1-3 components built, preview rendering done) |
 
 **Total estimated timeline: 14 weeks (~3.5 months)**
 
@@ -894,6 +970,9 @@ components/cms/
     EditorToolbar.vue
     MdcToolbar.vue
     MdcComponentModal.vue
+    MdcBlockExtension.ts
+    MdcBlockView.vue
+    LinkBubbleMenu.vue
     CodeEditor.vue
 
   media/                    # Media manager

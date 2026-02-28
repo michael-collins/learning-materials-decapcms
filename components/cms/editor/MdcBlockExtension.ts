@@ -11,9 +11,6 @@
  */
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import { Plugin, PluginKey, NodeSelection } from '@tiptap/pm/state'
-import { Fragment, Slice } from '@tiptap/pm/model'
-import { dropPoint } from '@tiptap/pm/transform'
 import MdcBlockView from './MdcBlockView.vue'
 
 /** Helper: parse key="value" attribute pairs from an MDC attribute string */
@@ -114,78 +111,6 @@ export const MdcBlockExtension = Node.create({
 
   addNodeView() {
     return VueNodeViewRenderer(MdcBlockView as any)
-  },
-
-  /**
-   * Custom ProseMirror plugin to handle drag-and-drop of mdcBlock nodes.
-   *
-   * tiptap-markdown's `transformPastedText` corrupts the mdcBlock during
-   * ProseMirror's default drop pipeline (which reuses the clipboard/paste
-   * path). By the time `handleDrop` fires, the node has been turned into
-   * plain text and is unrecoverable.
-   *
-   * This plugin intercepts at `handleDOMEvents.drop` — which fires BEFORE
-   * any clipboard processing — and uses the still-intact NodeSelection to
-   * move the original node directly via a ProseMirror transaction.
-   */
-  addProseMirrorPlugins() {
-    const nodeTypeName = this.name
-    return [
-      new Plugin({
-        key: new PluginKey('mdcBlockDragDrop'),
-        props: {
-          handleDOMEvents: {
-            drop(view, event) {
-              // Only handle internal moves of mdcBlock nodes
-              const { state } = view
-              if (!(state.selection instanceof NodeSelection)) return false
-              const draggedNode = state.selection.node
-              if (draggedNode.type.name !== nodeTypeName) return false
-
-              // Find where the user wants to drop
-              const dropCoords = { left: event.clientX, top: event.clientY }
-              const posResult = view.posAtCoords(dropCoords)
-              if (!posResult) return false
-
-              // Prevent ProseMirror's default drop handling (which would
-              // run through the clipboard pipeline and corrupt the node)
-              event.preventDefault()
-
-              const from = state.selection.from
-              const to = state.selection.to
-
-              // Don't move if dropping onto itself
-              if (posResult.pos >= from && posResult.pos <= to) return true
-
-              // Use dropPoint to find the nearest valid block-level position
-              const slice = new Slice(Fragment.from(draggedNode), 0, 0)
-              const dp = dropPoint(state.doc, posResult.pos, slice)
-              if (dp == null) return true
-
-              const tr = state.tr
-
-              if (dp <= from) {
-                // Dropping before the original position:
-                // insert first, then delete (so mapped positions stay correct)
-                tr.insert(dp, draggedNode)
-                const mappedFrom = tr.mapping.map(from)
-                const mappedTo = tr.mapping.map(to)
-                tr.delete(mappedFrom, mappedTo)
-              } else {
-                // Dropping after the original position:
-                // delete first, then insert at mapped position
-                tr.delete(from, to)
-                const mappedDp = tr.mapping.map(dp)
-                tr.insert(mappedDp, draggedNode)
-              }
-
-              view.dispatch(tr.scrollIntoView())
-              return true
-            },
-          },
-        },
-      }),
-    ]
   },
 
   // Custom storage for markdown serialization

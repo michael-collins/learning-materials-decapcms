@@ -161,23 +161,27 @@ export function groupCollections(collections: CmsCollection[]): CollectionGroup[
 
   const contentTypes = ['articles', 'tutorials', 'lectures', 'exercises', 'projects']
   const curriculum = ['lessons', 'specializations', 'pathways']
+  const publishing = ['books']
   const assessment = ['rubrics']
   const other = ['docs', 'resources']
 
   const contentGroup = collections.filter((c) => contentTypes.includes(c.name))
   const curriculumGroup = collections.filter((c) => curriculum.includes(c.name))
+  const publishingGroup = collections.filter((c) => publishing.includes(c.name))
   const assessmentGroup = collections.filter((c) => assessment.includes(c.name))
   const otherGroup = collections.filter((c) => other.includes(c.name))
   const ungrouped = collections.filter(
     (c) =>
       !contentTypes.includes(c.name) &&
       !curriculum.includes(c.name) &&
+      !publishing.includes(c.name) &&
       !assessment.includes(c.name) &&
       !other.includes(c.name)
   )
 
   if (contentGroup.length) groups.push({ label: 'Content', collections: contentGroup })
   if (curriculumGroup.length) groups.push({ label: 'Curriculum', collections: curriculumGroup })
+  if (publishingGroup.length) groups.push({ label: 'Publishing', collections: publishingGroup })
   if (assessmentGroup.length) groups.push({ label: 'Assessment', collections: assessmentGroup })
   if (otherGroup.length) groups.push({ label: 'Other', collections: otherGroup })
   if (ungrouped.length) groups.push({ label: 'Uncategorized', collections: ungrouped })

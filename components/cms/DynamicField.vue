@@ -25,6 +25,7 @@ import CmsObject from './fields/CmsObject.vue'
 import CmsImage from './fields/CmsImage.vue'
 import CmsFile from './fields/CmsFile.vue'
 import CmsVersionSelect from './fields/CmsVersionSelect.vue'
+import CmsOutlineEditor from './fields/CmsOutlineEditor.vue'
 
 const props = defineProps<{
   field: CmsFieldDef
@@ -63,8 +64,12 @@ const widgetMap: Record<string, any> = {
 }
 
 const component = computed(() => {
-  // Special routing for list widget: typed list vs regular list
+  // Special routing for list widget
   if (props.field.widget === 'list') {
+    // Use the visual outline editor for the book outline field
+    if (props.field.name === 'outline') {
+      return CmsOutlineEditor
+    }
     return props.field.types && props.field.types.length > 0
       ? CmsTypedList
       : CmsList

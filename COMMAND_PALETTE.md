@@ -8,6 +8,7 @@ The command palette provides a keyboard-first, accessible way to quickly navigat
 
 ### ✨ **Quick Access**
 - **`Cmd/Ctrl + K`** or **`Cmd/Ctrl + P`**: Open command palette from anywhere
+  - **Context-aware**: On `/cms` editor pages, `Cmd+K` defers to the Tiptap editor for link insertion instead. `Cmd+P` and `/` still open the palette.
 - **`/`**: Open palette (when not in an input field)
 - **`Escape`**: Close palette
 
@@ -64,7 +65,7 @@ Built-in commands (no typing needed after opening palette):
 ```
 components/CommandPalette.vue          # Main palette UI component
 composables/useCommandPalette.ts       # Global state management
-plugins/commandPalette.client.ts       # Global keyboard shortcuts
+plugins/commandPalette.client.ts       # Global keyboard shortcuts (with isEditorContext() guard)
 ```
 
 ### Extending
