@@ -29,9 +29,10 @@ import {
   BookOpen,
   Pencil,
   Check,
-  PackageOpen,
   Lock,
   Unlock,
+  RefreshCw,
+  PackageOpen,
 } from 'lucide-vue-next'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import Button from '~/components/ui/button/Button.vue'
@@ -559,21 +560,20 @@ async function extractLessonItems(lesson: any): Promise<{ collection: string; sl
 // Track importing state for loading indicator
 const importingId = ref<string | null>(null)
 
-/** Toggle import of lesson sub-items for an outline item */
-async function toggleImportChildren(id: string) {
+// Refresh confirmation dialog state
+const showRefreshConfirm = ref(false)
+const refreshTargetId = ref<string | null>(null)
+
+/** Import lesson sub-items for an outline item (no toggle — always imports) */
+async function importLessonChildren(id: string) {
   const idx = items.value.findIndex(i => i.id === id)
   if (idx < 0) return
   const item = items.value[idx]!
+  if (!isLessonContent(item)) return
 
-  if (item.importChildren) {
-    // Remove imported children
-    removeImportedChildren(id)
-    item.importChildren = false
-    emitUpdate()
-    return
-  }
+  // If already imported, skip (use refreshImportedChildren instead)
+  if (item.importChildren) return
 
-  // Import sub-items
   importingId.value = id
   try {
     item.importChildren = true
@@ -584,7 +584,6 @@ async function toggleImportChildren(id: string) {
       return
     }
 
-    // Re-find idx since the array may have changed
     const freshIdx = items.value.findIndex(i => i.id === id)
     if (freshIdx < 0) return
     const { end } = getSubtreeRange(freshIdx)
@@ -605,7 +604,7 @@ async function toggleImportChildren(id: string) {
     collapsedIds.value.delete(id)
     emitUpdate()
   } catch (e) {
-    console.error('[import] toggleImportChildren error:', e)
+    console.error('[import] importLessonChildren error:', e)
     item.importChildren = false
   } finally {
     importingId.value = null
@@ -615,6 +614,37 @@ async function toggleImportChildren(id: string) {
 /** Remove all imported children for a given parent */
 function removeImportedChildren(parentId: string) {
   items.value = items.value.filter(i => i.importedFrom !== parentId)
+}
+
+/** Prompt user to confirm refresh of imported lesson sub-items */
+function promptRefreshChildren(id: string) {
+  refreshTargetId.value = id
+  showRefreshConfirm.value = true
+}
+
+/** Refresh imported lesson sub-items: remove current children, re-import */
+async function confirmRefreshChildren() {
+  const id = refreshTargetId.value
+  showRefreshConfirm.value = false
+  refreshTargetId.value = null
+  if (!id) return
+
+  const item = items.value.find(i => i.id === id)
+  if (!item) return
+
+  // Remove existing imported children and reset flag
+  // Do NOT emitUpdate() here — it would trigger initFromProp() which
+  // regenerates all item IDs, causing importLessonChildren to fail.
+  removeImportedChildren(id)
+  item.importChildren = false
+
+  // Re-import (this will emitUpdate after inserting new children)
+  await importLessonChildren(id)
+}
+
+function cancelRefreshChildren() {
+  showRefreshConfirm.value = false
+  refreshTargetId.value = null
 }
 
 /** Toggle lock on an imported item */
@@ -777,14 +807,25 @@ async function performSearch() {
 
 function selectContent(result: PickerResult) {
   if (!pickerTargetId.value) return
-  const item = items.value.find(i => i.id === pickerTargetId.value)
+  const itemId = pickerTargetId.value
+  const item = items.value.find(i => i.id === itemId)
   if (item) {
+    // If changing content on an item that had imported children, remove old imports first
+    if (item.importChildren) {
+      removeImportedChildren(itemId)
+      item.importChildren = false
+    }
     const key = `${result.collection}/${result.baseSlug}`
     const chosenSlug = selectedVersions.value[key] || result.baseSlug
     item.content = `${result.collection}/${chosenSlug}`
     if (!item.title) item.title = result.title
     if (!item.path) item.path = slugify(result.title)
     emitUpdate()
+
+    // Auto-import sub-items when linking a lesson
+    if (result.collection === 'lessons') {
+      nextTick(() => importLessonChildren(itemId))
+    }
   }
   pickerIsNewItem.value = false
   showContentPicker.value = false
@@ -1194,24 +1235,41 @@ const totalCount = computed(() => items.value.length)
           <span class="max-w-30 truncate">{{ item.content.split('/').pop() }}</span>
         </button>
 
-        <!-- Import sub-items toggle for lessons -->
+        <!-- Loading indicator while importing lesson sub-items -->
+        <span
+          v-if="importingId === item.id"
+          class="shrink-0 p-1 text-primary animate-pulse mr-0.5"
+          title="Importing lesson items…"
+        >
+          <Loader2 class="h-3 w-3 animate-spin" />
+        </span>
+
+        <!-- Refresh imported lesson sub-items (already imported) -->
         <button
-          v-if="isLessonContent(item) && !item.imported"
+          v-else-if="isLessonContent(item) && !item.imported && item.importChildren"
           type="button"
-          :disabled="importingId === item.id"
           :class="[
             'shrink-0 p-1 rounded transition-colors mr-0.5',
-            importingId === item.id
-              ? 'text-primary animate-pulse'
-              : item.importChildren
-                ? 'text-primary hover:text-primary/80 hover:bg-accent'
-                : 'text-muted-foreground/50 hover:text-foreground hover:bg-accent opacity-0 group-hover:opacity-100',
+            'text-primary hover:text-primary/80 hover:bg-accent',
           ]"
-          :title="importingId === item.id ? 'Importing…' : item.importChildren ? 'Remove imported sub-items' : 'Import lesson sub-items'"
-          @click.stop="toggleImportChildren(item.id)"
+          title="Refresh lesson sub-items"
+          @click.stop="promptRefreshChildren(item.id)"
         >
-          <Loader2 v-if="importingId === item.id" class="h-3 w-3 animate-spin" />
-          <PackageOpen v-else class="h-3 w-3" />
+          <RefreshCw class="h-3 w-3" />
+        </button>
+
+        <!-- Import lesson sub-items (not yet imported) -->
+        <button
+          v-else-if="isLessonContent(item) && !item.imported && !item.importChildren"
+          type="button"
+          :class="[
+            'shrink-0 p-1 rounded transition-colors mr-0.5',
+            'text-muted-foreground/50 hover:text-foreground hover:bg-accent opacity-0 group-hover:opacity-100',
+          ]"
+          title="Import lesson sub-items"
+          @click.stop="importLessonChildren(item.id)"
+        >
+          <PackageOpen class="h-3 w-3" />
         </button>
 
         <!-- Hover actions -->
@@ -1290,6 +1348,25 @@ const totalCount = computed(() => items.value.length)
       <span><kbd class="font-mono">←→</kbd> collapse</span>
       <span>drag ↔ indent</span>
     </div>
+
+    <!-- ═══ Refresh Confirmation Dialog ═══ -->
+    <Dialog v-model:open="showRefreshConfirm">
+      <DialogContent class="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Refresh Lesson Items?</DialogTitle>
+          <DialogDescription>
+            This will remove the current imported sub-items and re-import them from the lesson. Any manual changes to the imported items will be lost.
+          </DialogDescription>
+        </DialogHeader>
+        <div class="flex justify-end gap-2 pt-2">
+          <Button variant="ghost" size="sm" @click="cancelRefreshChildren">Cancel</Button>
+          <Button variant="default" size="sm" @click="confirmRefreshChildren">
+            <RefreshCw class="h-3.5 w-3.5 mr-1.5" />
+            Refresh
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     <!-- ═══ Content Picker Dialog ═══ -->
     <Dialog v-model:open="showContentPicker">

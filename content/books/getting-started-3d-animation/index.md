@@ -34,6 +34,43 @@ outline:
           virtually using computers.
         path: 3d-modeling-fundamentals
         content: lessons/3d-modeling-fundamentals
+        importChildren: true
+        items:
+          - title: Introduction to Modeling
+            path: introduction-to-modeling
+            content: lectures/introduction-to-modeling
+            imported: true
+            locked: true
+          - title: Modeling the Airline Chair
+            path: modeling-the-airline-chair
+            content: exercises/modeling-the-airline-chair
+            imported: true
+            locked: true
+          - title: Introduction to Texturing
+            path: introduction-to-texturing
+            content: lectures/introduction-to-texturing
+            imported: true
+            locked: true
+          - title: Texturing the Airline Chair
+            path: texturing-the-airline-chair
+            content: exercises/texturing-the-airline-chair
+            imported: true
+            locked: true
+          - title: 'Introduction to Cameras, Lighting, and Rendering'
+            path: introduction-to-cameras-lighting-and-rendering
+            content: lectures/introduction-to-cameras-lighting-and-rendering
+            imported: true
+            locked: true
+          - title: Lighting and Rendering the Airline Chair
+            path: lighting-and-rendering-the-airline-chair
+            content: exercises/lighting-and-rendering-the-airline-chair
+            imported: true
+            locked: true
+          - title: You don't see that everyday objects
+            path: you-don-t-see-that-everyday-objects
+            content: projects/you-dont-see-that-everyday-objects
+            imported: true
+            locked: true
       - title: Animation Principles
         path: animation-principles
         content: lessons/animation-principles
@@ -92,6 +129,16 @@ outline:
       - title: Deformers and Shape Keys
         path: deformers
         content: lessons/deformers-shape-keys
+      - title: Texturing and UV Mapping
+        path: texturing-and-uv-mapping
+        content: lessons/texturing-uv-mapping
+        importChildren: true
+        items:
+          - title: Introduction to Texturing
+            path: introduction-to-texturing
+            content: lectures/introduction-to-texturing
+            imported: true
+            locked: true
   - title: 'Chapter 4: Advanced Topics'
     path: advanced
     items:
