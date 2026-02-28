@@ -17,7 +17,7 @@ tags:
   - rigging
   - textbook
 outline:
-  - title: Introduction
+  - title: 'Chapter 1: Introduction'
     path: introduction
     items:
       - title: Getting Started in 3D Animation
@@ -26,19 +26,25 @@ outline:
       - title: Career Development in 3D
         path: career-development
         content: articles/3d-career-development
-  - title: Fundamentals
+  - title: 'Chapter 2: Fundamentals'
     path: fundamentals
     items:
       - title: 3D Modeling Fundamentals
         path: modeling
         content: lessons/3d-modeling-fundamentals
-      - title: Animation Principles
-        path: animation-principles
-        content: lessons/animation-principles
+        items:
+          - title: >-
+              3D Modeling Fundamentals: A fundamental shift in how we do things
+              virtually using computers.
+            path: 3d-modeling-fundamentals
+            content: lessons/3d-modeling-fundamentals
+          - title: Animation Principles
+            path: animation-principles
+            content: lessons/animation-principles
       - title: Drawing for 3D Design
         path: drawing
         content: lessons/drawing-for-3d-design
-  - title: Intermediate Skills
+  - title: 'Chapter 3: Intermediate Skills'
     path: intermediate
     items:
       - title: Character Rigging
@@ -50,7 +56,7 @@ outline:
       - title: Deformers and Shape Keys
         path: deformers
         content: lessons/deformers-shape-keys
-  - title: Advanced Topics
+  - title: 'Chapter 4: Advanced Topics'
     path: advanced
     items:
       - title: Digital Sculpting
@@ -62,7 +68,7 @@ outline:
       - title: Environment Design for Realtime
         path: environment
         content: lessons/environment-design-realtime
-  - title: Resources
+  - title: 'Chapter 5: Resources'
     path: resources
     items:
       - title: 3D Communities

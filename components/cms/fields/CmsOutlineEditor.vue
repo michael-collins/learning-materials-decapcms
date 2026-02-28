@@ -15,7 +15,6 @@ import {
   Trash2,
   ChevronRight,
   ChevronDown,
-  GripVertical,
   Link,
   FolderPlus,
   FileText,
@@ -28,6 +27,8 @@ import {
   Search,
   Loader2,
   BookOpen,
+  Pencil,
+  Check,
 } from 'lucide-vue-next'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import Button from '~/components/ui/button/Button.vue'
@@ -261,11 +262,9 @@ function emitUpdate() {
 
 watch(focusItemId, (id) => {
   if (id) {
-    nextTick(() => {
-      const el = itemInputRefs.value[id]
-      if (el) el.focus()
-      focusItemId.value = null
-    })
+    // Auto-enter edit mode for newly added items
+    startEditing(id)
+    focusItemId.value = null
   }
 })
 
@@ -607,9 +606,11 @@ function selectContent(result: PickerResult) {
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────
 
+/** Keyboard handler for the input field (edit mode) */
 function handleKeydown(event: KeyboardEvent, item: FlatItem) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault()
+    stopEditing()
     addItemAfter(item.id)
   } else if (event.key === 'Tab' && !event.shiftKey) {
     event.preventDefault()
@@ -620,6 +621,7 @@ function handleKeydown(event: KeyboardEvent, item: FlatItem) {
   } else if (event.key === 'Backspace' && !item.title && !item.content) {
     event.preventDefault()
     if (items.value.length > 1) {
+      stopEditing()
       removeItem(item.id)
     }
   } else if (event.key === 'ArrowUp' && event.altKey) {
@@ -631,8 +633,86 @@ function handleKeydown(event: KeyboardEvent, item: FlatItem) {
   }
 }
 
+/** Keyboard handler for the row itself (display mode) */
+function handleRowKeydown(event: KeyboardEvent, item: FlatItem, realIndex: number) {
+  // Don't intercept when editing — the input handles it
+  if (editingId.value === item.id) return
+
+  if (event.key === 'Tab' && !event.shiftKey) {
+    event.preventDefault()
+    indentItem(item.id)
+  } else if (event.key === 'Tab' && event.shiftKey) {
+    event.preventDefault()
+    outdentItem(item.id)
+  } else if (event.key === 'Enter' || event.key === 'F2') {
+    event.preventDefault()
+    startEditing(item.id)
+  } else if (event.key === 'ArrowUp' && event.altKey) {
+    event.preventDefault()
+    moveUp(item.id)
+  } else if (event.key === 'ArrowDown' && event.altKey) {
+    event.preventDefault()
+    moveDown(item.id)
+  } else if (event.key === 'ArrowUp' && !event.altKey) {
+    event.preventDefault()
+    // Focus previous visible item
+    const vis = visibleItems.value
+    const curVIdx = vis.findIndex(v => v.item.id === item.id)
+    if (curVIdx > 0) {
+      const prevEl = document.querySelector(`[data-outline-item][data-item-id="${vis[curVIdx - 1]!.item.id}"]`) as HTMLElement | null
+      prevEl?.focus()
+    }
+  } else if (event.key === 'ArrowDown' && !event.altKey) {
+    event.preventDefault()
+    // Focus next visible item
+    const vis = visibleItems.value
+    const curVIdx = vis.findIndex(v => v.item.id === item.id)
+    if (curVIdx < vis.length - 1) {
+      const nextEl = document.querySelector(`[data-outline-item][data-item-id="${vis[curVIdx + 1]!.item.id}"]`) as HTMLElement | null
+      nextEl?.focus()
+    }
+  } else if (event.key === 'ArrowRight') {
+    // Expand if collapsed
+    if (hasChildren(realIndex) && collapsedIds.value.has(item.id)) {
+      event.preventDefault()
+      toggleCollapse(item.id)
+    }
+  } else if (event.key === 'ArrowLeft') {
+    // Collapse if expanded
+    if (hasChildren(realIndex) && !collapsedIds.value.has(item.id)) {
+      event.preventDefault()
+      toggleCollapse(item.id)
+    }
+  } else if (event.key === 'Delete' || (event.key === 'Backspace' && !item.title && !item.content)) {
+    event.preventDefault()
+    if (items.value.length > 1) removeItem(item.id)
+  }
+}
+
 function setItemRef(id: string, el: any) {
   if (el) itemInputRefs.value[id] = el.$el || el
+}
+
+// ── Edit mode ─────────────────────────────────────────────────────────
+
+const editingId = ref<string | null>(null)
+
+function startEditing(id: string) {
+  editingId.value = id
+  nextTick(() => {
+    const el = itemInputRefs.value[id]
+    if (el) {
+      el.focus()
+      // Place cursor at end
+      if (el instanceof HTMLInputElement) {
+        el.selectionStart = el.selectionEnd = el.value.length
+      }
+    }
+  })
+}
+
+function stopEditing() {
+  editingId.value = null
 }
 
 // ── Drag & Drop ───────────────────────────────────────────────────────
@@ -644,7 +724,7 @@ const dragPosition = ref<'before' | 'after'>('after')
 const dragStartX = ref(0)
 const dragOriginalDepth = ref(0)
 const dragPreviewDepth = ref<number | null>(null)
-const INDENT_PX = 40
+const INDENT_PX = 20
 
 function onDragStart(event: DragEvent, id: string) {
   draggedId.value = id
@@ -754,19 +834,26 @@ const totalCount = computed(() => items.value.length)
     </div>
 
     <!-- Tree -->
-    <div v-if="items.length > 0" class="rounded-lg border bg-card">
+    <div v-if="items.length > 0" class="rounded-lg border bg-background" role="tree">
       <div
         v-for="({ item, index: realIndex }, vIdx) in visibleItems"
         :key="item.id"
         data-outline-item
-        draggable="true"
+        :data-item-id="item.id"
+        :draggable="editingId !== item.id"
+        tabindex="0"
+        role="treeitem"
+        :aria-level="item.depth + 1"
+        :aria-expanded="hasChildren(realIndex) ? !collapsedIds.has(item.id) : undefined"
+        :aria-label="item.title || (item.depth === 0 ? 'Empty section' : 'Empty item')"
         :class="[
-          'group relative flex items-center h-8 pr-2 transition-colors hover:bg-accent/40',
+          'group relative flex items-center h-8 pr-2 transition-colors hover:bg-accent/40 focus:bg-accent/30 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
           dragOverId === item.id && dragPosition === 'before' ? 'ring-1 ring-inset ring-primary ring-offset-0' : '',
           dragOverId === item.id && dragPosition === 'after' ? 'ring-1 ring-inset ring-primary ring-offset-0' : '',
           draggedId === item.id ? 'opacity-40' : '',
           vIdx > 0 ? 'border-t border-border/40' : '',
         ]"
+        @keydown="handleRowKeydown($event, item, realIndex)"
         @dragstart="onDragStart($event, item.id)"
         @dragend="onDragEnd"
         @dragover="onDragOver($event, item.id)"
@@ -776,40 +863,34 @@ const totalCount = computed(() => items.value.length)
         <!-- Tree indent + lines -->
         <div
           class="flex items-center shrink-0 h-full"
-          :style="{ width: `${16 + ((draggedId === item.id && dragPreviewDepth !== null ? dragPreviewDepth : item.depth) * 20)}px`, transition: draggedId === item.id ? 'width 0.15s ease' : '' }"
+          :style="{ width: `${(draggedId === item.id && dragPreviewDepth !== null ? dragPreviewDepth : item.depth) * 20}px`, transition: draggedId === item.id ? 'width 0.15s ease' : '' }"
         >
-          <!-- Drag handle (left edge) -->
-          <div class="w-4 flex items-center justify-center shrink-0 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-50 transition-opacity">
-            <GripVertical class="h-3 w-3 text-muted-foreground pointer-events-none" />
-          </div>
           <!-- Depth spacers with tree lines -->
           <template v-for="d in item.depth" :key="d">
             <div class="relative w-5 h-full shrink-0">
-              <!-- Vertical tree line for continuing ancestors -->
+              <!-- Ancestor levels (d < item.depth): full vertical line if siblings continue -->
               <div
-                v-if="hasNextSiblingAtDepth(realIndex, d)"
+                v-if="d < item.depth && hasNextSiblingAtDepth(realIndex, d)"
                 class="absolute left-2 top-0 bottom-0 w-px bg-border"
               />
+              <!-- Current level (d === item.depth): tree elbow connector -->
+              <template v-if="d === item.depth">
+                <!-- Vertical: top half (always — connects from parent line above) -->
+                <div class="absolute left-2 top-0 h-1/2 w-px bg-border" />
+                <!-- Vertical: bottom half (only if siblings continue below) -->
+                <div
+                  v-if="hasNextSiblingAtDepth(realIndex, d)"
+                  class="absolute left-2 top-1/2 bottom-0 w-px bg-border"
+                />
+                <!-- Horizontal connector: from vertical line to toggle area center -->
+                <div class="absolute left-2 top-1/2 h-px bg-border" style="right: -10px" />
+              </template>
             </div>
           </template>
         </div>
 
-        <!-- Collapse toggle / tree connector -->
+        <!-- Collapse toggle / leaf dot -->
         <div class="w-5 h-full flex items-center justify-center shrink-0 relative">
-          <!-- Horizontal connector line -->
-          <div
-            v-if="item.depth > 0"
-            class="absolute right-0 top-1/2 w-2.5 h-px bg-border"
-            :style="{ left: '-1px' }"
-          />
-          <!-- Vertical line segment from parent -->
-          <div
-            v-if="item.depth > 0"
-            :class="[
-              'absolute left-1.75 w-px bg-border',
-              isLastChild(realIndex) ? 'top-0 h-1/2' : 'top-0 bottom-0',
-            ]"
-          />
           <!-- Collapse/expand chevron for parents -->
           <button
             v-if="hasChildren(realIndex)"
@@ -827,8 +908,22 @@ const totalCount = computed(() => items.value.length)
           />
         </div>
 
-        <!-- Title -->
+        <!-- Title: display mode (draggable) or edit mode (input) -->
+        <div v-if="editingId !== item.id" class="flex-1 min-w-0 flex items-center h-full cursor-grab active:cursor-grabbing select-none">
+          <span
+            v-if="item.title"
+            :class="[
+              'truncate text-sm px-1.5',
+              item.depth === 0 ? 'font-medium' : 'text-muted-foreground',
+            ]"
+          >{{ item.title }}</span>
+          <span
+            v-else
+            class="truncate text-sm px-1.5 text-muted-foreground/40 italic"
+          >{{ item.depth === 0 ? 'Section title…' : 'Item title…' }}</span>
+        </div>
         <input
+          v-else
           :ref="(el) => setItemRef(item.id, el)"
           :value="item.title"
           :placeholder="item.depth === 0 ? 'Section title…' : 'Item title…'"
@@ -839,7 +934,23 @@ const totalCount = computed(() => items.value.length)
           ]"
           @input="updateTitle(item.id, ($event.target as HTMLInputElement).value)"
           @keydown="handleKeydown($event, item)"
+          @keydown.enter.prevent="stopEditing()"
+          @keydown.escape.prevent="stopEditing()"
         />
+
+        <!-- Edit toggle: pencil (hover only) to enter edit, checkmark to confirm -->
+        <button
+          type="button"
+          :class="[
+            'shrink-0 p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors',
+            editingId === item.id ? '' : 'opacity-0 group-hover:opacity-100',
+          ]"
+          :title="editingId === item.id ? 'Done editing' : 'Edit title'"
+          @click.stop="editingId === item.id ? stopEditing() : startEditing(item.id)"
+        >
+          <Check v-if="editingId === item.id" class="h-3 w-3" />
+          <Pencil v-else class="h-3 w-3" />
+        </button>
 
         <!-- Collapsed children count badge -->
         <span
@@ -928,10 +1039,12 @@ const totalCount = computed(() => items.value.length)
 
     <!-- Keyboard hints (minimal) -->
     <div class="flex flex-wrap gap-x-3 text-[10px] text-muted-foreground/50">
-      <span><kbd class="font-mono">↵</kbd> new</span>
+      <span><kbd class="font-mono">↵</kbd> edit</span>
       <span><kbd class="font-mono">⇥</kbd> indent</span>
       <span><kbd class="font-mono">⇧⇥</kbd> outdent</span>
       <span><kbd class="font-mono">⌥↑↓</kbd> move</span>
+      <span><kbd class="font-mono">↑↓</kbd> navigate</span>
+      <span><kbd class="font-mono">←→</kbd> collapse</span>
       <span>drag ↔ indent</span>
     </div>
 

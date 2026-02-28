@@ -5,12 +5,8 @@
  * resolving content references, and computing prev/next chapter links.
  */
 
-export interface OutlineNode {
-  title: string
-  path?: string
-  content?: string // "collection/slug" reference
-  items?: OutlineNode[]
-}
+import type { OutlineNode } from './useOutlineBuilder'
+export type { OutlineNode }
 
 export interface FlatChapter {
   title: string
