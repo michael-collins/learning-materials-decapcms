@@ -87,9 +87,10 @@ outline:
             locked: true
           - title: Modeling the Airline Chair
             path: modeling-the-airline-chair
-            content: exercises/modeling-the-airline-chair
+            content: exercises/modeling-the-airline-chair/v/0.9.0
+            version: 0.9.0
+            icon: Dumbbell
             imported: true
-            locked: true
           - title: Introduction to Texturing
             path: introduction-to-texturing
             content: lectures/introduction-to-texturing

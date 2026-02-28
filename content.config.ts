@@ -8,6 +8,7 @@ const outlineLeaf = z.object({
   title: z.string(),
   path: z.string().optional(),
   content: z.string().optional(),
+  version: z.string().optional(),
   icon: z.string().optional(),
   imported: z.boolean().optional(),
   locked: z.boolean().optional(),

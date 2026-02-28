@@ -64,7 +64,7 @@ function getNodeIcon(node: SidebarNode): LucideIcon {
         <button
           @click="emit('toggle', node)"
           :class="[
-            'w-full flex items-start gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug font-medium transition-colors',
+            'w-full flex items-start gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors',
             'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
             node.isActive && 'bg-accent text-accent-foreground'
           ]"
@@ -111,7 +111,7 @@ function getNodeIcon(node: SidebarNode): LucideIcon {
             :class="[
               'flex-1 flex items-start gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors min-w-0',
               node.isActive
-                ? 'bg-primary/10 text-primary font-medium'
+                ? 'bg-primary/10 text-primary'
                 : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
               !node.children.length && 'ml-0'
             ]"

@@ -224,14 +224,14 @@ const filteredSidebarTree = computed(() =>
         </div>
 
         <!-- Sidebar tree navigation -->
-        <nav :class="['flex-1 overflow-y-auto overflow-x-hidden px-2 min-h-0', rootClass === 'theme-lambda' ? 'pt-4 pb-3' : 'py-3']" aria-label="Book navigation">
+        <nav :class="['flex-1 overflow-y-auto overflow-x-hidden px-2 min-h-0 font-mono font-thin', rootClass === 'theme-lambda' ? 'pt-4 pb-3' : 'py-3']" aria-label="Book navigation">
           <!-- Introduction link (book front page) -->
           <NuxtLink
             :to="`/books/${bookSlug}`"
             :class="[
               'flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors mb-4',
               isIntroductionActive
-                ? 'bg-primary/10 text-primary font-medium'
+                ? 'bg-primary/10 text-primary'
                 : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
             ]"
           >

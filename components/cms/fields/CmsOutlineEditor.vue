@@ -62,6 +62,7 @@ interface FlatItem {
   title: string
   path: string
   content: string
+  version: string
   icon: string
   depth: number
   imported?: boolean
@@ -102,6 +103,7 @@ function nestedToFlat(nodes: OutlineNode[], depth = 0, parentId?: string): FlatI
       title: node.title || '',
       path: node.path || '',
       content: node.content || '',
+      version: node.version || '',
       icon: node.icon || '',
       depth,
     }
@@ -124,6 +126,7 @@ function flatToNested(items: FlatItem[]): OutlineNode[] {
     const node: OutlineNode = { title: item.title }
     if (item.path) node.path = item.path
     if (item.content) node.content = item.content
+    if (item.version) node.version = item.version
     if (item.icon) node.icon = item.icon
     if (item.imported) node.imported = true
     if (item.locked) node.locked = true
@@ -179,6 +182,18 @@ const pickerLoading = ref(false)
 const pickerIsNewItem = ref(false)
 // Track selected version per result (key = "collection/baseSlug")
 const selectedVersions = ref<Record<string, string>>({})
+
+// Key of the currently linked content item (for highlighting in picker)
+const pickerCurrentKey = computed(() => {
+  if (!pickerTargetId.value) return ''
+  const item = items.value.find(i => i.id === pickerTargetId.value)
+  if (!item?.content) return ''
+  const parts = item.content.split('/')
+  const coll = parts[0] || ''
+  const vIdx = parts.indexOf('v')
+  const baseSlug = vIdx > 1 ? parts.slice(1, vIdx).join('/') : parts.slice(1).join('/')
+  return `${coll}/${baseSlug}`
+})
 
 // When picker is closed without selecting (for new items), remove the empty item
 watch(showContentPicker, (open) => {
@@ -300,7 +315,7 @@ watch(focusItemId, (id) => {
 // ── Item operations ───────────────────────────────────────────────────
 
 function addSection() {
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', icon: '', depth: 0 }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', version: '', icon: '', depth: 0 }
   items.value.push(newItem)
   focusItemId.value = newItem.id
   emitUpdate()
@@ -312,7 +327,7 @@ function addItemAfter(afterId: string, openPicker = false) {
   const depth = items.value[idx]!.depth
   // Insert after this item's subtree
   const { end } = getSubtreeRange(idx)
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', icon: '', depth }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', version: '', icon: '', depth }
   items.value.splice(end, 0, newItem)
   if (openPicker) {
     nextTick(() => openPickerForItem(newItem.id))
@@ -329,7 +344,7 @@ function addChild(parentId: string, openPicker = false) {
   const parentDepth = items.value[idx]!.depth
   const childDepth = Math.min(parentDepth + 1, 3)
   const { end } = getSubtreeRange(idx)
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', icon: '', depth: childDepth }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', version: '', icon: '', depth: childDepth }
   items.value.splice(end, 0, newItem)
   // Expand parent if collapsed
   collapsedIds.value.delete(parentId)
@@ -343,7 +358,7 @@ function addChild(parentId: string, openPicker = false) {
 }
 
 function addItemWithPicker() {
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', depth: items.value.length > 0 ? 1 : 0 }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', version: '', icon: '', depth: items.value.length > 0 ? 1 : 0 }
   items.value.push(newItem)
   emitUpdate()
   nextTick(() => openPickerForItem(newItem.id))
@@ -688,6 +703,7 @@ async function importLessonChildren(id: string) {
       title: si.title,
       path: slugify(si.title),
       content: `${si.collection}/${si.slug}`,
+      version: '',
       icon: typeIconNames[si.collection] || '',
       depth: childDepth,
       imported: true,
@@ -757,6 +773,14 @@ function openPicker(itemId: string) {
   pickerType.value = 'all'
   pickerIsNewItem.value = false
   showContentPicker.value = true
+  // Pre-filter to the current item's collection if it has content linked
+  const item = items.value.find(i => i.id === itemId)
+  if (item?.content) {
+    const coll = item.content.split('/')[0] || ''
+    if (SEARCHABLE_COLLECTIONS.some(c => c.name === coll)) {
+      pickerType.value = coll
+    }
+  }
   performSearch()
 }
 
@@ -778,6 +802,7 @@ function unlinkContent(id: string) {
     item.importChildren = false
   }
   item.content = ''
+  item.version = ''
   emitUpdate()
 }
 
@@ -887,7 +912,36 @@ async function performSearch() {
 
     const results = Array.from(grouped.values())
     const q = pickerQuery.value.trim().toLowerCase()
+
+    // Determine the currently linked content's key so we can boost it to the top
+    let currentKey = ''
+    if (pickerTargetId.value) {
+      const targetItem = items.value.find(i => i.id === pickerTargetId.value)
+      if (targetItem?.content) {
+        const parts = targetItem.content.split('/')
+        const coll = parts[0] || ''
+        // Extract base slug: strip collection prefix and /v/x.y.z suffix
+        const vIdx = parts.indexOf('v')
+        const baseSlug = vIdx > 1 ? parts.slice(1, vIdx).join('/') : parts.slice(1).join('/')
+        currentKey = `${coll}/${baseSlug}`
+
+        // Pre-select the pinned version for this item
+        if (targetItem.version && grouped.has(currentKey)) {
+          const entry = grouped.get(currentKey)!
+          const pinnedVer = entry.versions.find(v => v.version === targetItem.version)
+          if (pinnedVer) {
+            selectedVersions.value[currentKey] = pinnedVer.slug
+          }
+        }
+      }
+    }
+
     results.sort((a, b) => {
+      const aKey = `${a.collection}/${a.baseSlug}`
+      const bKey = `${b.collection}/${b.baseSlug}`
+      // Currently linked item always comes first
+      if (aKey === currentKey && bKey !== currentKey) return -1
+      if (bKey === currentKey && aKey !== currentKey) return 1
       if (q) {
         const aM = a.title.toLowerCase().startsWith(q) ? 0 : 1
         const bM = b.title.toLowerCase().startsWith(q) ? 0 : 1
@@ -914,6 +968,9 @@ function selectContent(result: PickerResult) {
     const key = `${result.collection}/${result.baseSlug}`
     const chosenSlug = selectedVersions.value[key] || result.baseSlug
     item.content = `${result.collection}/${chosenSlug}`
+    // Store version from the selected picker version
+    const chosenVersion = result.versions.find(v => v.slug === chosenSlug)
+    item.version = chosenVersion?.version || ''
     if (!item.title) item.title = result.title
     if (!item.path) item.path = slugify(result.title)
     // Set default icon from content type if none set
@@ -1360,12 +1417,21 @@ const totalCount = computed(() => items.value.length)
           v-if="item.content"
           type="button"
           class="shrink-0 flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-primary/70 hover:bg-accent transition-colors mr-1"
-          :title="item.content"
+          :title="item.content + (item.version ? ` (v${item.version})` : '')"
           @click.stop="!(item.imported && item.locked) && openPicker(item.id)"
         >
           <component :is="getContentIcon(item.content)" class="h-3 w-3" />
-          <span class="max-w-30 truncate">{{ item.content.split('/').pop() }}</span>
+          <span class="max-w-30 truncate">{{ item.content.includes('/v/') ? item.content.split('/').slice(1, item.content.split('/').indexOf('v')).join('/') : item.content.split('/').slice(1).join('/') }}</span>
         </button>
+
+        <!-- Version badge -->
+        <span
+          v-if="item.version"
+          class="shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 px-1.5 py-0 text-[10px] font-medium text-blue-700 dark:text-blue-300 mr-1"
+          :title="`Pinned to version ${item.version}`"
+        >
+          v{{ item.version }}
+        </span>
 
         <!-- Loading indicator while importing lesson sub-items -->
         <span
@@ -1596,7 +1662,12 @@ const totalCount = computed(() => items.value.length)
             <div
               v-for="r in pickerResults"
               :key="`${r.collection}-${r.baseSlug}`"
-              class="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
+              :class="[
+                'flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors',
+                pickerCurrentKey === `${r.collection}/${r.baseSlug}`
+                  ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800'
+                  : 'hover:bg-accent'
+              ]"
             >
               <component
                 :is="typeIcons[r.collection] || FileText"

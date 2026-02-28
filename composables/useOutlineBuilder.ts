@@ -36,6 +36,8 @@ export interface OutlineItem {
   path: string
   /** Linked content reference string like "lessons/slug" */
   content: string
+  /** Pinned content version, e.g. "1.2.0" */
+  version?: string
   /** Depth: 0 = Part, 1 = Chapter, 2 = Section, 3 = Subsection (max 4 levels) */
   depth: number
   /** Optional linked content metadata (resolved) */
@@ -63,6 +65,7 @@ export interface OutlineNode {
   title: string
   path?: string
   content?: string
+  version?: string
   icon?: string
   items?: OutlineNode[]
 }
@@ -130,6 +133,7 @@ function flatToNested(items: OutlineItem[]): OutlineNode[] {
       title: item.title,
       ...(item.path ? { path: item.path } : {}),
       ...(item.content ? { content: item.content } : {}),
+      ...(item.version ? { version: item.version } : {}),
     }
 
     // Pop stack until we find the parent (depth < current)
@@ -164,6 +168,7 @@ function nestedToFlat(nodes: OutlineNode[], depth = 0): OutlineItem[] {
       title: node.title,
       path: node.path || '',
       content: node.content || '',
+      version: node.version || '',
       depth,
     })
     if (node.items?.length) {

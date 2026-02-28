@@ -13,6 +13,8 @@ export interface FlatChapter {
   fullPath: string
   /** Content reference string, e.g. "articles/my-article" */
   content?: string
+  /** Pinned content version, e.g. "1.2.0" */
+  version?: string
   /** Depth level (0-based) */
   depth: number
   /** Whether this node has children (is a section heading) */
@@ -42,6 +44,7 @@ export function flattenOutline(
       title: node.title,
       fullPath,
       content: node.content,
+      version: node.version,
       depth,
       isSection: !!(hasChildren && !node.content),
       node,
@@ -135,6 +138,7 @@ export interface SidebarNode {
   title: string
   fullPath: string
   content?: string
+  version?: string
   icon?: string
   depth: number
   isSection: boolean
@@ -164,6 +168,7 @@ export function buildSidebarTree(
       title: node.title,
       fullPath,
       content: node.content,
+      version: node.version,
       icon: node.icon,
       depth,
       isSection: !!(hasChildren && !node.content),
