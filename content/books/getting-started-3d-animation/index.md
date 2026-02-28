@@ -19,7 +19,6 @@ tags:
 outline:
   - title: 'Chapter 1: Introduction'
     path: introduction
-    icon: LucideBookText
     items:
       - title: Getting Started in 3D Animation
         path: getting-started

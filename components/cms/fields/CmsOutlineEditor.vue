@@ -19,10 +19,12 @@ import {
   FolderPlus,
   FileText,
   GraduationCap,
-  Wrench,
   Presentation,
-  PenTool,
+  Lightbulb,
+  Dumbbell,
+  FolderKanban,
   FolderOpen,
+  Newspaper,
   X,
   Search,
   Loader2,
@@ -460,12 +462,12 @@ function moveDown(id: string) {
 // ── Content linking ───────────────────────────────────────────────────
 
 const typeIcons: Record<string, any> = {
-  lessons: GraduationCap,
-  articles: FileText,
-  tutorials: Wrench,
+  lessons: BookOpen,
+  articles: Newspaper,
+  tutorials: Lightbulb,
   lectures: Presentation,
-  exercises: PenTool,
-  projects: FolderOpen,
+  exercises: Dumbbell,
+  projects: FolderKanban,
 }
 
 const SEARCHABLE_COLLECTIONS = [
@@ -484,12 +486,12 @@ function getContentIcon(content: string) {
 
 /** Default icon name map for content types */
 const typeIconNames: Record<string, string> = {
-  lessons: 'GraduationCap',
-  articles: 'FileText',
-  tutorials: 'Wrench',
+  lessons: 'BookOpen',
+  articles: 'Newspaper',
+  tutorials: 'Lightbulb',
   lectures: 'Presentation',
-  exercises: 'PenTool',
-  projects: 'FolderOpen',
+  exercises: 'Dumbbell',
+  projects: 'FolderKanban',
 }
 
 /** Get the default icon name for an item based on its content type */
@@ -686,7 +688,7 @@ async function importLessonChildren(id: string) {
       title: si.title,
       path: slugify(si.title),
       content: `${si.collection}/${si.slug}`,
-      icon: '',
+      icon: typeIconNames[si.collection] || '',
       depth: childDepth,
       imported: true,
       locked: true,
@@ -914,6 +916,8 @@ function selectContent(result: PickerResult) {
     item.content = `${result.collection}/${chosenSlug}`
     if (!item.title) item.title = result.title
     if (!item.path) item.path = slugify(result.title)
+    // Set default icon from content type if none set
+    if (!item.icon) item.icon = typeIconNames[result.collection] || ''
     emitUpdate()
 
     // Auto-import sub-items when linking a lesson
