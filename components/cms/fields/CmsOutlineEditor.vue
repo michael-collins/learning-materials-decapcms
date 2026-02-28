@@ -610,8 +610,11 @@ function selectContent(result: PickerResult) {
 function handleKeydown(event: KeyboardEvent, item: FlatItem) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault()
+    event.stopPropagation()
     stopEditing()
-    addItemAfter(item.id)
+    return
+  } else if (event.key === 'Escape') {
+    event.stopPropagation()
   } else if (event.key === 'Tab' && !event.shiftKey) {
     event.preventDefault()
     indentItem(item.id)
@@ -847,7 +850,7 @@ const totalCount = computed(() => items.value.length)
         :aria-expanded="hasChildren(realIndex) ? !collapsedIds.has(item.id) : undefined"
         :aria-label="item.title || (item.depth === 0 ? 'Empty section' : 'Empty item')"
         :class="[
-          'group relative flex items-center h-8 pr-2 transition-colors hover:bg-accent/40 focus:bg-accent/30 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
+          'group relative flex items-center h-8 pl-2 pr-2 transition-colors hover:bg-accent/40 focus:bg-accent/30 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
           draggedId === item.id ? 'opacity-40' : '',
           vIdx > 0 ? 'border-t border-border/40' : '',
         ]"
@@ -920,7 +923,7 @@ const totalCount = computed(() => items.value.length)
         </div>
 
         <!-- Title: display mode (draggable) or edit mode (input) -->
-        <div v-if="editingId !== item.id" class="flex-1 min-w-0 flex items-center h-full cursor-grab active:cursor-grabbing select-none">
+        <div v-if="editingId !== item.id" class="flex-1 min-w-0 flex items-center h-full cursor-grab active:cursor-grabbing select-none" @dblclick.stop="startEditing(item.id)">
           <span
             v-if="item.title"
             :class="[
@@ -939,13 +942,12 @@ const totalCount = computed(() => items.value.length)
           :value="item.title"
           :placeholder="item.depth === 0 ? 'Section title…' : 'Item title…'"
           :class="[
-            'flex-1 min-w-0 bg-transparent border-none outline-none text-sm h-full px-1.5',
-            'focus:ring-0 placeholder:text-muted-foreground/40',
+            'flex-1 min-w-0 border outline-none text-sm h-6 my-auto px-1.5 rounded-md',
+            'bg-background border-border/60 focus:ring-1 focus:ring-primary/40 placeholder:text-muted-foreground/40',
             item.depth === 0 ? 'font-medium' : 'text-muted-foreground',
           ]"
           @input="updateTitle(item.id, ($event.target as HTMLInputElement).value)"
           @keydown="handleKeydown($event, item)"
-          @keydown.enter.prevent="stopEditing()"
           @keydown.escape.prevent="stopEditing()"
         />
 
