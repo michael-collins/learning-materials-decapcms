@@ -495,7 +495,7 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ---
 
-## Phase 7 — Book Publishing via Outline Builder (⬜ PLANNED)
+## Phase 7 — Book Publishing via Outline Builder (🔄 IN PROGRESS)
 
 **Goal:** Enable authors to compose and publish books (course books, textbooks, guides) by arranging existing content into a hierarchical outline, then exporting to multiple formats — most importantly a GitBook/docs-style website.
 
@@ -505,33 +505,39 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 
 ### 7.1 Book Content Type
 
-- [ ] Add `books` collection to config.yml (title, description, author, license, cover image, objectives, outline tree)
-- [ ] Add books collection to content.config.ts
-- [ ] Define outline tree schema: nested array of `{ title, slug?, type?, description?, children[] }` where `slug` references existing content and items without a slug are section headings
-- [ ] Create `pages/books/[...slug].vue` — book landing page with TOC and chapter navigation
-- [ ] Add to navigation sidebar and dashboard
+- [x] Add `books` collection to config.yml (title, description, author, license, cover image, objectives, outline tree)
+- [x] Add books collection to content.config.ts with 4-level deep outline schema (outlineLeaf → L3 → L2 → outlineNodeSchema)
+- [x] Define outline tree schema: nested array of `{ title, path?, content?, icon?, imported?, locked?, importChildren?, version?, children[] }` where `content` references existing items and items without content are section headings
+- [x] Create `pages/books/[book]/[...path].vue` — book chapter page with content rendering, metadata, and version display
+- [x] Create `pages/books/[book]/index.vue` — book landing page
+- [x] Add to navigation sidebar and dashboard
 
 ### 7.2 Outline Builder Tool
 
-- [ ] **`pages/cms/outline-builder.vue`** — Visual book composition interface
-  - **Metadata panel**: Title, description, author, license, cover image, learning objectives
-  - **Hierarchical tree builder**: Drag-and-drop tree with unlimited nesting depth
-    - Part → Chapter → Section → Subsection (or any custom hierarchy)
-    - Each node is either a **heading** (custom title, no linked content) or a **content reference** (links to an existing item)
-  - **Content picker**: Searchable panel to browse/filter existing content by collection, tags, difficulty; drag items into the tree or click to append
-  - **Inline notes**: Optional author notes or transition text between sections
-  - **Auto-generated Table of Contents**: Live-updating, numbered TOC preview reflecting the current tree structure
-  - **Save**: Commits book outline as structured frontmatter + markdown via CMS git backend
+- [x] **`components/cms/fields/CmsOutlineEditor.vue`** — CMS-integrated visual book composition interface (~1720 lines)
+  - **Hierarchical tree builder**: Drag-and-drop tree with 4-level nesting (Part → Chapter → Section → Subsection)
+  - **Content picker**: Searchable dialog to browse/filter content by collection; select and link items to outline nodes
+  - **Smart picker UX**: Collection pre-filtering when re-opening, current item boosted to top of results, pinned version pre-selected in dropdown, blue highlight on currently linked item
+  - **Content version pinning**: Choose specific content versions when linking; version badge displayed in tree
+  - **Icon system**: Enable/disable icons toggle, per-item Lucide icon picker with search, content-type default icons
+  - **Auto-import lesson children**: Adding a lesson auto-imports its child items; refresh button to re-sync
+  - **Inline editing**: Title, notes, content linking/unlinking all in-tree
+  - **Draft management**: Save/load via CMS git backend
 
-### 7.3 Book Editing & Preview
+### 7.3 Book Rendering & Themes
 
-- [ ] Generated books editable via standard CMS collection form and outline builder
-- [ ] Live preview showing rendered TOC with linked content titles and descriptions
-- [ ] Reorder chapters/sections via drag-and-drop in outline builder
-- [ ] Add/remove content references; update outline without affecting source content
+- [x] **`composables/useBookOutline.ts`** — Flatten outline, build sidebar tree, navigate chapters; version propagation
+- [x] **`composables/useBookTheme.ts`** — Three configurable themes (default, lambda, minimal) with typography and layout settings
+- [x] **`components/BookSidebarTree.vue`** — Hierarchical sidebar navigation with icon support, active state, expand/collapse
+- [x] **Content metadata on chapter pages** — Image, AIUL badges, attachments, tags, difficulty, prerequisites
+- [x] **Version badge on chapter pages** — GitBranch icon with version number and status (latest/archived)
+- [x] **Versioned "View original" link** — Appends `?version=X.Y.Z` for non-latest pinned versions
+- [x] **Monospace navigation font** — JetBrains Mono with thin weight for book sidebar nav
+- [x] **Prose link styling** — Fixed across all three themes
 
 ### 7.4 Export Formats
 
+- [x] **`composables/useBookExport.ts`** — Export composable (basic structure)
 - [ ] **GitBook / Docs-style Website** (primary format)
   - Static site generation (Nuxt `generate` or dedicated build) producing a standalone book site
   - Sidebar navigation matching the outline hierarchy
@@ -553,14 +559,29 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 
 ### 7.5 Technical Considerations
 
-- Book outline stored as structured YAML/JSON in frontmatter (references content by slug, not duplicated)
+- Book outline stored as structured YAML in frontmatter (references content by slug, not duplicated)
+- 4-level deep Zod schema: `outlineLeaf` → L3 → L2 → `outlineNodeSchema`, each extending with `children` array
+- Version pinning: `version` field on `outlineLeaf` stores semver string; propagated through `FlatChapter` → `SidebarNode` → chapter page
+- Icon system: Lucide icon names stored as strings; resolved to components via `resolveIconComponent()` helper that handles both prefixed and unprefixed names
 - Export pipeline: read outline → resolve content references → render per format
-- GitBook export could use a dedicated Nuxt layout (`layouts/book.vue`) or a separate mini Nuxt app generated from the outline
 - PDF generation could run server-side (H3 route) or as a CLI script
 - Common Cartridge XML generated from outline + content metadata
-- Consider incremental rebuilds for large books (only re-export changed chapters)
 
-**Milestone: Authors can compose books from existing content and publish as a docs-style website, PDF, or Common Cartridge package for LMS import.**
+**Milestone: ✅ Authors can compose books from existing content with version pinning, icons, and themes. 🔄 Export formats (PDF, Common Cartridge, standalone website) still planned.**
+
+### Related Files
+
+| File | Description |
+|---|---|
+| `content.config.ts` | `outlineLeaf` schema with version, icon, importChildren fields |
+| `components/cms/fields/CmsOutlineEditor.vue` | CMS outline editor (~1720 lines) |
+| `composables/useOutlineBuilder.ts` | Draft management, flat↔nested conversion |
+| `composables/useBookOutline.ts` | Flatten, navigate, build sidebar tree |
+| `composables/useBookTheme.ts` | Three theme configurations |
+| `composables/useBookExport.ts` | Export composable |
+| `components/BookSidebarTree.vue` | Hierarchical sidebar navigation |
+| `pages/books/[book]/[...path].vue` | Book chapter page with metadata and versioning |
+| `pages/books/[book]/index.vue` | Book landing page |
 
 ---
 
@@ -880,7 +901,7 @@ This content appears in the **right column**.
 | **Phase 5** | Editorial workflow, sync, conflict resolution, batch publish | ✅ Complete |
 | **Phase 5.5** | Version management, change tracking, editing UX | ✅ Complete |
 | **Phase 6** | Education-specific UX (custom builders) | ⬜ **Next up** |
-| **Phase 7** | Book publishing via Outline Builder (website, PDF, Common Cartridge) | ⬜ Planned |
+| **Phase 7** | Book publishing via Outline Builder (website, PDF, Common Cartridge) | 🔄 In progress (core builder, themes, versioning done; exports planned) |
 | **Phase 8** | Bulk operations & analytics | ⬜ Planned |
 | **Phase 9** | Polish, testing, migration | 🔄 In progress (UX polish items done) |
 | **Phase 10** | Layout & design components (Tier 1→3) | 🔄 In progress (Tiers 1-3 components built, preview rendering done) |

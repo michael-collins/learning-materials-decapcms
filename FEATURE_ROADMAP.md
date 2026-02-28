@@ -194,7 +194,7 @@ Evolve the chatbot into a comprehensive course construction tool that understand
 
 ## 3. OER Course Book Publishing System
 
-**Status:** Planned  
+**Status:** In Progress  
 **Priority:** High  
 **CMS Roadmap:** Phase 7
 
@@ -205,6 +205,32 @@ Publish OER materials as cohesive books (course books, textbooks, guides) by arr
 1. **Curate** — Browse the content library and select items (lessons, lectures, articles, exercises, projects, tutorials)
 2. **Arrange** — Organize selected items into a hierarchical outline (parts → chapters → sections) using a drag-and-drop tree builder in the CMS
 3. **Publish** — Export the arranged outline as a docs-style website, PDF, or Common Cartridge package
+
+### Implementation Progress
+
+**Completed**
+- ✅ **Book content type** — `books` collection with outline tree schema (4-level deep: Part → Chapter → Section → Subsection)
+- ✅ **CMS Outline Builder** — `CmsOutlineEditor.vue` with drag-and-drop tree, content picker, inline editing
+- ✅ **Book pages** — `pages/books/[book]/[...path].vue` with sidebar navigation, chapter rendering, previous/next pagination
+- ✅ **Three book themes** — Default, Lambda, Minimal with configurable typography and layout (`useBookTheme.ts`)
+- ✅ **Content metadata on chapter pages** — Image, AIUL badges, attachments, tags, difficulty, prerequisites rendered on book chapter pages
+- ✅ **Content version pinning** — Outline items can pin to specific content versions; version badge in builder and chapter pages; versioned "View original" link
+- ✅ **Icon system** — Enable/disable icons toggle, per-item Lucide icon picker, content-type default icons, icon propagation to sidebar
+- ✅ **Smart content picker** — Collection pre-filtering, currently-linked item boosted to top, pinned version pre-selected, blue highlight on current item
+- ✅ **Auto-import lesson children** — Adding a lesson to the outline auto-imports its child items; refresh button to re-sync
+- ✅ **Book sidebar tree** — `BookSidebarTree.vue` with hierarchical navigation, icon support, active state tracking
+- ✅ **Book export** — `useBookExport.ts` composable for export functionality
+- ✅ **Monospace navigation font** — JetBrains Mono with configurable weight for book nav
+
+**In Progress**
+- 🔄 **Prose link styling** across all three themes
+
+**Planned**
+- ⏳ **PDF Export** — Rendered from outline with proper pagination, headers/footers, TOC with page numbers
+- ⏳ **Common Cartridge (IMS CC)** — Standard package for LMS import (Canvas, Blackboard, Moodle)
+- ⏳ **Full-text search within book** — Search across all chapters in a book
+- ⏳ **Custom domain/branding** — Per-book theme configuration
+- ⏳ **SCORM/LTI compliance** for LMS integration
 
 ### Requirements
 
@@ -254,14 +280,16 @@ Publish OER materials as cohesive books (course books, textbooks, guides) by arr
 - SCORM/LTI compliance for LMS integration (optional)
 
 ### Related Files
-- New content type: `/content/books/`
-- CMS tool: `/pages/cms/outline-builder.vue`
-- New components: `/components/OutlineBuilder.vue`, `/components/BookTOC.vue`
-- Book layout: `/layouts/book.vue`
-- New composable: `/composables/useBookPublishing.ts`
-- New pages: `/pages/books/[...slug].vue`
-- Export utilities: `/lib/book-export/` (website, PDF, Common Cartridge generators)
-- Server API: `/server/api/books/`
+- Book content: `/content/books/`
+- CMS outline editor: `/components/cms/fields/CmsOutlineEditor.vue`
+- Book outline composable: `/composables/useBookOutline.ts`
+- Outline builder composable: `/composables/useOutlineBuilder.ts`
+- Book theme composable: `/composables/useBookTheme.ts`
+- Book export composable: `/composables/useBookExport.ts`
+- Book sidebar: `/components/BookSidebarTree.vue`
+- Book chapter page: `/pages/books/[book]/[...path].vue`
+- Content schema: `/content.config.ts` (outlineLeaf with version field)
+- Version system: [VERSIONING_SYSTEM.md](VERSIONING_SYSTEM.md#book-outline-version-pinning)
 
 ### Dependencies
 - Existing pathway and specialization systems
@@ -515,9 +543,9 @@ Structured, interactive guides that help students engage with learning materials
 - ✅ Created Tools section in navigation
 - ✅ Created placeholder pages for Outline Builder and Guides
 - ✅ Defined initial guide structure (concept dev, writing, career, theory/philosophy)
+- ✅ **Book Outline Builder implemented** — CMS-integrated outline editor with drag-and-drop tree, content picker, version pinning, icon system, and auto-import (see Section 3)
 
 **Planned**
-- ⏳ Implement Outline Builder drag-and-drop interface
 - ⏳ Design guide workflow system
 - ⏳ Develop first interactive guide (TBD based on priority)
 - ⏳ Integration with AI chat for enhanced interactivity
@@ -561,4 +589,4 @@ Future features to be determined based on user feedback and platform evolution.
 
 ---
 
-*Last Updated: February 27, 2026*
+*Last Updated: July 14, 2025*

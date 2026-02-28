@@ -179,11 +179,85 @@ A: The integrity validation will fail in CI, and deployed sites may break user e
 **Q: How do I deprecate a version?**
 A: Update the `versionStatus` to `deprecated`.
 
-## Related Documentation
+## Book Outline Version Pinning
 
-- [Custom CMS Roadmap](CUSTOM_CMS_ROADMAP.md) — Phase 5.5 covers version management implementation
-- [Feature Roadmap](FEATURE_ROADMAP.md)
+### Overview
+
+Book outlines can pin individual content references to specific versions, ensuring that a book's chapters remain stable even as the underlying content evolves. This bridges the content versioning system with the book publishing system — authors can lock a book to known-good versions of each chapter's content.
+
+### Schema
+
+The `outlineLeaf` schema in `content.config.ts` includes an optional `version` field:
+
+```ts
+const outlineLeaf = z.object({
+  title: z.string(),
+  path: z.string().optional(),
+  content: z.string().optional(),
+  icon: z.string().optional(),
+  imported: z.boolean().optional(),
+  locked: z.boolean().optional(),
+  importChildren: z.boolean().optional(),
+  version: z.string().optional(),   // ← pinned content version (e.g., "1.2.0")
+})
+```
+
+When `version` is set, the outline item references a specific archived version (e.g., `lessons/animation-basics/v/1.2.0`) rather than the latest version.
+
+### How It Works
+
+#### In the CMS Outline Builder (`CmsOutlineEditor.vue`)
+
+- **Selecting content**: When an author links content to an outline item via the content picker, they can choose a specific version from the version dropdown. The chosen version string (e.g., `"1.2.0"`) is stored on the outline item.
+- **Version badge**: Pinned items display a blue version badge (e.g., `v1.2.0`) next to the content reference badge in the outline tree.
+- **Unlinking content**: Clearing a content reference also clears the pinned version.
+- **Picker pre-selection**: Re-opening the content picker for an already-linked item pre-filters to the item's collection, boosts the current item to the top of search results, pre-selects the pinned version in the dropdown, and highlights the current item with a blue border.
+
+#### Version Propagation
+
+The `version` field flows through the entire rendering pipeline:
+
+| Layer | Interface | Field |
+|---|---|---|
+| Schema | `outlineLeaf` (content.config.ts) | `version: z.string().optional()` |
+| Composable | `OutlineNode` / `OutlineItem` (useOutlineBuilder.ts) | `version?: string` |
+| CMS Editor | `FlatItem` (CmsOutlineEditor.vue) | `version: string` |
+| Book Outline | `FlatChapter` (useBookOutline.ts) | `version?: string` |
+| Sidebar Tree | `SidebarNode` (useBookOutline.ts) | `version?: string` |
+| Chapter Page | `[...path].vue` (pages/books/) | `contentVersion` computed |
+
+#### On Book Chapter Pages (`pages/books/[book]/[...path].vue`)
+
+- A version badge with a `GitBranch` icon displays the pinned version (e.g., `v1.2.0`) in the chapter metadata row.
+- The version status (`latest` or `archived`) is shown alongside.
+- The "View original →" link includes a `?version=X.Y.Z` query parameter for non-latest versions, linking directly to the archived version's edit page.
+
+### Content Path Format
+
+| Scenario | Content Path | Version Field |
+|---|---|---|
+| Latest (unpinned) | `lessons/animation-basics` | `""` (empty) |
+| Pinned to version | `lessons/animation-basics` | `"1.2.0"` |
+| Resolved URL (pinned) | `lessons/animation-basics/v/1.2.0` | — |
+
+The content path stored in the outline always uses the base slug (without `/v/X.Y.Z`). The version is stored separately in the `version` field. Resolution to the full versioned path happens at render time.
+
+### Related Files
+
+- `content.config.ts` — `outlineLeaf` schema with `version` field
+- `composables/useOutlineBuilder.ts` — `OutlineNode` and `OutlineItem` with version, flat↔nested conversion
+- `composables/useBookOutline.ts` — `FlatChapter` and `SidebarNode` with version propagation
+- `components/cms/fields/CmsOutlineEditor.vue` — Version selection in picker, version badge in tree, pre-selection UX
+- `pages/books/[book]/[...path].vue` — Version badge and versioned "View original" link
 
 ---
 
-*Last Updated: February 27, 2026*
+## Related Documentation
+
+- [Custom CMS Roadmap](CUSTOM_CMS_ROADMAP.md) — Phase 5.5 covers version management implementation, Phase 7 covers book publishing
+- [Feature Roadmap](FEATURE_ROADMAP.md) — Section 3 covers the OER Course Book Publishing System
+- [Outline Builder Plan](OUTLINE_BUILDER_PLAN.md) — Course outline builder (separate from book outline)
+
+---
+
+*Last Updated: July 14, 2025*

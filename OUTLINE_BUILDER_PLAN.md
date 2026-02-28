@@ -1,5 +1,17 @@
 # Outline Builder → Course Content Pipeline — Implementation Plan
 
+> **Note (July 2025):** The outline builder concept described in this document evolved into the **Book Publishing System** (see [CUSTOM_CMS_ROADMAP.md](CUSTOM_CMS_ROADMAP.md) Phase 7 and [FEATURE_ROADMAP.md](FEATURE_ROADMAP.md) Section 3). The implemented system uses a `books` collection with a hierarchical outline stored as structured frontmatter, a CMS-integrated outline editor (`CmsOutlineEditor.vue`), and a docs-style book rendering system with themes, sidebar navigation, and chapter pages. Key features beyond the original plan include:
+>
+> - **4-level deep hierarchy** (Part → Chapter → Section → Subsection) instead of the 2-level module→item depth
+> - **CMS-native editor** (`CmsOutlineEditor.vue`) instead of a standalone tool page
+> - **Content version pinning** — outline items can lock to specific content versions (see [VERSIONING_SYSTEM.md](VERSIONING_SYSTEM.md#book-outline-version-pinning))
+> - **Icon system** — per-item icons with Lucide icon picker and content-type defaults
+> - **Three book themes** (default, lambda, minimal) with configurable typography and layout
+> - **Content metadata rendering** on chapter pages (images, AIUL badges, attachments, tags, difficulty)
+> - **Smart content picker** with collection pre-filtering, version pre-selection, and pinned-item highlighting
+>
+> The "Courses" content type described below remains a planned future addition, separate from the book system.
+
 ## Overview
 
 The Outline Builder is a content authoring tool that produces **Courses** — a new first-class content type that lives alongside Pathways and Specializations under the "Curriculum" section. Users build a hierarchical outline in the browser, link outline nodes to existing site content (lessons, lectures, exercises, etc.), and then **generate** the Course as Decap CMS-compatible markdown files that are committed back to the repository.
