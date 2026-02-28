@@ -135,6 +135,7 @@ export interface SidebarNode {
   title: string
   fullPath: string
   content?: string
+  icon?: string
   depth: number
   isSection: boolean
   isActive: boolean
@@ -148,7 +149,7 @@ export function buildSidebarTree(
   parentPath: string = '',
   depth: number = 0
 ): SidebarNode[] {
-  return nodes.map((node) => {
+  const result = nodes.map((node) => {
     const segment = node.path || slugify(node.title)
     const fullPath = parentPath ? `${parentPath}/${segment}` : segment
     const hasChildren = node.items && node.items.length > 0
@@ -163,6 +164,7 @@ export function buildSidebarTree(
       title: node.title,
       fullPath,
       content: node.content,
+      icon: node.icon,
       depth,
       isSection: !!(hasChildren && !node.content),
       isActive,
@@ -170,6 +172,16 @@ export function buildSidebarTree(
       children,
     }
   })
+
+  // Always expand the first top-level item that has children so the TOC isn't fully collapsed
+  if (depth === 0 && result.length > 0) {
+    const firstWithChildren = result.find(n => n.children.length > 0)
+    if (firstWithChildren && !firstWithChildren.isExpanded) {
+      firstWithChildren.isExpanded = true
+    }
+  }
+
+  return result
 }
 
 /**

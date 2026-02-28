@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ChevronRight, ChevronDown, FileText, FolderOpen, BookOpen, Presentation, Dumbbell, FolderKanban, Newspaper, GraduationCap, Route, Lightbulb, Clapperboard, type LucideIcon } from 'lucide-vue-next'
+import * as LucideIcons from 'lucide-vue-next'
 import type { SidebarNode } from '~/composables/useBookOutline'
 
 interface Props {
@@ -7,10 +8,12 @@ interface Props {
   bookSlug: string
   toggledSections: Set<string>
   depth?: number
+  uppercaseTopLevel?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  depth: 0
+  depth: 0,
+  uppercaseTopLevel: false,
 })
 
 const emit = defineEmits<{
@@ -42,6 +45,15 @@ function getContentIcon(content?: string): LucideIcon {
   const collection = content.split('/')[0]
   return (collection && contentTypeIcons[collection]) || FileText
 }
+
+/** Resolve a custom Lucide icon component by PascalCase name, falling back to content-type icon */
+function getNodeIcon(node: SidebarNode): LucideIcon {
+  if (node.icon) {
+    const comp = (LucideIcons as any)[node.icon] || (LucideIcons as any)[`Lucide${node.icon}`] || null
+    if (comp) return comp
+  }
+  return getContentIcon(node.content)
+}
 </script>
 
 <template>
@@ -62,8 +74,9 @@ function getContentIcon(content?: string): LucideIcon {
             :is="isExpanded(node) ? ChevronDown : ChevronRight"
             class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60"
           />
-          <FolderOpen v-if="isExpanded(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" />
-          <span class="wrap-break-word min-w-0">{{ node.title }}</span>
+          <component v-if="node.icon" :is="getNodeIcon(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" />
+          <FolderOpen v-else-if="isExpanded(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" />
+          <span :class="['break-words text-left min-w-0', uppercaseTopLevel && depth === 0 && 'uppercase tracking-wide']">{{ node.title }}</span>
         </button>
 
         <!-- Expanded children -->
@@ -104,8 +117,8 @@ function getContentIcon(content?: string): LucideIcon {
               !node.children.length && 'ml-0'
             ]"
           >
-            <component :is="getContentIcon(node.content)" class="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-60" />
-            <span class="wrap-break-word min-w-0">{{ node.title }}</span>
+            <component :is="getNodeIcon(node)" class="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-60" />
+            <span :class="['break-words text-left min-w-0', uppercaseTopLevel && depth === 0 && 'uppercase tracking-wide']">{{ node.title }}</span>
           </NuxtLink>
         </div>
 
@@ -122,7 +135,7 @@ function getContentIcon(content?: string): LucideIcon {
       </div>
 
       <!-- Non-navigable leaf (no content, no children — just a label) -->
-      <div v-else class="px-2 py-1 text-[13px] leading-snug text-muted-foreground/50 italic wrap-break-word min-w-0">
+      <div v-else class="px-2 py-1 text-[13px] leading-snug text-muted-foreground/50 italic break-words text-left min-w-0">
         {{ node.title }}
       </div>
     </li>

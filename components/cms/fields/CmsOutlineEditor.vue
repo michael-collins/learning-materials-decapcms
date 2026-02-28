@@ -33,7 +33,11 @@ import {
   Unlock,
   RefreshCw,
   PackageOpen,
+  Image as ImageIcon,
+  Eye,
+  EyeOff,
 } from 'lucide-vue-next'
+import * as LucideIcons from 'lucide-vue-next'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '~/components/ui/dialog'
 import Button from '~/components/ui/button/Button.vue'
 import Input from '~/components/ui/input/Input.vue'
@@ -44,6 +48,7 @@ interface OutlineNode {
   title: string
   path?: string
   content?: string
+  icon?: string
   items?: OutlineNode[]
   imported?: boolean
   locked?: boolean
@@ -55,6 +60,7 @@ interface FlatItem {
   title: string
   path: string
   content: string
+  icon: string
   depth: number
   imported?: boolean
   locked?: boolean
@@ -94,6 +100,7 @@ function nestedToFlat(nodes: OutlineNode[], depth = 0, parentId?: string): FlatI
       title: node.title || '',
       path: node.path || '',
       content: node.content || '',
+      icon: node.icon || '',
       depth,
     }
     if (node.imported) { item.imported = true; item.locked = node.locked !== false }
@@ -115,6 +122,7 @@ function flatToNested(items: FlatItem[]): OutlineNode[] {
     const node: OutlineNode = { title: item.title }
     if (item.path) node.path = item.path
     if (item.content) node.content = item.content
+    if (item.icon) node.icon = item.icon
     if (item.imported) node.imported = true
     if (item.locked) node.locked = true
     if (item.importChildren) node.importChildren = true
@@ -290,7 +298,7 @@ watch(focusItemId, (id) => {
 // ── Item operations ───────────────────────────────────────────────────
 
 function addSection() {
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', depth: 0 }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', icon: '', depth: 0 }
   items.value.push(newItem)
   focusItemId.value = newItem.id
   emitUpdate()
@@ -302,7 +310,7 @@ function addItemAfter(afterId: string, openPicker = false) {
   const depth = items.value[idx]!.depth
   // Insert after this item's subtree
   const { end } = getSubtreeRange(idx)
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', depth }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', icon: '', depth }
   items.value.splice(end, 0, newItem)
   if (openPicker) {
     nextTick(() => openPickerForItem(newItem.id))
@@ -319,7 +327,7 @@ function addChild(parentId: string, openPicker = false) {
   const parentDepth = items.value[idx]!.depth
   const childDepth = Math.min(parentDepth + 1, 3)
   const { end } = getSubtreeRange(idx)
-  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', depth: childDepth }
+  const newItem: FlatItem = { id: generateId(), title: '', path: '', content: '', icon: '', depth: childDepth }
   items.value.splice(end, 0, newItem)
   // Expand parent if collapsed
   collapsedIds.value.delete(parentId)
@@ -474,6 +482,91 @@ function getContentIcon(content: string) {
   return typeIcons[collection] || FileText
 }
 
+/** Default icon name map for content types */
+const typeIconNames: Record<string, string> = {
+  lessons: 'GraduationCap',
+  articles: 'FileText',
+  tutorials: 'Wrench',
+  lectures: 'Presentation',
+  exercises: 'PenTool',
+  projects: 'FolderOpen',
+}
+
+/** Get the default icon name for an item based on its content type */
+function getDefaultIconName(item: FlatItem): string {
+  if (!item.content) return ''
+  const collection = item.content.split('/')[0] || ''
+  return typeIconNames[collection] || ''
+}
+
+/** Resolve a Lucide icon component by its PascalCase name */
+function resolveIconComponent(iconName: string): any {
+  if (!iconName) return null
+  // Try exact name first, then Lucide-prefixed variant
+  return (LucideIcons as any)[iconName] || (LucideIcons as any)[`Lucide${iconName}`] || null
+}
+
+/** Get the display icon component for an item (custom → default → null) */
+function getItemIcon(item: FlatItem): any {
+  if (item.icon) return resolveIconComponent(item.icon)
+  if (item.content) return getContentIcon(item.content)
+  return null
+}
+
+// ── Icon toggle & picker ──────────────────────────────────────────────
+
+const showIcons = ref(true)
+const showIconPicker = ref(false)
+const iconPickerTargetId = ref<string | null>(null)
+const iconPickerQuery = ref('')
+
+// Build searchable icon list (once, lazily)
+let _iconList: { name: string; keywords: string }[] | null = null
+function getIconList(): { name: string; keywords: string }[] {
+  if (!_iconList) {
+    _iconList = Object.keys(LucideIcons)
+      .filter(k => k[0] === k[0].toUpperCase() && !k.endsWith('Icon') && !k.startsWith('Lucide') && k !== 'default' && k !== 'createLucideIcon' && typeof (LucideIcons as any)[k] === 'function')
+      .map(name => ({
+        name,
+        keywords: name.replace(/([A-Z])/g, ' $1').toLowerCase().trim(),
+      }))
+  }
+  return _iconList
+}
+
+const filteredIcons = computed(() => {
+  const all = getIconList()
+  const q = iconPickerQuery.value.toLowerCase().trim()
+  if (!q) return all.slice(0, 60)
+  const matches = all.filter(i => i.keywords.includes(q) || i.name.toLowerCase().includes(q))
+  return matches.slice(0, 60)
+})
+
+function openIconPicker(itemId: string) {
+  iconPickerTargetId.value = itemId
+  iconPickerQuery.value = ''
+  showIconPicker.value = true
+}
+
+function selectIcon(iconName: string) {
+  if (!iconPickerTargetId.value) return
+  const item = items.value.find(i => i.id === iconPickerTargetId.value)
+  if (item) {
+    item.icon = iconName
+    emitUpdate()
+  }
+  showIconPicker.value = false
+  iconPickerTargetId.value = null
+}
+
+function clearIcon(itemId: string) {
+  const item = items.value.find(i => i.id === itemId)
+  if (item) {
+    item.icon = ''
+    emitUpdate()
+  }
+}
+
 // ── Lesson sub-item import ────────────────────────────────────────────
 
 /** Map lesson item type → collection name and field key */
@@ -593,6 +686,7 @@ async function importLessonChildren(id: string) {
       title: si.title,
       path: slugify(si.title),
       content: `${si.collection}/${si.slug}`,
+      icon: '',
       depth: childDepth,
       imported: true,
       locked: true,
@@ -1064,9 +1158,22 @@ const totalCount = computed(() => items.value.length)
         <ListTree class="h-4 w-4 text-muted-foreground" />
         Outline
       </label>
-      <span class="text-xs text-muted-foreground">
-        {{ sectionCount }} section{{ sectionCount !== 1 ? 's' : '' }} · {{ totalCount }} item{{ totalCount !== 1 ? 's' : '' }}
-      </span>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] transition-colors"
+          :class="showIcons ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-accent'"
+          title="Toggle item icons"
+          @click="showIcons = !showIcons"
+        >
+          <Eye v-if="showIcons" class="h-3 w-3" />
+          <EyeOff v-else class="h-3 w-3" />
+          Icons
+        </button>
+        <span class="text-xs text-muted-foreground">
+          {{ sectionCount }} section{{ sectionCount !== 1 ? 's' : '' }} · {{ totalCount }} item{{ totalCount !== 1 ? 's' : '' }}
+        </span>
+      </div>
     </div>
 
     <!-- Tree -->
@@ -1155,6 +1262,27 @@ const totalCount = computed(() => items.value.length)
             class="relative z-10 w-1.5 h-1.5 rounded-full bg-border"
           />
         </div>
+
+        <!-- Item icon (when icons are enabled) -->
+        <button
+          v-if="showIcons && getItemIcon(item)"
+          type="button"
+          class="shrink-0 w-5 h-5 flex items-center justify-center rounded hover:bg-accent transition-colors"
+          :class="item.icon ? 'text-primary' : 'text-muted-foreground/60'"
+          :title="item.icon ? `Icon: ${item.icon} (click to change)` : 'Set custom icon'"
+          @click.stop="openIconPicker(item.id)"
+        >
+          <component :is="getItemIcon(item)" class="h-3.5 w-3.5" />
+        </button>
+        <button
+          v-else-if="showIcons && !getItemIcon(item)"
+          type="button"
+          class="shrink-0 w-5 h-5 flex items-center justify-center rounded text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-accent transition-colors opacity-0 group-hover:opacity-100"
+          title="Set icon"
+          @click.stop="openIconPicker(item.id)"
+        >
+          <ImageIcon class="h-3.5 w-3.5" />
+        </button>
 
         <!-- Title: display mode (draggable) or edit mode (input) -->
         <div v-if="editingId !== item.id" :class="['flex-1 min-w-0 flex items-center h-full select-none', item.imported && item.locked ? 'cursor-default' : 'cursor-grab active:cursor-grabbing']" @dblclick.stop="!(item.imported && item.locked) && startEditing(item.id)">
@@ -1364,6 +1492,58 @@ const totalCount = computed(() => items.value.length)
             <RefreshCw class="h-3.5 w-3.5 mr-1.5" />
             Refresh
           </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <!-- ═══ Icon Picker Dialog ═══ -->
+    <Dialog v-model:open="showIconPicker">
+      <DialogContent class="max-w-lg max-h-[70vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Choose Icon</DialogTitle>
+          <DialogDescription>
+            Search the Lucide icon library to assign a custom icon.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="relative">
+          <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            v-model="iconPickerQuery"
+            placeholder="Search icons…"
+            class="pl-10"
+          />
+        </div>
+
+        <div class="flex-1 overflow-y-auto min-h-0 -mx-2 px-2">
+          <div v-if="filteredIcons.length === 0" class="flex flex-col items-center justify-center py-8 text-center">
+            <Search class="h-6 w-6 text-muted-foreground/40 mb-2" />
+            <p class="text-sm text-muted-foreground">No icons match &ldquo;{{ iconPickerQuery }}&rdquo;</p>
+          </div>
+          <div v-else class="grid grid-cols-6 gap-1 py-2">
+            <button
+              v-for="ic in filteredIcons"
+              :key="ic.name"
+              type="button"
+              class="flex flex-col items-center justify-center gap-1 rounded-md p-2 transition-colors hover:bg-accent group/icon"
+              :title="ic.name"
+              @click="selectIcon(ic.name)"
+            >
+              <component :is="resolveIconComponent(ic.name)" class="h-5 w-5 text-foreground" />
+              <span class="text-[9px] text-muted-foreground truncate w-full text-center">{{ ic.name }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2 border-t">
+          <button
+            type="button"
+            class="text-xs text-destructive hover:underline"
+            @click="() => { if (iconPickerTargetId) { clearIcon(iconPickerTargetId); showIconPicker = false; iconPickerTargetId = null } }"
+          >
+            Remove icon
+          </button>
+          <Button variant="ghost" size="sm" @click="showIconPicker = false">Cancel</Button>
         </div>
       </DialogContent>
     </Dialog>

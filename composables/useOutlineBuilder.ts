@@ -63,6 +63,7 @@ export interface OutlineNode {
   title: string
   path?: string
   content?: string
+  icon?: string
   items?: OutlineNode[]
 }
 

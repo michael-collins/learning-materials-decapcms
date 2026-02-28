@@ -130,6 +130,11 @@ const openCommandPalette = () => {
 const bookSearchQuery = ref('')
 const bookSearchInputRef = ref<HTMLInputElement | null>(null)
 
+// Introduction link active state (active when on the book index page)
+const isIntroductionActive = computed(() => {
+  return route.path === `/books/${bookSlug.value}` || route.path === `/books/${bookSlug.value}/`
+})
+
 function filterTree(nodes: SidebarNode[], query: string): SidebarNode[] {
   if (!query) return nodes
   const q = query.toLowerCase()
@@ -196,14 +201,14 @@ const filteredSidebarTree = computed(() =>
       <div :class="['flex flex-col h-full', !isMobile && isDesktopCollapsed && 'invisible']">
         <!-- Book title header -->
         <div :class="[
-          'flex h-14 items-center justify-between px-4 border-b shrink-0',
-          rootClass === 'theme-lambda' ? 'uppercase tracking-tight text-xs' : '',
+          'flex items-center justify-between px-4 shrink-0',
+          rootClass === 'theme-lambda' ? 'h-14 tracking-tight text-xs' : 'h-14 border-b',
         ]">
           <NuxtLink
             :to="`/books/${bookSlug}`"
             class="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors truncate"
           >
-            <BookOpen class="h-4 w-4 shrink-0" />
+            <BookOpen v-if="rootClass !== 'theme-lambda'" class="h-4 w-4 shrink-0" />
             <span class="truncate">{{ bookTitle || 'Book' }}</span>
           </NuxtLink>
           <Button
@@ -219,8 +224,21 @@ const filteredSidebarTree = computed(() =>
         </div>
 
         <!-- Sidebar tree navigation -->
-        <nav class="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 min-h-0" aria-label="Book navigation">
-          <BookSidebarTree :nodes="filteredSidebarTree" :book-slug="bookSlug" :toggled-sections="toggledSections" @toggle="toggleSection" />
+        <nav :class="['flex-1 overflow-y-auto overflow-x-hidden px-2 min-h-0', rootClass === 'theme-lambda' ? 'pt-4 pb-3' : 'py-3']" aria-label="Book navigation">
+          <!-- Introduction link (book front page) -->
+          <NuxtLink
+            :to="`/books/${bookSlug}`"
+            :class="[
+              'flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors mb-1',
+              isIntroductionActive
+                ? 'bg-primary/10 text-primary font-medium'
+                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+            ]"
+          >
+            <span :class="['break-words text-left min-w-0', rootClass === 'theme-lambda' && 'uppercase tracking-wide']">Introduction</span>
+          </NuxtLink>
+
+          <BookSidebarTree :nodes="filteredSidebarTree" :book-slug="bookSlug" :toggled-sections="toggledSections" :uppercase-top-level="rootClass === 'theme-lambda'" @toggle="toggleSection" />
           <p v-if="bookSearchQuery && filteredSidebarTree.length === 0" class="px-2 py-4 text-xs text-muted-foreground text-center">
             No results for "{{ bookSearchQuery }}"
           </p>
