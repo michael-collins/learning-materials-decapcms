@@ -13,10 +13,13 @@ learningObjectives:
   - Apply textures to 3D models
   - Create and configure PBR materials
   - Minimize texture stretching and distortion
-items:
-  - type: lectures
-    __typename: lectures
-    lecture: introduction-to-texturing
+outline:
+  - title: Lectures
+    path: lectures
+    items:
+      - title: Introduction to Texturing
+        path: introduction-to-texturing
+        content: lectures/introduction-to-texturing
 published: true
 allowEmbed: true
 author: Michael Collins

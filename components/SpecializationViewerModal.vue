@@ -301,20 +301,32 @@ const getItemIcon = (type: string) => {
 }
 
 /**
- * Returns items grouped with category dividers inserted when categoryTitle changes.
- * Each entry is either { kind: 'category', title } or { kind: 'item', item, flatIndex }.
+ * Returns items grouped with category and sub-category dividers inserted when
+ * categoryTitle / subCategoryTitle changes.
+ * Each entry is one of:
+ *   { kind: 'category', title, level: 0 }   — primary heading
+ *   { kind: 'category', title, level: 1 }   — sub-heading (indented)
+ *   { kind: 'item', item, flatIndex }
  */
 const getGroupedItems = (lesson: any): Array<
-  | { kind: 'category'; title: string }
+  | { kind: 'category'; title: string; level: number }
   | { kind: 'item'; item: any; flatIndex: number }
 > => {
   if (!lesson?.items?.length) return []
-  const result: Array<{ kind: 'category'; title: string } | { kind: 'item'; item: any; flatIndex: number }> = []
+  const result: Array<{ kind: 'category'; title: string; level: number } | { kind: 'item'; item: any; flatIndex: number }> = []
   let lastCategory: string | undefined = undefined
+  let lastSubCategory: string | undefined = undefined
   lesson.items.forEach((item: any, idx: number) => {
+    // Primary category divider
     if (item.categoryTitle && item.categoryTitle !== lastCategory) {
-      result.push({ kind: 'category', title: item.categoryTitle })
+      result.push({ kind: 'category', title: item.categoryTitle, level: 0 })
       lastCategory = item.categoryTitle
+      lastSubCategory = undefined // reset sub-category on new primary
+    }
+    // Sub-category divider (only emit when there's actually a sub-category distinct from category)
+    if (item.subCategoryTitle && item.subCategoryTitle !== lastSubCategory) {
+      result.push({ kind: 'category', title: item.subCategoryTitle, level: 1 })
+      lastSubCategory = item.subCategoryTitle
     }
     result.push({ kind: 'item', item, flatIndex: idx })
   })
@@ -667,15 +679,23 @@ onBeforeUnmount(() => {
                     <!-- Content items (grouped by category when outline-based) -->
                     <template
                       v-for="entry in getGroupedItems(lesson)"
-                      :key="entry.kind === 'item' ? `${entry.item.type}-${entry.item.slug}` : `cat-${entry.title}`"
+                      :key="entry.kind === 'item' ? `${entry.item.type}-${entry.item.slug}` : `cat-${entry.level}-${entry.title}`"
                     >
-                      <!-- Category divider -->
+                      <!-- Primary category divider (level 0) -->
                       <div
-                        v-if="entry.kind === 'category'"
-                        class="flex items-center gap-2 pt-2 pb-1"
+                        v-if="entry.kind === 'category' && entry.level === 0"
+                        class="flex items-center gap-2 pt-3 pb-1"
                       >
                         <span class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">{{ entry.title }}</span>
                         <div class="flex-1 h-px bg-border/50" />
+                      </div>
+                      <!-- Sub-category divider (level 1) -->
+                      <div
+                        v-else-if="entry.kind === 'category' && entry.level === 1"
+                        class="flex items-center gap-2 pt-2 pb-0.5 pl-4"
+                      >
+                        <span class="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/50">{{ entry.title }}</span>
+                        <div class="flex-1 h-px bg-border/30" />
                       </div>
                       <!-- Item button -->
                       <button

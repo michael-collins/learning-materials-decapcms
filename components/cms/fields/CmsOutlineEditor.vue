@@ -1227,21 +1227,56 @@ function stopEditing() {
 
 // ── Drag & Drop ───────────────────────────────────────────────────────
 
+// Long-press to auto-collapse subtree before dragging
+const longPressTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+const longPressId = ref<string | null>(null)
+
+function hasChildrenById(id: string): boolean {
+  const idx = items.value.findIndex(i => i.id === id)
+  return idx >= 0 && hasChildren(idx)
+}
+
+function onPointerDown(_event: PointerEvent, id: string) {
+  if (!hasChildrenById(id) || collapsedIds.value.has(id)) return
+  longPressId.value = id
+  longPressTimer.value = setTimeout(() => {
+    if (longPressId.value === id) {
+      collapsedIds.value.add(id)
+      longPressId.value = null
+      longPressTimer.value = null
+    }
+  }, 2000)
+}
+
+function cancelLongPress() {
+  if (longPressTimer.value) {
+    clearTimeout(longPressTimer.value)
+    longPressTimer.value = null
+  }
+  longPressId.value = null
+}
+
 const draggedId = ref<string | null>(null)
 const dragOverId = ref<string | null>(null)
-const dragPosition = ref<'before' | 'after'>('after')
+const dragPosition = ref<'before' | 'after' | 'child'>('after')
+/** Whether the last drop was a cross-item drop (so onDragEnd skips depth-only apply) */
+const droppedOnOther = ref(false)
 
 const dragStartX = ref(0)
+const dragCurrentX = ref<number | null>(null)
 const dragOriginalDepth = ref(0)
 const dragPreviewDepth = ref<number | null>(null)
 const INDENT_PX = 20
 
 function onDragStart(event: DragEvent, id: string) {
+  cancelLongPress()
   draggedId.value = id
   dragStartX.value = event.clientX
+  dragCurrentX.value = event.clientX
   const item = items.value.find(i => i.id === id)
   dragOriginalDepth.value = item?.depth ?? 0
   dragPreviewDepth.value = null
+  droppedOnOther.value = false
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.setData('text/plain', id)
@@ -1256,7 +1291,9 @@ function onDragEnd(event: DragEvent) {
   const el = (event.target as HTMLElement).closest('[data-outline-item]') as HTMLElement | null
   if (el) el.style.opacity = ''
 
-  if (draggedId.value && dragPreviewDepth.value !== null) {
+  // Only apply a depth-only change when we didn't do a cross-item drop
+  // (cross-item drop already applied position + depth inside onDrop)
+  if (!droppedOnOther.value && draggedId.value && dragPreviewDepth.value !== null) {
     const item = items.value.find(i => i.id === draggedId.value)
     if (item && dragPreviewDepth.value !== item.depth) {
       item.depth = dragPreviewDepth.value
@@ -1267,32 +1304,83 @@ function onDragEnd(event: DragEvent) {
   draggedId.value = null
   dragOverId.value = null
   dragPreviewDepth.value = null
+  droppedOnOther.value = false
+}
+
+/**
+ * Compute the constrained depth preview for the dragged item.
+ * Always driven by horizontal mouse offset from drag-start so that both
+ * indent and position can be adjusted simultaneously.
+ *
+ * When inserting before/after a target the depth is clamped so it can't
+ * exceed (neighbor + 1). For 'child' drops depth is forced to targetDepth+1
+ * so horizontal movement doesn't override the explicit nest intent.
+ */
+function computePreviewDepth(targetId: string | null): number {
+  const deltaX = (dragCurrentX.value ?? dragStartX.value) - dragStartX.value
+  const depthChange = Math.round(deltaX / INDENT_PX)
+  let newDepth = Math.max(0, Math.min(3, dragOriginalDepth.value + depthChange))
+
+  if (targetId && targetId !== draggedId.value) {
+    const targetIdx = items.value.findIndex(i => i.id === targetId)
+    if (targetIdx >= 0) {
+      if (dragPosition.value === 'child') {
+        // For child mode, force depth to exactly targetDepth + 1
+        newDepth = Math.min(3, items.value[targetIdx]!.depth + 1)
+      } else {
+        // For before/after: max depth is prev-sibling-depth + 1
+        const refIdx = dragPosition.value === 'before'
+          ? Math.max(0, targetIdx - 1)
+          : targetIdx
+        const refDepth = items.value[refIdx]!.depth
+        newDepth = Math.min(newDepth, refDepth + 1)
+      }
+    }
+  } else if (targetId === draggedId.value) {
+    // Hovering over self: constrain by previous sibling
+    const idx = items.value.findIndex(i => i.id === targetId)
+    if (idx > 0) {
+      newDepth = Math.min(newDepth, items.value[idx - 1]!.depth + 1)
+    }
+  }
+
+  return newDepth
 }
 
 function onDragOver(event: DragEvent, id: string) {
   event.preventDefault()
   if (!draggedId.value) return
+  if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
+
+  // Always track horizontal position for depth preview
+  dragCurrentX.value = event.clientX
 
   if (draggedId.value === id) {
-    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
-    const deltaX = event.clientX - dragStartX.value
-    const depthChange = Math.round(deltaX / INDENT_PX)
-    const idx = items.value.findIndex(i => i.id === id)
-    let newDepth = Math.max(0, Math.min(3, dragOriginalDepth.value + depthChange))
-    if (idx > 0) {
-      const prevDepth = items.value[idx - 1]!.depth
-      newDepth = Math.min(newDepth, prevDepth + 1)
-    }
-    dragPreviewDepth.value = newDepth
+    // Hovering over self: only depth changes (no position target)
+    dragPreviewDepth.value = computePreviewDepth(id)
     return
   }
 
-  if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
+  // Over a different item: determine vertical position
   dragOverId.value = id
 
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  const midY = rect.top + rect.height / 2
-  dragPosition.value = event.clientY < midY ? 'before' : 'after'
+  const relY = event.clientY - rect.top
+  const pct = relY / rect.height
+
+  // Top 30% → before, bottom 30% → after, middle 40% → child
+  if (pct < 0.3) {
+    dragPosition.value = 'before'
+  } else if (pct > 0.7) {
+    dragPosition.value = 'after'
+  } else {
+    const targetIdx = items.value.findIndex(i => i.id === id)
+    const targetDepth = targetIdx >= 0 ? items.value[targetIdx]!.depth : 0
+    dragPosition.value = targetDepth < 3 ? 'child' : 'after'
+  }
+
+  // Depth preview always reflects horizontal offset
+  dragPreviewDepth.value = computePreviewDepth(id)
 }
 
 function onDragLeave(event: DragEvent, id: string) {
@@ -1311,17 +1399,49 @@ function onDrop(event: DragEvent, targetId: string) {
   const toIdx = items.value.findIndex(i => i.id === targetId)
   if (fromIdx < 0 || toIdx < 0) return
 
+  droppedOnOther.value = true
+
   const { start, end } = getSubtreeRange(fromIdx)
   const movedItems = items.value.splice(start, end - start)
 
-  let insertIdx = items.value.findIndex(i => i.id === targetId)
-  if (insertIdx < 0) insertIdx = items.value.length
-  if (dragPosition.value === 'after') insertIdx++
+  if (dragPosition.value === 'child') {
+    // Re-find target after splice (index shifted if dragged was before it)
+    let targetIdx = items.value.findIndex(i => i.id === targetId)
+    if (targetIdx < 0) {
+      items.value.push(...movedItems)
+    } else {
+      const targetDepth = items.value[targetIdx]!.depth
+      const newChildDepth = Math.min(targetDepth + 1, 3)
+      // Adjust all moved items' depths relative to the new parent depth
+      const depthDelta = newChildDepth - movedItems[0]!.depth
+      if (depthDelta !== 0) {
+        movedItems.forEach(mi => { mi.depth = Math.min(3, Math.max(0, mi.depth + depthDelta)) })
+      }
+      // Insert the subtree right after the target's entire subtree
+      const { end: targetEnd } = getSubtreeRange(targetIdx)
+      items.value.splice(targetEnd, 0, ...movedItems)
+      // Expand target so the new children are visible
+      collapsedIds.value.delete(targetId)
+    }
+  } else {
+    // Apply horizontal depth preview to the moved subtree
+    if (dragPreviewDepth.value !== null) {
+      const rootDepth = movedItems[0]!.depth
+      const depthDelta = dragPreviewDepth.value - rootDepth
+      if (depthDelta !== 0) {
+        movedItems.forEach(mi => { mi.depth = Math.min(3, Math.max(0, mi.depth + depthDelta)) })
+      }
+    }
 
-  items.value.splice(insertIdx, 0, ...movedItems)
+    let insertIdx = items.value.findIndex(i => i.id === targetId)
+    if (insertIdx < 0) insertIdx = items.value.length
+    if (dragPosition.value === 'after') insertIdx++
+    items.value.splice(insertIdx, 0, ...movedItems)
+  }
 
   draggedId.value = null
   dragOverId.value = null
+  dragCurrentX.value = null
   emitUpdate()
 }
 
@@ -1441,31 +1561,37 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
           'group relative flex items-center h-8 pl-2 pr-2 transition-colors focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
           item.imported && item.locked ? '' : 'hover:bg-accent/40 focus:bg-accent/30',
           draggedId === item.id ? 'opacity-40' : '',
+          dragOverId === item.id && draggedId !== item.id && dragPosition === 'child' ? 'bg-primary/10 ring-1 ring-inset ring-primary/40' : '',
+          longPressId === item.id ? 'ring-1 ring-inset ring-primary/60 animate-pulse' : '',
         ]"
         @keydown="handleRowKeydown($event, item, realIndex)"
+        @pointerdown="onPointerDown($event, item.id)"
+        @pointerup="cancelLongPress"
+        @pointerleave="cancelLongPress"
         @dragstart="onDragStart($event, item.id)"
         @dragend="onDragEnd"
         @dragover="onDragOver($event, item.id)"
         @dragleave="onDragLeave($event, item.id)"
         @drop="onDrop($event, item.id)"
       >
-        <!-- Drop indicator line -->
+        <!-- Drop indicator line (before / after only — child uses row highlight) -->
         <div
-          v-if="dragOverId === item.id && draggedId !== item.id"
+          v-if="dragOverId === item.id && draggedId !== item.id && dragPosition !== 'child'"
           class="absolute left-0 right-0 z-20 pointer-events-none"
           :class="dragPosition === 'before' ? '-top-px' : '-bottom-px'"
         >
           <div class="h-0.5 bg-primary rounded-full" />
+          <!-- Circle pinned at the preview indent level -->
           <div
-            class="absolute w-2 h-2 rounded-full border-2 border-primary bg-background"
-            :class="dragPosition === 'before' ? '-top-[3px] -left-1' : '-top-[3px] -left-1'"
+            class="absolute w-2.5 h-2.5 rounded-full border-2 border-primary bg-background -top-1"
+            :style="{ left: `${13 + (dragPreviewDepth ?? 0) * 20}px` }"
           />
         </div>
 
         <!-- Tree indent + lines -->
         <div
           class="flex items-center shrink-0 h-full"
-          :style="{ width: `${(draggedId === item.id && dragPreviewDepth !== null ? dragPreviewDepth : item.depth) * 20}px`, transition: draggedId === item.id ? 'width 0.15s ease' : '' }"
+          :style="{ width: `${(draggedId === item.id && dragPreviewDepth !== null ? dragPreviewDepth : item.depth) * 20}px`, transition: draggedId ? 'width 0.1s ease' : '' }"
         >
           <!-- Depth spacers with tree lines -->
           <template v-for="d in item.depth" :key="d">

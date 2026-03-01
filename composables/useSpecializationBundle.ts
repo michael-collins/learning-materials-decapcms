@@ -6,8 +6,10 @@ interface LessonContent {
   title: string
   description?: string
   estimatedDuration?: string
-  /** Category (top-level outline node title) this item belongs to */
+  /** Primary category (top-level outline node title) this item belongs to */
   categoryTitle?: string
+  /** Sub-category (second-level outline node title) this item belongs to */
+  subCategoryTitle?: string
 }
 
 interface LessonBundle {
@@ -98,14 +100,15 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
 
         /**
          * Walk a nested outline node list, collecting content items.
-         * Top-level nodes are treated as categories; their children with
-         * `content` refs become LessonContent items tagged with that category.
-         * Handles arbitrary depth: if a node has both content AND children,
-         * it also emits an item for itself before recursing.
+         * - Depth 0 nodes with children become primary category headers.
+         * - Depth 1 nodes with children become sub-category headers.
+         * - Leaf nodes (with `content`) become LessonContent entries tagged
+         *   with their ancestor category and sub-category titles.
+         * If a node has both `content` AND children, it emits an item for
+         * itself before recursing into its children.
          */
-        const collectOutline = async (nodes: any[], categoryTitle?: string) => {
+        const collectOutline = async (nodes: any[], categoryTitle?: string, subCategoryTitle?: string) => {
           for (const node of nodes) {
-            const currentCategory = categoryTitle ?? node.title
             const hasChildren = Array.isArray(node.items) && node.items.length > 0
 
             if (node.content) {
@@ -125,7 +128,9 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
                       title: (entry as any).title,
                       description: (entry as any).description,
                       estimatedDuration: (entry as any).estimatedDuration,
-                      categoryTitle: hasChildren ? undefined : currentCategory,
+                      // Only tag with category info when this is a leaf (no children)
+                      categoryTitle: hasChildren ? undefined : (categoryTitle ?? node.title),
+                      subCategoryTitle: hasChildren ? undefined : subCategoryTitle,
                     })
                   }
                 } catch { /* skip unresolvable refs */ }
@@ -133,8 +138,16 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
             }
 
             if (hasChildren) {
-              // First level: this node is a category header; recurse with its title as category  
-              await collectOutline(node.items, categoryTitle ? currentCategory : node.title)
+              if (categoryTitle === undefined) {
+                // This is a top-level category node — pass its title down
+                await collectOutline(node.items, node.title, undefined)
+              } else if (subCategoryTitle === undefined) {
+                // This is a second-level node — becomes a sub-category
+                await collectOutline(node.items, categoryTitle, node.title)
+              } else {
+                // Deeper levels — keep sub-category as the closest ancestor grouper
+                await collectOutline(node.items, categoryTitle, node.title)
+              }
             }
           }
         }
