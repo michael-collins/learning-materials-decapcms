@@ -1,7 +1,5 @@
 <script setup>
-import { BookOpen, Download } from 'lucide-vue-next'
-import Button from '~/components/ui/button/Button.vue'
-import { useBookExport } from '~/composables/useBookExport'
+import { BookOpen } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'docs'
@@ -24,9 +22,6 @@ const books = computed(() => {
   })
 })
 
-// Export
-const { exportBook, exporting, progress } = useBookExport()
-
 // Extract slug from path
 function bookSlug(book) {
   const parts = book.path?.split('/').filter(Boolean) || []
@@ -47,11 +42,6 @@ function chapterCount(book) {
   return count
 }
 
-function handleExport(e, book) {
-  e.preventDefault()
-  e.stopPropagation()
-  exportBook(bookSlug(book))
-}
 </script>
 
 <template>
@@ -105,18 +95,9 @@ function handleExport(e, book) {
           </div>
         </NuxtLink>
 
-        <!-- Download button -->
-        <div class="absolute top-2 right-2">
-          <Button
-            variant="secondary"
-            size="icon"
-            class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-            :disabled="exporting"
-            @click="handleExport($event, book)"
-            :aria-label="`Download ${book.title} as ZIP`"
-          >
-            <Download class="h-4 w-4" />
-          </Button>
+        <!-- Export dropdown -->
+        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <BookExportDropdown :book-slug="bookSlug(book)" />
         </div>
       </div>
     </div>
@@ -136,23 +117,5 @@ function handleExport(e, book) {
         </div>
       </div>
     </div>
-
-    <!-- Export progress toast -->
-    <Transition
-      enter-active-class="transition-all duration-200"
-      enter-from-class="translate-y-4 opacity-0"
-      enter-to-class="translate-y-0 opacity-100"
-      leave-active-class="transition-all duration-200"
-      leave-from-class="translate-y-0 opacity-100"
-      leave-to-class="translate-y-4 opacity-0"
-    >
-      <div
-        v-if="progress"
-        class="fixed bottom-6 right-6 z-50 rounded-lg border bg-card px-4 py-3 shadow-lg text-sm flex items-center gap-3"
-      >
-        <div v-if="exporting" class="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
-        {{ progress }}
-      </div>
-    </Transition>
   </div>
 </template>
