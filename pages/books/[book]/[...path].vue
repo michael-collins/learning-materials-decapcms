@@ -54,8 +54,10 @@ const { data: content, pending } = await useAsyncData(
 
 // Provide book data to the layout via useState
 const bookTitleState = useState('book-title', () => book.value?.title || '')
+const bookIntroductionTitleState = useState('book-introduction-title', () => book.value?.introductionTitle || '')
 const bookSlugState = useState('book-slug', () => bookSlug)
 const bookThemeState = useState('book-theme', () => book.value?.theme || 'default')
+const bookThemeOverridesState = useState('book-theme-overrides', () => book.value?.themeOverrides ?? null)
 const sidebarTreeState = useState('book-sidebar-tree', () =>
   book.value?.outline ? buildSidebarTree(book.value.outline, chapterPath) : []
 )
@@ -72,8 +74,10 @@ const nextState = useState('book-next', () =>
 
 watchEffect(() => {
   bookTitleState.value = book.value?.title || ''
+  bookIntroductionTitleState.value = book.value?.introductionTitle || ''
   bookSlugState.value = bookSlug
   bookThemeState.value = book.value?.theme || 'default'
+  bookThemeOverridesState.value = book.value?.themeOverrides ?? null
   sidebarTreeState.value = book.value?.outline
     ? buildSidebarTree(book.value.outline, chapterPath)
     : []
@@ -113,8 +117,22 @@ const contentAttachments = computed(() => {
   return Array.isArray(a) ? a : []
 })
 const contentAiLicense = computed(() => content.value?.aiLicense || null)
-const contentAuthor = computed(() => content.value?.author || '')
-const contentAuthorUrl = computed(() => content.value?.authorUrl || '')
+// Normalize page-level authors: prefers `authors` array, falls back to `author`/`authorUrl` string
+const contentAuthors = computed(() => {
+  const a = content.value?.authors
+  if (Array.isArray(a) && a.length > 0) return a
+  const name = content.value?.author
+  if (name) return [{ name, url: content.value?.authorUrl || '' }]
+  return []
+})
+// Normalize book-level authors the same way
+const bookAuthors = computed(() => {
+  const a = book.value?.authors
+  if (Array.isArray(a) && a.length > 0) return a
+  const name = book.value?.author
+  if (name) return [{ name, url: book.value?.authorUrl || '' }]
+  return []
+})
 const contentLicense = computed(() => content.value?.license || '')
 const contentDate = computed(() => content.value?.date || '')
 const contentDescription = computed(() => content.value?.description || '')
@@ -309,23 +327,44 @@ function getLicenseUrl(license) {
       <AIULComponent v-if="contentAiLicense" :license="contentAiLicense" />
 
       <!-- License footer -->
-      <div v-if="contentLicense || contentAuthor || book?.license" class="mt-12 pt-6 border-t text-xs text-muted-foreground">
+      <div v-if="contentLicense || contentAuthors.length > 0 || book?.license" class="mt-12 pt-6 border-t text-xs text-muted-foreground">
         <p>
-          <template v-if="contentLicense || contentAuthor">
+          <template v-if="contentLicense || contentAuthors.length > 0">
             This content is licensed under
             <a v-if="getLicenseUrl(contentLicense)" :href="getLicenseUrl(contentLicense)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ contentLicense }}</a>
             <span v-else class="font-medium">{{ contentLicense || book?.license }}</span>
-            <template v-if="contentAuthor">
+            <template v-if="contentAuthors.length > 0">
               by
-              <a v-if="contentAuthorUrl" :href="contentAuthorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ contentAuthor }}</a>
-              <span v-else class="font-medium">{{ contentAuthor }}</span>
+              <template v-for="(a, i) in contentAuthors" :key="a.name">
+                <a v-if="a.url" :href="a.url" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ a.name }}</a>
+                <span v-else class="font-medium">{{ a.name }}</span>
+                <span v-if="i < contentAuthors.length - 1">, </span>
+              </template>
             </template>.
           </template>
           <template v-else-if="book?.license">
             This content is licensed under
             <span class="font-medium">{{ book.license }}</span>
-            <template v-if="book.author"> by {{ book.author }}</template>.
+            <template v-if="bookAuthors.length > 0">
+              by
+              <template v-for="(a, i) in bookAuthors" :key="a.name">
+                <a v-if="a.url" :href="a.url" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ a.name }}</a>
+                <span v-else class="font-medium">{{ a.name }}</span>
+                <span v-if="i < bookAuthors.length - 1">, </span>
+              </template>
+            </template>.
           </template>
+        </p>
+        <!-- Show book attribution when page has a different contributor -->
+        <p v-if="contentAuthors.length > 0 && bookAuthors.length > 0" class="mt-1">
+          From
+          <NuxtLink :to="`/books/${bookSlug}`" class="font-medium text-primary hover:underline">{{ book?.title }}</NuxtLink>
+          by
+          <template v-for="(a, i) in bookAuthors" :key="a.name">
+            <a v-if="a.url" :href="a.url" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline">{{ a.name }}</a>
+            <span v-else class="font-medium">{{ a.name }}</span>
+            <span v-if="i < bookAuthors.length - 1">, </span>
+          </template>.
         </p>
       </div>
     </div>

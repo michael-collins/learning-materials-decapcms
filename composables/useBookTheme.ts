@@ -8,7 +8,7 @@
  *
  * Available themes:
  *   - default: Current site styling (no overrides, uses built-in Twitter theme)
- *   - lambda:  Purple-accented tech aesthetic inspired by lambda.ai
+   *   - lambda:  Blue-accented tech aesthetic inspired by lambda.ai
  *   - minimal: Clean serif reading experience with warm tones
  */
 
@@ -54,51 +54,51 @@ const themes: Record<BookTheme, ThemeConfig> = {
     header: { class: '' },
   },
 
-  /* ── Lambda (cyberpunk tech — inspired by lambda.ai) ──────────── */
+  /* ── Lambda (clean tech — blue accent) ──────────────────────────── */
   lambda: {
     label: 'Lambda',
     rootClass: 'theme-lambda',
     light: {
       '--color-background':           'oklch(1 0 0)',           // pure white
-      '--color-foreground':           'oklch(0.10 0.02 290)',   // near-black
-      '--color-card':                 'oklch(0.97 0.003 290)',
-      '--color-card-foreground':      'oklch(0.10 0.02 290)',
+      '--color-foreground':           'oklch(0.10 0.02 250)',   // near-black
+      '--color-card':                 'oklch(0.97 0.003 250)',
+      '--color-card-foreground':      'oklch(0.10 0.02 250)',
       '--color-popover':              'oklch(1 0 0)',
-      '--color-popover-foreground':   'oklch(0.10 0.02 290)',
-      '--color-primary':              'oklch(0.50 0.28 293)',   // deep electric violet
+      '--color-popover-foreground':   'oklch(0.10 0.02 250)',
+      '--color-primary':              'oklch(0.50 0.28 250)',   // deep electric blue
       '--color-primary-foreground':   'oklch(1 0 0)',
-      '--color-secondary':            'oklch(0.10 0.02 290)',   // near-black
+      '--color-secondary':            'oklch(0.10 0.02 250)',   // near-black
       '--color-secondary-foreground': 'oklch(1 0 0)',           // white
-      '--color-muted':                'oklch(0.95 0.005 290)',
-      '--color-muted-foreground':     'oklch(0.40 0.02 290)',
-      '--color-accent':               'oklch(0.10 0.02 290)',   // full reverse hover bg
+      '--color-muted':                'oklch(0.95 0.005 250)',
+      '--color-muted-foreground':     'oklch(0.40 0.02 250)',
+      '--color-accent':               'oklch(0.10 0.02 250)',   // full reverse hover bg
       '--color-accent-foreground':    'oklch(1 0 0)',           // full reverse hover text
       '--color-destructive':          'oklch(0.62 0.24 26)',
       '--color-destructive-foreground':'oklch(1 0 0)',
-      '--color-border':               'oklch(0.82 0.04 293)',   // violet-tinted border
-      '--color-input':                'oklch(0.92 0.01 290)',
-      '--color-ring':                 'oklch(0.50 0.28 293)',
+      '--color-border':               'oklch(0.82 0.04 250)',   // blue-tinted border
+      '--color-input':                'oklch(0.92 0.01 250)',
+      '--color-ring':                 'oklch(0.50 0.28 250)',
     },
     dark: {
       '--color-background':           'oklch(0 0 0)',           // pure black
       '--color-foreground':           'oklch(0.95 0 0)',        // near-white
-      '--color-card':                 'oklch(0.06 0.005 290)',  // barely off-black
+      '--color-card':                 'oklch(0.06 0.005 250)',  // barely off-black
       '--color-card-foreground':      'oklch(0.95 0 0)',
-      '--color-popover':              'oklch(0.06 0.005 290)',
+      '--color-popover':              'oklch(0.06 0.005 250)',
       '--color-popover-foreground':   'oklch(0.95 0 0)',
-      '--color-primary':              'oklch(0.65 0.28 293)',   // bright electric violet
+      '--color-primary':              'oklch(0.65 0.28 250)',   // bright electric blue
       '--color-primary-foreground':   'oklch(0 0 0)',
       '--color-secondary':            'oklch(0.95 0 0)',        // near-white
       '--color-secondary-foreground': 'oklch(0 0 0)',           // black
-      '--color-muted':                'oklch(0.12 0.005 290)',
-      '--color-muted-foreground':     'oklch(0.55 0.02 290)',
+      '--color-muted':                'oklch(0.12 0.005 250)',
+      '--color-muted-foreground':     'oklch(0.55 0.02 250)',
       '--color-accent':               'oklch(0.95 0 0)',        // full reverse hover bg
       '--color-accent-foreground':    'oklch(0 0 0)',           // full reverse hover text
       '--color-destructive':          'oklch(0.62 0.24 26)',
       '--color-destructive-foreground':'oklch(1 0 0)',
-      '--color-border':               'oklch(0.25 0.06 293)',   // thin violet-tinted border
-      '--color-input':                'oklch(0.15 0.02 290)',
-      '--color-ring':                 'oklch(0.65 0.28 293)',
+      '--color-border':               'oklch(0.25 0.06 250)',   // thin blue-tinted border
+      '--color-input':                'oklch(0.15 0.02 250)',
+      '--color-ring':                 'oklch(0.65 0.28 250)',
     },
     sidebar: { class: 'border-r-[1px]' },
     content: {
@@ -167,12 +167,27 @@ const themes: Record<BookTheme, ThemeConfig> = {
 /*  Composable                                                         */
 /* ------------------------------------------------------------------ */
 
+/** Export the raw themes map for direct color lookup without composable context */
+export { themes }
+
+export type BookThemeOverrides = {
+  light?: Record<string, string>
+  dark?: Record<string, string>
+}
+
 /**
  * Get the theme configuration for a book.
  * Reactive to the current color mode — returns the correct CSS variable
  * overrides for light or dark automatically.
+ *
+ * @param themeOverrides  Per-book overrides from frontmatter. Keys are the
+ *   short variable name without the `--color-` prefix (e.g. `primary`,
+ *   `background`). Values are any valid CSS color (typically oklch()).
  */
-export function useBookTheme(themeName?: MaybeRef<string | null | undefined>) {
+export function useBookTheme(
+  themeName?: MaybeRef<string | null | undefined>,
+  themeOverrides?: MaybeRef<BookThemeOverrides | null | undefined>,
+) {
   const { isDark } = useTheme()
 
   const name = computed<BookTheme>(() => {
@@ -184,8 +199,17 @@ export function useBookTheme(themeName?: MaybeRef<string | null | undefined>) {
 
   /** Inline style string with the active CSS variable overrides */
   const cssVarStyle = computed(() => {
-    const vars = isDark.value ? config.value.dark : config.value.light
-    const entries = Object.entries(vars)
+    const baseVars = isDark.value ? config.value.dark : config.value.light
+    const overrides = toValue(themeOverrides)
+    const overrideMap = overrides
+      ? (isDark.value ? overrides.dark : overrides.light) ?? {}
+      : {}
+    // Prepend --color- to short override keys, then merge on top of base vars
+    const overrideVars = Object.fromEntries(
+      Object.entries(overrideMap).map(([k, v]) => [`--color-${k}`, v])
+    )
+    const merged = { ...baseVars, ...overrideVars }
+    const entries = Object.entries(merged)
     if (!entries.length) return ''
     return entries.map(([k, v]) => `${k}: ${v}`).join('; ')
   })

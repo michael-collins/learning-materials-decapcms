@@ -43,7 +43,7 @@ const hiddenFields = computed(() =>
 )
 
 // ─── Collapse state ─────────────────────────────────────────
-const isCollapsed = ref(false)
+const isCollapsed = ref(props.field.collapsed === true)
 
 function toggleCollapse() {
   isCollapsed.value = !isCollapsed.value

@@ -20,8 +20,10 @@ useHead({
 
 // Provide book data to the layout via useState
 const bookTitleState = useState('book-title', () => book.value?.title || '')
+const bookIntroductionTitleState = useState('book-introduction-title', () => book.value?.introductionTitle || '')
 const bookSlugState = useState('book-slug', () => bookSlug)
 const bookThemeState = useState('book-theme', () => book.value?.theme || 'default')
+const bookThemeOverridesState = useState('book-theme-overrides', () => book.value?.themeOverrides ?? null)
 const sidebarTreeState = useState('book-sidebar-tree', () =>
   book.value?.outline ? buildSidebarTree(book.value.outline, '') : []
 )
@@ -30,8 +32,10 @@ const nextState = useState('book-next', () => null)
 
 watchEffect(() => {
   bookTitleState.value = book.value?.title || ''
+  bookIntroductionTitleState.value = book.value?.introductionTitle || ''
   bookSlugState.value = bookSlug
   bookThemeState.value = book.value?.theme || 'default'
+  bookThemeOverridesState.value = book.value?.themeOverrides ?? null
   sidebarTreeState.value = book.value?.outline
     ? buildSidebarTree(book.value.outline, '')
     : []

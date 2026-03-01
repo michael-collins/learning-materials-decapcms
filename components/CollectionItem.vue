@@ -31,6 +31,7 @@ interface Props {
   title: string
   description?: string
   date?: string
+  authors?: { name: string, url?: string }[]
   author?: string
   authorUrl?: string
   difficulty?: string
@@ -64,6 +65,12 @@ console.log('[CollectionItem] License prop:', props.license)
 console.log('[CollectionItem] Author prop:', props.author)
 console.log('[CollectionItem] Prerequisites prop:', props.prerequisites)
 
+// Normalize to authors array — prefers `authors` array, falls back to `author`/`authorUrl` string
+const resolvedAuthors = computed(() => {
+  if (props.authors && props.authors.length > 0) return props.authors
+  if (props.author) return [{ name: props.author, url: props.authorUrl || '' }]
+  return []
+})
 const { toggle: toggleBodyOverflow } = useBodyOverflow()
 
 // Content references / citations system
@@ -336,8 +343,8 @@ const generateCitation = () => {
   // Generate APA-style citation
   let citation = ''
   
-  if (props.author) {
-    citation += `${props.author}. `
+  if (resolvedAuthors.value.length > 0) {
+    citation += `${resolvedAuthors.value.map(a => a.name).join(', ')}. `
   }
   
   if (props.date) {
@@ -562,15 +569,18 @@ const copyCitation = async () => {
     <AIULComponent v-if="aiLicense && shouldShowAILicense" :license="aiLicense" />
 
     <!-- License or Copyright -->
-    <div v-if="license || author" class="container max-w-4xl mx-auto mt-12 pt-4 border-t">
+    <div v-if="license || resolvedAuthors.length > 0" class="container max-w-4xl mx-auto mt-12 pt-4 border-t">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p class="text-sm text-muted-foreground leading-relaxed">
             <a :href="currentUrl" class="font-medium text-foreground hover:text-primary transition-colors" :aria-label="`View ${title}`">{{ title }}</a>
-            <span v-if="author">
-              by 
-              <a v-if="authorUrl" :href="authorUrl" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline transition-colors">{{ author }}</a>
-              <span v-else class="font-medium text-foreground">{{ author }}</span>
-            </span>
+            <template v-if="resolvedAuthors.length > 0">
+              by
+              <template v-for="(a, i) in resolvedAuthors" :key="a.name">
+                <a v-if="a.url" :href="a.url" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline transition-colors">{{ a.name }}</a>
+                <span v-else class="font-medium text-foreground">{{ a.name }}</span>
+                <span v-if="i < resolvedAuthors.length - 1">, </span>
+              </template>
+            </template>
             <span v-if="license">
               is licensed under
               <a v-if="getLicenseUrl(license)" :href="getLicenseUrl(license)" target="_blank" rel="noopener noreferrer" class="font-medium text-primary hover:underline" :aria-label="`View ${license} license details`" :title="`View ${license} license details`">{{ license }}</a>
@@ -579,8 +589,8 @@ const copyCitation = async () => {
           </p>
           <CitationDropdown 
             :title="title"
-            :author="author"
-            :author-url="authorUrl"
+            :author="resolvedAuthors[0]?.name"
+            :author-url="resolvedAuthors[0]?.url"
             :date="date"
             :license="license"
             :version="version"

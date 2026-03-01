@@ -300,6 +300,27 @@ const getItemIcon = (type: string) => {
   }
 }
 
+/**
+ * Returns items grouped with category dividers inserted when categoryTitle changes.
+ * Each entry is either { kind: 'category', title } or { kind: 'item', item, flatIndex }.
+ */
+const getGroupedItems = (lesson: any): Array<
+  | { kind: 'category'; title: string }
+  | { kind: 'item'; item: any; flatIndex: number }
+> => {
+  if (!lesson?.items?.length) return []
+  const result: Array<{ kind: 'category'; title: string } | { kind: 'item'; item: any; flatIndex: number }> = []
+  let lastCategory: string | undefined = undefined
+  lesson.items.forEach((item: any, idx: number) => {
+    if (item.categoryTitle && item.categoryTitle !== lastCategory) {
+      result.push({ kind: 'category', title: item.categoryTitle })
+      lastCategory = item.categoryTitle
+    }
+    result.push({ kind: 'item', item, flatIndex: idx })
+  })
+  return result
+}
+
 // Calculate current item position in the entire specialization
 const getCurrentItemNumber = () => {
   let itemNumber = 0
@@ -643,31 +664,44 @@ onBeforeUnmount(() => {
                       </div>
                     </button>
                     
-                    <!-- Content items -->
-                    <button
-                      v-for="(item, itemIdx) in lesson.items"
-                      :key="`${item.type}-${item.slug}`"
-                      type="button"
-                      :aria-current="selectedLessonIndex === lessonIdx && selectedItemIndex === itemIdx ? 'location' : undefined"
-                      :aria-label="`${item.type}: ${item.title}${item.estimatedDuration ? '. Duration: ' + item.estimatedDuration : ''}`"
-                      class="w-full flex items-start gap-3 p-3 rounded-lg transition-all group text-left"
-                      :class="[
-                        selectedLessonIndex === lessonIdx && selectedItemIndex === itemIdx
-                          ? 'bg-primary/10'
-                          : 'hover:bg-muted/50'
-                      ]"
-                      @click="selectLesson(lessonIdx as number); selectItem(itemIdx as number)"
+                    <!-- Content items (grouped by category when outline-based) -->
+                    <template
+                      v-for="entry in getGroupedItems(lesson)"
+                      :key="entry.kind === 'item' ? `${entry.item.type}-${entry.item.slug}` : `cat-${entry.title}`"
                     >
-                      <component :is="getItemIcon(item.type)" class="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
-                          <span class="text-xs uppercase tracking-[0.08em] text-muted-foreground font-semibold">{{ item.type }}</span>
-                          <span v-if="item.estimatedDuration" class="text-xs text-muted-foreground">| {{ item.estimatedDuration }}</span>
-                        </div>
-                        <h5 class="font-semibold text-foreground group-hover:text-primary transition-colors">{{ item.title }}</h5>
-                        <p v-if="item.description" class="text-sm text-muted-foreground line-clamp-2 mt-1">{{ item.description }}</p>
+                      <!-- Category divider -->
+                      <div
+                        v-if="entry.kind === 'category'"
+                        class="flex items-center gap-2 pt-2 pb-1"
+                      >
+                        <span class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">{{ entry.title }}</span>
+                        <div class="flex-1 h-px bg-border/50" />
                       </div>
-                    </button>
+                      <!-- Item button -->
+                      <button
+                        v-else-if="entry.kind === 'item'"
+                        type="button"
+                        :aria-current="selectedLessonIndex === lessonIdx && selectedItemIndex === entry.flatIndex ? 'location' : undefined"
+                        :aria-label="`${entry.item.type}: ${entry.item.title}${entry.item.estimatedDuration ? '. Duration: ' + entry.item.estimatedDuration : ''}`"
+                        class="w-full flex items-start gap-3 p-3 rounded-lg transition-all group text-left"
+                        :class="[
+                          selectedLessonIndex === lessonIdx && selectedItemIndex === entry.flatIndex
+                            ? 'bg-primary/10'
+                            : 'hover:bg-muted/50'
+                        ]"
+                        @click="selectLesson(lessonIdx as number); selectItem(entry.flatIndex)"
+                      >
+                        <component :is="getItemIcon(entry.item.type)" class="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="text-xs uppercase tracking-[0.08em] text-muted-foreground font-semibold">{{ entry.item.type }}</span>
+                            <span v-if="entry.item.estimatedDuration" class="text-xs text-muted-foreground">| {{ entry.item.estimatedDuration }}</span>
+                          </div>
+                          <h5 class="font-semibold text-foreground group-hover:text-primary transition-colors">{{ entry.item.title }}</h5>
+                          <p v-if="entry.item.description" class="text-sm text-muted-foreground line-clamp-2 mt-1">{{ entry.item.description }}</p>
+                        </div>
+                      </button>
+                    </template>
                   </div>
                 </div>
               </div>

@@ -849,6 +849,31 @@ collections:
               - {label: "Type", name: "__typename", widget: "hidden", default: "projects"}
               - {label: "Project", name: "project", widget: "relation", required: true, collection: "projects", value_field: "{{slug}}", search_fields: ["title"], display_fields: ["title"]}
               - {label: "Version", name: "project_version", widget: "version_select", required: false, default: "latest", hint: "Pin to a specific version or use latest", collection: "projects", relation_field: "project"}
+      - label: "Outline"
+        name: "outline"
+        widget: "list"
+        required: false
+        hint: "Build the lesson's content outline with categories (e.g. Topics, Readings, Project). Each top-level item is a category; nested items reference content via 'content: collection/slug'."
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Path", name: "path", widget: "string", required: false}
+          - {label: "Content Reference", name: "content", widget: "string", required: false, hint: "e.g. articles/my-article"}
+          - label: "Items"
+            name: "items"
+            widget: "list"
+            required: false
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Path", name: "path", widget: "string", required: false}
+              - {label: "Content Reference", name: "content", widget: "string", required: false, hint: "e.g. articles/my-article"}
+              - label: "Items"
+                name: "items"
+                widget: "list"
+                required: false
+                fields:
+                  - {label: "Title", name: "title", widget: "string"}
+                  - {label: "Path", name: "path", widget: "string", required: false}
+                  - {label: "Content Reference", name: "content", widget: "string", required: false, hint: "e.g. articles/my-article"}
       - label: "Prerequisites"
         name: "prerequisites"
         widget: "list"
@@ -995,8 +1020,7 @@ collections:
       - {label: "Date", name: "date", widget: "datetime", required: false}
       - {label: "Cover Image", name: "coverImage", widget: "image", required: false}
       - {label: "Cover Image Alt", name: "coverImageAlt", widget: "string", required: false}
-      - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
-      - {label: "Published", name: "published", widget: "boolean", default: false, required: false}
+      - {label: "Introduction Page Title", name: "introductionTitle", widget: "string", required: false, hint: "Label for the book's landing page in the sidebar navigation. Defaults to 'Introduction'."}
       - label: "Theme"
         name: "theme"
         widget: "select"
@@ -1007,6 +1031,49 @@ collections:
           - { label: "Lambda (Dark Tech)", value: "lambda" }
           - { label: "Minimal", value: "minimal" }
         hint: "Visual theme for the book's public-facing pages"
+      - label: "Theme Color Overrides"
+        name: "themeOverrides"
+        widget: "object"
+        required: false
+        collapsed: true
+        hint: "Override individual theme colors for this book. Use oklch() values, e.g. oklch(0.50 0.28 293). Keys map to --color-{name} CSS variables."
+        fields:
+          - label: "Light Mode"
+            name: "light"
+            widget: "object"
+            required: false
+            collapsed: true
+            fields:
+              - {label: "Background", name: "background", widget: "color", required: false}
+              - {label: "Foreground", name: "foreground", widget: "color", required: false}
+              - {label: "Primary", name: "primary", widget: "color", required: false, hint: "e.g. oklch(0.50 0.28 293)"}
+              - {label: "Primary Foreground", name: "primary-foreground", widget: "color", required: false}
+              - {label: "Muted", name: "muted", widget: "color", required: false}
+              - {label: "Muted Foreground", name: "muted-foreground", widget: "color", required: false}
+              - {label: "Accent", name: "accent", widget: "color", required: false}
+              - {label: "Accent Foreground", name: "accent-foreground", widget: "color", required: false}
+              - {label: "Border", name: "border", widget: "color", required: false}
+              - {label: "Card", name: "card", widget: "color", required: false}
+              - {label: "Ring", name: "ring", widget: "color", required: false}
+          - label: "Dark Mode"
+            name: "dark"
+            widget: "object"
+            required: false
+            collapsed: true
+            fields:
+              - {label: "Background", name: "background", widget: "color", required: false}
+              - {label: "Foreground", name: "foreground", widget: "color", required: false}
+              - {label: "Primary", name: "primary", widget: "color", required: false, hint: "e.g. oklch(0.65 0.28 293)"}
+              - {label: "Primary Foreground", name: "primary-foreground", widget: "color", required: false}
+              - {label: "Muted", name: "muted", widget: "color", required: false}
+              - {label: "Muted Foreground", name: "muted-foreground", widget: "color", required: false}
+              - {label: "Accent", name: "accent", widget: "color", required: false}
+              - {label: "Accent Foreground", name: "accent-foreground", widget: "color", required: false}
+              - {label: "Border", name: "border", widget: "color", required: false}
+              - {label: "Card", name: "card", widget: "color", required: false}
+              - {label: "Ring", name: "ring", widget: "color", required: false}
+      - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
+      - {label: "Published", name: "published", widget: "boolean", default: false, required: false}
       - label: "Tags"
         name: "tags"
         widget: "list"

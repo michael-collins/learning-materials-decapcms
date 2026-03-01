@@ -109,6 +109,10 @@ function getEmptyValue(field: CmsFieldDef): any {
 initializeForm()
 watch(() => props.initialData, initializeForm, { deep: true })
 
+// Provide root form data so deeply nested widgets (e.g. CmsColor) can
+// read sibling fields like `theme` without needing explicit prop drilling.
+provide('cmsRootFormData', formData)
+
 // Emit title changes for slug auto-generation
 watch(() => formData.title, (newTitle) => {
   if (newTitle) emit('update:title', newTitle)

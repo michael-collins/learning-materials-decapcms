@@ -94,7 +94,15 @@ function slugify(text: string): string {
 
 // ── Flat ↔ Nested conversion ──────────────────────────────────────────
 
-function nestedToFlat(nodes: OutlineNode[], depth = 0, parentId?: string): FlatItem[] {
+/**
+ * Convert nested OutlineNode[] -> flat FlatItem[].
+ *
+ * markImportedFrom: the id of the nearest lesson ancestor whose children are
+ * all considered "imported". Set automatically when we detect a lesson node
+ * that already has children but no importChildren flag (i.e. written by the
+ * import script rather than by the CMS UI).
+ */
+function nestedToFlat(nodes: OutlineNode[], depth = 0, parentId?: string, markImportedFrom?: string): FlatItem[] {
   const result: FlatItem[] = []
   for (const node of nodes) {
     const id = generateId()
@@ -107,12 +115,38 @@ function nestedToFlat(nodes: OutlineNode[], depth = 0, parentId?: string): FlatI
       icon: node.icon || '',
       depth,
     }
-    if (node.imported) { item.imported = true; item.locked = node.locked !== false }
-    if (node.importChildren) item.importChildren = true
-    if (parentId && node.imported) item.importedFrom = parentId
+
+    // Auto-detect: lesson node with existing children but no importChildren flag
+    // (written by import script — treat its whole subtree as imported)
+    const isAutoLesson = !node.importChildren
+      && !!node.content?.startsWith('lessons/')
+      && Array.isArray(node.items)
+      && node.items.length > 0
+
+    // Determine effective cascade ancestor id for children.
+    // Both explicit importChildren (after first save) and auto-detected lessons
+    // start a fresh cascade so removeImportedChildren() keeps working across
+    // save/reload cycles.
+    const childMarkId = (isAutoLesson || node.importChildren) ? id : markImportedFrom
+
+    // Mark imported state
+    if (node.imported || markImportedFrom) {
+      item.imported = true
+      item.locked = node.locked !== false
+    }
+    if (node.importChildren || isAutoLesson) item.importChildren = true
+
+    // importedFrom: use cascaded lesson id, else old single-level mode
+    if (markImportedFrom) {
+      item.importedFrom = markImportedFrom
+    } else if (parentId && node.imported) {
+      item.importedFrom = parentId
+    }
+
     result.push(item)
     if (node.items?.length) {
-      result.push(...nestedToFlat(node.items, depth + 1, node.importChildren ? id : undefined))
+      const childParentId = (node.importChildren || isAutoLesson) ? id : undefined
+      result.push(...nestedToFlat(node.items, depth + 1, childParentId, childMarkId))
     }
   }
   return result
@@ -600,7 +634,7 @@ function isLessonContent(item: FlatItem): boolean {
   return item.content.startsWith('lessons/')
 }
 
-/** Fetch a lesson's sub-items from its frontmatter */
+/** Fetch a lesson's sub-items from its frontmatter (flat list, legacy use) */
 async function fetchLessonSubItems(lessonContent: string): Promise<{ collection: string; slug: string; title: string }[]> {
   // content is like "lessons/3d-modeling-fundamentals"
   const slug = lessonContent.replace(/^lessons\//, '')
@@ -619,16 +653,83 @@ async function fetchLessonSubItems(lessonContent: string): Promise<{ collection:
   }
 }
 
-/** Extract sub-item references from a lesson's metadata */
+/**
+ * Fetch a lesson's outline as a structured tree of OutlineNode[].
+ * Prefers the `outline` field (nested categories + content items),
+ * falls back to building a flat list from legacy `items[]`.
+ */
+async function fetchLessonOutlineNodes(lessonContent: string): Promise<OutlineNode[]> {
+  const slug = lessonContent.replace(/^lessons\//, '')
+  try {
+    const results = await queryCollection('lessons' as any).limit(200).all()
+    const lesson = results.find((r: any) => {
+      const p = (r.path || '').replace(/^\//, '')
+      return p === lessonContent || p === `lessons/${slug}`
+    }) as any
+    if (!lesson) return []
+
+    // New format: outline field (nested categories with content items)
+    let outlineNodes: any[] = lesson.outline || []
+    if (typeof outlineNodes === 'string') {
+      try { outlineNodes = JSON.parse(outlineNodes) } catch { outlineNodes = [] }
+    }
+    if (Array.isArray(outlineNodes) && outlineNodes.length > 0) {
+      return outlineNodes as OutlineNode[]
+    }
+
+    // Legacy: build flat list from items[]
+    const legacyItems = await extractLessonItems(lesson)
+    return legacyItems.map(si => ({
+      title: si.title,
+      path: slugify(si.title),
+      content: `${si.collection}/${si.slug}`,
+    } as OutlineNode))
+  } catch (e) {
+    console.error('[import] fetchLessonOutlineNodes error:', e)
+    return []
+  }
+}
+
+/** Extract sub-item references from a lesson's metadata.
+ *  Prefers the newer `outline` nested structure (used by DMD 100 lessons),
+ *  falls back to the legacy flat `items` array format. */
 async function extractLessonItems(lesson: any): Promise<{ collection: string; slug: string; title: string }[]> {
-  // items might be stored as a JSON string in SQLite
+  const subItems: { collection: string; slug: string; title: string }[] = []
+
+  // ── New format: outline (nested nodes with `content: collection/slug`) ──
+  let outlineNodes: any[] = lesson.outline || []
+  if (typeof outlineNodes === 'string') {
+    try { outlineNodes = JSON.parse(outlineNodes) } catch { outlineNodes = [] }
+  }
+
+  if (Array.isArray(outlineNodes) && outlineNodes.length > 0) {
+    /** Recursively walk outline nodes and collect leaf nodes with content refs. */
+    function walkOutlineNodes(nodes: any[]) {
+      for (const node of nodes) {
+        if (node.content) {
+          // content is "collection/slug", e.g. "articles/dmd100-lesson-1-topics-what-is-design"
+          const slashIdx = (node.content as string).indexOf('/')
+          if (slashIdx !== -1) {
+            const collection = node.content.slice(0, slashIdx) as string
+            const slug = node.content.slice(slashIdx + 1) as string
+            subItems.push({ collection, slug, title: node.title || slug })
+          }
+        }
+        if (Array.isArray(node.items) && node.items.length) {
+          walkOutlineNodes(node.items)
+        }
+      }
+    }
+    walkOutlineNodes(outlineNodes)
+    return subItems
+  }
+
+  // ── Legacy format: flat items array ──────────────────────────────────────
   let lessonItems: any[] = lesson.items || []
   if (typeof lessonItems === 'string') {
     try { lessonItems = JSON.parse(lessonItems) } catch { lessonItems = [] }
   }
   if (!Array.isArray(lessonItems) || lessonItems.length === 0) return []
-
-  const subItems: { collection: string; slug: string; title: string }[] = []
 
   // Cache collection results to avoid redundant queries
   const collectionCache: Record<string, any[]> = {}
@@ -687,8 +788,8 @@ async function importLessonChildren(id: string) {
   importingId.value = id
   try {
     item.importChildren = true
-    const subItems = await fetchLessonSubItems(item.content)
-    if (subItems.length === 0) {
+    const outlineNodes = await fetchLessonOutlineNodes(item.content)
+    if (outlineNodes.length === 0) {
       item.importChildren = false
       emitUpdate()
       return
@@ -697,20 +798,38 @@ async function importLessonChildren(id: string) {
     const freshIdx = items.value.findIndex(i => i.id === id)
     if (freshIdx < 0) return
     const { end } = getSubtreeRange(freshIdx)
-    const childDepth = items.value[freshIdx]!.depth + 1
-    const newItems: FlatItem[] = subItems.map(si => ({
-      id: generateId(),
-      title: si.title,
-      path: slugify(si.title),
-      content: `${si.collection}/${si.slug}`,
-      version: '',
-      icon: typeIconNames[si.collection] || '',
-      depth: childDepth,
-      imported: true,
-      locked: true,
-      importedFrom: id,
-    }))
+    const baseDepth = items.value[freshIdx]!.depth + 1
 
+    /**
+     * Recursively flatten the lesson outline into FlatItems, preserving
+     * the category → item hierarchy. Every node (category headers and
+     * leaf content items alike) gets importedFrom: id so that
+     * removeImportedChildren() can cleanly remove the whole subtree.
+     */
+    function flattenForImport(nodes: OutlineNode[], depth: number): FlatItem[] {
+      const result: FlatItem[] = []
+      for (const node of nodes) {
+        const collection = node.content ? (node.content.split('/')[0] || '') : ''
+        result.push({
+          id: generateId(),
+          title: node.title || '',
+          path: node.path || slugify(node.title || ''),
+          content: node.content || '',
+          version: '',
+          icon: collection ? (typeIconNames[collection] || '') : '',
+          depth,
+          imported: true,
+          locked: true,
+          importedFrom: id,
+        })
+        if (node.items?.length) {
+          result.push(...flattenForImport(node.items, depth + 1))
+        }
+      }
+      return result
+    }
+
+    const newItems = flattenForImport(outlineNodes, baseDepth)
     items.value.splice(end, 0, ...newItems)
     // Expand parent if collapsed
     collapsedIds.value.delete(id)
@@ -1209,6 +1328,55 @@ function onDrop(event: DragEvent, targetId: string) {
 // Stats
 const sectionCount = computed(() => items.value.filter(i => i.depth === 0).length)
 const totalCount = computed(() => items.value.length)
+
+// ── Collapse / expand all ─────────────────────────────────────────────
+
+/** True when at least one item has children */
+const hasAnyWithChildren = computed(() =>
+  items.value.some((_, i) => hasChildren(i))
+)
+
+function collapseAll() {
+  for (let i = 0; i < items.value.length; i++) {
+    if (hasChildren(i)) collapsedIds.value.add(items.value[i]!.id)
+  }
+}
+
+function expandAll() {
+  collapsedIds.value.clear()
+}
+
+/**
+ * Returns one entry per depth level that "closes" after visible item at vIdx
+ * (i.e. levels for which this item is the last child). Ordered deepest first.
+ * Each entry carries the id of the item to call addItemAfter() with so the
+ * new sibling is inserted at exactly that depth.
+ */
+function closingRows(vIdx: number): { depth: number; afterId: string; realIndex: number }[] {
+  const { item, index: realIdx } = visibleItems.value[vIdx]!
+  const nextDepth =
+    vIdx + 1 < visibleItems.value.length
+      ? visibleItems.value[vIdx + 1]!.item.depth
+      : -1
+  if (nextDepth >= item.depth) return []
+
+  const result: { depth: number; afterId: string; realIndex: number }[] = []
+  for (let d = item.depth; d > nextDepth; d--) {
+    // For the item's own depth, use its id directly.
+    // For shallower depths, walk backward through visibleItems to find the
+    // last item at that depth (the parent whose subtree ends here).
+    let afterId = item.id
+    if (d < item.depth) {
+      for (let i = vIdx - 1; i >= 0; i--) {
+        const vi = visibleItems.value[i]!
+        if (vi.item.depth === d) { afterId = vi.item.id; break }
+        if (vi.item.depth < d) break
+      }
+    }
+    result.push({ depth: d, afterId, realIndex: realIdx })
+  }
+  return result
+}
 </script>
 
 <template>
@@ -1220,6 +1388,26 @@ const totalCount = computed(() => items.value.length)
         Outline
       </label>
       <div class="flex items-center gap-2">
+        <template v-if="items.length > 0 && hasAnyWithChildren">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            title="Collapse all"
+            @click="collapseAll"
+          >
+            <ChevronRight class="h-3 w-3" />
+            Collapse all
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            title="Expand all"
+            @click="expandAll"
+          >
+            <ChevronDown class="h-3 w-3" />
+            Expand all
+          </button>
+        </template>
         <button
           type="button"
           class="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] transition-colors"
@@ -1239,9 +1427,8 @@ const totalCount = computed(() => items.value.length)
 
     <!-- Tree -->
     <div v-if="items.length > 0" class="rounded-lg border bg-background" role="tree">
+      <template v-for="({ item, index: realIndex }, vIdx) in visibleItems" :key="item.id">
       <div
-        v-for="({ item, index: realIndex }, vIdx) in visibleItems"
-        :key="item.id"
         data-outline-item
         :data-item-id="item.id"
         :draggable="editingId !== item.id && !(item.imported && item.locked)"
@@ -1252,9 +1439,8 @@ const totalCount = computed(() => items.value.length)
         :aria-label="item.title || (item.depth === 0 ? 'Empty section' : 'Empty item')"
         :class="[
           'group relative flex items-center h-8 pl-2 pr-2 transition-colors focus:outline-none focus:ring-1 focus:ring-inset focus:ring-primary/50',
-          item.imported && item.locked ? 'bg-muted/30' : 'hover:bg-accent/40 focus:bg-accent/30',
+          item.imported && item.locked ? '' : 'hover:bg-accent/40 focus:bg-accent/30',
           draggedId === item.id ? 'opacity-40' : '',
-          vIdx > 0 ? 'border-t border-border/40' : '',
         ]"
         @keydown="handleRowKeydown($event, item, realIndex)"
         @dragstart="onDragStart($event, item.id)"
@@ -1293,9 +1479,9 @@ const totalCount = computed(() => items.value.length)
               <template v-if="d === item.depth">
                 <!-- Vertical: top half (always — connects from parent line above) -->
                 <div class="absolute left-2 top-0 h-1/2 w-px bg-border" />
-                <!-- Vertical: bottom half (only if siblings continue below) -->
+                <!-- Vertical: bottom half (if siblings continue below, OR an add-row at this depth follows) -->
                 <div
-                  v-if="hasNextSiblingAtDepth(realIndex, d)"
+                  v-if="hasNextSiblingAtDepth(realIndex, d) || closingRows(vIdx).some(r => r.depth === d)"
                   class="absolute left-2 top-1/2 bottom-0 w-px bg-border"
                 />
                 <!-- Horizontal connector: from vertical line to toggle area center -->
@@ -1348,13 +1534,13 @@ const totalCount = computed(() => items.value.length)
         <!-- Title: display mode (draggable) or edit mode (input) -->
         <div v-if="editingId !== item.id" :class="['flex-1 min-w-0 flex items-center h-full select-none', item.imported && item.locked ? 'cursor-default' : 'cursor-grab active:cursor-grabbing']" @dblclick.stop="!(item.imported && item.locked) && startEditing(item.id)">
           <!-- Lock icon for imported locked items -->
-          <Lock v-if="item.imported && item.locked" class="h-3 w-3 shrink-0 text-muted-foreground/40 mr-0.5" />
+          <Lock v-if="item.imported && item.locked" class="h-3 w-3 shrink-0 text-muted-foreground/60 mr-0.5" />
           <span
             v-if="item.title"
             :class="[
               'truncate text-sm px-1.5',
               item.depth === 0 ? 'font-medium' : 'text-muted-foreground',
-              item.imported && item.locked ? 'text-muted-foreground/60 italic' : '',
+              item.imported && item.locked ? 'text-muted-foreground/80' : '',
             ]"
           >{{ item.title }}</span>
           <span
@@ -1471,7 +1657,7 @@ const totalCount = computed(() => items.value.length)
         </button>
 
         <!-- Hover actions -->
-        <div :class="['shrink-0 flex items-center transition-opacity', item.imported && item.locked ? 'opacity-0 group-hover:opacity-60' : 'opacity-0 group-hover:opacity-100']">
+        <div :class="['shrink-0 flex items-center transition-opacity', item.imported && item.locked ? 'opacity-0 group-hover:opacity-80' : 'opacity-0 group-hover:opacity-100']">
           <button
             v-if="!item.content && !(item.imported && item.locked)"
             type="button"
@@ -1510,6 +1696,49 @@ const totalCount = computed(() => items.value.length)
           </button>
         </div>
       </div>
+
+      <!-- Ghost add-rows: one per closing depth, from deepest to shallowest -->
+      <div
+        v-for="row in closingRows(vIdx)"
+        :key="`add-${item.id}-${row.depth}`"
+        role="button"
+        :title="`Add ${row.depth === 0 ? 'section' : 'item'} here`"
+        class="group/add relative flex items-center h-6 cursor-pointer select-none bg-background transition-colors hover:bg-accent/40"
+        @click="addItemAfter(row.afterId)"
+      >
+        <!-- Tree indent with ancestor lines -->
+        <div class="flex items-center shrink-0 h-full pl-2" :style="{ width: `${8 + row.depth * 20}px` }">
+          <template v-for="d in row.depth" :key="d">
+            <div class="relative w-5 h-full shrink-0">
+              <!-- Ancestor vertical line: only if siblings continue below at that depth -->
+              <div
+                v-if="d < row.depth && hasNextSiblingAtDepth(row.realIndex, d)"
+                class="absolute left-2 top-0 bottom-0 w-px bg-border"
+              />
+              <!-- Elbow connector at the row's own depth -->
+              <template v-if="d === row.depth">
+                <!-- Top half: connects from parent line above -->
+                <div class="absolute left-2 top-0 h-1/2 w-px bg-border" />
+                <!-- No bottom half: this is the last position, so line ends here -->
+                <!-- Horizontal connector -->
+                <div class="absolute left-2 top-1/2 h-px bg-border" style="right: -10px" />
+              </template>
+            </div>
+          </template>
+        </div>
+
+        <!-- Dot → Plus icon on hover -->
+        <div class="w-5 h-full flex items-center justify-center shrink-0 relative">
+          <div class="w-1.5 h-1.5 rounded-full bg-border group-hover/add:opacity-0 transition-opacity" />
+          <Plus class="h-3 w-3 text-muted-foreground absolute opacity-0 group-hover/add:opacity-100 transition-opacity" />
+        </div>
+
+        <!-- Label, visible only on hover -->
+        <span class="text-[11px] text-muted-foreground pl-1 opacity-0 group-hover/add:opacity-100 transition-opacity">
+          Add {{ row.depth === 0 ? 'section' : 'item' }}
+        </span>
+      </div>
+      </template>
     </div>
 
     <!-- Empty state -->

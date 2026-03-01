@@ -26,6 +26,7 @@ import CmsImage from './fields/CmsImage.vue'
 import CmsFile from './fields/CmsFile.vue'
 import CmsVersionSelect from './fields/CmsVersionSelect.vue'
 import CmsOutlineEditor from './fields/CmsOutlineEditor.vue'
+import CmsColor from './fields/CmsColor.vue'
 
 const props = defineProps<{
   field: CmsFieldDef
@@ -60,6 +61,7 @@ const widgetMap: Record<string, any> = {
   file: CmsFile,
   // Custom widgets
   version_select: CmsVersionSelect,
+  color: CmsColor,
   // list is special — routed below based on whether it has `types`
 }
 

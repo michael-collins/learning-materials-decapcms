@@ -173,6 +173,66 @@ const breadcrumbs = computed(() => {
   return crumbs
 })
 
+/**
+ * Build a navigable outline from lesson.outline when present.
+ * Returns an array of category groups, each with a title and array of nav items.
+ * Content refs like "articles/dmd100-lesson-1-topics-what-is-design" become href="/articles/..."
+ */
+const lessonOutlineNav = computed(() => {
+  const outline = lesson.value?.outline
+  if (!Array.isArray(outline) || !outline.length) return null
+
+  type NavItem = { title: string; href: string; content: string }
+  type CategoryGroup = { title: string; path?: string; items: NavItem[] }
+
+  const groups: CategoryGroup[] = []
+
+  const resolveHref = (contentRef: string) => {
+    if (!contentRef) return null
+    const slashIdx = contentRef.indexOf('/')
+    if (slashIdx === -1) return null
+    const collection = contentRef.slice(0, slashIdx)
+    const slug = contentRef.slice(slashIdx + 1)
+    return `/${collection}/${slug}`
+  }
+
+  const walkNodes = (nodes: any[], categoryTitle: string | null = null) => {
+    for (const node of nodes) {
+      const hasChildren = Array.isArray(node.items) && node.items.length > 0
+
+      if (hasChildren) {
+        // This is a category node — recurse with its title as the category
+        const group: CategoryGroup = { title: node.title, path: node.path, items: [] }
+        groups.push(group)
+        // Walk children; leaf items with content go into this group
+        for (const child of node.items) {
+          if (child.content) {
+            const href = resolveHref(child.content)
+            if (href) group.items.push({ title: child.title, href, content: child.content })
+          }
+          // Deeper nesting: recurse into child's children
+          if (Array.isArray(child.items) && child.items.length) {
+            walkNodes(child.items, node.title)
+          }
+        }
+      } else if (node.content && categoryTitle) {
+        // Leaf in a category — already handled by parent recursion
+      } else if (node.content) {
+        // Top-level leaf with content (no category)
+        const href = resolveHref(node.content)
+        if (href) {
+          let g = groups.find(g => g.title === 'Content')
+          if (!g) { g = { title: 'Content', items: [] }; groups.push(g) }
+          g.items.push({ title: node.title, href, content: node.content })
+        }
+      }
+    }
+  }
+
+  walkNodes(outline)
+  return groups.filter(g => g.items.length > 0)
+})
+
 // Helper to get link path from content item
 const getItemPath = (item: any, type: string) => {
   if (!item) return '#'
@@ -252,8 +312,27 @@ const oerSchema = computed(() => {
           </ul>
         </div>
 
-        <!-- Related Content -->
-        <div v-if="relatedContent && (relatedContent.lectures.length > 0 || relatedContent.tutorials.length > 0 || relatedContent.exercises.length > 0 || relatedContent.articles.length > 0 || relatedContent.projects.length > 0)" class="mt-12 space-y-8">
+        <!-- Outline-based navigation (preferred when outline field exists) -->
+        <div v-if="lessonOutlineNav && lessonOutlineNav.length" class="mt-10 space-y-8">
+          <h2 class="text-2xl font-bold">Lesson Contents</h2>
+          <div v-for="group in lessonOutlineNav" :key="group.title" class="space-y-3">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b pb-2">{{ group.title }}</h3>
+            <ul class="space-y-1">
+              <li v-for="item in group.items" :key="item.href">
+                <NuxtLink
+                  :to="item.href"
+                  class="flex items-center gap-2 py-1.5 px-2 rounded-md text-sm hover:bg-accent hover:text-accent-foreground transition-colors group"
+                >
+                  <span class="flex-1 group-hover:text-primary transition-colors">{{ item.title }}</span>
+                  <Icon name="lucide:arrow-right" class="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                </NuxtLink>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Related Content (legacy: shown only when no outline field present) -->
+        <div v-if="!lessonOutlineNav && relatedContent && (relatedContent.lectures.length > 0 || relatedContent.tutorials.length > 0 || relatedContent.exercises.length > 0 || relatedContent.articles.length > 0 || relatedContent.projects.length > 0)" class="mt-12 space-y-8">
           <h2 class="text-2xl font-bold">Related Content</h2>
           
           <div v-if="relatedContent.lectures.length > 0" class="space-y-4">

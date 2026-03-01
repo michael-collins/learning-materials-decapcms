@@ -1,0 +1,31 @@
+---
+title: 'Deliver: Final Prototype'
+authors:
+  - name: Michael Collins
+date: '2026-03-01'
+license: CC BY 4.0
+difficulty: intermediate
+course: dmd100
+tags:
+  - dmd-100
+  - lesson-2
+  - ritual
+  - project
+published: true
+---
+
+![Double Diamond Deliver Phase graphic](/uploads/dmd100/dd-process-deliver-1200px@2x.png)
+
+Let's wrap up the project with one more round of iteration to refine your work.
+
+## Instructions:
+
+1. Make changes based on the peer and instructor feedback. Submit only after recieving feedback and iterating upon your work. 
+2. Write a description of the changes made to the prototype.
+
+## Submission
+
+Use the file format indicated in each step. You must obtain prior approval to deviate from these upload requirements. Please check that your work has uploaded properly.
+
+1. Post a public link to the prototype.
+2. write a change log with all changes that were made.

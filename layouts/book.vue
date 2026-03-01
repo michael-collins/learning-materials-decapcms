@@ -25,14 +25,16 @@ onMounted(() => {
 
 // Book data is provided by the page via injection
 const bookTitle = useState<string>('book-title', () => '')
+const bookIntroductionTitle = useState<string>('book-introduction-title', () => '')
 const bookSlug = useState<string>('book-slug', () => '')
 const bookThemeName = useState<string>('book-theme', () => 'default')
+const bookThemeOverrides = useState<{ light?: Record<string, string>; dark?: Record<string, string> } | null>('book-theme-overrides', () => null)
 const sidebarTree = useState<SidebarNode[]>('book-sidebar-tree', () => [])
 const prevChapter = useState<{ title: string; fullPath: string } | null>('book-prev', () => null)
 const nextChapter = useState<{ title: string; fullPath: string } | null>('book-next', () => null)
 
 // Theme system
-const { config: themeConfig, cssVarStyle } = useBookTheme(bookThemeName)
+const { config: themeConfig, cssVarStyle } = useBookTheme(bookThemeName, bookThemeOverrides)
 
 const rootClass = computed(() => themeConfig.value.rootClass)
 const sidebarThemeClass = computed(() => themeConfig.value.sidebar.class)
@@ -235,7 +237,7 @@ const filteredSidebarTree = computed(() =>
                 : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
             ]"
           >
-            <span :class="['break-words text-left min-w-0', rootClass === 'theme-lambda' && 'uppercase tracking-wide']">Introduction</span>
+            <span :class="['break-words text-left min-w-0', rootClass === 'theme-lambda' && 'uppercase tracking-wide']">{{ bookIntroductionTitle || 'Introduction' }}</span>
           </NuxtLink>
 
           <BookSidebarTree :nodes="filteredSidebarTree" :book-slug="bookSlug" :toggled-sections="toggledSections" :uppercase-top-level="rootClass === 'theme-lambda'" @toggle="toggleSection" />
