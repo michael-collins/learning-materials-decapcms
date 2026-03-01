@@ -551,6 +551,11 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
   - Includes all referenced content (prose, images, figures, callouts)
   - Print-quality typography
   - Generated via Puppeteer/Playwright or a dedicated PDF library
+  - **QR codes for non-printable media:** Embedded videos, slides, iframes, 3D viewers, and downloadable attachments cannot render in a static PDF. Replace these with a styled placeholder card containing:
+    - A QR code linking to the original resource URL (generated client-side via a lightweight library like `qrcode`)
+    - An active hyperlink with descriptive text (e.g., "Watch on YouTube", "View Google Slides", "Download attachment")
+    - A thumbnail or icon indicating the media type
+  - This ensures printed copies remain useful — readers can scan the QR code with a phone to reach the interactive content
 - [ ] **Common Cartridge (IMS CC)**
   - Standard IMS Common Cartridge package for LMS import (Canvas, Blackboard, Moodle, etc.)
   - Maps outline hierarchy to CC organization structure
