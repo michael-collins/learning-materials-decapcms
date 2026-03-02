@@ -27,6 +27,14 @@ export interface BatchPublishResult {
   fileCount: number
 }
 
+export interface BranchInfo {
+  currentBranch: string
+  defaultBranch: string
+  isDefaultBranch: boolean
+  prUrl?: string
+  prNumber?: number
+}
+
 export function useBatchPublish() {
   const { getToken } = useCmsAuth()
 
@@ -38,6 +46,23 @@ export function useBatchPublish() {
   const publishError = ref<string | null>(null)
   const discardError = ref<string | null>(null)
   const lastResult = ref<BatchPublishResult | null>(null)
+
+  const branchInfo = ref<BranchInfo | null>(null)
+  const fetchingBranchInfo = ref(false)
+
+  async function fetchBranchInfo(): Promise<void> {
+    fetchingBranchInfo.value = true
+    try {
+      const token = getToken()
+      branchInfo.value = await $fetch<BranchInfo>('/api/cms/git/branch-info', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+    } catch {
+      // Non-fatal: fallback to null means UI shows defaults
+    } finally {
+      fetchingBranchInfo.value = false
+    }
+  }
 
   const summary = computed(() => ({
     total: changes.value.length,
@@ -111,6 +136,7 @@ export function useBatchPublish() {
           files: selected.map(c => ({ collection: c.collection, slug: c.slug })),
           message: options?.message,
           publishMode: options?.publishMode,
+          targetBranch: branchInfo.value?.currentBranch,
           token,
         },
       })
@@ -197,6 +223,8 @@ export function useBatchPublish() {
     publishError: readonly(publishError),
     discardError: readonly(discardError),
     lastResult: readonly(lastResult),
+    branchInfo: readonly(branchInfo),
+    fetchingBranchInfo: readonly(fetchingBranchInfo),
     summary,
     hasChanges,
     hasSelection,
@@ -205,5 +233,6 @@ export function useBatchPublish() {
     toggleSelection,
     selectAll,
     discardChange,
+    fetchBranchInfo,
   }
 }

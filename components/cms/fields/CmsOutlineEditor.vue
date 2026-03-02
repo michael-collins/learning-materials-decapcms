@@ -1629,7 +1629,7 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
     </div>
 
     <!-- Tree -->
-    <div v-if="items.length > 0" class="rounded-lg border bg-background" role="tree">
+    <div v-if="items.length > 0" class="rounded-lg border bg-background overflow-hidden" role="tree">
       <template v-for="({ item, index: realIndex }, vIdx) in visibleItems" :key="item.id">
       <div
         data-outline-item
@@ -1960,23 +1960,6 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
       <p class="text-sm text-muted-foreground">No outline items yet</p>
     </div>
 
-    <!-- Add buttons -->
-    <div class="flex items-center gap-2">
-      <button
-        type="button"
-        class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-        @click="addSection"
-      >
-        <FolderPlus class="h-3 w-3" /> Section
-      </button>
-      <button
-        type="button"
-        class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-        @click="addItemWithPicker"
-      >
-        <BookOpen class="h-3 w-3" /> Content
-      </button>
-    </div>
 
     <!-- Keyboard hints (minimal) -->
     <div class="flex flex-wrap gap-x-3 text-[10px] text-muted-foreground/50">

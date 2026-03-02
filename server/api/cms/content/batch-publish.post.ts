@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
     message: commitMessage,
     publishMode,
     token: bodyToken,
+    targetBranch: bodyTargetBranch,
   } = body
 
   if (!files?.length) {
@@ -46,9 +47,11 @@ export default defineEventHandler(async (event) => {
   const token = extractAuthToken(event, bodyToken)
   const config = await getCmsConfig()
   const { owner, repo } = parseRepo(config.backend.repo)
-  const mainBranch = config.backend.branch
+  const defaultBranch = config.backend.branch
+  // Use the supplied targetBranch (current checked-out branch) or fall back to the default
+  const targetBranch: string = bodyTargetBranch || defaultBranch
 
-  const git = createGitBackend({ owner, repo, branch: mainBranch, token })
+  const git = createGitBackend({ owner, repo, branch: defaultBranch, token })
 
   // Check if local content files are available
   const firstCollection = findCollection(config, files[0]?.collection)
@@ -117,35 +120,57 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (useEditorial) {
-      // Editorial: create branch → commit all files → open PR
-      const branchName = `cms/batch-${Date.now()}`
-      await git.createBranch(branchName)
+      // Editorial: ensure targetBranch exists on GitHub, commit, then open PR → defaultBranch
+      // If targetBranch is the same as defaultBranch, fall back to a generated branch
+      const prHeadBranch = targetBranch !== defaultBranch
+        ? targetBranch
+        : `cms/batch-${Date.now()}`
+
+      // Create the branch if it doesn't exist on GitHub yet
+      try {
+        await git.getBranchSha(prHeadBranch)
+        // Branch exists — use it as-is
+      } catch {
+        // Branch not on GitHub yet — push it from defaultBranch
+        await git.createBranch(prHeadBranch)
+      }
 
       await git.commitMultiple({
         files: filesToCommit,
         message,
-        branch: branchName,
+        branch: prHeadBranch,
       })
 
       const pr = await git.createPullRequest({
-        title: `CMS: Update ${filesToCommit.length} files`,
-        head: branchName,
-        body: `Batch publish of ${filesToCommit.length} files:\n\n${collectionSlugs.map(s => `- \`${s}\``).join('\n')}`,
+        title: `CMS: Update ${filesToCommit.length} ${filesToCommit.length === 1 ? 'file' : 'files'}`,
+        head: prHeadBranch,
+        base: defaultBranch,
+        body: `Batch publish of ${filesToCommit.length} ${filesToCommit.length === 1 ? 'file' : 'files'}:\n\n${collectionSlugs.map(s => `- \`${s}\``).join('\n')}`,
         labels: ['cms', 'batch'],
       })
 
       return {
         mode: 'editorial',
-        branch: branchName,
+        branch: prHeadBranch,
         prUrl: pr.url,
         prNumber: pr.number,
         fileCount: filesToCommit.length,
       }
     } else {
-      // Direct: commit all files to main in one commit
+      // Direct: commit all files to targetBranch (current local branch)
+      // If targetBranch doesn't exist on GitHub, create it first
+      if (targetBranch !== defaultBranch) {
+        try {
+          await git.getBranchSha(targetBranch)
+        } catch {
+          await git.createBranch(targetBranch)
+        }
+      }
+
       const result = await git.commitMultiple({
         files: filesToCommit,
         message,
+        branch: targetBranch,
       })
 
       return {

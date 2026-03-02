@@ -9,7 +9,7 @@
 import {
   Upload, Loader2, RefreshCw, Check, X,
   FilePlus, FileDiff, FileX, GitPullRequest,
-  ChevronDown, CheckCircle, ExternalLink,
+  ChevronDown, CheckCircle, ExternalLink, GitBranch,
   AlertCircle, Package, Eye, Undo2,
 } from 'lucide-vue-next'
 import type { VersionFileEntry } from './VersionProtectionDialog.vue'
@@ -41,7 +41,16 @@ const {
   toggleSelection,
   selectAll,
   discardChange,
+  branchInfo,
+  fetchingBranchInfo,
+  fetchBranchInfo,
 } = useBatchPublish()
+
+// Computed branch display helpers
+const currentBranch = computed(() => branchInfo.value?.currentBranch ?? 'main')
+const isDefaultBranch = computed(() => branchInfo.value?.isDefaultBranch ?? true)
+const existingPrUrl = computed(() => branchInfo.value?.prUrl)
+const existingPrNumber = computed(() => branchInfo.value?.prNumber)
 
 // Dropdown for publish mode
 const showModeDropdown = ref(false)
@@ -75,8 +84,11 @@ async function handleDiscard(path: string) {
 watch(
   () => props.open,
   (isOpen) => {
-    if (isOpen && !scanning.value && changes.value.length === 0) {
-      scanChanges(props.collections)
+    if (isOpen) {
+      fetchBranchInfo()
+      if (!scanning.value && changes.value.length === 0) {
+        scanChanges(props.collections)
+      }
     }
   },
 )
@@ -153,8 +165,10 @@ function statusBadgeClass(status: string) {
           <Package class="h-5 w-5 text-primary" />
           Publish Changes to GitHub
         </UiDialogTitle>
-        <UiDialogDescription>
-          Review local changes and publish them to GitHub in a single commit.
+        <UiDialogDescription class="flex items-center gap-1.5">
+          <GitBranch class="h-3.5 w-3.5 shrink-0" />
+          <span v-if="fetchingBranchInfo" class="text-muted-foreground/60">Detecting branch...</span>
+          <span v-else>Branch: <code class="rounded bg-muted px-1 py-0.5 text-xs font-mono">{{ currentBranch }}</code></span>
         </UiDialogDescription>
       </UiDialogHeader>
 
@@ -469,15 +483,31 @@ function statusBadgeClass(status: string) {
                     class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
                   >
                     <Upload class="h-4 w-4" />
-                    Commit to main
+                    Commit to <code class="font-mono text-xs">{{ currentBranch }}</code>
                   </button>
+                  <!-- View PR link if PR already open -->
+                  <a
+                    v-if="existingPrUrl"
+                    :href="existingPrUrl"
+                    target="_blank"
+                    class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent text-primary"
+                    @click="showModeDropdown = false"
+                  >
+                    <ExternalLink class="h-4 w-4" />
+                    View open PR #{{ existingPrNumber }}
+                  </a>
+                  <!-- Create PR button: disabled if on default branch or PR already exists -->
                   <button
+                    v-else
                     type="button"
                     @click="handlePublishPR"
-                    class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent"
+                    :disabled="isDefaultBranch"
+                    class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-sm hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed"
+                    :title="isDefaultBranch ? 'Switch to a feature branch to create a PR' : 'Commit and open a pull request'"
                   >
                     <GitPullRequest class="h-4 w-4" />
                     Create Pull Request
+                    <span v-if="isDefaultBranch" class="ml-auto text-xs text-muted-foreground">on main</span>
                   </button>
                 </div>
               </div>
