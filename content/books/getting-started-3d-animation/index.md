@@ -9,7 +9,7 @@ date: '2025-01-30'
 coverImage: ''
 coverImageAlt: ''
 license: CC BY 4.0
-published: true
+published: false
 theme: lambda
 tags:
   - 3d animation

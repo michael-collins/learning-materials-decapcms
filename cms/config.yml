@@ -1015,8 +1015,16 @@ collections:
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Description", name: "description", widget: "text", required: false}
-      - {label: "Author", name: "author", widget: "string", required: false}
-      - {label: "Author URL", name: "authorUrl", widget: "string", required: false}
+      - label: "Authors"
+        name: "authors"
+        widget: "list"
+        required: false
+        hint: "List of authors for this book. Preferred over the legacy Author field."
+        fields:
+          - {label: "Name", name: "name", widget: "string"}
+          - {label: "URL", name: "url", widget: "string", required: false, hint: "Author's website or profile URL"}
+      - {label: "Author (legacy)", name: "author", widget: "string", required: false, hint: "Legacy single-author name. Use the Authors list above for new content."}
+      - {label: "Author URL (legacy)", name: "authorUrl", widget: "string", required: false}
       - {label: "Date", name: "date", widget: "datetime", required: false}
       - {label: "Cover Image", name: "coverImage", widget: "image", required: false}
       - {label: "Cover Image Alt", name: "coverImageAlt", widget: "string", required: false}
@@ -1035,7 +1043,7 @@ collections:
         name: "themeOverrides"
         widget: "object"
         required: false
-        collapsed: true
+        collapsed: false
         hint: "Override individual theme colors for this book. Use oklch() values, e.g. oklch(0.50 0.28 293). Keys map to --color-{name} CSS variables."
         fields:
           - label: "Light Mode"

@@ -10,9 +10,8 @@ authorUrl: ''
 date: '2026-03-01'
 coverImage: ''
 coverImageAlt: ''
-introductionTitle: Overview
 license: CC BY 4.0
-published: true
+published: false
 theme: lambda
 tags:
   - design
