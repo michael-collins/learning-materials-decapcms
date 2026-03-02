@@ -316,6 +316,88 @@ function hasNextSiblingAtDepth(idx: number, depth: number): boolean {
   return false
 }
 
+/**
+ * Returns true if a closing "add" row at exactly `depth` will be rendered
+ * after visible item at `vIdx`. This happens whenever the visible depth later
+ * drops below `depth` (or we reach end-of-list), meaning the vertical line
+ * needs to continue through this row to connect to that add-row.
+ */
+function hasClosingAddRowAtDepth(vIdx: number, depth: number): boolean {
+  for (let i = vIdx + 1; i < visibleItems.value.length; i++) {
+    const d = visibleItems.value[i]!.item.depth
+    if (d < depth) return true  // depth will drop — closing add-row at `depth` exists
+    if (d === depth) return false // next sibling at depth; hasNextSiblingAtDepth covers this
+  }
+  // End of visible list: the last closing row block will include `depth`
+  return true
+}
+
+// ── Add-row hover highlight ──────────────────────────────────────────
+
+const hoveredAddRow = ref<{ afterId: string; depth: number } | null>(null)
+
+/** Resolve the active highlight target from either add-row hover or an in-progress drag */
+function activeHighlight(): { afterId: string; depth: number } | null {
+  if (hoveredAddRow.value) return hoveredAddRow.value
+  // During a drag (before/after only — 'child' uses its own row highlight)
+  if (draggedId.value && dragOverId.value && dragPosition.value !== 'child' && dragPreviewDepth.value !== null) {
+    return { afterId: dragOverId.value, depth: dragPreviewDepth.value }
+  }
+  return null
+}
+
+/**
+ * Returns true if `itemId` is a sibling of the position targeted by the
+ * currently-hovered add-row or active drag drop position (same depth, same parent).
+ */
+function isSiblingOfAddRow(itemId: string): boolean {
+  const hl = activeHighlight()
+  if (!hl) return false
+  const { afterId, depth } = hl
+  const flatItems = items.value
+  const item = flatItems.find(i => i.id === itemId)
+  if (!item || item.depth !== depth) return false
+  if (depth === 0) return true // all root-level items share the root parent
+  const afterIdx = flatItems.findIndex(i => i.id === afterId)
+  if (afterIdx < 0) return false
+  // For self-drag the dragged item hasn't moved yet — scan backward from the item
+  // *before* it so we find the correct new parent at the preview depth.
+  const scanStart = (afterId === draggedId.value) ? afterIdx - 1 : afterIdx
+  // Walk back to find the parent (nearest item at depth-1)
+  let parentIdx = -1
+  for (let i = scanStart; i >= 0; i--) {
+    if (flatItems[i]!.depth === depth - 1) { parentIdx = i; break }
+    if (flatItems[i]!.depth < depth - 1) break
+  }
+  if (parentIdx < 0) return false
+  // Check whether itemId is a direct child of that parent
+  for (let i = parentIdx + 1; i < flatItems.length; i++) {
+    if (flatItems[i]!.depth < depth) break
+    if (flatItems[i]!.depth === depth && flatItems[i]!.id === itemId) return true
+  }
+  return false
+}
+
+/**
+ * Returns true if the ancestor-bypass vertical line at column `columnDepth`
+ * within `itemId`'s row should be highlighted blue.
+ * Walks up from the item to find its ancestor at `columnDepth`, then checks
+ * whether that ancestor is a sibling of the active highlight target.
+ */
+function isColumnHighlighted(itemId: string, columnDepth: number): boolean {
+  const hl = activeHighlight()
+  if (!hl) return false
+  if (columnDepth !== hl.depth) return false
+  const flatItems = items.value
+  const itemIdx = flatItems.findIndex(i => i.id === itemId)
+  if (itemIdx < 0) return false
+  for (let i = itemIdx; i >= 0; i--) {
+    if (flatItems[i]!.depth === columnDepth) return isSiblingOfAddRow(flatItems[i]!.id)
+    if (flatItems[i]!.depth < columnDepth) return false
+  }
+  return false
+}
+
 // Initialize from prop
 function initFromProp() {
   const val = props.modelValue
@@ -1356,7 +1438,8 @@ function onDragOver(event: DragEvent, id: string) {
   dragCurrentX.value = event.clientX
 
   if (draggedId.value === id) {
-    // Hovering over self: only depth changes (no position target)
+    // Hovering over self: depth-only change — update dragOverId so highlight helpers work
+    dragOverId.value = id
     dragPreviewDepth.value = computePreviewDepth(id)
     return
   }
@@ -1596,22 +1679,22 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
           <!-- Depth spacers with tree lines -->
           <template v-for="d in item.depth" :key="d">
             <div class="relative w-5 h-full shrink-0">
-              <!-- Ancestor levels (d < item.depth): full vertical line if siblings continue -->
+              <!-- Ancestor levels (d < item.depth): full vertical line if siblings continue or there's a closing add-row at d -->
               <div
-                v-if="d < item.depth && hasNextSiblingAtDepth(realIndex, d)"
-                class="absolute left-2 top-0 bottom-0 w-px bg-border"
+                v-if="d < item.depth && (hasNextSiblingAtDepth(realIndex, d) || hasClosingAddRowAtDepth(vIdx, d))"
+                :class="['absolute left-2 top-0 bottom-0 w-px transition-colors', isColumnHighlighted(item.id, d) ? 'bg-primary' : 'bg-border']"
               />
               <!-- Current level (d === item.depth): tree elbow connector -->
               <template v-if="d === item.depth">
                 <!-- Vertical: top half (always — connects from parent line above) -->
-                <div class="absolute left-2 top-0 h-1/2 w-px bg-border" />
+                <div :class="['absolute left-2 top-0 h-1/2 w-px transition-colors', isSiblingOfAddRow(item.id) ? 'bg-primary' : 'bg-border']" />
                 <!-- Vertical: bottom half (if siblings continue below, OR an add-row at this depth follows) -->
                 <div
                   v-if="hasNextSiblingAtDepth(realIndex, d) || closingRows(vIdx).some(r => r.depth === d)"
-                  class="absolute left-2 top-1/2 bottom-0 w-px bg-border"
+                  :class="['absolute left-2 top-1/2 bottom-0 w-px transition-colors', isSiblingOfAddRow(item.id) ? 'bg-primary' : 'bg-border']"
                 />
                 <!-- Horizontal connector: from vertical line to toggle area center -->
-                <div class="absolute left-2 top-1/2 h-px bg-border" style="right: -10px" />
+                <div :class="['absolute left-2 top-1/2 h-px transition-colors', isSiblingOfAddRow(item.id) ? 'bg-primary' : 'bg-border']" style="right: -10px" />
               </template>
             </div>
           </template>
@@ -1623,16 +1706,16 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
           <button
             v-if="hasChildren(realIndex)"
             type="button"
-            class="relative z-10 flex items-center justify-center w-4 h-4 rounded-sm bg-card hover:bg-accent transition-colors"
+            :class="['relative z-10 flex items-center justify-center w-4 h-4 rounded-sm bg-card hover:bg-accent transition-colors', isSiblingOfAddRow(item.id) ? 'ring-1 ring-primary' : '']"
             @click.stop="toggleCollapse(item.id)"
           >
-            <ChevronDown v-if="!collapsedIds.has(item.id)" class="h-3 w-3 text-muted-foreground" />
-            <ChevronRight v-else class="h-3 w-3 text-muted-foreground" />
+            <ChevronDown v-if="!collapsedIds.has(item.id)" :class="['h-3 w-3 transition-colors', isSiblingOfAddRow(item.id) ? 'text-primary' : 'text-muted-foreground']" />
+            <ChevronRight v-else :class="['h-3 w-3 transition-colors', isSiblingOfAddRow(item.id) ? 'text-primary' : 'text-muted-foreground']" />
           </button>
           <!-- Leaf dot -->
           <div
             v-else
-            class="relative z-10 w-1.5 h-1.5 rounded-full bg-border"
+            :class="['relative z-10 w-1.5 h-1.5 rounded-full transition-colors', isSiblingOfAddRow(item.id) ? 'bg-primary' : 'bg-border']"
           />
         </div>
 
@@ -1830,24 +1913,26 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
         role="button"
         :title="`Add ${row.depth === 0 ? 'section' : 'item'} here`"
         class="group/add relative flex items-center h-6 cursor-pointer select-none bg-background transition-colors hover:bg-accent/40"
+        @mouseenter="hoveredAddRow = { afterId: row.afterId, depth: row.depth }"
+        @mouseleave="hoveredAddRow = null"
         @click="addItemAfter(row.afterId)"
       >
         <!-- Tree indent with ancestor lines -->
         <div class="flex items-center shrink-0 h-full pl-2" :style="{ width: `${8 + row.depth * 20}px` }">
           <template v-for="d in row.depth" :key="d">
             <div class="relative w-5 h-full shrink-0">
-              <!-- Ancestor vertical line: only if siblings continue below at that depth -->
+              <!-- Ancestor vertical line: continues if sibling follows OR a shallower closing add-row exists in this same block -->
               <div
-                v-if="d < row.depth && hasNextSiblingAtDepth(row.realIndex, d)"
-                class="absolute left-2 top-0 bottom-0 w-px bg-border"
+                v-if="d < row.depth && (hasNextSiblingAtDepth(row.realIndex, d) || closingRows(vIdx).some(r => r.depth === d))"
+                :class="['absolute left-2 top-0 bottom-0 w-px transition-colors', isColumnHighlighted(row.afterId, d) ? 'bg-primary' : 'bg-border']"
               />
               <!-- Elbow connector at the row's own depth -->
               <template v-if="d === row.depth">
                 <!-- Top half: connects from parent line above -->
-                <div class="absolute left-2 top-0 h-1/2 w-px bg-border" />
+                <div class="absolute left-2 top-0 h-1/2 w-px bg-border group-hover/add:bg-primary transition-colors" />
                 <!-- No bottom half: this is the last position, so line ends here -->
                 <!-- Horizontal connector -->
-                <div class="absolute left-2 top-1/2 h-px bg-border" style="right: -10px" />
+                <div class="absolute left-2 top-1/2 h-px bg-border group-hover/add:bg-primary transition-colors" style="right: -10px" />
               </template>
             </div>
           </template>
@@ -1856,7 +1941,9 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
         <!-- Dot → Plus icon on hover -->
         <div class="w-5 h-full flex items-center justify-center shrink-0 relative">
           <div class="w-1.5 h-1.5 rounded-full bg-border group-hover/add:opacity-0 transition-opacity" />
-          <Plus class="h-3 w-3 text-muted-foreground absolute opacity-0 group-hover/add:opacity-100 transition-opacity" />
+          <div class="absolute flex items-center justify-center w-4 h-4 rounded-sm bg-primary opacity-0 group-hover/add:opacity-100 transition-opacity">
+            <Plus class="h-3 w-3 text-primary-foreground" />
+          </div>
         </div>
 
         <!-- Label, visible only on hover -->
