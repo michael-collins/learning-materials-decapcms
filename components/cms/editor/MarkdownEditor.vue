@@ -12,6 +12,7 @@
  */
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Markdown } from 'tiptap-markdown'
@@ -125,6 +126,11 @@ const editor = useEditor({
     Link.configure({
       openOnClick: false,
       HTMLAttributes: { class: 'editor-link' },
+    }),
+    Image.configure({
+      inline: false,
+      allowBase64: false,
+      HTMLAttributes: { class: 'rounded-lg max-w-full' },
     }),
     Placeholder.configure({
       placeholder: props.placeholder || 'Start writing your content...',

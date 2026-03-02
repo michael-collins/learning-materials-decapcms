@@ -7,7 +7,7 @@
  * Publish-to-GitHub flow includes a sync check to prevent
  * accidental overwrites when local and remote diverge.
  */
-import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, Archive, GitBranch, ChevronDown } from 'lucide-vue-next'
+import { ChevronLeft, CheckCircle, ExternalLink, AlertCircle, Loader2, Archive, GitBranch, ChevronDown, Trash2 } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'cms',
@@ -44,6 +44,34 @@ const unpublishedChanges = ref(false)
 /** Whether a discard operation is in progress */
 const discarding = ref(false)
 const discardError = ref<string | null>(null)
+
+// ─── Delete state ───────────────────────────────────────
+const deleting = ref(false)
+const deleteError = ref<string | null>(null)
+const showDeleteConfirm = ref(false)
+
+async function handleDelete() {
+  deleting.value = true
+  deleteError.value = null
+  try {
+    const token = getToken()
+    await $fetch('/api/cms/content/delete', {
+      method: 'POST',
+      body: {
+        collection: collectionName.value,
+        slug: slug.value,
+        ...(token ? { token } : {}),
+      },
+    })
+    // Navigate back to the collection list after successful deletion
+    await navigateTo(`/cms/${collectionName.value}`)
+  } catch (err: any) {
+    deleteError.value = err.data?.message || err.message || 'Failed to delete item'
+    showDeleteConfirm.value = false
+  } finally {
+    deleting.value = false
+  }
+}
 
 // ─── Sync conflict dialog state ─────────────────────────
 const showSyncDialog = ref(false)
@@ -461,8 +489,45 @@ async function handleDiscard() {
           Edit: {{ initialData?.title || slug }}
         </h1>
 
-        <!-- Version switcher (only for collections with a version field) -->
-        <div v-if="hasVersionField && initialData && !loading && !showSuccess" class="relative">
+        <!-- Right-side header controls (delete + version switcher) -->
+        <div v-if="initialData && !loading && !showSuccess" class="flex items-center gap-3">
+
+          <!-- Delete button -->
+          <button
+            v-if="!showDeleteConfirm"
+            type="button"
+            :disabled="deleting"
+            class="flex items-center gap-1.5 rounded-md border border-destructive/40 px-3 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+            @click="showDeleteConfirm = true"
+          >
+            <Trash2 class="h-3.5 w-3.5" />
+            Delete
+          </button>
+          <!-- Confirm prompt -->
+          <div v-else class="flex items-center gap-2">
+            <span class="text-sm text-destructive">Delete permanently?</span>
+            <button
+              type="button"
+              :disabled="deleting"
+              class="flex items-center gap-1.5 rounded-md bg-destructive px-3 py-1.5 text-sm font-medium text-destructive-foreground transition-colors hover:bg-destructive/90 disabled:opacity-50"
+              @click="handleDelete"
+            >
+              <Loader2 v-if="deleting" class="h-3.5 w-3.5 animate-spin" />
+              <Trash2 v-else class="h-3.5 w-3.5" />
+              Yes, delete
+            </button>
+            <button
+              type="button"
+              :disabled="deleting"
+              class="rounded-md border px-3 py-1.5 text-sm transition-colors hover:bg-accent disabled:opacity-50"
+              @click="showDeleteConfirm = false"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <!-- Version switcher (only for collections with a version field) -->
+          <div v-if="hasVersionField" class="relative">
           <button
             type="button"
             @click="toggleVersionSwitcher"
@@ -525,6 +590,9 @@ async function handleDiscard() {
             />
           </Teleport>
         </div>
+        <!-- /version switcher -->
+        </div>
+        <!-- /right-side header controls -->
       </div>
     </div>
 
@@ -638,6 +706,15 @@ async function handleDiscard() {
     >
       <AlertCircle class="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
       <p class="text-sm text-destructive">{{ discardError }}</p>
+    </div>
+
+    <!-- Delete Error -->
+    <div
+      v-if="deleteError"
+      class="mb-6 flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/5 p-4"
+    >
+      <AlertCircle class="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+      <p class="text-sm text-destructive">{{ deleteError }}</p>
     </div>
 
     <!-- Form -->
