@@ -1,11 +1,6 @@
 ---
-recordId: recKy155GBMBZKNjJ
 title: Ideas In Motion
-date: 2026-01-12T12:00:00.000Z
-slug: ideas-in-motion
-type: 'oer:Assessment'
-difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrWRqmkePyLUhIndLHarj7H-
+difficulty: Intermediate
 image: /uploads/recKy155GBMBZKNjJ_image_cycles-banner-compressed2.jpg
 imageAlt: cycles-banner-compressed2.jpg
 license: CC BY 4.0
@@ -13,15 +8,18 @@ aiLicense:
   - AIUL-WA
   - AIUL-CD
   - AIUL-NA-3D
-rubric: project
 tags:
   - Blender
   - AfterEffects
+authors: []
 author: Michael Collins
-course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
+version: 1.0.0
+versionStatus: latest
+publishEmbed: true
+prerequisites: []
 attachments:
   - file: /uploads/recWIZ9by8kdM9JEo_attachment_dart303-project-concepts.docx
     title: Concept Development Worksheet (.docx)
@@ -37,10 +35,7 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: application/pdf
-version: '1.0.0'
-versionStatus: latest
 ---
-
 In this project, you will apply creative 3D production workflows to develop a 30 second animation. You will pursue your own interests while balance solving for the project's theme.
 
 
@@ -150,4 +145,3 @@ Do not produce work that could be construed as ‘fan art’ for existing intell
 
 ::rubric-component{id="project"}
 ::
-
