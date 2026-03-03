@@ -8,7 +8,7 @@
  */
 import {
   Blocks, Play, Globe, CodeXml, Presentation, ClipboardList, Box, Package, Quote, ImagePlus,
-  AlertTriangle, ChevronsUpDown, LayoutGrid, RectangleHorizontal, Minus, ArrowUpDown,
+  AlertTriangle, ChevronsUpDown, LayoutGrid, RectangleHorizontal, Minus, ArrowUpDown, Images,
 } from 'lucide-vue-next'
 
 const emit = defineEmits<{
@@ -17,6 +17,7 @@ const emit = defineEmits<{
 
 const showDropdown = ref(false)
 const activeComponent = ref<MdcComponentDef | null>(null)
+const showGalleryEditor = ref(false)
 const triggerRef = ref<HTMLElement | null>(null)
 const dropdownStyle = ref<Record<string, string>>({})
 
@@ -343,6 +344,20 @@ function openComponentModal(comp: MdcComponentDef) {
   showDropdown.value = false
 }
 
+function openGalleryEditor() {
+  showGalleryEditor.value = true
+  showDropdown.value = false
+}
+
+function handleGalleryInsert(mdcBlock: string) {
+  emit('insert', mdcBlock)
+  showGalleryEditor.value = false
+}
+
+function handleGalleryCancel() {
+  showGalleryEditor.value = false
+}
+
 function insertSnippet(snippet: MdcSnippetDef) {
   emit('insert', snippet.snippet)
   showDropdown.value = false
@@ -401,6 +416,15 @@ function handleCancel() {
         <component :is="comp.icon" class="h-4 w-4" :class="comp.color" />
         {{ comp.label }}
       </button>
+      <!-- Gallery (custom editor modal) -->
+      <button
+        type="button"
+        @click="openGalleryEditor"
+        class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
+      >
+        <Images class="h-4 w-4 text-pink-500" />
+        Image Gallery
+      </button>
 
       <!-- Layout snippets (insert directly into code view) -->
       <div class="my-1 border-t border-border" />
@@ -424,5 +448,12 @@ function handleCancel() {
     :component="activeComponent"
     @insert="handleInsert"
     @cancel="handleCancel"
+  />
+
+  <!-- Gallery editor modal -->
+  <CmsGalleryEditorModal
+    v-if="showGalleryEditor"
+    @insert="handleGalleryInsert"
+    @cancel="handleGalleryCancel"
   />
 </template>

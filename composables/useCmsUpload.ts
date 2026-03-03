@@ -36,15 +36,9 @@ function sanitizeFilename(originalFilename: string): string {
 }
 
 export function useCmsUpload() {
-  const { getToken } = useCmsAuth()
+  const { getToken, isAuthenticated } = useCmsAuth()
   const { config } = useCmsConfig()
 
-  /**
-   * Upload a file to the CMS media storage.
-   *
-   * Production: calls GitHub Contents API directly from the browser.
-   * Dev: posts to /api/cms/media/upload (local filesystem).
-   */
   /**
    * Returns the raw GitHub URL for a public path (for immediate preview of just-uploaded files).
    */
@@ -55,9 +49,41 @@ export function useCmsUpload() {
     return `https://raw.githubusercontent.com/${repoStr}/${branch}/public${publicPath}`
   }
 
+  /**
+   * Resolve the GitHub access token.
+   *
+   * PAT users: token is in memory (localStorage-backed).
+   * OAuth users: token is in an httpOnly session cookie — fetch it from the
+   * server /api/cms/auth/token endpoint so we can use it for direct GitHub API
+   * calls (bypassing Netlify's 1 MB function body limit).
+   */
+  async function resolveToken(): Promise<string | null> {
+    const pat = getToken()
+    if (pat) return pat
+
+    // OAuth path — retrieve token from session cookie on the server
+    if (isAuthenticated.value) {
+      try {
+        const res = await $fetch<{ token: string }>('/api/cms/auth/token')
+        return res.token || null
+      } catch {
+        return null
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * Upload a file to the CMS media storage.
+   *
+   * Production (PAT or OAuth): calls GitHub Contents API directly from the
+   * browser to avoid Netlify's 1 MB function body limit.
+   * Local dev fallback: posts to /api/cms/media/upload (local filesystem).
+   */
   async function uploadFile(file: File, folder: string = 'uploads'): Promise<{ path: string; filename: string; rawUrl?: string }> {
     const base64 = await fileToBase64(file)
-    const token = getToken()
+    const token = await resolveToken()
     const safeFilename = sanitizeFilename(file.name)
     const normalizedFolder = folder.replace(/\.\./g, '').replace(/^\//, '')
 
