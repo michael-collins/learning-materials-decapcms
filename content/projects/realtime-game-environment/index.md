@@ -1,7 +1,7 @@
 ---
 title: Realtime Game Environment
 difficulty: Beginner
-image: ''
+image: /uploads/game-environment-banner-mmaenefy.jpg
 imageAlt: Banner image of a game environment.
 license: CC BY 4.0
 aiLicense:
@@ -21,15 +21,6 @@ versionStatus: latest
 publishEmbed: true
 prerequisites: []
 attachments:
-  - file: /uploads/recc2Pn0D4cExQqgE_attachment_static-image-project.png
-    title: Project Workflow (Static images)
-    description: The 5-step project production process
-    alt: >-
-      A diagram of the project production process including pre-viz, intention
-      statement, craft, work statement, and critique.
-    citation: ''
-    sourceUrl: ''
-    type: image/png
   - file: >-
       /uploads/recAhknW8gYC34qZr_attachment_dart303-project-statement-worksheet-1.docx
     title: Work Statement Worksheet (.doc)
@@ -39,60 +30,91 @@ attachments:
     sourceUrl: ''
     type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
 ---
-For this project, you will produce 3D rendered poster series of objects that you encounter every day, but augmented in such a way changing their nature including material qualities, operation or use, or the system or environmental context.
+For this project, you will design and build a simple first person real-time 3D game environment that functions not only as a playable space, but as a meaningful spatial experience. In games, environments guide a players movement, establish atmosphere, suggest histories, and communicate how a world is used without relying entirely on dialogue or text. As you design the environment, think about how space itself can tell a story, and what kinds of stories are important to tell. How does a player understand where they are, what happened there, who belongs there, and what kinds of actions are possible?
 
-To explore these concepts, we delve into the philosophical realm of objects and their existence, considering how we interact with them in both a functional and perceptual sense. [***Ontology***](https://www.merriam-webster.com/dictionary/ontology), the study of being, invites us to question not just what objects *are* but *how* they are—how they exist independently of human utility and purpose. By distorting or modifying the object, you are encouraged to explore the essence of its being outside of the roles assigned to it by human need or desire.
+This project asks you to consider game design, architecture, and spatial theory. In game studies, environment design is often understood as a form of environmental storytelling, where space communicates narrative, mood, and player possibility through layout, objects, lighting, and atmosphere. In architecture and urban design, theorists such as Kevin Lynch, Juhani Pallasmaa, and Gaston Bachelard help us think about how spaces become legible, memorable, sensory, and emotionally meaningful. As you research and design your environment, consider not just what your space looks like, but how it guides, affects, and communicates with a player.
 
-We will also touch on the concept of hyper-objects—entities that transcend our immediate comprehension and experience, such as climate change or the internet. These phenomena challenge our usual boundaries of time, space, and perception. As you alter your chosen object, consider whether it can become something more than a mere item of daily use. Can its altered form push it into a new realm of being, perhaps even taking on characteristics of a hyper-object that defies easy understanding?
-
-**Further reading:**
-
-1. [**Anthony Dunne & Fiona Raby - *Speculative Everything: Design, Fiction, and Social Dreaming***](http://ezaccess.libraries.psu.edu/login?url=https://search.ebscohost.com/login.aspx?direct=true&db=nlebk&AN=672907&site=ehost-live&scope=site&ebv=EB&ppid=pp_Cover) **(2013):** Dunne and Raby explore the use of speculative design as a tool for reimagining objects and systems. This book will help you think critically about how design can question the status quo and offer alternative realities, which aligns with the idea of augmenting objects to alter their utility and context.
-2. [**Joseph Bedford - Is There an Object Oriented Architecture? : Engaging Graham Harman**](http://ezaccess.libraries.psu.edu/login?url=https://search.ebscohost.com/login.aspx?direct=true&db=nlebk&AN=2332813&site=ehost-live&scope=site&ebv=EB&ppid=pp_15) **(2020):** Harman's work is central to Object-Oriented Ontology (OOO), a branch of metaphysics that explores the independence of objects from human perception. This book provides a foundational understanding of how objects interact with one another outside of human intervention.
-3. [**Timothy Morton - *Hyperobjects: Philosophy and Ecology after the End of the World***](https://ebookcentral.proquest.com/lib/pensu/detail.action?docID=1477347) **(2013):** Morton introduces the concept of hyper-objects, entities that are massively distributed in time and space. His work helps us understand how objects might exist beyond immediate human comprehension, providing insight into the philosophical underpinnings of your project.
-4. [**Jane Bennett - *Vibrant Matter: A Political Ecology of Things***](https://www-jstor-org.ezaccess.libraries.psu.edu/stable/j.ctv111jh6w.2) **(2010):** Bennett’s work on new materialism discusses the vitality of objects and their ability to act independently of human agency. This text expands on the idea that objects possess their own agency and liveliness.
-5. [**Ian Bogost - *Alien Phenomenology, or What It’s Like to Be a Thing***](https://carbonfarm.us/555/bogost-ontography.pdf) **(2012):** This book explores the speculative philosophy of objects and offers a more accessible take on object-oriented thought, pushing you to think about objects beyond human-centered perspectives.
+1. [**Gaston Bachelard – *The Poetics of Space***](https://catalog.libraries.psu.edu/catalog/18365742) **(2014):** Bachelard explores how intimate spaces like rooms, attics, drawers, corners, and nests can shape memory, imagination, and feeling. This reading focuses on emotional tone, symbolic space, or the psychology of interiors and environmental storytelling.
+2. [**Henry Jenkins – *Game Design as Narrative Architecture***](https://paas.org.pl/wp-content/uploads/2012/12/09.-Henry-Jenkins-Game-Design-As-Narrative-Architecture.pdf) **(2004):** Jenkins argues for understanding games as spaces with narrative possibilities. This is a useful starting point for thinking about environments as active in the process of meaning-making rather than passive backgrounds.
+3. [**Kevin Lynch – *The Image of the City***](https://www.cooldavis.org/wp-content/uploads/2022/03/THE_IMAGE_OF_THE_CITY_Kevin_Lynch.pdf) **(1960):** Lynch’s concept of imageability helps explain how spaces become vivid, memorable, and navigable, and discusses the importance of landmarks, paths, edges, districts, and nodes.
+4. [**Juhani Pallasmaa – *The Eyes of the Skin: Architecture and the Senses***](https://onlinelibrary-wiley-com.ezaccess.libraries.psu.edu/doi/book/10.1002/9781394200702)** *(1996):*** Pallasmaa’s book is a classic of architectural theory and asks why design is so often treated as purely visual when human experience is multi-sensory. This is useful for thinking about atmosphere, embodiment, sound, surface, light, compression, scale, and mood.
 
 ## Learning Objectives
 
-1. Demonstrate understanding of modeling, texturing, lighting and rendering using 3D software.
-2. Practice creative problem solving and visual storytelling skills.
-3. Explore ideas of material, form, and ontology through creative image production.
-4. Engage with conceptual questions related to the 'object' through a short work statement. (Your writing should be specific to your work, and not be generated via AI tools)
+1. Practice creative problem solving and visual storytelling skills.
+2. Demonstrate understanding of real-time 3D environment production through modeling, materials, lighting, scene assembly, optimization, and animation.
+3. Practice visual storytelling through the design of spatial atmosphere, layout, props, and environmental detail.
+4. Apply ideas from game design and spatial theory to the development of an explorable 3D environment.
 
 ## Instructions
 
-1. **Read** the project description and identify at least one of the listed readings to aid in the pre-viz research.
-2. Review the project **requirements.**
-3. **Review links** in Associated Material to see how artists and designers engage with related themes to the project.
-4. Go through the **project development process** (*See downloads for diagram image*):
-   1. Pre-viz (references, sketch, research)
-   2. Concept development proposals
-   3. Production steps (model, texture, light, render) and post-production (compositing, color grade, export)
-   4. Work Statement
-5. You will engage in an online feedback and discussion with your peers.
+1. Read the project description and select at least **one reading** from the list above to support your research and design process.
+
+2. Based on the concept development worksheet you completed, identify whether the setting or scenario is realistic, stylized, speculative, historical, surreal, atmospheric, or genre-based.
+
+3. Consider the role of the environment as a designed space:
+
+   - Who uses this place?
+
+   - What happened here?
+
+   - What mood should the player feel?
+
+   - How does the space guide exploration or interaction?
+
+4. Go through the production process:
+
+   1. **Pre-viz** (references, sketches, mood boards, layout ideas, research)
+
+   2. **Production** (blockout, modeling, materials, lighting, real-time implementation, optimization)
+
+      1. Rather than building everything as a one-off asset, build **low-poly modular assets** that can be reused in the scene to construct the environment.
+
+   3. **Reflection / work statement**
+
+5. Share progress updates and participate in critique and feedback with peers.
 
 ## Requirements
 
-**Pre-viz:**
+### Pre-viz
 
-1. **Sketches (.jpg or .png):** label, and write ideas in physical/digital sketchbook.
-   - Fill 3 to 5 pages of your sketchbook with project ideas. You may also work digitally if you prefer an all digital workflow, in which case, sketch the equivalent of 3 to 5 pages of a paper sketchbook.
-   - Upload `jpg` or `png` images of sketchbook pages.
-   - Must be clearly scanned or photographed. This should look professional, do not upload blurry, rotated, poorly cropped images.
-2. **Reference sheet (.jpg or .png):** Find reference images and put them into a large image canvas. [See example](https://3.bp.blogspot.com/-4Yut0Kf3RvM/VsMZtsN8XaI/AAAAAAAABLs/vHE3iQ7FtLw/s1600/Roman_Times_Moodboard_.jpg) of mood board. Save as a single image.
-   - You can use [PureRef](https://www.pureref.com/), Photoshop, [Mural.co](https://www.mural.co/), or similar tools.
-   - Submit references as a combined image as a `png` or `jpg`
-3. **Work intent (.doc):** Describe what you will be doing.
-   - Include name and date
-   - Short one sentence description of what you intend to make.
-   - Upload this in an MS Word `doc` format.
+1. **Sketches / diagrams** (`.jpg` or `.png`)
 
-**Production updates (.jpg or .png):**
+   - Produce **3–5 pages** of concept sketches, thumbnails, maps, or layout ideas. Please add notations and labels.
 
-1. Submit screenshots from software showing significant progress to the **Project updates** discussion thread.
-2. Write a reflection about your creative process, technical process, and if AI tools are being used. If AI tools are used, which ones, how are they being used, and how did they impact your work, process, and outcomes.
-3. Meet with instructor if needed.
+   - These can include top-down level ideas, perspective sketches, focal-point studies, lighting studies, or prop concepts.
+
+2. **Reference sheet / mood board** (`.jpg` or `.png`)
+
+   - Compile references for architecture, landscape, lighting, materials, props, composition, and atmosphere.
+
+   - Save references as one organized image sheet.
+
+3. **Intent document** (`.doc`)
+
+   - Include your name and date.
+
+   - Write a short description of the environment you plan to create.
+
+   - Identify the key concept, mood, and player experience.
+
+   - Briefly note which reading or theory is helping shape your approach.
+
+### Production updates
+
+1. Submit screenshots from Blender and PlayCanvas showing major progress stages:
+
+   - blockout
+
+   - low poly asset development
+
+   - texturing/material setup
+
+   - lighting
+
+2. Write a brief reflection on your creative and technical process.
+
+3. If AI tools are used for brainstorming, reference gathering, or ideation, explain how they were used and how they affected the process. If they supported a technical production process, please explain what tools were used and how it impacted the production.
 
 **Work Statement (.doc):**
 
@@ -100,21 +122,25 @@ A work statement is a clear articulation about what you’ve made. This is not a
 \
 **Upload work (.zip):**
 
-1. Four rendered images total. Three posters and one render with the posters in a scene arranged on a wall.
-   1. The posters should be 2400px × 3600px in portrait orientation (tall).
-   2. The rendered poster scene should be 1920px x 1080px landscape orientation (wide).
-2. Upload final materials as a `LASTNAME-project1-files.zip` file
+1. A recorded video of you doing a walkthrough of the game environment.
+2. One or more renders of your game assets
+   1. The renders should be 1920px x 1080px landscape orientation (wide).
+3. A link to the live PlayCanvas scene.
+4. Upload production materials as a `LASTNAME-project1-files.zip` file
    1. Include final work statement
       - MS Word .doc format
       - 150 words minimum
       - file name: `LASTNAME-project1-statement.doc`
    2. Include the media you created
-3. Post your render(s) to the **Project discussion** discussion thread.
-4. Participate in work critique with peers.
+5. Post your render(s) to the **Project discussion** discussion thread.
+6. Participate in work critique with peers.
 
 ## Tutorial
 
-::iframe-component{src="https://youtube.com/embed/videoseries?list=PL-V2nChTadrV1iw9_XUwArDOs5mwu6fAk" title="Project Tutorial"}
+::video-component{src="https://youtube.com/playlist?list=PL-V2nChTadrVuW5-ZxIkQZSKewzQMrDJj" title="PlayCanvas Tutorials"}
+::
+
+::video-component{src="https://youtube.com/playlist?list=PLn3ukorJv4vul0BmORcWYNOVi3nnna-M4" title="Grant Abbitt – Low Poly Game Modeling"}
 ::
 
 ## Grading Rubric
