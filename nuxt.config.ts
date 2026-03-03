@@ -105,10 +105,30 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'netlify',
     prerender: {
-      crawlLinks: true,
+      // crawlLinks disabled to keep build fast (was generating all 400+ pages).
+      // Pages NOT listed in routes[] are SSR'd via Netlify Functions — still
+      // fully served, just rendered on first request instead of at build time.
+      //
+      // ADD content paths here if they are embedded via iframe and need the
+      // fast static TTFB (50-150ms) rather than SSR cold-start (300ms-3s):
+      //   e.g. '/lessons', '/exercises', '/lectures'
+      // Nuxt will crawl links starting from those paths and prerender them all.
+      crawlLinks: false,
       routes: ['/'],
       ignore: ['/admin', '/docs/about', '/docs/home'],
       failOnError: false
+    },
+    // Cache SSR responses at Netlify's CDN edge for non-prerendered routes.
+    // This means only the very first visitor after a deploy hits the cold
+    // Netlify Function — all subsequent requests are served from the CDN cache.
+    // Adjust max-age as needed; stale-while-revalidate keeps it fresh silently.
+    routeRules: {
+      '/lessons/**':        { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/exercises/**':      { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/lectures/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/tutorials/**':      { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/projects/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/articles/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
     }
   }
 })
