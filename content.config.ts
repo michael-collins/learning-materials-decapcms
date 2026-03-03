@@ -1,5 +1,38 @@
 import { defineContentConfig, defineCollection, z } from '@nuxt/content'
 
+// Fixed-depth outline node schema for book table of contents.
+// Nuxt Content doesn't support z.lazy() recursive schemas, so we
+// unroll to 4 levels deep (leaf → L3 → L2 → L1), which is sufficient
+// for most book structures (Part > Chapter > Section > Subsection).
+const outlineLeaf = z.object({
+  title: z.string(),
+  path: z.string().optional(),
+  content: z.string().optional(),
+  version: z.string().optional(),
+  icon: z.string().optional(),
+  imported: z.boolean().optional(),
+  locked: z.boolean().optional(),
+  importChildren: z.boolean().optional(),
+})
+
+const outlineL3 = outlineLeaf.extend({
+  items: z.array(outlineLeaf).optional(),
+})
+
+const outlineL2 = outlineLeaf.extend({
+  items: z.array(outlineL3).optional(),
+})
+
+const outlineNodeSchema = outlineLeaf.extend({
+  items: z.array(outlineL2).optional(),
+})
+
+// Shared author entry schema
+const authorEntrySchema = z.object({
+  name: z.string(),
+  url: z.string().optional(),
+})
+
 export default defineContentConfig({
   collections: {
     articles: defineCollection({
@@ -8,10 +41,14 @@ export default defineContentConfig({
       schema: z.object({
         title: z.string(),
         description: z.string(),
+        // Multi-author support (preferred)
+        authors: z.array(authorEntrySchema).optional(),
+        // Legacy single-author fields (kept for backward compat)
         author: z.string().optional(),
         authorUrl: z.string().optional(),
         date: z.string().optional(),
         license: z.string().optional(),
+        course: z.string().optional(),
         allowEmbed: z.boolean().optional(),
         prerequisites: z.array(z.any()).optional(),
         // Version control fields
@@ -32,11 +69,16 @@ export default defineContentConfig({
       schema: z.object({
         title: z.string(),
         description: z.string(),
+        // Multi-author support (preferred)
+        authors: z.array(authorEntrySchema).optional(),
+        // Legacy single-author fields (kept for backward compat)
         author: z.string().optional(),
         authorUrl: z.string().optional(),
         date: z.string().optional(),
         license: z.string().optional(),
-        allowEmbed: z.boolean().optional(),        prerequisites: z.array(z.any()).optional(),        prerequisites: z.array(z.any()).optional(),
+        course: z.string().optional(),
+        allowEmbed: z.boolean().optional(),
+        prerequisites: z.array(z.any()).optional(),
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
@@ -59,12 +101,17 @@ export default defineContentConfig({
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         license: z.string().optional(),
-        aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
-        tags: z.array(z.string()).optional(),
+        course: z.string().optional(),
+        // Multi-author support (preferred)
+        authors: z.array(authorEntrySchema).optional(),
+        // Legacy single-author fields (kept for backward compat)
         author: z.string().optional(),
         authorUrl: z.string().optional(),
+        aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
+        tags: z.array(z.string()).optional(),
         published: z.boolean().optional(),
-        allowEmbed: z.boolean().optional(),        prerequisites: z.array(z.any()).optional(),        prerequisites: z.array(z.any()).optional(),
+        allowEmbed: z.boolean().optional(),
+        prerequisites: z.array(z.any()).optional(),
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
@@ -98,10 +145,14 @@ export default defineContentConfig({
         image: z.string().optional(),
         imageAlt: z.string().optional(),
         license: z.string().optional(),
-        aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
-        tags: z.array(z.string()).optional(),
+        course: z.string().optional(),
+        // Multi-author support (preferred)
+        authors: z.array(authorEntrySchema).optional(),
+        // Legacy single-author fields (kept for backward compat)
         author: z.string().optional(),
         authorUrl: z.string().optional(),
+        aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
+        tags: z.array(z.string()).optional(),
         published: z.boolean().optional(),
         allowEmbed: z.boolean().optional(),
         prerequisites: z.array(z.any()).optional(),
@@ -234,6 +285,8 @@ export default defineContentConfig({
         resources: z.array(z.string()).optional(),
         projects: z.array(z.string()).optional(),
         items: z.array(z.any()).optional(),
+        // Outline-based content structure (preferred, replaces flat arrays)
+        outline: z.array(outlineNodeSchema).optional(),
         prerequisites: z.array(z.any()).optional(),
         published: z.boolean().optional(),
         allowEmbed: z.boolean().optional(),
@@ -247,8 +300,6 @@ export default defineContentConfig({
         // Version control fields
         version: z.string().optional(),
         versionStatus: z.enum(['latest', 'archived', 'deprecated']).optional(),
-        changelog: z.string().optional(),
-        breakingChanges: z.array(z.string()).optional(),
       })
     }),
     docs: defineCollection({
@@ -274,6 +325,35 @@ export default defineContentConfig({
           name: z.string(),
           description: z.string().optional(),
         })).optional(),
+      })
+    }),
+    books: defineCollection({
+      type: 'page',
+      source: 'books/*/index.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        // Multi-author support (preferred)
+        authors: z.array(authorEntrySchema).optional(),
+        // Legacy single-author fields (kept for backward compat)
+        author: z.string().optional(),
+        authorUrl: z.string().optional(),
+        date: z.string().optional(),
+        license: z.string().optional(),
+        course: z.string().optional(),
+        coverImage: z.string().optional(),
+        coverImageAlt: z.string().optional(),
+        published: z.boolean().optional(),
+        theme: z.enum(['default', 'lambda', 'minimal']).optional(),
+        tags: z.array(z.string()).optional(),
+        introductionTitle: z.string().optional(),
+        // Per-book color overrides — short var names (without --color-) mapped to oklch values
+        themeOverrides: z.object({
+          light: z.record(z.string(), z.string()).optional(),
+          dark: z.record(z.string(), z.string()).optional(),
+        }).optional(),
+        // Book outline — hierarchical tree of chapters/sections
+        outline: z.array(outlineNodeSchema).optional(),
       })
     })
   }

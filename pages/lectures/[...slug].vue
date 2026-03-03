@@ -73,6 +73,7 @@ const oerSchema = computed(() => {
         :breadcrumbs="isEmbed ? [] : breadcrumbs"
         :title="lecture.title"
         :date="lecture.date"
+        :authors="lecture.authors"
         :author="lecture.author"
         :authorUrl="lecture.authorUrl"
         :license="lecture.license"

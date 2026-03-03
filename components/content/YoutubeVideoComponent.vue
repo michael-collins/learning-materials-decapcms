@@ -2,9 +2,15 @@
 interface Props {
   id: string
   title?: string
+  caption?: string
+  align?: 'left' | 'center' | 'right' | 'full'
+  size?: 'small' | 'medium' | 'large' | 'full'
+  float?: 'left' | 'right' | 'none'
 }
 
 const props = defineProps<Props>()
+
+const { layoutClasses } = useMdcLayout(props)
 
 // Construct the embed URL
 const embedUrl = computed(() => {
@@ -13,7 +19,7 @@ const embedUrl = computed(() => {
 </script>
 
 <template>
-  <div class="youtube-video-wrapper my-8">
+  <div class="youtube-video-wrapper my-8" :class="layoutClasses">
     <div class="relative w-full overflow-hidden rounded-lg" style="padding-top: 56.25%;">
       <iframe
         :src="embedUrl"
@@ -23,14 +29,8 @@ const embedUrl = computed(() => {
         allowfullscreen
       />
     </div>
-    <p v-if="title" class="text-sm text-muted-foreground mt-2 text-center">
-      {{ title }}
+    <p v-if="title || caption" class="text-sm text-muted-foreground mt-2 text-center">
+      {{ caption || title }}
     </p>
   </div>
 </template>
-
-<style scoped>
-.youtube-video-wrapper {
-  max-width: 100%;
-}
-</style>

@@ -4,6 +4,9 @@ interface Props {
   title?: string
   width?: string
   height?: string
+  caption?: string
+  credit?: string
+  creditUrl?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -75,10 +78,13 @@ const sketchfabEmbedUrl = computed(() => {
       />
     </div>
     
-    <!-- Title caption -->
-    <p v-if="title" class="text-sm text-muted-foreground mt-2 text-center">
-      {{ title }}
-    </p>
+    <MediaCaption
+      :title="title"
+      :caption="caption"
+      :credit="credit"
+      :credit-url="creditUrl"
+      component-type="sketchfab"
+    />
   </div>
 </template>
 

@@ -1,0 +1,29 @@
+---
+title: Daily Design Journal
+authors:
+  - name: Michael Collins
+date: '2026-03-01'
+license: CC BY 4.0
+difficulty: beginner
+course: dmd100
+tags:
+  - dmd-100
+  - lesson-1
+  - activity
+published: true
+---
+
+Now that you have documented at least one object each day for two weeks, it's time to talk about it, shown-and-tell style.
+
+## Prompt
+
+1. From the 14 objects that you sketched, which are your favorite objects? Why?
+2. Select one object from your list. What role does this object play in your life? What would be the result if you did not have it anymore?
+3. Do you generally take these objects for granted or are they special?
+
+## Instructions
+
+1. Respond to the prompt questions in Canvas.
+2. Upload all 14 of your sketches in JPG format.
+    - **Please either use a scanner or take clear and well lit photographs.**
+2. Write your responses to the prompt questions at the end of the two weeks.

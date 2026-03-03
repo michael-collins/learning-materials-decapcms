@@ -4,6 +4,12 @@ interface Props {
   title?: string
   width?: string
   height?: string
+  caption?: string
+  credit?: string
+  creditUrl?: string
+  align?: 'left' | 'center' | 'right' | 'full'
+  size?: 'small' | 'medium' | 'large' | 'full'
+  float?: 'left' | 'right' | 'none'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,16 +49,24 @@ const embedUrl = computed(() => {
   
   return url
 })
+const { layoutClasses } = useMdcLayout(props)
 </script>
 
 <template>
-  <div class="iframe-container my-8 rounded-lg overflow-hidden border border-border bg-muted/30">
+  <div class="iframe-container my-8 rounded-lg overflow-hidden border border-border bg-muted/30" :class="layoutClasses">
     <iframe
       :src="embedUrl"
       :title="title"
       frameborder="0"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
+    />
+    <MediaCaption
+      :title="title"
+      :caption="caption"
+      :credit="credit"
+      :credit-url="creditUrl"
+      component-type="iframe"
     />
   </div>
 </template>

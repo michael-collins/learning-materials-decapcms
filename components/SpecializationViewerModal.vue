@@ -300,6 +300,39 @@ const getItemIcon = (type: string) => {
   }
 }
 
+/**
+ * Returns items grouped with category and sub-category dividers inserted when
+ * categoryTitle / subCategoryTitle changes.
+ * Each entry is one of:
+ *   { kind: 'category', title, level: 0 }   — primary heading
+ *   { kind: 'category', title, level: 1 }   — sub-heading (indented)
+ *   { kind: 'item', item, flatIndex }
+ */
+const getGroupedItems = (lesson: any): Array<
+  | { kind: 'category'; title: string; level: number }
+  | { kind: 'item'; item: any; flatIndex: number }
+> => {
+  if (!lesson?.items?.length) return []
+  const result: Array<{ kind: 'category'; title: string; level: number } | { kind: 'item'; item: any; flatIndex: number }> = []
+  let lastCategory: string | undefined = undefined
+  let lastSubCategory: string | undefined = undefined
+  lesson.items.forEach((item: any, idx: number) => {
+    // Primary category divider
+    if (item.categoryTitle && item.categoryTitle !== lastCategory) {
+      result.push({ kind: 'category', title: item.categoryTitle, level: 0 })
+      lastCategory = item.categoryTitle
+      lastSubCategory = undefined // reset sub-category on new primary
+    }
+    // Sub-category divider (only emit when there's actually a sub-category distinct from category)
+    if (item.subCategoryTitle && item.subCategoryTitle !== lastSubCategory) {
+      result.push({ kind: 'category', title: item.subCategoryTitle, level: 1 })
+      lastSubCategory = item.subCategoryTitle
+    }
+    result.push({ kind: 'item', item, flatIndex: idx })
+  })
+  return result
+}
+
 // Calculate current item position in the entire specialization
 const getCurrentItemNumber = () => {
   let itemNumber = 0
@@ -339,13 +372,11 @@ const getItemPath = (type: string, slug: string) => {
   return `/${type}/${slug}`
 }
 
-const getDecapEditUrl = () => {
+const getCmsEditUrl = () => {
   if (isOverviewMode.value && selectedLesson.value) {
-    // Always link to the latest version (index), not archived versions
-    return `/admin/#/collections/lessons/entries/${selectedLesson.value.slug}/index`
+    return `/cms/lessons/edit/${selectedLesson.value.slug}`
   } else if (!isOverviewMode.value && selectedItem.value) {
-    // Always link to the latest version (index), not archived versions
-    return `/admin/#/collections/${selectedItem.value.type}/entries/${selectedItem.value.slug}/index`
+    return `/cms/${selectedItem.value.type}/edit/${selectedItem.value.slug}`
   }
   return null
 }
@@ -645,31 +676,52 @@ onBeforeUnmount(() => {
                       </div>
                     </button>
                     
-                    <!-- Content items -->
-                    <button
-                      v-for="(item, itemIdx) in lesson.items"
-                      :key="`${item.type}-${item.slug}`"
-                      type="button"
-                      :aria-current="selectedLessonIndex === lessonIdx && selectedItemIndex === itemIdx ? 'location' : undefined"
-                      :aria-label="`${item.type}: ${item.title}${item.estimatedDuration ? '. Duration: ' + item.estimatedDuration : ''}`"
-                      class="w-full flex items-start gap-3 p-3 rounded-lg transition-all group text-left"
-                      :class="[
-                        selectedLessonIndex === lessonIdx && selectedItemIndex === itemIdx
-                          ? 'bg-primary/10'
-                          : 'hover:bg-muted/50'
-                      ]"
-                      @click="selectLesson(lessonIdx as number); selectItem(itemIdx as number)"
+                    <!-- Content items (grouped by category when outline-based) -->
+                    <template
+                      v-for="entry in getGroupedItems(lesson)"
+                      :key="entry.kind === 'item' ? `${entry.item.type}-${entry.item.slug}` : `cat-${entry.level}-${entry.title}`"
                     >
-                      <component :is="getItemIcon(item.type)" class="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
-                          <span class="text-xs uppercase tracking-[0.08em] text-muted-foreground font-semibold">{{ item.type }}</span>
-                          <span v-if="item.estimatedDuration" class="text-xs text-muted-foreground">| {{ item.estimatedDuration }}</span>
-                        </div>
-                        <h5 class="font-semibold text-foreground group-hover:text-primary transition-colors">{{ item.title }}</h5>
-                        <p v-if="item.description" class="text-sm text-muted-foreground line-clamp-2 mt-1">{{ item.description }}</p>
+                      <!-- Primary category divider (level 0) -->
+                      <div
+                        v-if="entry.kind === 'category' && entry.level === 0"
+                        class="flex items-center gap-2 pt-3 pb-1"
+                      >
+                        <span class="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">{{ entry.title }}</span>
+                        <div class="flex-1 h-px bg-border/50" />
                       </div>
-                    </button>
+                      <!-- Sub-category divider (level 1) -->
+                      <div
+                        v-else-if="entry.kind === 'category' && entry.level === 1"
+                        class="flex items-center gap-2 pt-2 pb-0.5 pl-4"
+                      >
+                        <span class="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/50">{{ entry.title }}</span>
+                        <div class="flex-1 h-px bg-border/30" />
+                      </div>
+                      <!-- Item button -->
+                      <button
+                        v-else-if="entry.kind === 'item'"
+                        type="button"
+                        :aria-current="selectedLessonIndex === lessonIdx && selectedItemIndex === entry.flatIndex ? 'location' : undefined"
+                        :aria-label="`${entry.item.type}: ${entry.item.title}${entry.item.estimatedDuration ? '. Duration: ' + entry.item.estimatedDuration : ''}`"
+                        class="w-full flex items-start gap-3 p-3 rounded-lg transition-all group text-left"
+                        :class="[
+                          selectedLessonIndex === lessonIdx && selectedItemIndex === entry.flatIndex
+                            ? 'bg-primary/10'
+                            : 'hover:bg-muted/50'
+                        ]"
+                        @click="selectLesson(lessonIdx as number); selectItem(entry.flatIndex)"
+                      >
+                        <component :is="getItemIcon(entry.item.type)" class="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="text-xs uppercase tracking-[0.08em] text-muted-foreground font-semibold">{{ entry.item.type }}</span>
+                            <span v-if="entry.item.estimatedDuration" class="text-xs text-muted-foreground">| {{ entry.item.estimatedDuration }}</span>
+                          </div>
+                          <h5 class="font-semibold text-foreground group-hover:text-primary transition-colors">{{ entry.item.title }}</h5>
+                          <p v-if="entry.item.description" class="text-sm text-muted-foreground line-clamp-2 mt-1">{{ entry.item.description }}</p>
+                        </div>
+                      </button>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -751,18 +803,16 @@ onBeforeUnmount(() => {
                         </Button>
                         <div class="absolute right-0 mt-0 w-56 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                           <!-- Edit button -->
-                          <a
-                            v-if="getDecapEditUrl()"
-                            :href="getDecapEditUrl()"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <NuxtLink
+                            v-if="getCmsEditUrl()"
+                            :to="getCmsEditUrl()"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted rounded-t-lg transition-colors"
                             @click.stop
                           >
                             <Pencil class="w-4 h-4" />
                             Edit page
-                          </a>
-                          <div v-if="getDecapEditUrl()" class="h-px bg-border" />
+                          </NuxtLink>
+                          <div v-if="getCmsEditUrl()" class="h-px bg-border" />
                           
                           <!-- Versions dropdown -->
                           <VersionsDropdown 
@@ -778,7 +828,7 @@ onBeforeUnmount(() => {
                             v-if="isOverviewMode && selectedLesson"
                             :to="`/lessons/${selectedLesson.slug}`"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                            :class="getDecapEditUrl() ? '' : 'rounded-t-lg'"
+                            :class="getCmsEditUrl() ? '' : 'rounded-t-lg'"
                             @click.stop
                           >
                             <Eye class="w-4 h-4" />
@@ -788,7 +838,7 @@ onBeforeUnmount(() => {
                             v-else-if="!isOverviewMode && selectedItem"
                             :to="getItemPath(selectedItem.type, selectedItem.slug)"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                            :class="getDecapEditUrl() ? '' : 'rounded-t-lg'"
+                            :class="getCmsEditUrl() ? '' : 'rounded-t-lg'"
                             @click.stop
                           >
                             <Eye class="w-4 h-4" />

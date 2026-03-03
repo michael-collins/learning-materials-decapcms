@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Add prerequisite widgets to all content types in DecapCMS config
+ * Add prerequisite widgets to all content types in CMS config
  * This adds a structured prerequisite list similar to the content items widget in lessons
  */
 
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const configPath = path.join(__dirname, '../public/admin/config.yml');
+const configPath = path.join(__dirname, '../cms/config.yml');
 
 // Read the config file
 let config = fs.readFileSync(configPath, 'utf8');

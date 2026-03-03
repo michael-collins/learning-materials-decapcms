@@ -46,7 +46,7 @@ export const useContentVersions = async (
     
     if (latestContent) {
       const latestVersion: ContentVersion = {
-        version: latestContent.version || latestContent.meta?.version,
+        version: latestContent.version || latestContent.meta?.version || '1.0.0',
         versionStatus: 'latest',
         publishedAt: latestContent.date
       }
@@ -128,6 +128,7 @@ export const useContentVersions = async (
       
       // Parse semantic versions for comparison
       const parseVersion = (v: string) => {
+        if (!v || typeof v !== 'string') return { major: 0, minor: 0, patch: 0 }
         const parts = v.split('.').map(Number)
         return { major: parts[0] || 0, minor: parts[1] || 0, patch: parts[2] || 0 }
       }

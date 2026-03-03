@@ -96,3 +96,99 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
+
+/* ─── Lambda cyberpunk theme ─────────────────────────────────────── */
+
+.theme-lambda {
+  /* Kill all border-radius — sharp corners everywhere */
+  *,
+  *::before,
+  *::after {
+    border-radius: 0 !important;
+  }
+
+  /* Inter for body text and headings */
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Monospaced for UI chrome: nav, buttons, kbd, code, labels */
+  & nav,
+  & button,
+  & kbd,
+  & code,
+  & pre,
+  & a[class*="rounded"],
+  & label,
+  & [role="menuitem"],
+  & .font-mono {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', ui-monospace, monospace;
+  }
+
+  /* Thin colored borders on key structural elements */
+  & aside {
+    border-right-color: var(--color-border);
+  }
+
+  & header {
+    border-bottom-color: var(--color-border);
+  }
+
+  /* Nav links: full reverse hover (bg ↔ fg swap) */
+  & nav a,
+  & nav button {
+    transition: color 120ms ease, background-color 120ms ease;
+  }
+  & nav a:hover,
+  & nav button:hover {
+    background-color: var(--color-accent) !important;
+    color: var(--color-accent-foreground) !important;
+  }
+
+  /* Active nav item — primary accent bar */
+  & nav a[class*="bg-primary"] {
+    border-left: 2px solid var(--color-primary);
+  }
+
+  /* Headings: tight tracking */
+  & h1, & h2, & h3, & h4 {
+    letter-spacing: -0.02em;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+  }
+
+  /* Buttons: sharp, thin border */
+  & button {
+    border-radius: 0 !important;
+  }
+
+  /* Code blocks: thin border accent */
+  & pre {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-card) !important;
+  }
+
+  /* Prev/Next pagination: thin border, full reverse hover */
+  & a[class*="rounded-lg"] {
+    border-color: var(--color-border);
+  }
+  & a[class*="rounded-lg"]:hover {
+    background-color: var(--color-accent) !important;
+    color: var(--color-accent-foreground) !important;
+  }
+
+  /* Kbd shortcuts: match theme */
+  & kbd {
+    border-color: var(--color-border);
+    font-family: inherit;
+  }
+
+  /* Scrollbar styling (webkit) */
+  & ::-webkit-scrollbar {
+    width: 6px;
+  }
+  & ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+  & ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+  }
+}

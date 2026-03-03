@@ -14,7 +14,9 @@ interface CollectionItem {
   title: string
   description?: string
   date: string
+  authors?: { name: string; url?: string }[]
   author?: string
+  authorUrl?: string
   difficulty?: string
   image?: string
   imageAlt?: string
@@ -23,6 +25,14 @@ interface CollectionItem {
   path?: string
   slug?: string
   previewable?: boolean
+}
+
+/** Resolve display name(s) from either the `authors` array or legacy `author` string */
+function resolveAuthorLabel(item: CollectionItem): string {
+  if (item.authors && item.authors.length > 0) {
+    return item.authors.map(a => a.name).join(', ')
+  }
+  return item.author ?? ''
 }
 
 interface Props {
@@ -55,23 +65,27 @@ const getItemPath = (item: CollectionItem) => {
   return item._path || item.path || `/articles/${item.slug}` || '#'
 }
 
-// Get unique authors from items
+// Get unique authors from items (handles both authors array and legacy author string)
 const authors = computed(() => {
   const authorSet = new Set<string>()
   props.items.forEach(item => {
-    if (item.author) {
-      authorSet.add(item.author)
-    }
+    const label = resolveAuthorLabel(item)
+    if (label) authorSet.add(label)
   })
   return Array.from(authorSet).sort()
 })
+
+/** True if any item has author info in either format */
+const hasAnyAuthor = computed(() =>
+  props.items.some(i => (i.authors && i.authors.length > 0) || i.author)
+)
 
 const filteredItems = computed(() => {
   let filtered = props.items
   
   // Filter by author
   if (selectedAuthor.value) {
-    filtered = filtered.filter(item => item.author === selectedAuthor.value)
+    filtered = filtered.filter(item => resolveAuthorLabel(item) === selectedAuthor.value)
   }
   
   // Filter by search query
@@ -82,7 +96,7 @@ const filteredItems = computed(() => {
       const matchesText = 
         item.title.toLowerCase().includes(query) ||
         item.description?.toLowerCase().includes(query) ||
-        item.author?.toLowerCase().includes(query)
+        resolveAuthorLabel(item).toLowerCase().includes(query)
       
       // Search in tags
       const matchesTags = item.tags?.some(tag => 
@@ -177,7 +191,7 @@ watch([searchQuery, selectedAuthor], () => {
           <TableRow>
             <TableHead v-if="items.some(i => i.image)" class="w-[160px]"></TableHead>
             <TableHead class="w-[50%]">Title</TableHead>
-            <TableHead v-if="items.some(i => i.author)">Author</TableHead>
+            <TableHead v-if="hasAnyAuthor">Author</TableHead>
             <TableHead v-if="items.some(i => i.difficulty)">Difficulty</TableHead>
           </TableRow>
         </TableHeader>
@@ -222,8 +236,8 @@ watch([searchQuery, selectedAuthor], () => {
                 </button>
               </div>
             </TableCell>
-            <TableCell v-if="items.some(i => i.author)">
-              <span class="text-sm">{{ item.author || '-' }}</span>
+            <TableCell v-if="hasAnyAuthor">
+              <span class="text-sm">{{ resolveAuthorLabel(item) || '-' }}</span>
             </TableCell>
             <TableCell v-if="items.some(i => i.difficulty)">
               <span v-if="item.difficulty" class="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-semibold text-primary">

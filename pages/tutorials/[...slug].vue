@@ -58,6 +58,7 @@ const oerSchema = computed(() => {
         :title="tutorial.title"
         :description="tutorial.description"
         :date="tutorial.date"
+        :authors="tutorial.authors"
         :author="tutorial.author"
         :authorUrl="tutorial.authorUrl"
         :difficulty="tutorial.difficulty"

@@ -1,0 +1,1300 @@
+# Custom CMS Roadmap: Decap-Compatible Git CMS for OER Content
+
+## Project Vision
+
+Build a custom, Nuxt-native CMS admin interface that reads the existing Decap CMS `config.yml` for schema definitions, uses the GitHub API for git operations, and provides a modern, tailored editing experience purpose-built for educational content authoring.
+
+**Core Principles:**
+
+- **Decap-compatible**: Reads the same `config.yml`, writes the same markdown+frontmatter files — Decap remains a working fallback throughout development
+- **Incremental**: Build one widget/collection at a time; both systems run side-by-side
+- **Education-first UX**: Specialized interfaces for OER schema, pathways, rubrics, prerequisites, and version management that Decap can never provide
+- **Zero external services**: Git-backed, self-hosted, no databases — same Jamstack philosophy
+
+---
+
+## Current State Inventory
+
+### Collections in config.yml (10 total)
+
+| Collection | Widget Complexity | Custom Needs |
+|---|---|---|
+| articles | Medium | Prerequisites (typed list), attachments |
+| tutorials | Medium | Prerequisites, attachments, difficulty |
+| exercises | High | AI licenses (multi-select), rubric ref, tags, versioning, prerequisites, attachments |
+| projects | High | Same as exercises |
+| lectures | Medium | Course code, attachments, prerequisites |
+| lessons | High | Ordered content items (typed list), prerequisites, versioning, changelog |
+| specializations | High | Ordered lesson relations, skills, tools, learning objectives |
+| pathways | High | Ordered specialization relations, learning objectives |
+| rubrics | Medium | Grading criteria (nested list) |
+| docs | Low | Simple title + body |
+
+### Decap Widget Types Used
+
+| Widget | Count | Custom CMS Component Needed |
+|---|---|---|
+| `string` | ~30 | `<CmsString>` — text input |
+| `text` | ~15 | `<CmsText>` — textarea |
+| `markdown` | 10 | `<CmsMarkdown>` — Tiptap editor |
+| `select` | ~20 | `<CmsSelect>` — dropdown (single + multi) |
+| `boolean` | ~15 | `<CmsBoolean>` — checkbox/switch |
+| `datetime` | ~5 | `<CmsDatetime>` — date picker |
+| `image` | ~8 | `<CmsImage>` — file upload + preview |
+| `file` | ~5 | `<CmsFile>` — file upload |
+| `list` | ~15 | `<CmsList>` — repeatable fields |
+| `list` (typed) | ~10 | `<CmsTypedList>` — polymorphic list (prerequisites, items) |
+| `relation` | ~20 | `<CmsRelation>` — content reference picker |
+| `object` | ~10 | `<CmsObject>` — nested field group |
+| `hidden` | ~10 | `<CmsHidden>` — hidden input with default |
+
+### Editor Components (MDC shortcuts in markdown body)
+
+| Component | Fields | Pattern |
+|---|---|---|
+| YouTube Video | id, title | `::youtube-video{id="..." title="..."}::` |
+| Video Embed (iframe) | src, title | `::iframe-component{src="..." title="..."}::` |
+| Google Slides | id, title | `::google-slides-component{id="..." title="..."}::` |
+| Assessment Rubric | id | `::rubric-component{id="..."}::` |
+| Sketchfab Model | src, title, height | `::sketchfab-component{src="..." ...}::` |
+| 3D Model Upload | src, title, height, autoRotate | `::threed-viewer-component{src="..." ...}::` |
+
+### Existing UI Components Available
+
+Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pagination, Popover, Radio Group, Scroll Area, Select, Sidebar, Stepper, Table, Textarea, Tooltip, Breadcrumb.
+
+### Existing Infrastructure
+
+- `gray-matter` already in devDependencies (frontmatter parsing)
+- `@nuxt/content` for reading content (query builder)
+- `reka-ui` / `radix-vue` for accessible primitives
+- Tailwind CSS v4 with `@tailwindcss/typography`
+- `lucide-vue-next` icons
+- Nuxt H3 server routes available
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Custom CMS (/cms/...)                        │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────────────┐ │
+│  │ Config Parser │  │ Form Engine  │  │ Content Browser       │ │
+│  │              │  │              │  │                       │ │
+│  │ Reads        │  │ DynamicField │  │ Grid/list views       │ │
+│  │ config.yml   │→ │ per widget   │  │ Filters, search       │ │
+│  │ at build     │  │ type         │  │ Sort, pagination      │ │
+│  └──────────────┘  └──────┬───────┘  └───────────────────────┘ │
+│                           │                                     │
+│  ┌──────────────┐  ┌──────┴───────┐  ┌───────────────────────┐ │
+│  │ Markdown     │  │ Collection   │  │ Media Manager         │ │
+│  │ Editor       │  │ Form         │  │                       │ │
+│  │              │  │              │  │ Upload, browse,       │ │
+│  │ Tiptap +     │  │ Auto-gen     │  │ delete files from     │ │
+│  │ MDC toolbar  │  │ from config  │  │ public/uploads        │ │
+│  └──────────────┘  └──────┬───────┘  └───────────────────────┘ │
+│                           │                                     │
+│  ┌────────────────────────┴────────────────────────────────┐   │
+│  │                   Git Backend Layer                      │   │
+│  │                                                          │   │
+│  │  ┌─────────────┐  ┌───────────┐  ┌──────────────────┐  │   │
+│  │  │ GitHub Auth  │  │ Read/Write│  │ Editorial        │  │   │
+│  │  │ (OAuth)      │  │ Content   │  │ Workflow         │  │   │
+│  │  │              │  │ (Octokit) │  │ (Branch + PR)    │  │   │
+│  │  └─────────────┘  └───────────┘  └──────────────────┘  │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+
+   Decap CMS (/admin) remains functional as fallback throughout.
+```
+
+### Key Design Decisions
+
+1. **Config-driven forms**: Parse `public/admin/config.yml` → generate Vue form components dynamically. No separate schema definition needed.
+2. **Local-first for dev**: In development mode, read/write directly to the filesystem (like Decap's `local_backend`). In production, use GitHub API.
+3. **Nuxt Content for reads**: Use `queryContent()` for listing/searching content (fast, already indexed). Use GitHub API only for writes.
+4. **Editorial workflow**: Match Decap's branch+PR model — create a branch, commit changes, open a PR. Authors can merge from GitHub or from the CMS.
+
+---
+
+## Phase 0 — Foundation ✅ COMPLETE
+
+**Goal:** Project scaffolding, config parser, auth, and a working read-only content browser.
+
+### 0.1 Config Parser
+
+- [x] **`lib/cms/config-parser.ts`** — Parse `config.yml` into typed TypeScript interfaces
+  - `DecapConfig` (backend, media_folder, collections)
+  - `DecapCollection` (name, label, folder, slug, path, fields, view_filters, sort)
+  - `DecapField` (label, name, widget, required, default, options, hint, pattern, fields, types, collection, value_field, search_fields, display_fields, multiple)
+- [x] **`lib/cms/config-types.ts`** — Full type definitions
+- [x] **`server/api/cms/config.get.ts`** — Endpoint that serves parsed config (cached)
+- [x] **`composables/useCmsConfig.ts`** — Client-side composable to fetch and cache config
+
+### 0.2 Authentication
+
+- [x] **`server/api/cms/auth/github.get.ts`** — GitHub OAuth flow initiation
+- [x] **`server/api/cms/auth/callback.get.ts`** — OAuth callback, exchange code for token, store in httpOnly cookie
+- [x] **`server/api/cms/auth/session.get.ts`** — Get current session
+- [x] **`server/api/cms/auth/logout.post.ts`** — Clear session
+- [x] **`server/api/cms/auth/token.get.ts`** — Token retrieval for API calls
+- [x] **`composables/useCmsAuth.ts`** — Auth state, login/logout, guard (supports OAuth + PAT dual auth)
+- [x] **`middleware/cms-auth.ts`** — Route middleware protecting `/cms/**`
+- [x] **`pages/cms/login.vue`** — Login page with OAuth + PAT options
+
+### 0.3 CMS Layout & Navigation
+
+- [x] **`layouts/cms.vue`** — Admin layout with sidebar, top bar, user menu
+- [x] **`pages/cms/index.vue`** — Dashboard: collection cards with item counts, quick links, batch publish
+- [x] **`pages/cms/[collection]/index.vue`** — Collection browser (search, sort, pagination)
+- [x] Sidebar generated from config collections
+
+### 0.4 Content Reading (via Nuxt Content)
+
+- [x] **`composables/useCmsContent.ts`** — Wrapper around `queryCollection()` for CMS views
+  - List items in a collection with pagination
+  - Search by title/description
+  - Sort by sortable_fields from config
+  - Filter out version files automatically
+
+**Milestone: ✅ Browse all collections and items in a custom UI.**
+
+---
+
+## Phase 1 — Form Engine & Basic Widgets ✅ COMPLETE
+
+**Goal:** Dynamic form generation from config, covering simple widget types. Edit and save one collection (articles — simplest schema).
+
+### 1.1 Dynamic Field Components
+
+- [x] **`components/cms/fields/CmsString.vue`** — Text input with validation (supports `pattern`)
+- [x] **`components/cms/fields/CmsText.vue`** — Textarea
+- [x] **`components/cms/fields/CmsBoolean.vue`** — Switch (shadcn style)
+- [x] **`components/cms/fields/CmsSelect.vue`** — Dropdown, supports `multiple: true` for multi-select
+- [x] **`components/cms/fields/CmsDatetime.vue`** — Date/time picker
+- [x] **`components/cms/fields/CmsHidden.vue`** — Hidden field with default value
+- [x] **`components/cms/fields/CmsNumber.vue`** — Number input
+
+### 1.2 DynamicField Router
+
+- [x] **`components/cms/DynamicField.vue`** — Routes `field.widget` → correct component
+- [x] **`components/cms/CollectionForm.vue`** — Renders all fields for a collection, manages form state
+- [x] Form validation based on `required`, `pattern`, `hint` from config
+
+### 1.3 Git Write Operations
+
+- [x] **`server/api/cms/content/save.post.ts`** — Save content to GitHub (branch+PR or direct commit)
+- [x] **`server/api/cms/content/save-local.post.ts`** — Direct local filesystem save for dev
+- [x] **`server/api/cms/content/read.get.ts`** — Read content for editing
+- [x] **`composables/useCmsSave.ts`** — Client-side save with loading/error states, publish to GitHub
+
+### 1.4 Editor Pages
+
+- [x] **`pages/cms/[collection]/new.vue`** — Create new content item
+- [x] **`pages/cms/[collection]/edit/[...slug].vue`** — Edit existing content item
+- [x] **`pages/cms/[collection]/[...slug].vue`** — View content item (preview)
+
+### 1.5 Local Development Backend
+
+- [x] **`lib/cms/local-backend.ts`** — File-system based read/write for `nuxt dev`
+- [x] **`lib/cms/git-backend.ts`** — GitHub API abstraction (read, write, branch, PR, tree, commit)
+- [x] Toggle via `local_backend: true` in config (same as Decap)
+
+**Milestone: ✅ Create and edit all collections via custom CMS. Form auto-generates from config.yml.**
+
+---
+
+## Phase 2 — Complex Widgets ✅ COMPLETE
+
+**Goal:** Support the remaining widget types that make up the bulk of your content complexity.
+
+### 2.1 List Widget
+
+- [x] **`components/cms/fields/CmsList.vue`** — Repeatable field group
+  - Add/remove items
+  - Drag-to-reorder
+  - Supports `fields` (fixed structure per item)
+  - Supports `field` (single field per item, e.g., tags, skills)
+
+### 2.2 Typed List Widget (Polymorphic)
+
+- [x] **`components/cms/fields/CmsTypedList.vue`** — List with `types` (used by prerequisites, lesson items)
+  - Type selector dropdown per item
+  - Renders different field sets per type
+  - Manages `__typename` hidden field
+  - Drag-to-reorder
+
+### 2.3 Relation Widget
+
+- [x] **`components/cms/fields/CmsRelation.vue`** — Content reference picker
+  - Fetch items from referenced `collection` via Nuxt Content
+  - Searchable dropdown (combobox) using `search_fields`
+  - Display with `display_fields`
+  - Stores `value_field` (slug)
+  - Supports `multiple: true` for ordered multi-select
+
+### 2.4 Object Widget
+
+- [x] **`components/cms/fields/CmsObject.vue`** — Nested field group
+  - Renders child `fields` recursively using DynamicField
+  - Collapsible section in form
+
+### 2.5 File & Image Widgets
+
+- [x] **`components/cms/fields/CmsImage.vue`** — Image upload with preview and media browser
+- [x] **`components/cms/fields/CmsFile.vue`** — Generic file upload with media browser
+
+### 2.6 Additional Widgets
+
+- [x] **`components/cms/fields/CmsMarkdown.vue`** — Delegates to the Tiptap MarkdownEditor
+- [x] **`components/cms/fields/CmsVersionSelect.vue`** — Version selector for versioned content
+
+**Milestone: ✅ All 10 collections fully editable. Every Decap widget type replicated.**
+
+---
+
+## Phase 3 — Markdown Editor ✅ COMPLETE
+
+**Goal:** A rich markdown editor with toolbar, MDC component insertion, and live preview.
+
+### 3.1 Tiptap Integration
+
+- [x] **`components/cms/editor/MarkdownEditor.vue`** — Main editor component (~760 lines)
+  - Tiptap with `tiptap-markdown` extension for markdown ↔ rich-text
+  - Toolbar: bold, italic, headings (1-3), lists (ordered/unordered), blockquote, code block, horizontal rule, link, image
+  - Four modes: Rich editor, Split (editor + preview), Code view, Preview
+  - Responsive full-width layout
+
+### 3.2 MDC Component Toolbar
+
+- [x] **`components/cms/MdcToolbar.vue`** — "Insert Component" dropdown
+  - YouTube Video, Video Embed, Google Slides, Rubric, Sketchfab, 3D Viewer
+- [x] **`components/cms/MdcComponentModal.vue`** — Modal for editing MDC component props
+- [x] **`components/cms/editor/MdcBlockExtension.ts`** — Custom Tiptap Node for MDC blocks
+- [x] **`components/cms/editor/MdcBlockView.vue`** — NodeView renderer for MDC block cards
+
+### 3.3 Code Mode
+
+- [x] **`components/cms/editor/CodeEditor.vue`** — CodeMirror 6 integration
+  - Markdown + YAML frontmatter syntax highlighting
+  - Dark/light theme support
+
+### 3.4 Editor Interaction Improvements ✅ COMPLETE
+
+- [x] **`components/cms/editor/LinkBubbleMenu.vue`** — Floating bubble menu for link editing (NEW)
+  - Replaces `window.prompt()` with proper inline editing UX
+  - Preview mode: shows URL + edit/open/copy/unlink actions on link click
+  - Edit mode: URL + display text fields, Enter to apply, Escape to cancel
+  - Uses `BubbleMenu` from `@tiptap/vue-3/menus` subpath export
+- [x] **Keyboard shortcut: `Cmd+K` for link insertion** — Custom Tiptap Extension (`editorKeyboardShortcuts`)
+  - Maps `Mod-k` to `insertLink()` within the editor
+  - Global command palette (`commandPalette.client.ts`) updated with `isEditorContext()` guard
+  - Cmd+K defers to the editor on `/cms` pages or when focus is in editor/input; opens command palette elsewhere
+- [x] **Visual NodeViews (Phase A)** — Complete rewrite of `MdcBlockView.vue` (~830 lines)
+  - Upgraded from generic pill/card widgets to styled inline previews showing actual rendered content
+  - Each MDC component type gets a purpose-built preview (YouTube thumbnails, 3D model cards, rubric tables, etc.)
+  - Floating toolbar with opacity-based visibility (CSS `opacity` + `pointer-events-none` instead of `v-show`) to keep `data-drag-handle` in the DOM for ProseMirror
+- [x] **Drag-and-drop for MDC blocks** — Custom ProseMirror plugin in `MdcBlockExtension.ts`
+  - Uses `handleDOMEvents.drop` (fires BEFORE tiptap-markdown's clipboard pipeline)
+  - Detects `NodeSelection` of mdcBlock, uses `dropPoint()` for valid position, moves node via direct ProseMirror transaction
+  - Prevents tiptap-markdown's `transformPastedText` from corrupting atom nodes into plain text
+- [x] **Move up/down buttons** — ChevronUp/ChevronDown in toolbar for reliable block reordering
+  - Programmatic ProseMirror transactions (delete + insert at new position)
+- [x] **Container MDC preview rendering** — `ContentPreview.vue` updated
+  - Added `MDC_CONTAINER_REGEX` for `:::triple-colon` syntax (runs before atom regex)
+  - Renders 7 container component types: callout, accordion, card-block, figure, columns, tabs, steps
+  - `inlineFormatBody()` helper for inline markdown formatting in body content
+- [x] **Live columns preview** — Parses `#slotName` markers from body and renders actual column content
+- [x] **Media browser integration for image/file fields**
+  - `CmsImage.vue` and `CmsFile.vue` now open `MediaPickerModal` as primary action
+  - Secondary actions: "Upload from device" and "Enter URL/path" below the drop zone
+  - "Change" button (folder icon) when a file is already selected
+
+**Milestone: ✅ Rich markdown editing with MDC components. Matches or exceeds Decap's editor. Editor interactions polished with proper link editing, drag-and-drop, keyboard shortcuts, and visual node previews.**
+
+---
+
+## Phase 4 — Media Manager ✅ COMPLETE
+
+**Goal:** Browse, upload, and manage files in `public/uploads/`.
+
+### 4.1 Media Browser
+
+- [x] **`pages/cms/media.vue`** — Full media manager page
+- [x] **`components/cms/media/MediaBrowser.vue`** — Full-featured browser (874 lines)
+  - Grid view with thumbnails (images), icons (other files)
+  - Folder navigation
+  - Search by filename
+  - File type filtering
+- [x] **`components/cms/media/MediaPickerModal.vue`** — Reusable picker for image/file fields
+
+### 4.2 Upload & Operations
+
+- [x] **`server/api/cms/media/upload.post.ts`** — File upload handler
+- [x] **`server/api/cms/media/list.get.ts`** — Browse media directory
+- [x] **`server/api/cms/media/delete.post.ts`** — Delete files
+- [x] **`server/api/cms/media/create-folder.post.ts`** — Create folders
+- [x] **`server/api/cms/media/move.post.ts`** — Move/rename files
+
+**Milestone: ✅ Complete media management. No need to use Decap for file uploads.**
+
+---
+
+## Phase 5 — Editorial Workflow & Publishing ✅ COMPLETE
+
+**Goal:** Branch-based drafts, PR review, sync checking, and batch publishing.
+
+### 5.1 Draft Management
+
+- [x] **`pages/cms/drafts.vue`** — List all open draft PRs (304 lines)
+- [x] **`composables/useCmsDrafts.ts`** — Fetch and manage draft PRs via GitHub API (267 lines)
+  - List open PRs with `cms/` branch prefix
+  - Show status, diff summary
+  - Publish (merge) and discard (close PR + delete branch)
+
+### 5.2 Save Modes
+
+- [x] "Publish to GitHub" split button: Commit to main / Create Pull Request
+- [x] Local save (filesystem) for development mode
+- [x] Direct commit to main for trusted authors
+- [x] Branch+PR editorial workflow
+
+### 5.3 Sync & Conflict Resolution
+
+- [x] **`composables/useCmsSync.ts`** — Pre-publish sync checking (SHA comparison)
+- [x] **`server/api/cms/content/sync-check.post.ts`** — Single-file sync check (local vs GitHub)
+- [x] **`server/api/cms/content/pull.post.ts`** — Pull GitHub version to local
+- [x] **`components/cms/SyncConflictDialog.vue`** — Force Publish / Resolve / Pull / Cancel
+- [x] **`components/cms/ConflictResolver.vue`** — Full-screen side-by-side diff resolver for non-developers
+
+### 5.4 Batch Publishing
+
+- [x] **`server/api/cms/content/batch-sync-check.post.ts`** — Scan collections using Git Trees API (recursive, single API call)
+- [x] **`server/api/cms/content/batch-publish.post.ts`** — Atomic multi-file commit using Git Data API
+- [x] **`composables/useBatchPublish.ts`** — Reactive scan + publish state
+- [x] **`components/cms/BatchPublishDialog.vue`** — File checklist, select/deselect, split button publish
+- [x] "Publish Changes" button on dashboard and collection pages
+
+**Milestone: ✅ Full editorial workflow with sync checking, conflict resolution, and batch publishing.**
+
+---
+
+## Phase 5.5 — Version Management & Editing UX ✅ COMPLETE
+
+**Goal:** CMS-native versioning, change tracking, and editing quality-of-life improvements.
+
+### 5.5.1 Content Versioning System
+
+- [x] **`server/api/cms/content/create-version.post.ts`** — Create new version (archive current, bump index.md)
+- [x] **`server/api/cms/content/versions.get.ts`** — List all versions (local filesystem + GitHub API modes)
+- [x] **`components/cms/CreateVersionDialog.vue`** — Version bump UI (major/minor/patch/custom, conflict checking)
+- [x] **`components/cms/VersionProtectionDialog.vue`** — Requires typing "OVERRIDE" to publish modified archived versions
+- [x] Version-aware server endpoints (`read`, `save-local`, `save`, `sync-check`, `pull` all accept `version` param)
+- [x] Version-aware composables (`useCmsSave`, `useCmsSync` pass version through all operations)
+
+### 5.5.2 Version-Aware Editing
+
+- [x] Edit page reads `?version=` query param for archived version editing
+- [x] Amber "Editing archived version" banner with link to latest
+- [x] Version switcher dropdown in edit page header (fetch versions, navigate between them)
+- [x] "Save as New Version" option in local Save button dropdown
+- [x] "Publish as New Version" option in Publish to GitHub dropdown
+- [x] Auto-publish flow: save → create version → publish to GitHub in one action
+- [x] Version dropdown on collection listing pages (clickable badge → navigate to edit)
+
+### 5.5.3 Change Tracking & Editing UX
+
+- [x] **`components/cms/ViewChangesDialog.vue`** — Field-level diff (added/removed/modified) + LCS-based line-by-line body diff
+- [x] "Changes" button in sticky toolbar next to Discard
+- [x] False-positive dirty state fix (`cleanSnapshot` captures post-initialization form state)
+- [x] Drag-and-drop reordering for `CmsList.vue` (simple, single, and structured modes)
+- [x] Drag-and-drop reordering for `CmsTypedList.vue`
+- [x] Split button height consistency fix (flex items-stretch + h-full)
+- [x] Discard changes feature (revert to last committed GitHub state)
+- [x] Sync check fix: `local-only` files no longer falsely flagged as "unpublished changes"
+
+### 5.5.4 Editorial Workflow Messaging
+
+- [x] Improved success messages explaining PR → merge → deploy pipeline
+- [x] Deployment timing expectations ("allow a few minutes for the site to rebuild")
+
+**Milestone: ✅ Full version management, change tracking, and editing UX polish.**
+
+---
+
+## Phase 6 — Enhanced UX for Education Content (⬜ NEXT UP)
+
+**Goal:** Custom interfaces that go far beyond what any generic CMS can offer.
+
+> **Status:** Not started. All prerequisite phases complete. This is the next major phase.
+
+### 6.1 Prerequisites Builder
+
+- [ ] **`components/cms/custom/PrerequisitesBuilder.vue`**
+  - Visual drag-and-drop prerequisite chain
+  - Searchable content picker across all collections
+  - Show content cards (title, type badge, description) instead of raw slugs
+  - Circular dependency detection and warning
+  - Quick-add from recent/related content
+
+### 6.2 Lesson Composer
+
+- [ ] **`components/cms/custom/LessonComposer.vue`**
+  - Drag-and-drop ordering of lectures, tutorials, exercises, articles, projects
+  - Visual timeline/outline view
+  - Quick search across all content types
+  - Preview card for each item showing type, title, difficulty
+  - Estimated total duration calculation
+
+### 6.3 Specialization Builder
+
+- [ ] **`components/cms/custom/SpecializationBuilder.vue`**
+  - Ordered lesson list with drag-and-drop
+  - Skills and tools tag management
+  - Learning objectives editor with AI suggestion option
+  - Visual progress indicator (completeness of required fields)
+
+### 6.4 Pathway Visualizer
+
+- [ ] **`components/cms/custom/PathwayBuilder.vue`**
+  - Visual map of specializations → lessons → items
+  - Drag to reorder specializations
+  - Expandable tree showing full content hierarchy
+  - Gap analysis: highlight specializations missing lessons, lessons missing content
+
+### 6.5 AI License Selector
+
+- [ ] **`components/cms/custom/AILicenseSelector.vue`**
+  - Grouped by license type (NA, WA, CD, TC, DP, IU) with clear labels
+  - Media-type sub-selectors (Writing, Image, Video, Audio, 3D, etc.)
+  - Visual matrix UI instead of a flat multi-select dropdown
+  - Tooltips explaining each license code
+  - Common presets ("Strict — No AI", "Standard — Approval Required", "Open — Full AI")
+
+### 6.6 Version Management Dashboard
+
+- [x] Version switcher dropdown on edit page (list all versions, navigate between them)
+- [x] Save as New Version / Publish as New Version from toolbar dropdowns
+- [x] Version creation dialog with semver bump and conflict detection
+- [ ] Side-by-side diff between two version snapshots
+- [ ] Rollback option (create new version from old snapshot content)
+- [ ] Changelog and breaking changes display
+- [ ] Embed status per version
+
+### 6.7 Rubric Editor
+
+- [ ] **`components/cms/custom/RubricEditor.vue`**
+  - Drag-and-drop criteria ordering
+  - Inline editing of criterion name and description
+  - Preview of rubric as rendered table
+  - Templates for common rubric patterns
+
+**Milestone: Education-specific UX that no existing CMS can provide.**
+
+---
+
+## Phase 7 — Book Publishing via Outline Builder (✅ COMPLETE — exports done; search/branding planned)
+
+**Goal:** Enable authors to compose and publish books (course books, textbooks, guides) by arranging existing content into a hierarchical outline, then exporting to multiple formats — most importantly a GitBook/docs-style website.
+
+### Vision
+
+The core workflow is: **curate → arrange → publish**. Authors select from the existing content library (lessons, lectures, articles, exercises, projects, tutorials), organize items into a hierarchical chapter/section structure using a visual outline builder, and publish the result as a standalone book. The book is a new content type that references (not duplicates) existing materials.
+
+### 7.1 Book Content Type
+
+- [x] Add `books` collection to config.yml (title, description, author, license, cover image, objectives, outline tree)
+- [x] Add books collection to content.config.ts with 4-level deep outline schema (outlineLeaf → L3 → L2 → outlineNodeSchema)
+- [x] Define outline tree schema: nested array of `{ title, path?, content?, icon?, imported?, locked?, importChildren?, version?, children[] }` where `content` references existing items and items without content are section headings
+- [x] Create `pages/books/[book]/[...path].vue` — book chapter page with content rendering, metadata, and version display
+- [x] Create `pages/books/[book]/index.vue` — book landing page
+- [x] Add to navigation sidebar and dashboard
+
+### 7.2 Outline Builder Tool
+
+- [x] **`components/cms/fields/CmsOutlineEditor.vue`** — CMS-integrated visual book composition interface (~1720 lines)
+  - **Hierarchical tree builder**: Drag-and-drop tree with 4-level nesting (Part → Chapter → Section → Subsection)
+  - **Content picker**: Searchable dialog to browse/filter content by collection; select and link items to outline nodes
+  - **Smart picker UX**: Collection pre-filtering when re-opening, current item boosted to top of results, pinned version pre-selected in dropdown, blue highlight on currently linked item
+  - **Content version pinning**: Choose specific content versions when linking; version badge displayed in tree
+  - **Icon system**: Enable/disable icons toggle, per-item Lucide icon picker with search, content-type default icons
+  - **Auto-import lesson children**: Adding a lesson auto-imports its child items; refresh button to re-sync
+  - **Inline editing**: Title, notes, content linking/unlinking all in-tree
+  - **Draft management**: Save/load via CMS git backend
+
+### 7.3 Book Rendering & Themes
+
+- [x] **`composables/useBookOutline.ts`** — Flatten outline, build sidebar tree, navigate chapters; version propagation
+- [x] **`composables/useBookTheme.ts`** — Three configurable themes (default, lambda, minimal) with typography and layout settings
+- [x] **`components/BookSidebarTree.vue`** — Hierarchical sidebar navigation with icon support, active state, expand/collapse
+- [x] **Content metadata on chapter pages** — Image, AIUL badges, attachments, tags, difficulty, prerequisites
+- [x] **Version badge on chapter pages** — GitBranch icon with version number and status (latest/archived)
+- [x] **Versioned "View original" link** — Appends `?version=X.Y.Z` for non-latest pinned versions
+- [x] **Monospace navigation font** — JetBrains Mono with thin weight for book sidebar nav
+- [x] **Prose link styling** — Fixed across all three themes
+
+### 7.4 Export Formats
+
+- [x] **`composables/useBookExport.ts`** — Full export composable with four formats (`exportBook`, `exportBookPdf`, `exportBookDocx`, `exportBookCC`)
+- [x] **HTML ZIP (GitBook-style standalone website)** — `exportBook()`
+  - Packages a complete standalone book site as a ZIP download
+  - Sidebar navigation matching the outline hierarchy
+  - Chapter-by-chapter pagination (previous/next)
+  - Responsive design, print-friendly CSS; deployable to GitHub Pages, Netlify, or any static host
+  - Theme CSS variables (default/lambda/minimal) baked in
+- [x] **PDF Export** — `exportBookPdf()`
+  - Opens a print-optimized combined HTML page via `window.print()`
+  - All chapters rendered sequentially with proper typography
+  - Print-friendly CSS with page breaks
+- [x] **Word / DOCX Export** — `exportBookDocx()`
+  - Generates a `.docx` document using the `docx` library
+  - Headings, paragraphs, tables, and metadata included
+- [x] **Common Cartridge (IMS CC)** — `exportBookCC()`
+  - IMS Common Cartridge 1.3 package for LMS import (Canvas, Blackboard, Moodle, etc.)
+  - Maps outline hierarchy to CC organization structure
+  - Includes content items, metadata, and learning objectives
+
+**Note:** Full-text search within the standalone book site and custom domain/branding are not yet implemented.
+  - ⏳ Full-text search within the exported book
+  - ⏳ Custom domain/branding per-book theme configuration
+
+### 7.5 Technical Considerations
+
+- Book outline stored as structured YAML in frontmatter (references content by slug, not duplicated)
+- 4-level deep Zod schema: `outlineLeaf` → L3 → L2 → `outlineNodeSchema`, each extending with `children` array
+- Version pinning: `version` field on `outlineLeaf` stores semver string; propagated through `FlatChapter` → `SidebarNode` → chapter page
+- Icon system: Lucide icon names stored as strings; resolved to components via `resolveIconComponent()` helper that handles both prefixed and unprefixed names
+- Export pipeline: read outline → resolve content references → render per format
+- PDF generation could run server-side (H3 route) or as a CLI script
+- Common Cartridge XML generated from outline + content metadata
+
+**Milestone: ✅ Authors can compose books from existing content with version pinning, icons, and themes. ✅ All four export formats implemented (HTML ZIP, PDF, Word/DOCX, Common Cartridge). ⏳ Full-text search within exported book and custom domain branding still planned.**
+
+### Related Files
+
+| File | Description |
+|---|---|
+| `content.config.ts` | `outlineLeaf` schema with version, icon, importChildren fields |
+| `components/cms/fields/CmsOutlineEditor.vue` | CMS outline editor (~1720 lines) |
+| `composables/useOutlineBuilder.ts` | Draft management, flat↔nested conversion |
+| `composables/useBookOutline.ts` | Flatten, navigate, build sidebar tree |
+| `composables/useBookTheme.ts` | Three theme configurations |
+| `composables/useBookExport.ts` | Export composable |
+| `components/BookSidebarTree.vue` | Hierarchical sidebar navigation |
+| `pages/books/[book]/[...path].vue` | Book chapter page with metadata and versioning |
+| `pages/books/[book]/index.vue` | Book landing page |
+
+---
+
+## Phase 8 — Bulk Operations & Analytics (⬜ PLANNED)
+
+**Goal:** Power-user tools for managing content at scale.
+
+### 8.1 Bulk Editor
+
+- [ ] **`pages/cms/bulk/index.vue`** — Select multiple items, apply changes
+  - Update license across selected items
+  - Update AI license presets
+  - Toggle published/unpublished
+  - Add/remove tags in batch
+  - Change author
+- [ ] Creates a single branch with all changes, one PR
+
+### 8.2 Content Analytics Dashboard
+
+- [ ] **`pages/cms/analytics.vue`**
+  - Total content by type (pie/bar chart)
+  - Content with missing fields (no description, no image, no license)
+  - Orphaned content (not referenced by any lesson/specialization/pathway)
+  - Version status overview (how many items have versions, latest vs archived)
+  - Embed usage stats
+
+### 8.3 Content Health Checks
+
+- [ ] Broken internal references (prerequisites pointing to deleted content)
+- [ ] Missing media files
+- [ ] Schema validation warnings (content that doesn't match config)
+- [ ] Duplicate slugs or titles
+
+**Milestone: Content governance and quality management at scale.**
+
+---
+
+## Phase 9 — Polish, Testing & Migration (🔄 IN PROGRESS)
+
+**Goal:** Production-ready CMS that can replace Decap for daily use. Verified to work on Netlify for all collaborators.
+
+---
+
+### 9.1 UX Polish
+
+- [x] Keyboard shortcuts (Cmd+K command palette, context-aware on CMS pages)
+- [x] Cmd+K link insertion in Tiptap editor (defers from command palette when in editor context)
+- [ ] Cmd+S save shortcut in editor
+- [x] Command palette integration (existing CommandPalette.vue)
+- [x] Link editing UX — floating bubble menu replaces `window.prompt()`
+- [x] MDC block drag-and-drop and move up/down
+- [x] Visual NodeViews for MDC blocks (styled inline previews)
+- [x] Media browser as primary action for image/file fields
+- [ ] Toast notifications for save/error/publish events
+- [ ] Autosave drafts to localStorage
+- [ ] Unsaved changes warning on navigation
+- [x] Responsive design for tablet/mobile editing
+- [x] Dark mode support (existing theme system)
+- [ ] Loading skeletons for all async operations
+
+---
+
+### 9.2 Performance
+
+- [ ] Config parsing cached at build time
+- [ ] Relation field options prefetched and cached
+- [ ] Lazy-load heavy components (Tiptap, media browser)
+- [ ] Optimistic UI updates on save
+
+---
+
+### 9.3 Known Bugs
+
+Issues discovered during use that need fixing before handoff to collaborators.
+
+#### 9.3.1 Book Cover Image — Broken Reference ⚠️
+
+**Symptom:** Adding a cover image to a book's frontmatter (via the image picker in the CMS) produces a broken image reference on the book landing page and chapter pages.
+
+**Likely cause:** The image path stored in frontmatter (e.g., `/uploads/cover.jpg`) may not match the path expected by the book pages, or the `CmsImage` field is storing a relative path that doesn't resolve correctly in the Nuxt Content + book page rendering context.
+
+**Files to investigate:**
+- `pages/books/[book]/index.vue` — how book cover is rendered
+- `components/cms/fields/CmsImage.vue` — what path format is stored
+- `content/books/*/index.md` — inspect frontmatter written by CMS
+- `server/api/cms/media/` — check if upload paths use `/uploads/` or `/public/uploads/`
+
+**Fix checklist:**
+- [ ] Reproduce: add an image in book frontmatter via CMS, check rendered book landing page
+- [ ] Log the exact path stored in frontmatter vs. the path the image tag expects
+- [ ] Align `CmsImage.vue` output path with `public/` serving convention (should be `/uploads/...` relative to site root)
+- [ ] Verify fix works in both local dev and Netlify production
+- [ ] Check all other collections (lessons, exercises, etc.) for the same image path issue and fix uniformly
+
+---
+
+### 9.4 Book Export QA
+
+All four export formats in `useBookExport.ts` need end-to-end testing with real book content before the workflow is reliable for collaborators.
+
+#### 9.4.1 HTML ZIP Export (`exportBook`)
+
+- [ ] Export a multi-chapter book (at least 3 chapters across 2 parts)
+- [ ] Unzip and open `index.html` locally — confirm landing page renders correctly
+- [ ] Verify sidebar navigation matches the outline hierarchy
+- [ ] Verify previous/next chapter links work without a server
+- [ ] Verify images load (check that asset URLs resolve correctly in the ZIP)
+- [ ] Verify embedded media (YouTube, iframes) renders in standalone context
+- [ ] Test all three themes (default, lambda, minimal)
+- [ ] Deploy the ZIP to GitHub Pages or Netlify drag-and-drop — confirm full site works
+- [ ] Check responsive layout on mobile viewport
+
+#### 9.4.2 PDF Export (`exportBookPdf`)
+
+- [ ] Export a multi-chapter book as PDF
+- [ ] Confirm all chapters appear in the correct order
+- [ ] Confirm images render (not broken)
+- [ ] Confirm embedded media (YouTube, iframes) is replaced with a placeholder or link (not a broken iframe)
+- [ ] Check page breaks between chapters
+- [ ] Test in Chrome, Safari, and Firefox (print dialog behavior differs)
+- [ ] Check print output on paper or to a PDF file via browser print dialog
+
+#### 9.4.3 Word / DOCX Export (`exportBookDocx`)
+
+- [ ] Export a multi-chapter book as `.docx`
+- [ ] Open in Microsoft Word — confirm headings, paragraphs, and tables are correct
+- [ ] Open in LibreOffice Writer — confirm same
+- [ ] Confirm chapter metadata (title, difficulty, tags) appears correctly
+- [ ] Confirm images are either embedded or gracefully omitted (not broken references)
+- [ ] Check that special characters and markdown formatting export cleanly
+
+#### 9.4.4 Common Cartridge Export (`exportBookCC`)
+
+- [ ] Export a book as an IMS Common Cartridge package (`.imscc`)
+- [ ] Import the package into Canvas (or a Canvas sandbox) — confirm structure imports
+- [ ] Verify outline hierarchy maps to CC organization structure
+- [ ] Verify content items appear with correct titles and metadata
+- [ ] Check that the package validates against the IMS CC 1.3 schema
+- [ ] Test with Moodle or Blackboard import if available
+
+---
+
+### 9.5 Media Manager QA
+
+Testing that the media upload and browsing workflow is reliable across all contexts and on Netlify.
+
+#### 9.5.1 Upload
+
+- [ ] Upload an image via the standalone media manager (`/cms/media`)
+- [ ] Upload an image via the image field picker (inline, from an edit form)
+- [ ] Upload a non-image file (PDF, zip) and confirm it appears in the browser
+- [ ] Upload a large file (>5MB) — confirm it succeeds or fails with a clear error
+- [ ] Upload a file with a space or special character in the filename — check path stored
+- [ ] Attempt duplicate filename upload — confirm behavior (overwrite, rename, or error)
+- [ ] Verify uploaded files appear immediately without page reload
+- [ ] **Netlify:** confirm server API route (`/api/cms/media/upload`) runs correctly as a Netlify function — file system writes on Netlify are ephemeral, so uploads must go to GitHub via the git backend, not local disk. Investigate and document the correct behavior.
+
+#### 9.5.2 Media Browser
+
+- [ ] Browse folders — confirm folder navigation works
+- [ ] Search by filename — confirm results are correct
+- [ ] Filter by file type — confirm images vs. files are separated
+- [ ] Select an image from the media browser and confirm it populates the image field
+- [ ] Select a file from the media browser and confirm it populates the file field
+- [ ] Delete a file — confirm it is removed and no broken references remain
+- [ ] Move/rename a file — confirm the operation succeeds
+
+#### 9.5.3 Image Path Consistency
+
+- [ ] Confirm the path stored in frontmatter after picking an image matches the path served at runtime
+- [ ] Test on local dev and on Netlify production — paths should be identical
+- [ ] Check all collection types that have image fields: books, lessons, exercises, articles, lectures, specializations, pathways
+
+---
+
+### 9.6 GitHub Save / Editorial Workflow QA
+
+The save and publish workflow must be logical, reliable, recoverable from mistakes, and clear enough for collaborators who are not developers.
+
+#### 9.6.1 Core Save Flows
+
+- [ ] **Local save:** Edit a field and click Save — confirm file is written to disk correctly
+- [ ] **Direct publish to main:** Click "Publish to GitHub" → "Commit to main" — confirm commit appears on GitHub, site rebuilds
+- [ ] **Draft PR:** Click "Publish to GitHub" → "Create Pull Request" — confirm PR is created on GitHub with the correct branch name and content
+- [ ] **Multiple edits before publish:** Make several edits across sessions using local save, then batch publish — confirm all changes are included in a single commit
+- [ ] **Publish after someone else commits:** Trigger a sync conflict deliberately (edit same file on GitHub directly, then try to publish from CMS) — confirm sync conflict dialog appears and all three resolution options work (force publish, pull, open resolver)
+
+#### 9.6.2 Conflict Resolution
+
+- [ ] Force publish — confirm local version overwrites remote, site rebuilds
+- [ ] Pull remote — confirm local form resets to the GitHub version with no data loss message
+- [ ] Open conflict resolver (`ConflictResolver.vue`) — confirm side-by-side diff is readable and both "keep local" and "accept remote" actions work
+- [ ] Confirm the "discard changes" button (revert to last GitHub state) works correctly and does not require a page reload
+
+#### 9.6.3 Draft (PR) Workflow
+
+- [ ] Create a draft PR, navigate to the drafts list (`/cms/drafts`) — confirm the PR appears
+- [ ] Publish (merge) a draft PR from the drafts list — confirm merge succeeds and branch is deleted
+- [ ] Discard a draft PR — confirm PR is closed, branch is deleted, no orphaned branches remain
+- [ ] Create two draft PRs for two different content items — confirm they are listed independently and can be merged/discarded separately
+- [ ] **Netlify preview:** Confirm PRs created via the CMS trigger a Netlify preview deployment if branch deploys are enabled
+
+#### 9.6.4 Batch Publishing
+
+- [ ] Edit three different content items with local save, then open batch publish dialog — confirm all three appear as pending
+- [ ] Deselect one item and publish — confirm only the two selected items are committed
+- [ ] Confirm the batch commit appears as a single commit on GitHub (not three separate commits)
+- [ ] Confirm the batch sync check correctly identifies files changed vs. files already in sync
+
+#### 9.6.5 Collaborator Experience
+
+- [ ] Log in as a second GitHub user (or reviewer) — confirm they can access `/cms` after OAuth
+- [ ] Confirm a second user cannot publish without write access to the repo
+- [ ] Confirm error messaging is clear when a publish fails due to permissions
+- [ ] Confirm a new collaborator can understand the save/publish flow without documentation — note any confusion points
+- [ ] Document the intended workflow in the author guide (9.7 below)
+
+#### 9.6.6 Recovery Scenarios
+
+- [ ] Accidentally publish wrong content → can the author revert to a previous version from the CMS version switcher?
+- [ ] Accidentally delete content via the CMS → is there a recovery path (git history)?
+- [ ] CMS session expires mid-edit → confirm draft work is not lost (localStorage fallback or warning)
+- [ ] Network interruption during publish → confirm the CMS shows a clear error and allows retry without duplicate commits
+
+---
+
+### 9.7 Netlify Compatibility Audit
+
+All CMS server API routes run as Netlify serverless functions. Every route needs to be verified in the production environment.
+
+#### 9.7.1 Server Routes to Verify on Netlify
+
+| Route | Function | Status |
+|---|---|---|
+| `GET /api/cms/config` | Serve parsed CMS config | ⬜ Untested |
+| `POST /api/cms/content/save` | Commit to GitHub | ⬜ Untested |
+| `POST /api/cms/content/save-local` | Local filesystem save | ⚠️ N/A on Netlify — local only |
+| `POST /api/cms/content/batch-publish` | Atomic multi-file commit | ⬜ Untested |
+| `POST /api/cms/content/sync-check` | SHA comparison vs. GitHub | ⬜ Untested |
+| `POST /api/cms/content/batch-sync-check` | Git Trees API scan | ⬜ Untested |
+| `POST /api/cms/content/pull` | Pull GitHub version to local | ⚠️ N/A on Netlify |
+| `POST /api/cms/content/create-version` | Archive + bump version | ⬜ Untested |
+| `GET /api/cms/content/versions` | List version files | ⬜ Untested |
+| `POST /api/cms/media/upload` | File upload | ⚠️ Needs GitHub storage on Netlify |
+| `GET /api/cms/media/list` | Browse media directory | ⚠️ Filesystem read on Netlify |
+| `POST /api/cms/media/delete` | Delete file | ⚠️ Filesystem write on Netlify |
+| `POST /api/cms/media/create-folder` | Create folder | ⚠️ Filesystem write on Netlify |
+| `POST /api/cms/media/move` | Move/rename file | ⚠️ Filesystem write on Netlify |
+| `GET /api/cms/auth/session` | Auth session check | ⬜ Untested |
+| `POST /api/cms/auth/logout` | Logout | ⬜ Untested |
+| `POST /api/chat` | LLM proxy | ⬜ Untested |
+
+> **⚠️ Media routes on Netlify:** Netlify's serverless functions cannot write to the filesystem persistently. All media operations that currently write to `public/uploads/` locally will fail silently or error on Netlify. Media must be stored via GitHub API (commit files to the repo) or an external storage service (S3, Cloudinary). This is the highest-priority Netlify compatibility issue to resolve.
+
+#### 9.7.2 Netlify-Specific Checklist
+
+- [ ] Confirm Netlify environment variables are set correctly: `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO`, `NUXT_SESSION_SECRET`, and any LLM API keys used server-side
+- [ ] Confirm GitHub OAuth callback URL is set to the Netlify production domain (not localhost)
+- [ ] Test the full auth flow on Netlify (login, session persistence, logout)
+- [ ] Test "Publish to GitHub" from a Netlify-deployed CMS instance — confirm commit reaches GitHub and triggers rebuild
+- [ ] Test batch publish from Netlify
+- [ ] Confirm server API routes respond within Netlify's 10-second function timeout for typical payloads
+- [ ] Test media upload on Netlify — confirm it routes through GitHub API rather than local filesystem
+- [ ] Confirm the media browser on Netlify reads from GitHub (not the ephemeral Netlify filesystem)
+- [ ] Test with a branch deploy (PR preview) to confirm CMS works in non-production Netlify environments
+
+---
+
+### 9.8 Testing (Automated)
+
+- [ ] Config parser unit tests (cover all widget types)
+- [ ] Form generation tests (each widget renders correctly)
+- [ ] Git backend integration tests (mock GitHub API)
+- [ ] E2E tests: create, edit, draft, publish workflows
+
+---
+
+### 9.9 Documentation
+
+- [ ] Author guide: how to use the CMS (save, publish, draft, media, versioning)
+- [ ] Collaborator onboarding: GitHub OAuth setup, roles and permissions
+- [ ] Developer guide: adding new widget types, custom fields
+- [ ] Migration notes: differences from Decap workflow
+
+---
+
+### 9.10 Cutover Plan
+
+- [ ] Run both Decap (/admin) and Custom CMS (/cms) in parallel for 2–4 weeks
+- [ ] Track usage of each to confirm feature parity
+- [ ] Redirect /admin → /cms when confident
+- [ ] Keep Decap config.yml as source of truth for schema (or migrate to TypeScript schema)
+
+**Milestone: Custom CMS is the primary editing interface for all collaborators on Netlify. Decap available as emergency fallback.**
+
+---
+
+## Phase 10 — Layout & Design Components
+
+> **Status:** Research complete. Ready for implementation.
+>
+> **Goal:** Give content authors control over how media and text blocks render — alignment, sizing, callouts, collapsible sections, card views — without requiring theme edits or raw HTML.
+
+### Research Summary
+
+#### Current State
+- All 10 existing MDC components (image, video, iframe, code-embed, Google Slides, rubric, Sketchfab, 3D viewer, citation, YouTube) are **atom-type** blocks in Tiptap (`atom: true`), meaning they render as non-editable cards in the editor.
+- MDC blocks use **double-colon** syntax: `::component-name{props}::` — no nested markdown content.
+- Content pages are constrained by `container max-w-4xl mx-auto` in `CollectionItem.vue`, and prose gets `max-w-none` (fluid within the container).
+- No layout CSS or alignment utilities exist in the project today.
+
+#### MDC Container Syntax (Triple-Colon)
+MDC natively supports **container components** with nested markdown content:
+
+```md
+:::callout{type="warning"}
+This is a **warning** with _formatted_ markdown inside.
+:::
+```
+
+Container components:
+- Use `:::` (triple-colon) instead of `::` (double-colon)
+- Accept a default slot for nested markdown content
+- Support named slots via `#slotName` syntax
+- Render nested content through `<MDCSlot unwrap="p" />` in the Vue component
+- Are auto-resolved from `components/content/` directory by Nuxt Content
+
+#### Industry Patterns (Notion, Editor.js)
+- **Notion** succeeds with a minimal set of layout blocks: Callout (boxed text with emoji icon for tips/warnings), Toggle list (collapsible), Quote, Columns, Divider. These cover ~90% of content layout needs.
+- **Editor.js** favors a block-based architecture with clean JSON output, keeping each block self-contained.
+- **Best practice:** A small set of composable layout primitives outperforms a large library of specialized components. Don't recreate a CSS framework.
+
+#### Technical Constraint: Tiptap Editor
+- The current `MdcBlockExtension.ts` creates atom nodes — no editable content inside.
+- Container blocks with editable nested markdown require either:
+  1. A **new Tiptap node type** that supports nested editable content (complex but ideal UX)
+  2. **Code-mode insertion** — authors type `:::` syntax in the markdown code view; Nuxt Content renders it correctly at view time (simpler, leverages existing infrastructure)
+  3. A **hybrid approach** — card preview in rich editor with a mini-editor for the inner content (modal or inline expandable)
+- **Recommendation:** Start with approach 2 (code-mode) for container components while building prop-based features (Tier 1) in the rich editor. Upgrade to approach 1 or 3 as a follow-up.
+
+### Implementation Tiers
+
+#### Tier 1 — Media Alignment & Sizing Props (Easiest)
+Add `align` and `size` props to existing atom-type MDC components.
+
+**Components affected:** `image-component`, `video-component`, `iframe-component`, `youtube-video`
+
+**New props:**
+| Prop | Values | Default | Description |
+|------|--------|---------|-------------|
+| `align` | `left`, `center`, `right`, `full` | `center` | Horizontal alignment within the content column |
+| `size` | `small` (25%), `medium` (50%), `large` (75%), `full` (100%) | `full` | Width relative to content column |
+| `float` | `left`, `right`, `none` | `none` | Text wrap behavior (left/right float with margin) |
+| `caption` | string | — | Optional caption below the media |
+
+**Markdown syntax (existing atom format):**
+```md
+::image-component{src="/img/photo.jpg" alt="Example" align="right" size="medium" caption="Photo credit: Author"}::
+```
+
+**CSS approach:**
+- Alignment classes applied to the component wrapper: `mx-auto`, `mr-auto`, `ml-auto`
+- Size classes set `max-width` percentages
+- `align="full"` uses negative margins to break out of the `max-w-4xl` container (standard CSS breakout pattern)
+- Float classes use `float-left`/`float-right` with `mr-4`/`ml-4` margin and `clear` rules
+
+**Editor UX:** Add alignment and size dropdowns to MdcToolbar field definitions for media components. No Tiptap architecture changes needed.
+
+**Tasks:**
+- [x] Add `align`, `size`, `float`, `caption` props to media MDC components
+- [x] Create shared CSS utility classes for layout (e.g., `.mdc-align-left`, `.mdc-size-medium`, `.mdc-float-right`)
+- [x] Add full-width breakout CSS (negative margin pattern for `align="full"`)
+- [x] Update MdcToolbar to include alignment/size fields on media insert dialogs
+- [x] Update MdcBlockExtension to pass new props through to rendered components
+
+#### Tier 2 — Container Components (Moderate)
+New MDC components that wrap arbitrary markdown content using triple-colon syntax.
+
+**Components to build:**
+
+| Component | Purpose | Education Use Case |
+|-----------|---------|-------------------|
+| `callout` | Boxed text with icon/color by type | Tips, warnings, definitions, key concepts, learning objectives |
+| `accordion` | Collapsible section with title | FAQ, progressive disclosure, self-assessment answers |
+| `card` | Styled card with optional title/image | Highlighted content blocks, summaries |
+| `figure` | Captioned wrapper for any content | Images with credits, diagrams with descriptions |
+
+**Markdown syntax (container format):**
+```md
+:::callout{type="info" title="Key Concept"}
+The **OER Schema** defines metadata for open educational resources.
+:::
+
+:::accordion{title="Click to reveal the answer"}
+The answer is **42**. This is because...
+:::
+
+:::card{title="Summary" variant="outlined"}
+This lesson covered three main topics:
+1. First topic
+2. Second topic
+3. Third topic
+:::
+
+:::figure{caption="Figure 1: System Architecture" align="center"}
+::image-component{src="/img/architecture.png" alt="Architecture diagram"}::
+:::
+```
+
+**Callout types and styling:**
+| Type | Icon | Color | Use Case |
+|------|------|-------|----------|
+| `info` | ℹ️ | Blue | General information |
+| `tip` | 💡 | Green | Helpful tips, best practices |
+| `warning` | ⚠️ | Amber | Cautions, common mistakes |
+| `danger` | 🚫 | Red | Critical warnings, errors |
+| `definition` | 📖 | Purple | Terms, glossary entries |
+| `objective` | 🎯 | Teal | Learning objectives |
+
+**Vue component pattern:**
+```vue
+<!-- components/content/Callout.vue -->
+<template>
+  <div :class="['callout', `callout-${type}`]" role="note">
+    <div class="callout-icon">{{ icon }}</div>
+    <div class="callout-content">
+      <div v-if="title" class="callout-title">{{ title }}</div>
+      <MDCSlot unwrap="p" />
+    </div>
+  </div>
+</template>
+```
+
+**Tasks:**
+- [x] Create `components/content/Callout.vue` with type variants and styling
+- [x] Create `components/content/Accordion.vue` using shadcn-vue/radix-vue accordion primitives
+- [x] Create `components/content/CardBlock.vue` (name avoids shadcn `Card` conflict)
+- [x] Create `components/content/Figure.vue` with caption and alignment support
+- [x] Add CSS for all container component variants (Tailwind utilities + custom classes)
+- [ ] Document triple-colon syntax for content authors
+- [ ] Test nested markdown rendering with `<MDCSlot unwrap="p" />`
+
+**Editor integration (deferred to Tier 2b):**
+- [ ] Implement Tiptap container node type for editable nested content
+- [x] OR implement code-mode insertion helpers (toolbar buttons that insert `:::` boilerplate)
+- [x] Container component previews in ContentPreview.vue (callout, accordion, card-block, figure, columns, tabs, steps)
+- [ ] Container component previews in the rich editor (inline within Tiptap)
+
+#### Tier 3 — Layout Primitives (Advanced)
+Multi-column layouts and spatial arrangement.
+
+**Components:**
+
+| Component | Purpose | Syntax |
+|-----------|---------|--------|
+| `columns` | Side-by-side column layout | `:::columns{count="2"}` with `:::col` dividers |
+| `divider` | Horizontal rule with optional label | `:::divider{label="Section 2"}:::` |
+| `spacer` | Vertical spacing control | `::spacer{size="lg"}::` (atom, not container) |
+
+**Column syntax:**
+```md
+:::columns{count="2" gap="lg"}
+#left
+This content appears in the **left column**.
+
+#right
+This content appears in the **right column**.
+:::
+```
+
+**Tasks:**
+- [x] Create `components/content/Columns.vue` with named slots and responsive collapse
+- [x] Create `components/content/ContentDivider.vue` (avoids HTML `<hr>` naming)
+- [x] Create `components/content/Spacer.vue` (atom component, simple)
+- [x] Implement responsive behavior (columns stack on mobile)
+- [ ] Test with various content combinations (media inside columns, etc.)
+
+### Dependencies
+- **Tier 1** has no blockers — can begin immediately using existing atom-block architecture
+- **Tier 2** requires decisions on editor integration approach (code-mode vs. nested Tiptap nodes)
+- **Tier 3** depends on Tier 2 container infrastructure being proven
+
+### Design Principles
+1. **Minimal and composable** — A few well-designed primitives that combine, not dozens of specialized blocks
+2. **Markdown-first** — All layout expressed in standard MDC syntax, stored as plain markdown files
+3. **Progressive enhancement** — Content remains readable without layout styling (graceful degradation)
+4. **Mobile-responsive** — All layout components collapse sensibly on small screens
+5. **Accessible** — Semantic HTML, ARIA roles, keyboard navigation (especially accordion)
+6. **Education-focused** — Prioritize components that serve teaching: callouts for key concepts, accordions for self-assessment, figures for diagrams
+
+---
+
+## Future Phases (Post-Launch)
+
+### Real-Time Collaboration
+- WebSocket-based co-editing (Tiptap Collaboration extension)
+- Presence indicators (who's editing what)
+- Conflict-free saves
+
+### AI-Assisted Authoring
+- AI-generated descriptions, learning objectives, tags
+- Content suggestions based on existing materials
+- Auto-prerequisite detection from content analysis
+- Integration with existing chatbot system
+
+### Common Cartridge Export
+- Generate IMS Common Cartridge packages from courses/pathways
+- LTI integration for LMS platforms
+
+### Multi-Repository Support
+- Extend config parser to support multiple repos
+- Cross-repo content referencing
+
+---
+
+## Timeline Summary
+
+| Phase | Focus | Status |
+|---|---|---|
+| **Phase 0** | Foundation, config parser, auth, content browser | ✅ Complete |
+| **Phase 1** | Form engine, basic widgets, git save, all collections editable | ✅ Complete |
+| **Phase 2** | Complex widgets (list, typed list, relation, file) | ✅ Complete |
+| **Phase 3** | Markdown editor (Tiptap + CodeMirror + MDC + editor UX) | ✅ Complete |
+| **Phase 4** | Media manager | ✅ Complete |
+| **Phase 5** | Editorial workflow, sync, conflict resolution, batch publish | ✅ Complete |
+| **Phase 5.5** | Version management, change tracking, editing UX | ✅ Complete |
+| **Phase 6** | Education-specific UX (custom builders) | ⬜ **Next up** |
+| **Phase 7** | Book publishing via Outline Builder (website, PDF, Word, Common Cartridge) | ✅ Complete (HTML ZIP, PDF, Word/DOCX, Common Cartridge all implemented; full-text search and custom branding still planned) |
+| **Phase 8** | Bulk operations & analytics | ⬜ Planned |
+| **Phase 9** | Polish, testing, Netlify compatibility, editorial workflow QA | 🔄 In progress (UX polish items done; QA checklists added — testing pending) |
+| **Phase 10** | Layout & design components (Tier 1→3) | 🔄 In progress (Tiers 1-3 components built, preview rendering done) |
+
+**Total estimated timeline: 14 weeks (~3.5 months)**
+
+### Acceleration Strategies
+
+- **AI-assisted development**: Use Copilot for boilerplate widget components (each follows the same pattern)
+- **Skip Phase 4 initially**: Use Decap for media uploads only; build custom media manager later
+- **Skip Phase 5 initially**: Direct commits to main for solo author; add editorial workflow when needed
+- **Prioritize Phase 6**: If custom education UX is the main motivation, jump to Phase 6 after Phase 2
+
+### Minimum Viable CMS (Fast Track — 4–5 weeks)
+
+If time is constrained, build only:
+
+| Phase | What | Time |
+|---|---|---|
+| Phase 0 | Config parser, auth, content browser | 1 week |
+| Phase 1 | Basic widgets + simple save (direct to main) | 1.5 weeks |
+| Phase 2 | Complex widgets (list, relation, typed list) | 1.5 weeks |
+| Phase 3 | Markdown editor (Tiptap, basic toolbar) | 1 week |
+
+This gives you a working CMS for all collections in ~5 weeks. Media uploads and editorial workflow stay on Decap.
+
+---
+
+## Dependencies to Install
+
+```bash
+# Core
+npm install @octokit/rest           # GitHub API
+npm install @tiptap/vue-3            # Rich text editor
+npm install @tiptap/starter-kit      # Tiptap extensions
+npm install tiptap-markdown          # Markdown ↔ Tiptap
+npm install js-yaml                  # YAML parsing
+
+# Optional (later phases)
+npm install @tiptap/extension-collaboration  # Real-time collab
+npm install @tiptap/extension-image          # Image handling in editor
+npm install vuedraggable@next                # Drag-and-drop lists
+```
+
+---
+
+## File Structure
+
+```
+lib/cms/
+  config-parser.ts          # Parse config.yml → TypeScript types
+  config-types.ts           # Type definitions
+  git-backend.ts            # GitHub API operations
+  local-backend.ts          # Filesystem operations for dev
+  slug-utils.ts             # Slug generation matching Decap patterns
+
+composables/
+  useCmsAuth.ts             # Authentication state
+  useCmsConfig.ts           # Parsed config access
+  useCmsContent.ts          # Content reading (via Nuxt Content)
+  useCmsSave.ts             # Save/commit operations
+  useCmsDrafts.ts           # Draft/PR management
+  useCmsMedia.ts            # Media upload/browse
+
+components/cms/
+  DynamicField.vue          # Widget router
+  CollectionForm.vue        # Auto-generated form
+  ContentBrowser.vue        # Collection list/grid
+  
+  fields/                   # One component per widget type
+    CmsString.vue
+    CmsText.vue
+    CmsMarkdown.vue
+    CmsSelect.vue
+    CmsBoolean.vue
+    CmsDatetime.vue
+    CmsImage.vue
+    CmsFile.vue
+    CmsList.vue
+    CmsTypedList.vue
+    CmsRelation.vue
+    CmsObject.vue
+    CmsHidden.vue
+
+  editor/                   # Markdown editor
+    MarkdownEditor.vue
+    EditorToolbar.vue
+    MdcToolbar.vue
+    MdcComponentModal.vue
+    MdcBlockExtension.ts
+    MdcBlockView.vue
+    LinkBubbleMenu.vue
+    CodeEditor.vue
+
+  media/                    # Media manager
+    MediaBrowser.vue
+    MediaUpload.vue
+    MediaGrid.vue
+
+  custom/                   # Education-specific UX
+    PrerequisitesBuilder.vue
+    LessonComposer.vue
+    SpecializationBuilder.vue
+    PathwayBuilder.vue
+    AILicenseSelector.vue
+    RubricEditor.vue
+    OutlineBuilder.vue
+
+layouts/
+  cms.vue                   # Admin layout
+
+middleware/
+  cms-auth.ts               # Auth guard
+
+pages/cms/
+  index.vue                 # Dashboard
+  media.vue                 # Media manager
+  drafts.vue                # Draft PRs
+  analytics.vue             # Content analytics
+  bulk/
+    index.vue               # Bulk operations
+  outline-builder.vue       # Course creation
+  versions/
+    [collection]/
+      [...slug].vue         # Version management
+  [collection]/
+    index.vue               # Collection browser
+    new.vue                 # Create new item
+    edit/
+      [...slug].vue         # Edit existing item
+
+server/api/cms/
+  config.get.ts             # Serve parsed config
+  auth/
+    github.ts               # OAuth flow
+    session.get.ts           # Current session
+    logout.post.ts           # Logout
+  content/
+    save.post.ts             # Save via GitHub API
+    save-direct.post.ts      # Direct commit (dev/trusted)
+    [collection]/
+      [...slug].get.ts       # Read single item
+  media/
+    upload.post.ts           # File upload
+    list.get.ts              # Browse media
+    delete.post.ts           # Delete file
+  drafts/
+    list.get.ts              # List open PRs
+    publish.post.ts          # Merge PR
+    discard.post.ts          # Close PR + delete branch
+  local/
+    read.get.ts              # Filesystem read (dev)
+    write.post.ts            # Filesystem write (dev)
+```
+
+---
+
+## Success Criteria
+
+**Phase 0–2 complete (Minimum Viable): ✅ DONE**
+- [x] All 10 collections browsable in custom UI
+- [x] All widget types render and accept input
+- [x] Content saves produce valid markdown identical to Decap output
+- [x] Can create new content and edit existing content
+
+**Phase 3–5 complete (Feature Parity): ✅ DONE**
+- [x] Markdown editing with MDC components matches Decap
+- [x] Media upload works without Decap
+- [x] Editorial workflow (draft → review → publish) works
+- [x] Sync checking, conflict resolution, batch publishing
+- [x] No reason to use Decap for standard editing
+
+**Phase 5.5 complete (Version Management & UX): ✅ DONE**
+- [x] CMS-native versioning (create, browse, switch, edit archived versions)
+- [x] Version creation from dropdown menus (Save as New Version / Publish as New Version)
+- [x] View Changes dialog with field-level and body diffs
+- [x] Drag-and-drop reordering in list widgets
+- [x] False-positive dirty state and sync check fixes
+- [x] Improved editorial workflow messaging
+
+**Phase 6+ complete (Beyond Decap): ⬜ IN PROGRESS**
+- [ ] Custom education UX that Decap cannot provide
+- [ ] Outline Builder creates courses
+- [ ] Bulk operations save hours of manual work
+- [ ] Content health checks catch issues proactively

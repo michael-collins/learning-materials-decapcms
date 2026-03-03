@@ -1,0 +1,48 @@
+---
+title: 'Develop: Hypertext narrative \(draft 1\)'
+authors:
+  - name: Michael Collins
+date: '2026-03-01'
+license: CC BY 4.0
+difficulty: intermediate
+course: dmd100
+tags:
+  - dmd-100
+  - lesson-3
+  - narrative
+  - project
+published: true
+---
+
+![Double Diamond Develop Phase graphic](/uploads/dmd100/dd-process-develop-1200px@2x.png)
+
+In this phase, you will use a tool called Twine to create an interactive narrative from your latest narrative draft. Twine allows you to create linked decision nodes, similar to a "choose your own adventure" book where you can follow different story paths. Twine is available as a downloadable app for Linux, OSX, and Windows, or as an online editor located at [twinery.org/2](https://twinery.org/2/). You can use either to complete this project, but you will need to submit the compiled HTML story file.
+
+## Learning resources
+
+*   [Twine tutorial: Getting started with Twine](/lessons/lesson-3/topics/twine-tutorial-getting-started.html)
+
+## Story requirements
+
+1. As mentioned in the project introduction, the story must explore plausible, civic-minded ideas for a more positive future.
+2. **Your story must have a title**. "Untitled" is an acceptable title. "My class project" or something similar is not an acceptable title unless the content of the story is actually about a class project.
+3. You must have a minimum of **five critical pathway nodes** \(events\). These nodes can correspond to the plot structure, however, this is not required. Your narrative should take a viewer no longer than 10 minutes to get through the critical pathway.
+4. **Branching nodes are optional**. You can use branching nodes to elaborate on backstory, settings, drill-downs into characters, to explore sub plots, and anything else you think would be interesting and contribute to the telling of the narrative.
+5. These are the baseline requirements. If you wish to develop the story using Twine's javascript capabilities, and more tightly control the visual look and feel with CSS styling,  that is great. However, it is not expected since this is not a web development project. The story is the priority.
+
+## Instructions
+
+1. Use the Twine application to create a hypertext narrative from the story and plot elements that you wrote in the develop phase of the project. You may choose to write the story in a traditional word processor and paste text into Twine. 
+2. Follow the Twine Tutorial to learn how to create a linear hypertext narrative.
+3. You can add as many supporting events or nodes as you want. If you are unsure of what type of story to produce, start with a linear narrative model. Refer back to the topic on story structure for more information.
+4. [Publish the Twine story](https://twinery.org/wiki/twine2:playing_testing_proofing_and_publishing_stories) to an HTML file.
+
+
+
+
+## Post work
+
+* Submit a functional `.html` file by following the instructions above.
+* Alternatively, you may create a `.zip` archive containing the `.html` file, and upload the `.zip` file.
+
+**IMPORTANT:** Make sure the file you submit is a `.html` file. It should not be a public web URL (https://...) or a local filepath (user:///...)

@@ -6,6 +6,10 @@ interface LessonContent {
   title: string
   description?: string
   estimatedDuration?: string
+  /** Primary category (top-level outline node title) this item belongs to */
+  categoryTitle?: string
+  /** Sub-category (second-level outline node title) this item belongs to */
+  subCategoryTitle?: string
 }
 
 interface LessonBundle {
@@ -94,6 +98,60 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
           )
         }
 
+        /**
+         * Walk a nested outline node list, collecting content items.
+         * - Depth 0 nodes with children become primary category headers.
+         * - Depth 1 nodes with children become sub-category headers.
+         * - Leaf nodes (with `content`) become LessonContent entries tagged
+         *   with their ancestor category and sub-category titles.
+         * If a node has both `content` AND children, it emits an item for
+         * itself before recursing into its children.
+         */
+        const collectOutline = async (nodes: any[], categoryTitle?: string, subCategoryTitle?: string) => {
+          for (const node of nodes) {
+            const hasChildren = Array.isArray(node.items) && node.items.length > 0
+
+            if (node.content) {
+              // Parse "collection/slug" ref
+              const slashIdx = node.content.indexOf('/')
+              if (slashIdx !== -1) {
+                const collection = node.content.slice(0, slashIdx) as string
+                const slug = node.content.slice(slashIdx + 1) as string
+                try {
+                  const entry = await queryCollection(collection as any)
+                    .path(`/${collection}/${slug}`)
+                    .first()
+                  if (entry) {
+                    items.push({
+                      type: collection,
+                      slug,
+                      title: (entry as any).title,
+                      description: (entry as any).description,
+                      estimatedDuration: (entry as any).estimatedDuration,
+                      // Only tag with category info when this is a leaf (no children)
+                      categoryTitle: hasChildren ? undefined : (categoryTitle ?? node.title),
+                      subCategoryTitle: hasChildren ? undefined : subCategoryTitle,
+                    })
+                  }
+                } catch { /* skip unresolvable refs */ }
+              }
+            }
+
+            if (hasChildren) {
+              if (categoryTitle === undefined) {
+                // This is a top-level category node — pass its title down
+                await collectOutline(node.items, node.title, undefined)
+              } else if (subCategoryTitle === undefined) {
+                // This is a second-level node — becomes a sub-category
+                await collectOutline(node.items, categoryTitle, node.title)
+              } else {
+                // Deeper levels — keep sub-category as the closest ancestor grouper
+                await collectOutline(node.items, categoryTitle, node.title)
+              }
+            }
+          }
+        }
+
         const collectItems = async (lessonItems: any[]) => {
           const entries = await Promise.all(
             lessonItems.map(async (lessonItem: any) => {
@@ -121,7 +179,10 @@ export function useSpecializationBundle(slug: any): SpecializationBundle {
           })
         }
 
-        if (Array.isArray(lesson.items) && lesson.items.length) {
+        if (Array.isArray(lesson.outline) && lesson.outline.length) {
+          // Preferred: nested outline structure with categories
+          await collectOutline(lesson.outline)
+        } else if (Array.isArray(lesson.items) && lesson.items.length) {
           await collectItems(lesson.items)
         } else {
           await collectLegacy('lectures', 'lectures', '/lectures')

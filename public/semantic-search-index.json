@@ -1489,14 +1489,16 @@
       "title": "Introduction to Animation",
       "type": "lectures",
       "description": "",
-      "searchText": "introduction to animation \n## presentation\n\n::google-slides-component{id=\"2pacx-1vtksgvumlzy3wax5o0e8zipbwbffsuzgyubuccvint9pjubvpibqtr9qejs6yq6xff5e7419mfneajn\" title=\"introduction to animation\"}\n::\n\n\n\n## topics covered\n\n- 1. **screenings**\n    - [fairytales of motion by alan warburton](https://www.youtube.com/watch?v=hk6sxggq_qq)\n    - [illusion of life](https://vimeo.com/93206523)\n    - [newton’s 3 laws of motion](https://vimeo.com/159043081)\n    - [animation mentor](https://www.youtube.com/watch?v=ctrboi0pvgi)\n    - ",
-      "tags": [],
+      "searchText": "introduction to animation [] ## presentation\n\n::google-slides-component{id=\"2pacx-1vtksgvumlzy3wax5o0e8zipbwbffsuzgyubuccvint9pjubvpibqtr9qejs6yq6xff5e7419mfneajn\" title=\"introduction to animation\"}\n::\n## topics covered\n\n1. **screenings**\n   - [fairytales of motion by alan warburton](https://www.youtube.com/watch?v=hk6sxggq_qq)\n   - [illusion of life](https://vimeo.com/93206523)\n   - [newton’s 3 laws of motion](https://vimeo.com/159043081)\n   - [animation mentor](https://www.youtube.com/watch?v=ctrboi0pvgi)\n   - [karl sims ",
+      "tags": [
+        "[]"
+      ],
       "difficulty": "",
       "duration": "",
       "author": "Michael Collins",
       "course": "DART 303",
       "learningObjectives": [],
-      "prerequisites": [],
+      "prerequisites": "[]",
       "published": true,
       "version": "1.0.0",
       "versionStatus": "latest",
@@ -1568,9 +1570,9 @@
       "author": "Michael Collins",
       "course": "",
       "learningObjectives": [],
-      "prerequisites": [],
+      "prerequisites": "[]",
       "published": true,
-      "version": "1.0.0",
+      "version": "",
       "versionStatus": "latest",
       "rubric": ""
     },
@@ -2749,6 +2751,7 @@
         "modeling",
         "sculpting",
         "blender",
+        "[]",
         "compositing",
         "pipeline",
         "animation",
@@ -3381,6 +3384,6 @@
       "oer:Course": 13,
       "oer:InstructionalPattern": 7
     },
-    "buildDate": "2026-02-10T16:46:09.990Z"
+    "buildDate": "2026-02-27T04:29:33.101Z"
   }
 }
