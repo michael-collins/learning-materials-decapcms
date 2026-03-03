@@ -105,16 +105,28 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'netlify',
     prerender: {
-      // crawlLinks disabled to keep build fast (was generating all 400+ pages).
-      // Pages NOT listed in routes[] are SSR'd via Netlify Functions — still
-      // fully served, just rendered on first request instead of at build time.
-      //
-      // ADD content paths here if they are embedded via iframe and need the
-      // fast static TTFB (50-150ms) rather than SSR cold-start (300ms-3s):
-      //   e.g. '/lessons', '/exercises', '/lectures'
-      // Nuxt will crawl links starting from those paths and prerender them all.
-      crawlLinks: false,
-      routes: ['/'],
+      // crawlLinks: true so Nuxt follows links from each seed route and
+      // prerenders all pages underneath it (e.g. every /lessons/* page).
+      // We seed only the content sections likely used in iframe embeds —
+      // NOT '/' — so the crawler doesn't cascade into every other section
+      // and rebuild the entire site on every deploy.
+      // Non-seeded routes (books, docs, pathways, etc.) are still fully
+      // served via SSR + CDN edge caching (see routeRules below).
+      crawlLinks: true,
+      routes: [
+        '/',
+        // Dedicated embed routes — prerendered so iframes load from CDN instantly.
+        // The crawler seeds each section and follows links to generate all
+        // /embed/{type}/{slug} pages statically.
+        '/embed/lessons',
+        '/embed/exercises',
+        '/embed/lectures',
+        '/embed/tutorials',
+        '/embed/projects',
+        '/embed/articles',
+        '/embed/pathways',
+        '/embed/specializations',
+      ],
       ignore: ['/admin', '/docs/about', '/docs/home'],
       failOnError: false
     },
