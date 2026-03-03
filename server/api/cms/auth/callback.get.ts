@@ -31,6 +31,18 @@ export default defineEventHandler(async (event) => {
 
   const config = useRuntimeConfig()
 
+  // Read the client secret directly from process.env at runtime.
+  // Do NOT use config.githubClientSecret — runtimeConfig values set from
+  // process.env in nuxt.config.ts get inlined into the Nitro bundle at build
+  // time, which causes Netlify's secrets scanner to fail the build.
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET || ''
+  if (!clientSecret) {
+    throw createError({
+      statusCode: 500,
+      message: 'GitHub OAuth not configured. Set GITHUB_CLIENT_SECRET environment variable.',
+    })
+  }
+
   // Exchange code for access token
   const tokenRes = await $fetch<{
     access_token: string
@@ -43,7 +55,7 @@ export default defineEventHandler(async (event) => {
     headers: { Accept: 'application/json' },
     body: {
       client_id: config.public.githubClientId,
-      client_secret: config.githubClientSecret,
+      client_secret: clientSecret,
       code,
     },
   })
