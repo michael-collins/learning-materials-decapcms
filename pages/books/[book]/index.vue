@@ -72,14 +72,6 @@ const contentClass = computed(() => themeConfig.value.content.class)
     <div v-else-if="book" class="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Book header -->
       <div class="mb-8">
-        <div v-if="book.coverImage" class="mb-6 rounded-lg overflow-hidden border bg-muted aspect-21/9">
-          <img
-            :src="book.coverImage"
-            :alt="book.coverImageAlt || book.title"
-            class="h-full w-full object-cover"
-          />
-        </div>
-
         <h1 class="text-4xl font-bold mb-3">{{ book.title }}</h1>
 
         <p v-if="book.description" class="text-lg text-muted-foreground mb-4">
