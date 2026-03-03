@@ -44,7 +44,7 @@ This project asks you to consider game design, architecture, and spatial theory.
 1. [**Gaston Bachelard – *The Poetics of Space***](https://catalog.libraries.psu.edu/catalog/18365742) **(2014):** Bachelard explores how intimate spaces like rooms, attics, drawers, corners, and nests can shape memory, imagination, and feeling. This reading focuses on emotional tone, symbolic space, or the psychology of interiors and environmental storytelling.
 2. [**Henry Jenkins – *Game Design as Narrative Architecture***](https://paas.org.pl/wp-content/uploads/2012/12/09.-Henry-Jenkins-Game-Design-As-Narrative-Architecture.pdf) **(2004):** Jenkins argues for understanding games as spaces with narrative possibilities. This is a useful starting point for thinking about environments as active in the process of meaning-making rather than passive backgrounds.
 3. [**Kevin Lynch – *The Image of the City***](https://www.cooldavis.org/wp-content/uploads/2022/03/THE_IMAGE_OF_THE_CITY_Kevin_Lynch.pdf) **(1960):** Lynch’s concept of imageability helps explain how spaces become vivid, memorable, and navigable, and discusses the importance of landmarks, paths, edges, districts, and nodes.
-4. [**Juhani Pallasmaa – *The Eyes of the Skin: Architecture and the Senses***](https://onlinelibrary-wiley-com.ezaccess.libraries.psu.edu/doi/book/10.1002/9781394200702)\*\* *(1996):*\*\* Pallasmaa’s book is a classic of architectural theory and asks why design is so often treated as purely visual when human experience is multi-sensory. This is useful for thinking about atmosphere, embodiment, sound, surface, light, compression, scale, and mood.
+4. [**Juhani Pallasmaa – *The Eyes of the Skin: Architecture and the Senses***](https://onlinelibrary-wiley-com.ezaccess.libraries.psu.edu/doi/book/10.1002/9781394200702) ***(1996):*** Pallasmaa’s book is a classic of architectural theory and asks why design is so often treated as purely visual when human experience is multi-sensory. This is useful for thinking about atmosphere, embodiment, sound, surface, light, compression, scale, and mood.
 
 ## Learning Objectives
 
@@ -137,7 +137,7 @@ A work statement is a clear articulation about what you’ve made. This is not a
 2. One or more renders of your game assets
    1. The renders should be 1920px x 1080px landscape orientation (wide).
 3. A link to the live PlayCanvas scene.
-   1. Please follow the tutorials to host your game on Github.com
+   1. Please follow the tutorials to host your game on [Github.com](http://Github.com)
 4. Upload game .zip as a `LASTNAME-game-files.zip` file
    1. Include final work statement
       - MS Word .doc format
