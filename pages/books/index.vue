@@ -67,14 +67,14 @@ function chapterCount(book) {
       >
         <NuxtLink :to="`/books/${bookSlug(book)}`" class="block">
           <!-- Cover image -->
-          <div v-if="book.coverImage" class="aspect-video overflow-hidden bg-muted">
+          <div v-if="book.coverImage" class="aspect-[1800/2360] overflow-hidden bg-muted">
             <img
               :src="book.coverImage"
               :alt="book.coverImageAlt || book.title"
               class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
-          <div v-else class="aspect-video bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+          <div v-else class="aspect-[1800/2360] bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
             <BookOpen class="h-12 w-12 text-primary/30" />
           </div>
 
