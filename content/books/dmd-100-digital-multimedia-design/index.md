@@ -10,8 +10,10 @@ author: ''
 authorUrl: ''
 date: '2026-03-01'
 coverImage: /uploads/dmd-100-cover-mm8lvg0z.jpg
-coverImageAlt: ''
-introductionTitle: ''
+coverImageAlt: >-
+  Digital Multimedia Design Foundations book cover with a graphic depicting a
+  lattice made of 8 equilateral triangles.
+introductionTitle: Overview
 theme: lambda
 themeOverrides: {}
 license: CC BY 4.0
