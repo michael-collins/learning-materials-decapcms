@@ -105,36 +105,22 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'netlify',
     prerender: {
-      // crawlLinks: true so Nuxt follows links from each seed route and
-      // prerenders all pages underneath it (e.g. every /lessons/* page).
-      // We seed only the content sections likely used in iframe embeds —
-      // NOT '/' — so the crawler doesn't cascade into every other section
-      // and rebuild the entire site on every deploy.
-      // Non-seeded routes (books, docs, pathways, etc.) are still fully
-      // served via SSR + CDN edge caching (see routeRules below).
-      crawlLinks: true,
-      routes: [
-        '/',
-        // Dedicated embed routes — prerendered so iframes load from CDN instantly.
-        // The crawler seeds each section and follows links to generate all
-        // /embed/{type}/{slug} pages statically.
-        '/embed/lessons',
-        '/embed/exercises',
-        '/embed/lectures',
-        '/embed/tutorials',
-        '/embed/projects',
-        '/embed/articles',
-        '/embed/pathways',
-        '/embed/specializations',
-      ],
+      // Only prerender the home page. All /embed/* routes are handled by ISR
+      // (routeRules below) — rendered on first request then cached at Netlify's
+      // CDN edge until the next deploy, so builds stay fast while embed iframes
+      // are served from the edge after the first hit per deploy.
+      crawlLinks: false,
+      routes: ['/'],
       ignore: ['/admin', '/docs/about', '/docs/home'],
       failOnError: false
     },
-    // Cache SSR responses at Netlify's CDN edge for non-prerendered routes.
-    // This means only the very first visitor after a deploy hits the cold
-    // Netlify Function — all subsequent requests are served from the CDN cache.
-    // Adjust max-age as needed; stale-while-revalidate keeps it fresh silently.
     routeRules: {
+      // ISR via Netlify On-Demand Builders: first request renders & caches the
+      // page at the CDN edge permanently until next deploy. Subsequent requests
+      // (including iframes) are served from CDN — same speed as prerendered.
+      // Change `isr: true` to `isr: 3600` if content can change without a deploy.
+      '/embed/**': { isr: true },
+      // SSR + CDN cache for regular content routes (not typically iframed).
       '/lessons/**':        { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
       '/exercises/**':      { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
       '/lectures/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
