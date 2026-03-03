@@ -21,7 +21,12 @@ export default defineNuxtConfig({
   // Runtime config — server-only secrets + public client keys
   runtimeConfig: {
     // Server-only (never exposed to client)
-    githubClientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+    // NOTE: GITHUB_CLIENT_SECRET is intentionally NOT set here at build time.
+    // Reading process.env at build time causes Rollup to inline the value into
+    // the server bundle, which triggers Netlify's secrets scanner.
+    // Instead, callback.get.ts reads process.env.GITHUB_CLIENT_SECRET directly
+    // at runtime so the secret never appears in build output.
+    githubClientSecret: '',        // unused placeholder — see callback.get.ts
     // Deploy commit SHA (Netlify provides COMMIT_REF at build time)
     deployCommitRef: process.env.COMMIT_REF || '',
     // CMS config.yml inlined at build time — available in Netlify functions
