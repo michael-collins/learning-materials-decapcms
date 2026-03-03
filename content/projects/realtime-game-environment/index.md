@@ -9,6 +9,8 @@ aiLicense:
   - AIUL-NA-3D
 tags:
   - Blender
+  - PlayCanvas
+  - Github
 authors:
   - name: Michael Collins
     url: 'https://michaelcollins.xyz'
@@ -29,6 +31,11 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+  - title: PlayCanvas Technical Resources
+    description: ''
+    file: ''
+    url: >-
+      https://docs.google.com/document/d/1o2QzpJocAsGN0vMm7glIa31BEBgKIPR6mYQ0tRfMA5o/edit?usp=sharing
 ---
 For this project, you will design and build a simple first person real-time 3D game environment that functions not only as a playable space, but as a meaningful spatial experience. In games, environments guide a players movement, establish atmosphere, suggest histories, and communicate how a world is used without relying entirely on dialogue or text. As you design the environment, think about how space itself can tell a story, and what kinds of stories are important to tell. How does a player understand where they are, what happened there, who belongs there, and what kinds of actions are possible?
 
