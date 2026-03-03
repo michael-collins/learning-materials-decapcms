@@ -1,6 +1,6 @@
 ---
 title: Realtime Game Environment
-difficulty: Beginner
+difficulty: Advanced
 image: /uploads/game-environment-banner-mmaenefy.jpg
 imageAlt: Banner image of a game environment.
 license: CC BY 4.0
