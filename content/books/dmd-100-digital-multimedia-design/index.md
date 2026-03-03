@@ -5,14 +5,17 @@ description: >-
   facilitate creative and reasoned approaches to ambiguous and ill-defined
   problem spaces. It is the first of three spine courses in the Bachelor of
   Design in Digital Multimedia Design program at Penn State University.
+authors: []
 author: ''
 authorUrl: ''
 date: '2026-03-01'
-coverImage: ''
+coverImage: /uploads/dmd-100-cover-mm8lvg0z.jpg
 coverImageAlt: ''
+introductionTitle: ''
+theme: lambda
+themeOverrides: {}
 license: CC BY 4.0
 published: false
-theme: lambda
 tags:
   - design
   - digital-multimedia
