@@ -67,11 +67,10 @@ Integrate a chatbot-based query system that allows students to ask questions abo
 - ✅ Chat UI (popover + fullscreen) with message history
 - ✅ Settings for provider/model selection and BYOK storage
 - ✅ Server API proxy for provider requests (CORS-safe)
-
-**In Progress**
-- 🔄 LLM response grounding and relevance tuning (prompting + retrieval scoring)
-- 🔄 Learning plan generation with step-by-step materials and Word export
-- 🔄 **Mode-based architecture for specialized guidance** (see section 2.1 below)
+- ✅ LLM integration — multi-stage pipeline (analysis → evaluation → synthesis) with OpenAI, Anthropic, and Ollama
+- ✅ LLM response grounding and relevance tuning (prompting + retrieval scoring)
+- ✅ Learning plan generation with step-by-step materials and Word/DOCX export (`useLearningPlanExport.ts`)
+- ✅ **Mode-based architecture** — 8 modes implemented (see section 2.1 below)
 
 **Planned**
 - ⏳ Streaming responses
@@ -80,42 +79,49 @@ Integrate a chatbot-based query system that allows students to ask questions abo
 
 #### 2.1 Mode-Based Architecture
 
-**Status:** In Progress  
+**Status:** ✅ Complete (core modes implemented)  
 **Description**  
 Extensible mode system that provides specialized AI guidance for different learning contexts, similar to GitHub Copilot's agent/ask/edit/plan modes.
 
-**Implemented Modes**
+**Implemented Modes** (`useChatModes.ts`)
 
-*Ask Mode (Default)*
-- General learning assistant
-- Material discovery and recommendations
-- Quick answers to learning questions
+*Auto Mode*
+- Automatically detects the best mode based on query patterns
+- Keyword-driven auto-routing to appropriate specialized mode
+
+*Ask Mode*
+- General learning questions and material discovery
+- Quick answers grounded in repository content
 
 *Plan Mode*
-- Structured learning plan generation
-- Step-by-step progression with materials
-- Time estimates and scheduling
-- Word document export
+- Structured learning plan generation with step-by-step progression
+- Time estimates and scheduling; Word/DOCX export
 
-**Guide Modes (Planned)**
-
-*Concept Guide Mode*
+*Concept Mode*
 - Deep concept exploration and relationships
-- Prerequisite identification
-- Theory-to-practice connections
-- Socratic questioning approach
+- Prerequisite identification and theory-to-practice connections
+
+*Critique Mode*
+- Critical analysis and feedback workflows
+- Structured evaluation frameworks
+
+*Pathway Mode*
+- Guided learning pathway construction
+- Progression recommendations across specializations and lessons
+
+*Explain Mode*
+- Detailed explanations with examples
+- Adapted to different levels of prior knowledge
+
+*Career Mode*
+- Professional development pathways
+- Portfolio building guidance and industry role mapping
+
+**Guide Modes (Still Planned)**
 
 *Writing Guide Mode*
 - Technical and creative writing development
-- Genre-specific guidance
-- Style and structure templates
-- Peer review workflows
-
-*Career Guide Mode*
-- Professional development pathways
-- Portfolio building guidance
-- Industry role mapping
-- Skill progression tracking
+- Genre-specific guidance and peer review workflows
 
 *Theory Guide Mode*
 - Theoretical framework exploration
@@ -219,15 +225,16 @@ Publish OER materials as cohesive books (course books, textbooks, guides) by arr
 - ✅ **Smart content picker** — Collection pre-filtering, currently-linked item boosted to top, pinned version pre-selected, blue highlight on current item
 - ✅ **Auto-import lesson children** — Adding a lesson to the outline auto-imports its child items; refresh button to re-sync
 - ✅ **Book sidebar tree** — `BookSidebarTree.vue` with hierarchical navigation, icon support, active state tracking
-- ✅ **Book export** — `useBookExport.ts` composable for export functionality
+- ✅ **Book export** — `useBookExport.ts` composable with HTML ZIP, PDF, Word/DOCX, and Common Cartridge
 - ✅ **Monospace navigation font** — JetBrains Mono with configurable weight for book nav
-
-**In Progress**
-- 🔄 **Prose link styling** across all three themes
+- ✅ **Prose link styling** — Fixed across all three themes
+- ✅ **HTML ZIP Export** — Standalone book site with sidebar, themes, prev/next navigation
+- ✅ **PDF Export** — Print-optimized combined HTML via `window.print()`
+- ✅ **Word/DOCX Export** — `.docx` document via `docx` library
+- ✅ **Common Cartridge (IMS CC)** — IMS CC 1.3 package for Canvas/Blackboard/Moodle
+- ✅ **GitHub Pages deploy** — `DeployToGitHubPagesDialog.vue` + `useGitHubPagesDeploy.ts`
 
 **Planned**
-- ⏳ **PDF Export** — Rendered from outline with proper pagination, headers/footers, TOC with page numbers
-- ⏳ **Common Cartridge (IMS CC)** — Standard package for LMS import (Canvas, Blackboard, Moodle)
 - ⏳ **Full-text search within book** — Search across all chapters in a book
 - ⏳ **Custom domain/branding** — Per-book theme configuration
 - ⏳ **SCORM/LTI compliance** for LMS integration
@@ -589,4 +596,4 @@ Future features to be determined based on user feedback and platform evolution.
 
 ---
 
-*Last Updated: July 14, 2025*
+*Last Updated: March 2, 2026*

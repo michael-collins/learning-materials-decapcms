@@ -495,7 +495,7 @@ Shadcn/Vue components already installed: Button, Card, Dialog, Input, Label, Pag
 
 ---
 
-## Phase 7 — Book Publishing via Outline Builder (🔄 IN PROGRESS)
+## Phase 7 — Book Publishing via Outline Builder (✅ COMPLETE — exports done; search/branding planned)
 
 **Goal:** Enable authors to compose and publish books (course books, textbooks, guides) by arranging existing content into a hierarchical outline, then exporting to multiple formats — most importantly a GitBook/docs-style website.
 
@@ -537,30 +537,28 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 
 ### 7.4 Export Formats
 
-- [x] **`composables/useBookExport.ts`** — Export composable (basic structure)
-- [ ] **GitBook / Docs-style Website** (primary format)
-  - Static site generation (Nuxt `generate` or dedicated build) producing a standalone book site
+- [x] **`composables/useBookExport.ts`** — Full export composable with four formats (`exportBook`, `exportBookPdf`, `exportBookDocx`, `exportBookCC`)
+- [x] **HTML ZIP (GitBook-style standalone website)** — `exportBook()`
+  - Packages a complete standalone book site as a ZIP download
   - Sidebar navigation matching the outline hierarchy
   - Chapter-by-chapter pagination (previous/next)
-  - Full-text search within the book
-  - Responsive design, print-friendly CSS
-  - Deployable to GitHub Pages, Netlify, or any static host
-  - Optional: custom domain, branding, and theme configuration
-- [ ] **PDF Export**
-  - Rendered from the book outline with proper pagination, headers/footers, and TOC with page numbers
-  - Includes all referenced content (prose, images, figures, callouts)
-  - Print-quality typography
-  - Generated via Puppeteer/Playwright or a dedicated PDF library
-  - **QR codes for non-printable media:** Embedded videos, slides, iframes, 3D viewers, and downloadable attachments cannot render in a static PDF. Replace these with a styled placeholder card containing:
-    - A QR code linking to the original resource URL (generated client-side via a lightweight library like `qrcode`)
-    - An active hyperlink with descriptive text (e.g., "Watch on YouTube", "View Google Slides", "Download attachment")
-    - A thumbnail or icon indicating the media type
-  - This ensures printed copies remain useful — readers can scan the QR code with a phone to reach the interactive content
-- [ ] **Common Cartridge (IMS CC)**
-  - Standard IMS Common Cartridge package for LMS import (Canvas, Blackboard, Moodle, etc.)
+  - Responsive design, print-friendly CSS; deployable to GitHub Pages, Netlify, or any static host
+  - Theme CSS variables (default/lambda/minimal) baked in
+- [x] **PDF Export** — `exportBookPdf()`
+  - Opens a print-optimized combined HTML page via `window.print()`
+  - All chapters rendered sequentially with proper typography
+  - Print-friendly CSS with page breaks
+- [x] **Word / DOCX Export** — `exportBookDocx()`
+  - Generates a `.docx` document using the `docx` library
+  - Headings, paragraphs, tables, and metadata included
+- [x] **Common Cartridge (IMS CC)** — `exportBookCC()`
+  - IMS Common Cartridge 1.3 package for LMS import (Canvas, Blackboard, Moodle, etc.)
   - Maps outline hierarchy to CC organization structure
   - Includes content items, metadata, and learning objectives
-  - Optional LTI links for interactive content
+
+**Note:** Full-text search within the standalone book site and custom domain/branding are not yet implemented.
+  - ⏳ Full-text search within the exported book
+  - ⏳ Custom domain/branding per-book theme configuration
 
 ### 7.5 Technical Considerations
 
@@ -572,7 +570,7 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 - PDF generation could run server-side (H3 route) or as a CLI script
 - Common Cartridge XML generated from outline + content metadata
 
-**Milestone: ✅ Authors can compose books from existing content with version pinning, icons, and themes. 🔄 Export formats (PDF, Common Cartridge, standalone website) still planned.**
+**Milestone: ✅ Authors can compose books from existing content with version pinning, icons, and themes. ✅ All four export formats implemented (HTML ZIP, PDF, Word/DOCX, Common Cartridge). ⏳ Full-text search within exported book and custom domain branding still planned.**
 
 ### Related Files
 
@@ -624,9 +622,11 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 
 ---
 
-## Phase 9 — Polish & Migration (⬜ PLANNED)
+## Phase 9 — Polish, Testing & Migration (🔄 IN PROGRESS)
 
-**Goal:** Production-ready CMS that can replace Decap for daily use.
+**Goal:** Production-ready CMS that can replace Decap for daily use. Verified to work on Netlify for all collaborators.
+
+---
 
 ### 9.1 UX Polish
 
@@ -645,6 +645,8 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 - [x] Dark mode support (existing theme system)
 - [ ] Loading skeletons for all async operations
 
+---
+
 ### 9.2 Performance
 
 - [ ] Config parsing cached at build time
@@ -652,27 +654,231 @@ The core workflow is: **curate → arrange → publish**. Authors select from th
 - [ ] Lazy-load heavy components (Tiptap, media browser)
 - [ ] Optimistic UI updates on save
 
-### 9.3 Testing
+---
+
+### 9.3 Known Bugs
+
+Issues discovered during use that need fixing before handoff to collaborators.
+
+#### 9.3.1 Book Cover Image — Broken Reference ⚠️
+
+**Symptom:** Adding a cover image to a book's frontmatter (via the image picker in the CMS) produces a broken image reference on the book landing page and chapter pages.
+
+**Likely cause:** The image path stored in frontmatter (e.g., `/uploads/cover.jpg`) may not match the path expected by the book pages, or the `CmsImage` field is storing a relative path that doesn't resolve correctly in the Nuxt Content + book page rendering context.
+
+**Files to investigate:**
+- `pages/books/[book]/index.vue` — how book cover is rendered
+- `components/cms/fields/CmsImage.vue` — what path format is stored
+- `content/books/*/index.md` — inspect frontmatter written by CMS
+- `server/api/cms/media/` — check if upload paths use `/uploads/` or `/public/uploads/`
+
+**Fix checklist:**
+- [ ] Reproduce: add an image in book frontmatter via CMS, check rendered book landing page
+- [ ] Log the exact path stored in frontmatter vs. the path the image tag expects
+- [ ] Align `CmsImage.vue` output path with `public/` serving convention (should be `/uploads/...` relative to site root)
+- [ ] Verify fix works in both local dev and Netlify production
+- [ ] Check all other collections (lessons, exercises, etc.) for the same image path issue and fix uniformly
+
+---
+
+### 9.4 Book Export QA
+
+All four export formats in `useBookExport.ts` need end-to-end testing with real book content before the workflow is reliable for collaborators.
+
+#### 9.4.1 HTML ZIP Export (`exportBook`)
+
+- [ ] Export a multi-chapter book (at least 3 chapters across 2 parts)
+- [ ] Unzip and open `index.html` locally — confirm landing page renders correctly
+- [ ] Verify sidebar navigation matches the outline hierarchy
+- [ ] Verify previous/next chapter links work without a server
+- [ ] Verify images load (check that asset URLs resolve correctly in the ZIP)
+- [ ] Verify embedded media (YouTube, iframes) renders in standalone context
+- [ ] Test all three themes (default, lambda, minimal)
+- [ ] Deploy the ZIP to GitHub Pages or Netlify drag-and-drop — confirm full site works
+- [ ] Check responsive layout on mobile viewport
+
+#### 9.4.2 PDF Export (`exportBookPdf`)
+
+- [ ] Export a multi-chapter book as PDF
+- [ ] Confirm all chapters appear in the correct order
+- [ ] Confirm images render (not broken)
+- [ ] Confirm embedded media (YouTube, iframes) is replaced with a placeholder or link (not a broken iframe)
+- [ ] Check page breaks between chapters
+- [ ] Test in Chrome, Safari, and Firefox (print dialog behavior differs)
+- [ ] Check print output on paper or to a PDF file via browser print dialog
+
+#### 9.4.3 Word / DOCX Export (`exportBookDocx`)
+
+- [ ] Export a multi-chapter book as `.docx`
+- [ ] Open in Microsoft Word — confirm headings, paragraphs, and tables are correct
+- [ ] Open in LibreOffice Writer — confirm same
+- [ ] Confirm chapter metadata (title, difficulty, tags) appears correctly
+- [ ] Confirm images are either embedded or gracefully omitted (not broken references)
+- [ ] Check that special characters and markdown formatting export cleanly
+
+#### 9.4.4 Common Cartridge Export (`exportBookCC`)
+
+- [ ] Export a book as an IMS Common Cartridge package (`.imscc`)
+- [ ] Import the package into Canvas (or a Canvas sandbox) — confirm structure imports
+- [ ] Verify outline hierarchy maps to CC organization structure
+- [ ] Verify content items appear with correct titles and metadata
+- [ ] Check that the package validates against the IMS CC 1.3 schema
+- [ ] Test with Moodle or Blackboard import if available
+
+---
+
+### 9.5 Media Manager QA
+
+Testing that the media upload and browsing workflow is reliable across all contexts and on Netlify.
+
+#### 9.5.1 Upload
+
+- [ ] Upload an image via the standalone media manager (`/cms/media`)
+- [ ] Upload an image via the image field picker (inline, from an edit form)
+- [ ] Upload a non-image file (PDF, zip) and confirm it appears in the browser
+- [ ] Upload a large file (>5MB) — confirm it succeeds or fails with a clear error
+- [ ] Upload a file with a space or special character in the filename — check path stored
+- [ ] Attempt duplicate filename upload — confirm behavior (overwrite, rename, or error)
+- [ ] Verify uploaded files appear immediately without page reload
+- [ ] **Netlify:** confirm server API route (`/api/cms/media/upload`) runs correctly as a Netlify function — file system writes on Netlify are ephemeral, so uploads must go to GitHub via the git backend, not local disk. Investigate and document the correct behavior.
+
+#### 9.5.2 Media Browser
+
+- [ ] Browse folders — confirm folder navigation works
+- [ ] Search by filename — confirm results are correct
+- [ ] Filter by file type — confirm images vs. files are separated
+- [ ] Select an image from the media browser and confirm it populates the image field
+- [ ] Select a file from the media browser and confirm it populates the file field
+- [ ] Delete a file — confirm it is removed and no broken references remain
+- [ ] Move/rename a file — confirm the operation succeeds
+
+#### 9.5.3 Image Path Consistency
+
+- [ ] Confirm the path stored in frontmatter after picking an image matches the path served at runtime
+- [ ] Test on local dev and on Netlify production — paths should be identical
+- [ ] Check all collection types that have image fields: books, lessons, exercises, articles, lectures, specializations, pathways
+
+---
+
+### 9.6 GitHub Save / Editorial Workflow QA
+
+The save and publish workflow must be logical, reliable, recoverable from mistakes, and clear enough for collaborators who are not developers.
+
+#### 9.6.1 Core Save Flows
+
+- [ ] **Local save:** Edit a field and click Save — confirm file is written to disk correctly
+- [ ] **Direct publish to main:** Click "Publish to GitHub" → "Commit to main" — confirm commit appears on GitHub, site rebuilds
+- [ ] **Draft PR:** Click "Publish to GitHub" → "Create Pull Request" — confirm PR is created on GitHub with the correct branch name and content
+- [ ] **Multiple edits before publish:** Make several edits across sessions using local save, then batch publish — confirm all changes are included in a single commit
+- [ ] **Publish after someone else commits:** Trigger a sync conflict deliberately (edit same file on GitHub directly, then try to publish from CMS) — confirm sync conflict dialog appears and all three resolution options work (force publish, pull, open resolver)
+
+#### 9.6.2 Conflict Resolution
+
+- [ ] Force publish — confirm local version overwrites remote, site rebuilds
+- [ ] Pull remote — confirm local form resets to the GitHub version with no data loss message
+- [ ] Open conflict resolver (`ConflictResolver.vue`) — confirm side-by-side diff is readable and both "keep local" and "accept remote" actions work
+- [ ] Confirm the "discard changes" button (revert to last GitHub state) works correctly and does not require a page reload
+
+#### 9.6.3 Draft (PR) Workflow
+
+- [ ] Create a draft PR, navigate to the drafts list (`/cms/drafts`) — confirm the PR appears
+- [ ] Publish (merge) a draft PR from the drafts list — confirm merge succeeds and branch is deleted
+- [ ] Discard a draft PR — confirm PR is closed, branch is deleted, no orphaned branches remain
+- [ ] Create two draft PRs for two different content items — confirm they are listed independently and can be merged/discarded separately
+- [ ] **Netlify preview:** Confirm PRs created via the CMS trigger a Netlify preview deployment if branch deploys are enabled
+
+#### 9.6.4 Batch Publishing
+
+- [ ] Edit three different content items with local save, then open batch publish dialog — confirm all three appear as pending
+- [ ] Deselect one item and publish — confirm only the two selected items are committed
+- [ ] Confirm the batch commit appears as a single commit on GitHub (not three separate commits)
+- [ ] Confirm the batch sync check correctly identifies files changed vs. files already in sync
+
+#### 9.6.5 Collaborator Experience
+
+- [ ] Log in as a second GitHub user (or reviewer) — confirm they can access `/cms` after OAuth
+- [ ] Confirm a second user cannot publish without write access to the repo
+- [ ] Confirm error messaging is clear when a publish fails due to permissions
+- [ ] Confirm a new collaborator can understand the save/publish flow without documentation — note any confusion points
+- [ ] Document the intended workflow in the author guide (9.7 below)
+
+#### 9.6.6 Recovery Scenarios
+
+- [ ] Accidentally publish wrong content → can the author revert to a previous version from the CMS version switcher?
+- [ ] Accidentally delete content via the CMS → is there a recovery path (git history)?
+- [ ] CMS session expires mid-edit → confirm draft work is not lost (localStorage fallback or warning)
+- [ ] Network interruption during publish → confirm the CMS shows a clear error and allows retry without duplicate commits
+
+---
+
+### 9.7 Netlify Compatibility Audit
+
+All CMS server API routes run as Netlify serverless functions. Every route needs to be verified in the production environment.
+
+#### 9.7.1 Server Routes to Verify on Netlify
+
+| Route | Function | Status |
+|---|---|---|
+| `GET /api/cms/config` | Serve parsed CMS config | ⬜ Untested |
+| `POST /api/cms/content/save` | Commit to GitHub | ⬜ Untested |
+| `POST /api/cms/content/save-local` | Local filesystem save | ⚠️ N/A on Netlify — local only |
+| `POST /api/cms/content/batch-publish` | Atomic multi-file commit | ⬜ Untested |
+| `POST /api/cms/content/sync-check` | SHA comparison vs. GitHub | ⬜ Untested |
+| `POST /api/cms/content/batch-sync-check` | Git Trees API scan | ⬜ Untested |
+| `POST /api/cms/content/pull` | Pull GitHub version to local | ⚠️ N/A on Netlify |
+| `POST /api/cms/content/create-version` | Archive + bump version | ⬜ Untested |
+| `GET /api/cms/content/versions` | List version files | ⬜ Untested |
+| `POST /api/cms/media/upload` | File upload | ⚠️ Needs GitHub storage on Netlify |
+| `GET /api/cms/media/list` | Browse media directory | ⚠️ Filesystem read on Netlify |
+| `POST /api/cms/media/delete` | Delete file | ⚠️ Filesystem write on Netlify |
+| `POST /api/cms/media/create-folder` | Create folder | ⚠️ Filesystem write on Netlify |
+| `POST /api/cms/media/move` | Move/rename file | ⚠️ Filesystem write on Netlify |
+| `GET /api/cms/auth/session` | Auth session check | ⬜ Untested |
+| `POST /api/cms/auth/logout` | Logout | ⬜ Untested |
+| `POST /api/chat` | LLM proxy | ⬜ Untested |
+
+> **⚠️ Media routes on Netlify:** Netlify's serverless functions cannot write to the filesystem persistently. All media operations that currently write to `public/uploads/` locally will fail silently or error on Netlify. Media must be stored via GitHub API (commit files to the repo) or an external storage service (S3, Cloudinary). This is the highest-priority Netlify compatibility issue to resolve.
+
+#### 9.7.2 Netlify-Specific Checklist
+
+- [ ] Confirm Netlify environment variables are set correctly: `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO`, `NUXT_SESSION_SECRET`, and any LLM API keys used server-side
+- [ ] Confirm GitHub OAuth callback URL is set to the Netlify production domain (not localhost)
+- [ ] Test the full auth flow on Netlify (login, session persistence, logout)
+- [ ] Test "Publish to GitHub" from a Netlify-deployed CMS instance — confirm commit reaches GitHub and triggers rebuild
+- [ ] Test batch publish from Netlify
+- [ ] Confirm server API routes respond within Netlify's 10-second function timeout for typical payloads
+- [ ] Test media upload on Netlify — confirm it routes through GitHub API rather than local filesystem
+- [ ] Confirm the media browser on Netlify reads from GitHub (not the ephemeral Netlify filesystem)
+- [ ] Test with a branch deploy (PR preview) to confirm CMS works in non-production Netlify environments
+
+---
+
+### 9.8 Testing (Automated)
 
 - [ ] Config parser unit tests (cover all widget types)
 - [ ] Form generation tests (each widget renders correctly)
 - [ ] Git backend integration tests (mock GitHub API)
 - [ ] E2E tests: create, edit, draft, publish workflows
 
-### 9.4 Documentation
+---
 
-- [ ] Author guide: how to use the CMS
+### 9.9 Documentation
+
+- [ ] Author guide: how to use the CMS (save, publish, draft, media, versioning)
+- [ ] Collaborator onboarding: GitHub OAuth setup, roles and permissions
 - [ ] Developer guide: adding new widget types, custom fields
 - [ ] Migration notes: differences from Decap workflow
 
-### 9.5 Cutover Plan
+---
+
+### 9.10 Cutover Plan
 
 - [ ] Run both Decap (/admin) and Custom CMS (/cms) in parallel for 2–4 weeks
 - [ ] Track usage of each to confirm feature parity
 - [ ] Redirect /admin → /cms when confident
 - [ ] Keep Decap config.yml as source of truth for schema (or migrate to TypeScript schema)
 
-**Milestone: Custom CMS is the primary editing interface. Decap available as emergency fallback.**
+**Milestone: Custom CMS is the primary editing interface for all collaborators on Netlify. Decap available as emergency fallback.**
 
 ---
 
@@ -906,9 +1112,9 @@ This content appears in the **right column**.
 | **Phase 5** | Editorial workflow, sync, conflict resolution, batch publish | ✅ Complete |
 | **Phase 5.5** | Version management, change tracking, editing UX | ✅ Complete |
 | **Phase 6** | Education-specific UX (custom builders) | ⬜ **Next up** |
-| **Phase 7** | Book publishing via Outline Builder (website, PDF, Common Cartridge) | 🔄 In progress (core builder, themes, versioning done; exports planned) |
+| **Phase 7** | Book publishing via Outline Builder (website, PDF, Word, Common Cartridge) | ✅ Complete (HTML ZIP, PDF, Word/DOCX, Common Cartridge all implemented; full-text search and custom branding still planned) |
 | **Phase 8** | Bulk operations & analytics | ⬜ Planned |
-| **Phase 9** | Polish, testing, migration | 🔄 In progress (UX polish items done) |
+| **Phase 9** | Polish, testing, Netlify compatibility, editorial workflow QA | 🔄 In progress (UX polish items done; QA checklists added — testing pending) |
 | **Phase 10** | Layout & design components (Tier 1→3) | 🔄 In progress (Tiers 1-3 components built, preview rendering done) |
 
 **Total estimated timeline: 14 weeks (~3.5 months)**
