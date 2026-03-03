@@ -20,6 +20,7 @@ import {
   Pencil,
   Archive,
   Loader2,
+  Copy,
 } from 'lucide-vue-next'
 
 definePageMeta({
@@ -130,6 +131,35 @@ function editVersion(e: Event, itemSlug: string, version?: string) {
     router.push(`/cms/${collectionName.value}/edit/${itemSlug}?version=${version}`)
   } else {
     router.push(`/cms/${collectionName.value}/edit/${itemSlug}`)
+  }
+}
+
+// ─── Duplicate ─────────────────────────────────────────
+const duplicating = ref<string | null>(null)
+
+async function duplicateItem(e: Event, item: { slug: string; title?: string }) {
+  e.stopPropagation()
+  e.preventDefault()
+  duplicating.value = item.slug
+  try {
+    await restoreSession()
+    const token = getToken()
+    const res = await $fetch<{ frontmatter: Record<string, any>; body: string }>(
+      '/api/cms/content/read',
+      { params: { collection: collectionName.value, slug: item.slug, ...(token ? { token } : {}) } },
+    )
+    // Strip versioning fields; mark as a copy so the author can rename before saving
+    const { version, versionStatus, date, ...fm } = res.frontmatter
+    fm.title = `Copy of ${fm.title || item.title || 'Untitled'}`
+    sessionStorage.setItem(
+      `cms-duplicate-${collectionName.value}`,
+      JSON.stringify({ frontmatter: fm, body: res.body }),
+    )
+    await navigateTo(`/cms/${collectionName.value}/new`)
+  } catch {
+    // silently ignore — user stays on the list page
+  } finally {
+    duplicating.value = null
   }
 }
 
@@ -352,17 +382,37 @@ onUnmounted(() => {
           </div>
 
           <!-- Meta -->
-          <div class="hidden shrink-0 items-center gap-4 text-xs text-muted-foreground sm:flex">
+          <div class="hidden shrink-0 items-center gap-3 text-xs text-muted-foreground sm:flex">
             <span v-if="item.date">{{ formatDate(item.date) }}</span>
             <!-- View on site -->
             <NuxtLink
               :to="item.path"
               class="rounded p-1 opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
-              title="View on site"
+              title="View published page"
               @click.stop
             >
               <Eye class="h-3.5 w-3.5" />
             </NuxtLink>
+            <!-- Edit -->
+            <NuxtLink
+              :to="`/cms/${collectionName}/edit/${item.slug}`"
+              class="rounded p-1 opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100"
+              title="Edit"
+              @click.stop
+            >
+              <Pencil class="h-3.5 w-3.5" />
+            </NuxtLink>
+            <!-- Duplicate -->
+            <button
+              type="button"
+              class="rounded p-1 opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100 disabled:cursor-not-allowed"
+              title="Duplicate"
+              :disabled="duplicating === item.slug"
+              @click="duplicateItem($event, item)"
+            >
+              <Loader2 v-if="duplicating === item.slug" class="h-3.5 w-3.5 animate-spin" />
+              <Copy v-else class="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       </NuxtLink>

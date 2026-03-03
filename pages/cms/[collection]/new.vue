@@ -28,6 +28,29 @@ const showSyncDialog = ref(false)
 const showResolver = ref(false)
 const pendingPublish = ref<{ frontmatter: Record<string, any>; body: string; publishMode?: 'draft' | 'direct' } | null>(null)
 
+/** Pre-filled data when creating a duplicate (set from sessionStorage on mount) */
+const initialData = ref<Record<string, any> | null>(null)
+
+onMounted(() => {
+  const key = `cms-duplicate-${collectionName.value}`
+  const stored = sessionStorage.getItem(key)
+  if (stored) {
+    try {
+      const data = JSON.parse(stored) as { frontmatter: Record<string, any>; body: string }
+      // CollectionForm expects { ...frontmatter, body } spread together
+      initialData.value = { ...data.frontmatter, body: data.body }
+      // Pre-populate slug field from duplicated title
+      if (data.frontmatter?.title) {
+        slugFromTitle.value = generateSlug(data.frontmatter.title)
+      }
+    } catch {
+      // ignore malformed data
+    } finally {
+      sessionStorage.removeItem(key)
+    }
+  }
+})
+
 // The effective slug: manual override if set, otherwise auto-generated from title
 const effectiveSlug = computed(() => {
   if (slugManualMode.value && slugOverride.value.trim()) {
@@ -273,6 +296,7 @@ function handleResolverCancel() {
       <CmsCollectionForm
         :collection="collection"
         :is-new="true"
+        :initial-data="initialData"
         :saving="saving"
         :publishing="publishing"
         :editorial-workflow="isEditorial"
