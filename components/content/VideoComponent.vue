@@ -34,11 +34,17 @@ const embedUrl = computed(() => {
     // YouTube
     if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
       const v = parsed.searchParams.get('v')
-      if (v) return `https://www.youtube-nocookie.com/embed/${v}`
-      if (parsed.pathname.startsWith('/embed/')) return `https://www.youtube-nocookie.com${parsed.pathname}`
-      // Playlist
-      if (parsed.pathname.startsWith('/embed/videoseries') || parsed.searchParams.get('list')) {
-        return `https://www.youtube-nocookie.com${parsed.pathname}${parsed.search}`
+      const list = parsed.searchParams.get('list')
+      if (v) {
+        // Single video — optionally also attach a playlist context
+        const embedParams = new URLSearchParams({ v })
+        if (list) embedParams.set('list', list)
+        return `https://www.youtube-nocookie.com/embed/${v}?${embedParams.toString()}`
+      }
+      if (parsed.pathname.startsWith('/embed/')) return `https://www.youtube-nocookie.com${parsed.pathname}${parsed.search}`
+      // Playlist-only URL (e.g. youtube.com/playlist?list=...)
+      if (list) {
+        return `https://www.youtube-nocookie.com/embed/videoseries?list=${list}`
       }
     }
     if (host === 'youtu.be') {
