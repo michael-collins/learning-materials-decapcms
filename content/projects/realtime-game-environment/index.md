@@ -51,7 +51,7 @@ This project asks you to consider game design, architecture, and spatial theory.
 1. Practice creative problem solving and visual storytelling skills.
 2. Demonstrate understanding of real-time 3D environment production through modeling, materials, lighting, scene assembly, optimization, and animation.
 3. Practice visual storytelling through the design of spatial atmosphere, layout, props, and environmental detail.
-4. Apply ideas from game design and spatial theory to the development of an explorable 3D environment.
+4. Apply ideas from game design and spatial theory to create an explorable 3D environment using  modular/reusable 3D assets.
 
 ## Instructions
 
@@ -75,8 +75,8 @@ This project asks you to consider game design, architecture, and spatial theory.
 
    2. **Production** (blockout, modeling, materials, lighting, real-time implementation, optimization)
 
-      1. Use [PlayCanvas.com](http://PlayCanvas.com) to build the game environment using assets you modeled and textured in Blender.
-      2. Host the game environment for free on [Github.com.](http://Github.com)
+      1. Use [PlayCanvas.com](http://PlayCanvas.com) to build the game environment using assets you modeled and textured in Blender. See tutorials. **Note:** If you already have experience with other 3D game engines (Godot, Unity, Unreal), you may use those in place of PlayCanvas.
+      2. Host the game environment for free on [Github.com. ](http://Github.com)See tutorials.
       3. Rather than building everything as a one-off asset, build **low-poly modular assets** that can be reused in the scene to construct the environment.
 
    3. Publishing: Make game available on Github
