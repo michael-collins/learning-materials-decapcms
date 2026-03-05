@@ -35,6 +35,11 @@ collections:
           - {label: "URL", name: "url", widget: "string", required: false, hint: "Author's website or profile URL"}
       - {label: "Author (legacy)", name: "author", widget: "string", required: false, hint: "Legacy single author. Use the Authors list above for new content."}
       - {label: "Date", name: "date", widget: "datetime"}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: false, required: false}
       - {label: "Version", name: "version", widget: "hidden", default: "1.0.0"}
@@ -136,6 +141,11 @@ collections:
       - {label: "Author (legacy)", name: "author", widget: "string", required: false, hint: "Legacy single author. Use the Authors list above for new content."}
       - {label: "Date", name: "date", widget: "datetime"}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "Allow Embedding", name: "allowEmbed", widget: "boolean", default: false, required: false}
       - {label: "Version", name: "version", widget: "hidden", default: "1.0.0"}
@@ -238,6 +248,11 @@ collections:
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "AI Usage Licenses", name: "aiLicense", widget: "select", required: false, multiple: true, default: ["AIUL-WA"], options: ["AIUL-NA", "AIUL-NA-WR", "AIUL-NA-IM", "AIUL-NA-VD", "AIUL-NA-AU", "AIUL-NA-3D", "AIUL-NA-TR", "AIUL-NA-MX", "AIUL-NA-CO", "AIUL-WA", "AIUL-WA-WR", "AIUL-WA-IM", "AIUL-WA-VD", "AIUL-WA-AU", "AIUL-WA-3D", "AIUL-WA-TR", "AIUL-WA-MX", "AIUL-WA-CO", "AIUL-CD", "AIUL-CD-WR", "AIUL-CD-IM", "AIUL-CD-VD", "AIUL-CD-AU", "AIUL-CD-3D", "AIUL-CD-TR", "AIUL-CD-MX", "AIUL-CD-CO", "AIUL-TC", "AIUL-TC-WR", "AIUL-TC-IM", "AIUL-TC-VD", "AIUL-TC-AU", "AIUL-TC-3D", "AIUL-TC-TR", "AIUL-TC-MX", "AIUL-TC-CO", "AIUL-DP", "AIUL-DP-WR", "AIUL-DP-IM", "AIUL-DP-VD", "AIUL-DP-AU", "AIUL-DP-3D", "AIUL-DP-TR", "AIUL-DP-MX", "AIUL-DP-CO", "AIUL-IU", "AIUL-IU-WR", "AIUL-IU-IM", "AIUL-IU-VD", "AIUL-IU-AU", "AIUL-IU-3D", "AIUL-IU-TR", "AIUL-IU-MX", "AIUL-IU-CO"], hint: "Select one or more AI usage policies. Defaults: AIUL-WA (general approval required) + AIUL-NA-3D (no AI for 3D work)"}
       - {label: "Tags", name: "tags", widget: "list", required: false, hint: "Content tags (e.g., Blender, AfterEffects)"}
@@ -353,6 +368,11 @@ collections:
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - {label: "License", name: "license", widget: "select", required: false, default: "CC BY 4.0", options: ["CC BY 4.0", "CC BY-SA 4.0", "CC BY-NC 4.0", "CC BY-NC-SA 4.0", "CC BY-ND 4.0", "CC BY-NC-ND 4.0", "CC0 1.0", "All Rights Reserved"]}
       - {label: "AI Usage Licenses", name: "aiLicense", widget: "select", required: false, multiple: true, default: ["AIUL-WA"], options: ["AIUL-NA", "AIUL-NA-WR", "AIUL-NA-IM", "AIUL-NA-VD", "AIUL-NA-AU", "AIUL-NA-3D", "AIUL-NA-TR", "AIUL-NA-MX", "AIUL-NA-CO", "AIUL-WA", "AIUL-WA-WR", "AIUL-WA-IM", "AIUL-WA-VD", "AIUL-WA-AU", "AIUL-WA-3D", "AIUL-WA-TR", "AIUL-WA-MX", "AIUL-WA-CO", "AIUL-CD", "AIUL-CD-WR", "AIUL-CD-IM", "AIUL-CD-VD", "AIUL-CD-AU", "AIUL-CD-3D", "AIUL-CD-TR", "AIUL-CD-MX", "AIUL-CD-CO", "AIUL-TC", "AIUL-TC-WR", "AIUL-TC-IM", "AIUL-TC-VD", "AIUL-TC-AU", "AIUL-TC-3D", "AIUL-TC-TR", "AIUL-TC-MX", "AIUL-TC-CO", "AIUL-DP", "AIUL-DP-WR", "AIUL-DP-IM", "AIUL-DP-VD", "AIUL-DP-AU", "AIUL-DP-3D", "AIUL-DP-TR", "AIUL-DP-MX", "AIUL-DP-CO", "AIUL-IU", "AIUL-IU-WR", "AIUL-IU-IM", "AIUL-IU-VD", "AIUL-IU-AU", "AIUL-IU-3D", "AIUL-IU-TR", "AIUL-IU-MX", "AIUL-IU-CO"], hint: "Select one or more AI usage policies. Defaults: AIUL-WA (approval required) + AIUL-CD (conceptual ok) + AIUL-NA-3D (no AI for 3D)"}
       - {label: "Tags", name: "tags", widget: "list", required: false, hint: "Content tags"}
@@ -471,6 +491,11 @@ collections:
       - {label: "Description", name: "description", widget: "text", required: false}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '8 weeks', '3 months'"}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - label: "Lessons"
         name: "lessons"
         widget: "relation"
@@ -614,6 +639,11 @@ collections:
       - {label: "Description", name: "description", widget: "text", required: false}
       - {label: "Difficulty", name: "difficulty", widget: "select", options: ["Beginner", "Intermediate", "Advanced"]}
       - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '12 weeks', '6 months'"}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - label: "Specializations"
         name: "specializations"
         widget: "relation"
@@ -739,7 +769,11 @@ collections:
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Slug", name: "slug", widget: "string", required: false, hint: "URL-friendly identifier (auto-generated from title if not provided)"}
-      - {label: "Course", name: "course", widget: "string", required: false, hint: "Course code (e.g., DART 303)"}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - {label: "Featured Image", name: "image", widget: "image", required: false}
       - {label: "Image Alt Text", name: "imageAlt", widget: "string", required: false}
       - label: "Authors"
@@ -859,6 +893,11 @@ collections:
       - {label: "Type", name: "type", widget: "hidden", default: "oer:LearningComponent"}
       - {label: "Description", name: "description", widget: "text", required: false}
       - {label: "Estimated Duration", name: "estimatedDuration", widget: "string", required: false, hint: "e.g., '3 hours', '2 days'"}
+      - label: "Courses"
+        name: "courses"
+        widget: "list"
+        required: false
+        hint: "Course codes associated with this content (e.g., DART 303). Multiple courses are supported."
       - label: "Learning Objectives"
         name: "learningObjectives"
         widget: "list"

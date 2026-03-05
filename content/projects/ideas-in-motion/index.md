@@ -3,6 +3,8 @@ title: Ideas In Motion
 difficulty: Intermediate
 image: /uploads/recKy155GBMBZKNjJ_image_cycles-banner-compressed2.jpg
 imageAlt: cycles-banner-compressed2.jpg
+courses:
+  - Dart 303
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA

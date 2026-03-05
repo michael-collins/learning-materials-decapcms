@@ -1,27 +1,26 @@
 ---
-recordId: rec67LSQtsxBgHxxE
 title: You don't see that everyday objects
-date: 2026-01-12T12:00:00.000Z
-slug: you-dont-see-that-everyday-objects
-type: 'oer:Assessment'
 difficulty: Beginner
-youtubePlaylistID: PL-V2nChTadrV1iw9_XUwArDOs5mwu6fAk
-image: >-
-  /uploads/rec67LSQtsxBgHxxE_image_youdontseethateveryday-banner-comp2.jpg
+image: /uploads/rec67LSQtsxBgHxxE_image_youdontseethateveryday-banner-comp2.jpg
 imageAlt: youdontseethateveryday-banner-comp2.jpg
+courses:
+  - Dart 303
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-CD
   - AIUL-NA-3D
-rubric: project
 tags:
   - Blender
+authors: []
 author: Michael Collins
-course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
+version: 1.0.0
+versionStatus: latest
+publishEmbed: true
+prerequisites: []
 attachments:
   - file: /uploads/recc2Pn0D4cExQqgE_attachment_static-image-project.png
     title: Project Workflow (Static images)
@@ -40,10 +39,7 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
-version: '1.0.0'
-versionStatus: latest
 ---
-
 For this project, you will produce 3D rendered images of products and other objects you experience every day, but with one slight difference. You will augment the object in such a way to inhibit its utility, material qualities, or its system or environmental context.
 <br><br>
 To explore these concepts, we delve into the philosophical realm of objects and their existence, considering how we interact with them in both a functional and perceptual sense. **_[Ontology](https://www.merriam-webster.com/dictionary/ontology)_**, the study of being, invites us to question not just what objects _are_ but _how_ they are—how they exist independently of human utility and purpose. By distorting or modifying the object, you are encouraged to explore the essence of its being outside of the roles assigned to it by human need or desire.
@@ -149,4 +145,3 @@ A work statement is a clear articulation about what you’ve made. This is not a
 
 ::rubric-component{id="project"}
 ::
-

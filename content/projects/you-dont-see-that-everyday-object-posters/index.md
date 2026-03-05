@@ -3,6 +3,8 @@ title: You don't see that everyday object posters
 difficulty: Beginner
 image: /uploads/object-poster-banner-mmabf552.png
 imageAlt: Banner image of posters depicting rendered objects.
+courses:
+  - Dart 303
 license: CC BY 4.0
 aiLicense:
   - AIUL-CD

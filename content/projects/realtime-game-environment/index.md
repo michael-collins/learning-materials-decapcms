@@ -3,6 +3,8 @@ title: Realtime Game Environment
 difficulty: Advanced
 image: /uploads/game-environment-banner-mmaenefy.jpg
 imageAlt: Banner image of a game environment.
+courses:
+  - Dart 303
 license: CC BY 4.0
 aiLicense:
   - AIUL-CD

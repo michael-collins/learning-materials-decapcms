@@ -49,6 +49,7 @@ export default defineContentConfig({
         date: z.string().optional(),
         license: z.string().optional(),
         course: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         allowEmbed: z.boolean().optional(),
         prerequisites: z.array(z.any()).optional(),
         // Version control fields
@@ -77,6 +78,7 @@ export default defineContentConfig({
         date: z.string().optional(),
         license: z.string().optional(),
         course: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         allowEmbed: z.boolean().optional(),
         prerequisites: z.array(z.any()).optional(),
         // Version control fields
@@ -102,6 +104,7 @@ export default defineContentConfig({
         imageAlt: z.string().optional(),
         license: z.string().optional(),
         course: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         // Multi-author support (preferred)
         authors: z.array(authorEntrySchema).optional(),
         // Legacy single-author fields (kept for backward compat)
@@ -146,6 +149,7 @@ export default defineContentConfig({
         imageAlt: z.string().optional(),
         license: z.string().optional(),
         course: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         // Multi-author support (preferred)
         authors: z.array(authorEntrySchema).optional(),
         // Legacy single-author fields (kept for backward compat)
@@ -196,6 +200,7 @@ export default defineContentConfig({
         author: z.string().optional(),
         authorUrl: z.string().optional(),
         license: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
         published: z.boolean().optional(),
         oer: z.any().optional(),
@@ -223,6 +228,7 @@ export default defineContentConfig({
         author: z.string().optional(),
         authorUrl: z.string().optional(),
         license: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
         published: z.boolean().optional(),
         oer: z.any().optional(),
@@ -235,6 +241,7 @@ export default defineContentConfig({
         title: z.string(),
         date: z.string().optional(),
         course: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         author: z.string().optional(),
         authorUrl: z.string().optional(),
         license: z.string().optional(),
@@ -293,6 +300,7 @@ export default defineContentConfig({
         author: z.string().optional(),
         authorUrl: z.string().optional(),
         license: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         aiLicense: z.union([z.string(), z.array(z.string())]).optional(),
         image: z.string().optional(),
         imageAlt: z.string().optional(),
@@ -341,6 +349,7 @@ export default defineContentConfig({
         date: z.string().optional(),
         license: z.string().optional(),
         course: z.string().optional(),
+        courses: z.union([z.string(), z.array(z.string())]).optional(),
         coverImage: z.string().optional(),
         coverImageAlt: z.string().optional(),
         published: z.boolean().optional(),

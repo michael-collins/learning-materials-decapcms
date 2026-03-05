@@ -24,6 +24,7 @@ interface CollectionItem {
   authorUrl?: string
   difficulty?: string
   course?: string
+  courses?: string[] | string
   image?: string
   imageAlt?: string
   tags?: string[]
@@ -36,6 +37,17 @@ interface CollectionItem {
 function resolveAuthorLabel(item: CollectionItem): string {
   if (item.authors && item.authors.length > 0) return item.authors.map(a => a.name).join(', ')
   return item.author ?? ''
+}
+
+function resolveCourses(item: CollectionItem): string[] {
+  const list: string[] = []
+  if (item.courses) {
+    if (Array.isArray(item.courses)) list.push(...item.courses)
+    else list.push(item.courses)
+  }
+  // backward compat: legacy single-string `course` field
+  if (item.course && !list.includes(item.course)) list.push(item.course)
+  return list
 }
 
 interface Props {
@@ -122,7 +134,7 @@ const difficulties = computed(() => {
 
 const courses = computed(() => {
   const set = new Set<string>()
-  props.items.forEach(item => { if (item.course) set.add(item.course) })
+  props.items.forEach(item => resolveCourses(item).forEach(c => set.add(c)))
   return Array.from(set).sort()
 })
 
@@ -136,7 +148,7 @@ const hasAnyAuthor     = computed(() => props.items.some(i => (i.authors && i.au
 const hasAnyImage      = computed(() => props.items.some(i => i.image))
 const hasAnyDifficulty = computed(() => props.items.some(i => i.difficulty))
 const hasAnyTags       = computed(() => props.items.some(i => i.tags && i.tags.length > 0))
-const hasAnyCourse     = computed(() => props.items.some(i => i.course))
+const hasAnyCourse     = computed(() => props.items.some(i => resolveCourses(i).length > 0))
 const hasAnyDate       = computed(() => props.items.some(i => i.date))
 
 // ── Column management ────────────────────────────────────────────────────────
@@ -215,7 +227,7 @@ const filteredItems = computed(() => {
 
   if (selectedAuthor.value)     f = f.filter(i => resolveAuthorLabel(i) === selectedAuthor.value)
   if (selectedDifficulty.value) f = f.filter(i => i.difficulty === selectedDifficulty.value)
-  if (selectedCourse.value)     f = f.filter(i => i.course === selectedCourse.value)
+  if (selectedCourse.value)     f = f.filter(i => resolveCourses(i).includes(selectedCourse.value))
   if (selectedTags.value.length > 0)
     f = f.filter(i => selectedTags.value.some(t => i.tags?.includes(t)))
   if (searchQuery.value) {
@@ -224,7 +236,8 @@ const filteredItems = computed(() => {
       i.title.toLowerCase().includes(q) ||
       i.description?.toLowerCase().includes(q) ||
       resolveAuthorLabel(i).toLowerCase().includes(q) ||
-      i.tags?.some(t => t.toLowerCase().includes(q))
+      i.tags?.some(t => t.toLowerCase().includes(q)) ||
+      resolveCourses(i).some(c => c.toLowerCase().includes(q))
     )
   }
 
@@ -243,7 +256,7 @@ const groups = computed<Group[]>(() => {
     let keys: string[]
     if      (field === 'tag')        keys = item.tags?.length ? item.tags : ['(No tag)']
     else if (field === 'author')     keys = [resolveAuthorLabel(item) || '(No author)']
-    else if (field === 'course')     keys = [item.course || '(No course)']
+    else if (field === 'course')     keys = resolveCourses(item).length ? resolveCourses(item) : ['(No course)']
     else if (field === 'difficulty') keys = [item.difficulty || '(No difficulty)']
     else keys = ['Other']
 
@@ -592,11 +605,14 @@ watch([groupBy, searchQuery, selectedAuthor, selectedDifficulty, selectedCourse,
                     <span v-else class="text-sm text-muted-foreground">-</span>
                   </TableCell>
                   <TableCell v-if="showCol('course') && hasAnyCourse">
-                    <button v-if="item.course" type="button"
-                      :class="['text-sm hover:text-primary transition-colors', selectedCourse === item.course ? 'text-primary font-medium' : 'text-foreground']"
-                      @click="selectedCourse = selectedCourse === item.course ? '' : item.course">
-                      {{ item.course }}
-                    </button>
+                    <div v-if="resolveCourses(item).length > 0" class="flex flex-wrap gap-1">
+                      <button v-for="c in resolveCourses(item)" :key="c" type="button"
+                        :class="['inline-flex items-center rounded-full border px-2 py-px text-[11px] font-medium transition-colors',
+                          selectedCourse === c ? 'bg-primary border-primary text-primary-foreground' : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/40 hover:text-primary']"
+                        @click.prevent="selectedCourse = selectedCourse === c ? '' : c">
+                        {{ c }}
+                      </button>
+                    </div>
                     <span v-else class="text-sm text-muted-foreground">-</span>
                   </TableCell>
                   <TableCell v-if="showCol('date') && hasAnyDate">
@@ -718,11 +734,14 @@ watch([groupBy, searchQuery, selectedAuthor, selectedDifficulty, selectedCourse,
                 <span v-else class="text-sm text-muted-foreground">-</span>
               </TableCell>
               <TableCell v-if="showCol('course') && hasAnyCourse">
-                <button v-if="item.course" type="button"
-                  :class="['text-sm hover:text-primary transition-colors', selectedCourse === item.course ? 'text-primary font-medium' : 'text-foreground']"
-                  @click="selectedCourse = selectedCourse === item.course ? '' : item.course">
-                  {{ item.course }}
-                </button>
+                <div v-if="resolveCourses(item).length > 0" class="flex flex-wrap gap-1">
+                  <button v-for="c in resolveCourses(item)" :key="c" type="button"
+                    :class="['inline-flex items-center rounded-full border px-2 py-px text-[11px] font-medium transition-colors',
+                      selectedCourse === c ? 'bg-primary border-primary text-primary-foreground' : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/40 hover:text-primary']"
+                    @click.prevent="selectedCourse = selectedCourse === c ? '' : c">
+                    {{ c }}
+                  </button>
+                </div>
                 <span v-else class="text-sm text-muted-foreground">-</span>
               </TableCell>
               <TableCell v-if="showCol('date') && hasAnyDate">
