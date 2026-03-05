@@ -30,14 +30,6 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: image/png
-  - file: >-
-      /uploads/recAhknW8gYC34qZr_attachment_dart303-project-statement-worksheet-1.docx
-    title: Work Statement Worksheet (.doc)
-    description: Work statement worksheet
-    alt: Work statement worksheet
-    citation: ''
-    sourceUrl: ''
-    type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
 ---
 For this project, you will produce 3D rendered poster series of objects that you encounter every day, but augmented in such a way changing their nature including material qualities, operation or use, or the system or environmental context.
 
