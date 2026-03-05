@@ -6,7 +6,7 @@ imageAlt: Banner image of posters depicting rendered objects.
 license: CC BY 4.0
 aiLicense:
   - AIUL-CD
-  - AIUL-NA-3D
+  - AIUL-DP-3D
 tags:
   - Blender
 authors:
