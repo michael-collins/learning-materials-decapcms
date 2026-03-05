@@ -65,7 +65,7 @@
     color: var(--color-foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
   /* For LTI/iframe embeds, remove ALL height constraints */
   html {
     height: auto !important;
@@ -94,6 +94,23 @@
     transition-property: color, background-color, border-color;
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Content links use primary color */
+  .prose a {
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  /* Strong inside a link should inherit the link's primary color */
+  .prose a strong {
+    color: inherit !important;
+  }
+
+  /* Heading anchor links should inherit heading color, not primary */
+  .prose :where(h1, h2, h3, h4, h5, h6) a {
+    color: inherit;
+    font-weight: inherit;
   }
 }
 
