@@ -5,11 +5,8 @@ authors:
   - name: Paul Atkinson
 date: '2026-03-01'
 license: CC BY 4.0
-course: dmd100
-tags:
-  - dmd-100
-  - lesson-4
-  - topic
+courses:
+  - DMD 100
 published: true
 ---
 
