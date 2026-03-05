@@ -5,12 +5,11 @@ authors:
 date: '2026-03-01'
 license: CC BY 4.0
 difficulty: intermediate
-course: dmd100
+courses:
+  - DMD 100
 tags:
-  - dmd-100
-  - lesson-4
-  - open-design
-  - project
+  - Double diamond
+  - Design thinking
 published: true
 ---
 

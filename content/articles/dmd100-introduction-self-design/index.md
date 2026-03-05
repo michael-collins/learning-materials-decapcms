@@ -5,10 +5,9 @@ authors:
   - name: Michael Collins
 date: '2026-03-01'
 license: CC BY 4.0
-course: dmd100
+courses:
+  - DMD 100
 tags:
-  - dmd-100
-  - lesson-5
   - lesson-introduction
 published: true
 ---

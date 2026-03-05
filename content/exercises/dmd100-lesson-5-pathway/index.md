@@ -5,10 +5,9 @@ authors:
 date: '2026-03-01'
 license: CC BY 4.0
 difficulty: beginner
-course: dmd100
+courses:
+  - DMD 100
 tags:
-  - dmd-100
-  - lesson-5
   - activity
 published: true
 ---
