@@ -17,6 +17,7 @@ import {
   ChevronDown,
   Link,
   FolderPlus,
+  FilePlus,
   FileText,
   GraduationCap,
   Presentation,
@@ -75,6 +76,8 @@ interface FlatItem {
 
 const props = defineProps<{
   modelValue: OutlineNode[] | undefined
+  /** Sibling field values from the parent document (course, license, etc.) */
+  parentData?: Record<string, any>
 }>()
 
 const emit = defineEmits<{
@@ -209,6 +212,31 @@ interface PickerResult {
 
 const showContentPicker = ref(false)
 const pickerTargetId = ref<string | null>(null)
+
+// ── Create Content dialog ─────────────────────────────────────────────
+
+const { save: saveNewContent } = useCmsSave()
+
+const showCreateDialog = ref(false)
+const createTarget = ref<{ afterId: string | null; depth: number } | null>(null)
+const createForm = reactive({
+  type: 'articles' as string,
+  title: '',
+  description: '',
+  body: '',
+})
+const createSaving = ref(false)
+const createError = ref<string | null>(null)
+
+/** Content type options for the Create dialog */
+const createContentTypes = [
+  { value: 'articles', label: 'Article', icon: Newspaper },
+  { value: 'tutorials', label: 'Tutorial', icon: Lightbulb },
+  { value: 'lectures', label: 'Lecture', icon: Presentation },
+  { value: 'exercises', label: 'Exercise', icon: Dumbbell },
+  { value: 'projects', label: 'Project', icon: FolderKanban },
+  { value: 'lessons', label: 'Lesson', icon: BookOpen },
+]
 const pickerQuery = ref('')
 const pickerType = ref('all')
 const pickerResults = ref<PickerResult[]>([])
@@ -478,6 +506,77 @@ function addItemWithPicker() {
   items.value.push(newItem)
   emitUpdate()
   nextTick(() => openPickerForItem(newItem.id))
+}
+
+// ── Create Content ────────────────────────────────────────────────────
+
+function openCreateDialog(afterId: string | null, depth: number) {
+  createTarget.value = { afterId, depth }
+  createForm.type = 'articles'
+  createForm.title = ''
+  createForm.description = ''
+  createForm.body = ''
+  createError.value = null
+  showCreateDialog.value = true
+}
+
+async function createAndInsertContent() {
+  if (!createForm.title.trim()) return
+  createSaving.value = true
+  createError.value = null
+
+  try {
+    const slug = slugify(createForm.title)
+
+    // Build frontmatter — omit undefined/empty values
+    const frontmatter: Record<string, any> = {
+      title: createForm.title.trim(),
+    }
+    if (createForm.description.trim()) frontmatter.description = createForm.description.trim()
+    // Prefill from parent document context
+    const pd = props.parentData
+    if (pd) {
+      if (pd.course) frontmatter.course = pd.course
+      if (pd.courses && Array.isArray(pd.courses) && pd.courses.length > 0) frontmatter.courses = pd.courses
+      if (pd.license) frontmatter.license = pd.license
+    }
+    // Date defaults to today
+    frontmatter.date = new Date().toISOString().slice(0, 10)
+
+    await saveNewContent({
+      collection: createForm.type,
+      slug,
+      frontmatter,
+      body: createForm.body.trim(),
+      isNew: true,
+    })
+
+    // Insert a new linked node after the target
+    const target = createTarget.value
+    let newItem: FlatItem
+
+    if (target?.afterId) {
+      newItem = addItemAfter(target.afterId)!
+    } else {
+      // Top-level (empty outline or no target)
+      newItem = { id: generateId(), title: '', path: '', content: '', version: '', icon: '', depth: 0 }
+      items.value.push(newItem)
+      emitUpdate()
+    }
+
+    // Populate the new node with the created content
+    newItem.title = createForm.title.trim()
+    newItem.path = slug
+    newItem.content = `${createForm.type}/${slug}`
+    newItem.icon = typeIconNames[createForm.type] || ''
+    emitUpdate()
+
+    showCreateDialog.value = false
+  } catch (err: any) {
+    createError.value = err.message || 'Failed to create content'
+  } finally {
+    createSaving.value = false
+  }
 }
 
 function removeItem(id: string) {
@@ -1910,12 +2009,10 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
       <div
         v-for="row in closingRows(vIdx)"
         :key="`add-${item.id}-${row.depth}`"
-        role="button"
         :title="`Add ${row.depth === 0 ? 'section' : 'item'} here`"
-        class="group/add relative flex items-center h-6 cursor-pointer select-none bg-background transition-colors hover:bg-accent/40"
+        class="group/add relative flex items-center h-7 select-none bg-background transition-colors hover:bg-accent/40"
         @mouseenter="hoveredAddRow = { afterId: row.afterId, depth: row.depth }"
         @mouseleave="hoveredAddRow = null"
-        @click="addItemAfter(row.afterId)"
       >
         <!-- Tree indent with ancestor lines -->
         <div class="flex items-center shrink-0 h-full pl-2" :style="{ width: `${8 + row.depth * 20}px` }">
@@ -1946,18 +2043,43 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
           </div>
         </div>
 
-        <!-- Label, visible only on hover -->
-        <span class="text-[11px] text-muted-foreground pl-1 opacity-0 group-hover/add:opacity-100 transition-opacity">
-          Add {{ row.depth === 0 ? 'section' : 'item' }}
-        </span>
+        <!-- Two action buttons, visible only on hover -->
+        <div class="flex items-center gap-1 pl-1 opacity-0 group-hover/add:opacity-100 transition-opacity">
+          <button
+            type="button"
+            class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            @click.stop="addItemAfter(row.afterId, true)"
+          >
+            <Link class="h-2.5 w-2.5" />
+            Add Existing
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            @click.stop="openCreateDialog(row.afterId, row.depth)"
+          >
+            <FilePlus class="h-2.5 w-2.5" />
+            Create
+          </button>
+        </div>
       </div>
       </template>
     </div>
 
     <!-- Empty state -->
-    <div v-else class="rounded-lg border border-dashed py-6 text-center">
+    <div v-else class="rounded-lg border border-dashed py-8 text-center">
       <ListTree class="h-6 w-6 mx-auto mb-1.5 text-muted-foreground/40" />
-      <p class="text-sm text-muted-foreground">No outline items yet</p>
+      <p class="text-sm text-muted-foreground mb-3">No outline items yet</p>
+      <div class="flex items-center justify-center gap-2">
+        <Button variant="outline" size="sm" @click="addItemWithPicker">
+          <Link class="h-3.5 w-3.5 mr-1.5" />
+          Add Existing
+        </Button>
+        <Button variant="outline" size="sm" @click="openCreateDialog(null, 0)">
+          <FilePlus class="h-3.5 w-3.5 mr-1.5" />
+          Create
+        </Button>
+      </div>
     </div>
 
 
@@ -2141,6 +2263,87 @@ function closingRows(vIdx: number): { depth: number; afterId: string; realIndex:
         <div class="flex justify-between items-center pt-2 border-t text-xs text-muted-foreground">
           <span>{{ pickerResults.length }} item{{ pickerResults.length !== 1 ? 's' : '' }}</span>
           <Button variant="ghost" size="sm" @click="showContentPicker = false">Cancel</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <!-- ═══ Create Content Dialog ═══ -->
+    <Dialog v-model:open="showCreateDialog">
+      <DialogContent class="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Create Content</DialogTitle>
+          <DialogDescription>
+            Create a new content item and add it to the outline.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="space-y-4 mt-2">
+          <!-- Type selector -->
+          <div>
+            <label class="text-sm font-medium mb-1.5 block">Type</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                v-for="ct in createContentTypes"
+                :key="ct.value"
+                type="button"
+                :class="[
+                  'flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors',
+                  createForm.type === ct.value
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border hover:bg-accent text-muted-foreground hover:text-foreground',
+                ]"
+                @click="createForm.type = ct.value"
+              >
+                <component :is="ct.icon" class="h-4 w-4 shrink-0" />
+                {{ ct.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div>
+            <label class="text-sm font-medium mb-1.5 block">
+              Title <span class="text-destructive">*</span>
+            </label>
+            <Input
+              v-model="createForm.title"
+              placeholder="Enter title…"
+              @keydown.enter.prevent="createAndInsertContent"
+            />
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="text-sm font-medium mb-1.5 block">
+              Description
+              <span class="text-xs font-normal text-muted-foreground">(optional)</span>
+            </label>
+            <Input v-model="createForm.description" placeholder="Brief description…" />
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div
+          v-if="createError"
+          class="mt-3 rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive"
+        >
+          {{ createError }}
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4">
+          <Button variant="ghost" size="sm" :disabled="createSaving" @click="showCreateDialog = false">
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            :disabled="!createForm.title.trim() || createSaving"
+            @click="createAndInsertContent"
+          >
+            <Loader2 v-if="createSaving" class="h-3.5 w-3.5 mr-1.5 animate-spin" />
+            <FilePlus v-else class="h-3.5 w-3.5 mr-1.5" />
+            Create &amp; Add
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
