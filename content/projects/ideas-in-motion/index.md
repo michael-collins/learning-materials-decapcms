@@ -21,13 +21,6 @@ versionStatus: latest
 publishEmbed: true
 prerequisites: []
 attachments:
-  - file: /uploads/recWIZ9by8kdM9JEo_attachment_dart303-project-concepts.docx
-    title: Concept Development Worksheet (.docx)
-    description: Concept development worksheet
-    alt: Concept development worksheet
-    citation: ''
-    sourceUrl: ''
-    type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
   - file: /uploads/rec5yoxGObqGbFsIn_attachment_storyboard-template.pdf
     title: Storyboard Template (pdf)
     description: Storyboard template
