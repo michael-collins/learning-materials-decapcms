@@ -1,4 +1,5 @@
 ---
+specialization: design-thinking
 title: Visual and interaction design
 description: ''
 authors:
@@ -104,6 +105,7 @@ outline:
         path: deliver-final-prototype
         content: projects/dmd100-lesson-2-ritual-deliver-final-prototype
 ---
+specialization: design-thinking
 
 In this lesson you will learn about design topics that expand your understanding of the visual and conceptual nature of design.
 

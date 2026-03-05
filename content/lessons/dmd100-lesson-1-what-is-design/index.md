@@ -1,4 +1,5 @@
 ---
+specialization: design-thinking
 title: 'What is design?'
 description: ''
 authors:
@@ -59,6 +60,7 @@ outline:
         path: end-of-lesson-discussion
         content: articles/dmd100-what-is-design-end-of-lesson-discussion
 ---
+specialization: design-thinking
 
 In this lesson you will learn about how design thinking, systems thinking, and critical thinking play important roles in the process of design and the complex implications that design has for the world. The Double Diamond design process will be introduced and will be applied to projects in later lessons. You will have a daily design journal activity that spans two weeks, culminating in a personal reflection writing. Podcasts have been selected that talk about design issues from a range of perspectives. 99 Percent Invisible is one of my favorite design podcasts and covers a range of fascinating design issues.
 

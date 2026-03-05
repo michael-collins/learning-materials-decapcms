@@ -1,4 +1,7 @@
 ---
+specialization: introductory-animation
+courses:
+  - DART 303
 title: 'Deformers and Shape Keys'
 date: 2026-01-12T12:00:00.000Z
 slug: 'deformers-shape-keys'

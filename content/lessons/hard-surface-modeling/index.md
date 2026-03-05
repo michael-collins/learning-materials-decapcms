@@ -1,4 +1,7 @@
 ---
+specialization: 3d-design
+courses:
+  - DART 303
 title: 'Hard Surface Modeling'
 date: 2026-01-12T12:00:00.000Z
 slug: 'hard-surface-modeling'

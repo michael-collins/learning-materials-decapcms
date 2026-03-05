@@ -1,4 +1,5 @@
 ---
+specialization: design-thinking
 title: Storytelling
 description: ''
 authors:
@@ -93,6 +94,7 @@ outline:
         path: deliver-hypertext-narrative-draft-2
         content: projects/dmd100-lesson-3-narrative-deliver-hypertext-narrative-draft-2
 ---
+specialization: design-thinking
 
 We are surrounded by stories. These stories affect our attitudes, beliefs, and form our entire perception of reality. Historically, stories are how humans have transferred knowledge from generation to generation. Everything a designer does will be in support of telling stories and by extension, shape the world we inhabit.
 

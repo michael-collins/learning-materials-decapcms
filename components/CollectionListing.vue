@@ -25,6 +25,7 @@ interface CollectionItem {
   difficulty?: string
   course?: string
   courses?: string[] | string
+  specialization?: string
   image?: string
   imageAlt?: string
   tags?: string[]
@@ -81,7 +82,7 @@ const selectedTags       = useLocalStorage<string[]>(`${sk}:tags`, [])
 
 type SortField  = 'title' | 'author' | 'difficulty' | 'date'
 type SortDir    = 'asc' | 'desc'
-type GroupField = '' | 'course' | 'author' | 'difficulty' | 'tag'
+type GroupField = '' | 'course' | 'author' | 'difficulty' | 'tag' | 'specialization'
 
 const sortField = useLocalStorage<SortField>(`${sk}:sortField`, 'title')
 const sortDir   = useLocalStorage<SortDir>(`${sk}:sortDir`, 'asc')
@@ -148,8 +149,9 @@ const hasAnyAuthor     = computed(() => props.items.some(i => (i.authors && i.au
 const hasAnyImage      = computed(() => props.items.some(i => i.image))
 const hasAnyDifficulty = computed(() => props.items.some(i => i.difficulty))
 const hasAnyTags       = computed(() => props.items.some(i => i.tags && i.tags.length > 0))
-const hasAnyCourse     = computed(() => props.items.some(i => resolveCourses(i).length > 0))
-const hasAnyDate       = computed(() => props.items.some(i => i.date))
+const hasAnyCourse          = computed(() => props.items.some(i => resolveCourses(i).length > 0))
+const hasAnySpecialization  = computed(() => props.items.some(i => !!i.specialization))
+const hasAnyDate            = computed(() => props.items.some(i => i.date))
 
 // ── Column management ────────────────────────────────────────────────────────
 type ColumnKey = 'image' | 'title' | 'tags' | 'difficulty' | 'author' | 'course' | 'date'
@@ -193,10 +195,11 @@ function toggleColumn(key: ColumnKey) {
 
 const groupByOptions = computed(() => {
   const opts: { value: GroupField; label: string }[] = []
-  if (courses.value.length > 1)      opts.push({ value: 'course',     label: 'Course' })
-  if (authors.value.length > 1)      opts.push({ value: 'author',     label: 'Author' })
-  if (difficulties.value.length > 1) opts.push({ value: 'difficulty', label: 'Difficulty' })
-  if (allTags.value.length > 0)      opts.push({ value: 'tag',        label: 'Tag' })
+  if (courses.value.length > 1)        opts.push({ value: 'course',         label: 'Course' })
+  if (hasAnySpecialization.value)      opts.push({ value: 'specialization', label: 'Specialization' })
+  if (authors.value.length > 1)        opts.push({ value: 'author',         label: 'Author' })
+  if (difficulties.value.length > 1)   opts.push({ value: 'difficulty',     label: 'Difficulty' })
+  if (allTags.value.length > 0)        opts.push({ value: 'tag',            label: 'Tag' })
   return opts
 })
 
@@ -254,10 +257,11 @@ const groups = computed<Group[]>(() => {
 
   filteredItems.value.forEach(item => {
     let keys: string[]
-    if      (field === 'tag')        keys = item.tags?.length ? item.tags : ['(No tag)']
-    else if (field === 'author')     keys = [resolveAuthorLabel(item) || '(No author)']
-    else if (field === 'course')     keys = resolveCourses(item).length ? resolveCourses(item) : ['(No course)']
-    else if (field === 'difficulty') keys = [item.difficulty || '(No difficulty)']
+    if      (field === 'tag')            keys = item.tags?.length ? item.tags : ['(No tag)']
+    else if (field === 'author')         keys = [resolveAuthorLabel(item) || '(No author)']
+    else if (field === 'course')         keys = resolveCourses(item).length ? resolveCourses(item) : ['(No course)']
+    else if (field === 'difficulty')     keys = [item.difficulty || '(No difficulty)']
+    else if (field === 'specialization') keys = [item.specialization || '(No specialization)']
     else keys = ['Other']
 
     keys.forEach(k => {
@@ -277,7 +281,13 @@ const groups = computed<Group[]>(() => {
     entries.sort(([a], [b]) => a === '(No tag)' || a.startsWith('(') ? 1 : b.startsWith('(') ? -1 : a.localeCompare(b))
   }
 
-  return entries.map(([key, items]) => ({ key, label: key, items }))
+  const slugToTitle = (s: string) => s.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
+  return entries.map(([key, items]) => ({
+    key,
+    label: field === 'specialization' && !key.startsWith('(') ? slugToTitle(key) : key,
+    items,
+  }))
 })
 
 // ── Group pagination helpers ─────────────────────────────────────────────────
@@ -480,24 +490,22 @@ watch([groupBy, searchQuery, selectedAuthor, selectedDifficulty, selectedCourse,
         </div>
       </template>
 
+      <template #default>
     <!-- Loading -->
     <div v-if="loading" class="rounded-lg border bg-card shadow-sm p-12 text-center">
       <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
       <p class="mt-4 text-sm text-muted-foreground">Loading...</p>
     </div>
 
-    <template v-else-if="filteredItems.length === 0">
-      <div class="rounded-lg border bg-card shadow-sm p-12 text-center">
-        <p class="text-muted-foreground">No {{ title.toLowerCase() }} found.</p>
-        <button v-if="hasActiveFilters" type="button" class="mt-3 text-sm text-primary hover:underline" @click="clearAllFilters">
-          Clear filters
-        </button>
-      </div>
-    </template>
+    <div v-else-if="filteredItems.length === 0" class="rounded-lg border bg-card shadow-sm p-12 text-center">
+      <p class="text-muted-foreground">No {{ title.toLowerCase() }} found.</p>
+      <button v-if="hasActiveFilters" type="button" class="mt-3 text-sm text-primary hover:underline" @click="clearAllFilters">
+        Clear filters
+      </button>
+    </div>
 
     <!-- Grouped view -->
-    <template v-else-if="groupBy">
-      <div class="space-y-6">
+    <div v-else-if="groupBy" class="space-y-6">
         <div v-for="group in groups" :key="group.key" :data-group-key="group.key" class="rounded-lg border bg-card shadow-sm overflow-hidden">
           <button type="button"
             class="w-full flex items-center justify-between px-5 py-3.5 bg-muted/50 border-b border-border hover:bg-muted/80 transition-colors"
@@ -636,11 +644,10 @@ watch([groupBy, searchQuery, selectedAuthor, selectedDifficulty, selectedCourse,
             </div>
           </template>
         </div>
-      </div>
-    </template>
+    </div>
 
     <!-- Flat view -->
-    <template v-else>
+    <div v-else>
       <div class="rounded-lg border bg-card shadow-sm">
         <Table>
           <TableHeader>
@@ -760,8 +767,9 @@ watch([groupBy, searchQuery, selectedAuthor, selectedDifficulty, selectedCourse,
         </p>
         <Pagination :current-page="currentPage" :total-pages="totalPages" @update:current-page="updatePage" />
       </div>
-    </template>
+    </div>
 
+      </template><!-- /#default -->
     </ClientOnly>
   </div>
 </template>

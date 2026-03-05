@@ -1,4 +1,5 @@
 ---
+specialization: design-thinking
 title: Open design
 description: ''
 authors:
@@ -95,6 +96,7 @@ outline:
         path: deliver-open-design
         content: projects/dmd100-lesson-4-open-design-deliver-open-design
 ---
+specialization: design-thinking
 
 ![Excerpt from book, Open Design Now](/uploads/dmd100/open-design-img@2x.jpg)
 

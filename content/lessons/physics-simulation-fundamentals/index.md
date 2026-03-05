@@ -1,4 +1,7 @@
 ---
+specialization: vfx-and-simulation
+courses:
+  - DART 303
 title: 'Physics Simulation Fundamentals'
 date: 2026-01-12T12:00:00.000Z
 slug: 'physics-simulation-fundamentals'

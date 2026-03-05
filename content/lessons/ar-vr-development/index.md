@@ -1,4 +1,7 @@
 ---
+specialization: realtime-for-immersive-environments
+courses:
+  - DART 303
 title: 'AR/VR Development'
 date: 2026-01-12T12:00:00.000Z
 slug: 'ar-vr-development'
