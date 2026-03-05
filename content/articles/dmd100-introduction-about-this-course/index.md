@@ -1,8 +1,11 @@
 ---
 title: About this course
 description: ''
+authors: []
 author: Michael Collins
 date: '2026-03-01'
+courses:
+  - DMD 100
 license: CC BY 4.0
 allowEmbed: false
 version: 1.0.0
