@@ -1,4 +1,7 @@
 ---
+specialization: cgi-foundations
+courses:
+  - DART 303
 title: 'History of CGI'
 date: 2026-01-12T12:00:00.000Z
 slug: 'history-of-cgi'

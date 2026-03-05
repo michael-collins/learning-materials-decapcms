@@ -1,5 +1,5 @@
 <script setup>
-import { BookOpen } from 'lucide-vue-next'
+import { BookOpen, Pencil } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'docs'
@@ -67,15 +67,23 @@ function chapterCount(book) {
       >
         <NuxtLink :to="`/books/${bookSlug(book)}`" class="block">
           <!-- Cover image -->
-          <div v-if="book.coverImage" class="aspect-[1800/2360] overflow-hidden bg-muted">
+          <div v-if="book.coverImage" class="relative aspect-[1800/2360] overflow-hidden bg-muted">
             <img
               :src="book.coverImage"
               :alt="book.coverImageAlt || book.title"
               class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
+            <!-- Export: bottom-right of image -->
+            <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" @click.prevent>
+              <BookExportDropdown :book-slug="bookSlug(book)" side="top" />
+            </div>
           </div>
-          <div v-else class="aspect-[1800/2360] bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+          <div v-else class="relative aspect-[1800/2360] bg-linear-to-br from-primary/10 to-primary/5 flex items-center justify-center">
             <BookOpen class="h-12 w-12 text-primary/30" />
+            <!-- Export: bottom-right of placeholder -->
+            <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" @click.prevent>
+              <BookExportDropdown :book-slug="bookSlug(book)" side="top" />
+            </div>
           </div>
 
           <div class="p-5">
@@ -95,9 +103,15 @@ function chapterCount(book) {
           </div>
         </NuxtLink>
 
-        <!-- Export dropdown -->
+        <!-- Edit button: top-right of card -->
         <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <BookExportDropdown :book-slug="bookSlug(book)" />
+          <NuxtLink
+            :to="`/cms/books/${bookSlug(book)}`"
+            class="inline-flex items-center gap-1 rounded-md bg-background/90 backdrop-blur-sm border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:border-primary/50 hover:text-primary transition-colors shadow-sm"
+            title="Edit in CMS"
+          >
+            <Pencil class="h-3 w-3" /> Edit
+          </NuxtLink>
         </div>
       </div>
     </div>

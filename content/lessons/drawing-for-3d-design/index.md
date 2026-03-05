@@ -1,4 +1,7 @@
 ---
+specialization: 3d-design
+courses:
+  - DART 303
 title: 'Drawing for 3D Design'
 date: 2026-01-12T12:00:00.000Z
 slug: 'drawing-for-3d-design'

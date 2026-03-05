@@ -9,7 +9,10 @@ import { useGitHubPagesDeploy } from '~/composables/useGitHubPagesDeploy'
 
 const props = defineProps<{
   bookSlug: string
+  side?: 'top' | 'bottom' | 'left' | 'right'
 }>()
+
+const side = computed(() => props.side ?? 'bottom')
 
 const open = ref(false)
 const { exportBook, exportBookPdf, exportBookDocx, exportBookCC, exporting, progress } = useBookExport()
@@ -92,7 +95,7 @@ const deployFormat = {
         <ChevronDown class="h-3 w-3 opacity-50" />
       </Button>
     </PopoverTrigger>
-    <PopoverContent align="end" class="w-72 p-1.5">
+    <PopoverContent :side="side" align="end" class="w-72 p-1.5">
       <div class="px-2 py-1.5 text-xs font-medium text-muted-foreground">
         Export Book
       </div>

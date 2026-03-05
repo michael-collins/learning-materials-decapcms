@@ -1,4 +1,7 @@
 ---
+specialization: compositing
+courses:
+  - DART 303
 title: 'Exporting and Delivery'
 date: 2026-01-12T12:00:00.000Z
 slug: 'exporting-delivery'

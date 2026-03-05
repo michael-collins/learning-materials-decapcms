@@ -1,4 +1,7 @@
 ---
+specialization: cgi-foundations
+courses:
+  - DART 303
 title: 3D Modeling Fundamentals
 slug: 3d-modeling-fundamentals
 type: 'oer:LearningComponent'

@@ -1,4 +1,7 @@
 ---
+specialization: realtime-for-immersive-environments
+courses:
+  - DART 303
 title: 'Real-time Engines'
 date: 2026-01-12T12:00:00.000Z
 slug: 'realtime-engines'
