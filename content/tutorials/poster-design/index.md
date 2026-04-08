@@ -10,7 +10,7 @@ difficulty: Beginner
 courses:
   - DART 303
 license: CC BY 4.0
-allowEmbed: false
+allowEmbed: true
 version: 1.0.0
 versionStatus: latest
 prerequisites: []
