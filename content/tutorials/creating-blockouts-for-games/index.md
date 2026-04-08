@@ -20,5 +20,5 @@ attachments: []
 ::video-component{src="https://www.youtube.com/watch?v=-_-SNug8VUA" title=" Blockout in Level design l Blocktober" credit="InspirationTuts"}
 ::
 
-::video-component{src="https://www.youtube.com/watch?v=fjakOuNer78" title="What Is Greyboxing in Videogames?" creditUrl="Neil Blevins"}
+::video-component{src="https://www.youtube.com/watch?v=fjakOuNer78" title="What Is Greyboxing in Videogames?" credit="Neil Blevins"}
 ::
