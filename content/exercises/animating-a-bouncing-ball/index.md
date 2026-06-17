@@ -1,21 +1,24 @@
 ---
 title: Animating a bouncing ball
-date: 2026-01-12T12:00:00.000Z
-slug: animating-a-bouncing-ball
 difficulty: Beginner
 image: /uploads/recmjJ85mfZrRGRFu_image_viewport-render.png
 imageAlt: viewport-render.png
+courses: []
 license: CC BY 4.0
 aiLicense:
   - AIUL-WA
   - AIUL-NA-3D
 tags:
   - Blender
+  - Animation
+authors: []
 author: Michael Collins
-course: DART 303
 authorUrl: 'https://michaelcollins.xyz'
 published: true
 allowEmbed: true
+version: 1.0.0
+versionStatus: latest
+prerequisites: []
 attachments:
   - file: /uploads/recIeZMcCM9SG8jcK_attachment_ball-bounce-reference.png
     title: Bouncing Ball Reference
@@ -27,10 +30,7 @@ attachments:
     citation: ''
     sourceUrl: ''
     type: image/png
-version: 1.0.0
-versionStatus: latest
 ---
-
 In this exercise, level 1 students will practice keyframe animation to animate a bouncing ball
 
 
@@ -72,4 +72,3 @@ In this exercise, level 1 students will practice keyframe animation to animate a
 
 ::rubric-component{id="exercise"}
 ::
-
