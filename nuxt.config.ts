@@ -105,10 +105,28 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'netlify',
     prerender: {
-      crawlLinks: true,
+      // Only prerender the home page. All /embed/* routes are handled by ISR
+      // (routeRules below) — rendered on first request then cached at Netlify's
+      // CDN edge until the next deploy, so builds stay fast while embed iframes
+      // are served from the edge after the first hit per deploy.
+      crawlLinks: false,
       routes: ['/'],
       ignore: ['/admin', '/docs/about', '/docs/home'],
       failOnError: false
+    },
+    routeRules: {
+      // ISR via Netlify On-Demand Builders: first request renders & caches the
+      // page at the CDN edge permanently until next deploy. Subsequent requests
+      // (including iframes) are served from CDN — same speed as prerendered.
+      // Change `isr: true` to `isr: 3600` if content can change without a deploy.
+      '/embed/**': { isr: true },
+      // SSR + CDN cache for regular content routes (not typically iframed).
+      '/lessons/**':        { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/exercises/**':      { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/lectures/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/tutorials/**':      { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/projects/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
+      '/articles/**':       { headers: { 'cache-control': 'public, max-age=3600, stale-while-revalidate=86400' } },
     }
   }
 })
